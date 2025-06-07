@@ -42,4 +42,4 @@ next-env.d.ts
 
 # Không push file nhạy cảm
 serviceAccountKey.json
-.env.local
+.env.local.env.local
