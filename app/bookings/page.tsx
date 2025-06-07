@@ -27,9 +27,6 @@ export default function BookingManagementPage() {
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
-  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
   const [filters, setFilters] = useState<{ startDate?: string; endDate?: string }>({});
 
   const {
@@ -135,7 +132,7 @@ export default function BookingManagementPage() {
         title: 'Import completed',
         description: `${importedBookings.length} bookings imported successfully.`,
       });
-    } catch (error) {
+    } catch (_error) {
       setNotification({
         open: true,
         type: 'error',
@@ -162,8 +159,6 @@ export default function BookingManagementPage() {
           onSearchChange={setSearchText}
           onStatusFilterChange={setStatusFilter}
           onDateRangeChange={(start, end) => {
-            setStartDate(start);
-            setEndDate(end);
             setFilters({ startDate: start, endDate: end });
           }}
         />

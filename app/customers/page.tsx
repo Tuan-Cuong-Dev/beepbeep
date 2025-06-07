@@ -73,7 +73,7 @@ export default function CustomersPage() {
           setCustomers(customers.filter((c) => c.id !== id));
           setDialog((prev) => ({ ...prev, open: false }));
           showDialog('success', 'Customer deleted successfully');
-        } catch (err) {
+        } catch (_err) {
           showDialog('error', 'Failed to delete customer');
         }
       },
@@ -109,7 +109,7 @@ export default function CustomersPage() {
   };
 
   const handleEdit = (customer: Customer) => {
-    const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...dataForForm } = customer;
+    const { id, createdAt, updatedAt, ...dataForForm } = customer;
     setEditingCustomer(customer);
     setNewCustomer(dataForForm);
   };

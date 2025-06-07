@@ -55,15 +55,20 @@ export default function AccountPage() {
   const handleResetPassword = async () => {
     if (currentUser?.email) {
       try {
-        await sendPasswordResetEmail(auth, currentUser.email); // ✅ truyền auth đúng cách
+        await sendPasswordResetEmail(auth, currentUser.email);
         alert("A password reset email has been sent to your inbox.");
-      } catch (err: any) {
-        alert(`Failed to send reset email: ${err.message}`);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          alert(`Failed to send reset email: ${err.message}`);
+        } else {
+          alert("An unknown error occurred.");
+        }
       }
     } else {
       alert("No email found for current user.");
     }
   };
+
 
   if (loading) return <div className="p-6">Loading...</div>;
 
