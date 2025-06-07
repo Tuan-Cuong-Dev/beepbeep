@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+
+/* Thay đổi màu nền của DatePicker */
+.react-datepicker {
+  background-color: white !important;; /* Màu nền */
+  color: #00d289 !important; /* Màu chữ */ 
+  border-radius: 8px; /* Bo góc */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+}
+
+/* Màu của phần header */
+.react-datepicker__header {
+  background-color: white !important; /* Nền trắng */
+  color: #00d289 !important; /* Màu chữ xanh */
+  border-bottom: 2px solid #00d289;
+}
+
+/* Ngày trong lịch */
+.react-datepicker__day {
+  color: #333; /* Màu chữ ngày */
+}
+
+/* Ngày được chọn */
+.react-datepicker__day--selected {
+  background-color: #00d289 !important; /* Màu nền ngày được chọn */
+  color: white !important; /* Màu chữ */
+  border-radius: 50%;
+}
+/* Màu chữ của tháng + năm trong header */
+.react-datepicker__current-month, 
+.react-datepicker-time__header, 
+.react-datepicker-year-header {
+  color: #00d289 !important; /* Màu chữ xanh */
+}
+
+/* Màu chữ của các ngày trong header (T2, T3, ...) */
+.react-datepicker__day-name {
+  color: #00d289 !important; /* Màu chữ xanh */
+}
+
+/* Ngày hôm nay */
+.react-datepicker__day--today {
+  font-weight: bold;
+  color: white !important; /* Màu ngày hôm nay */
+}
+
+/* Hover vào ngày */
+.react-datepicker__day:hover {
+  background-color: #00d289 !important;
+  color: white !important;
+}
+
+/* Nút điều hướng */
+.react-datepicker__navigation {
+  top: 12px;
+}
+
+.react-datepicker__navigation--previous {
+  left: 10px;
+}
+
+.react-datepicker__navigation--next {
+  right: 10px;
+}
+
+

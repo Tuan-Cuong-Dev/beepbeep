@@ -1,28 +1,5 @@
 {
-  "node": {
-    "404ce3b585b6b471cb259ba217049be47097927d94": {
-      "workers": {
-        "app/vehicles/page": {
-          "moduleId": "[project]/.next-internal/server/app/vehicles/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/lib/ebikes/deleteEbikesByCompany.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/vehicles/page": "action-browser"
-      }
-    },
-    "00ef3e86026e293296fb1664fd3882ca5e580fd317": {
-      "workers": {
-        "app/vehicles/page": {
-          "moduleId": "[project]/.next-internal/server/app/vehicles/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/lib/ebikes/deleteEbikesByCompany.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/vehicles/page": "action-browser"
-      }
-    }
-  },
+  "node": {},
   "edge": {},
   "encryptionKey": "62PHy/vlFNxhJQ5gHf1nL56Lc4O8WL1Pix9AFU4ibng="
 }
