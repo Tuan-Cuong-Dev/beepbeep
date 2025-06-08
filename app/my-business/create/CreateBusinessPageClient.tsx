@@ -10,7 +10,7 @@ import { BusinessType, BUSINESS_TYPE_LABELS } from '@/src/lib/my-business/busine
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
 
-export default function CreateBusinessPage() {
+export default function CreateBusinessPageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { role, user } = useUser();
