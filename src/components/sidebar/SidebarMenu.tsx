@@ -38,9 +38,11 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
 
       {/* Menu Items */}
       <ul className="space-y-4 text-gray-800">
-        <li className="flex items-center space-x-3 hover:text-blue-500 cursor-pointer">
+        <li className="flex items-center space-x-3 hover:text-blue-500">
           <FaHome />
-          <span>Home</span>
+          <Link href="/" onClick={onClose}>
+            Home
+          </Link>
         </li>
         <hr />
         <li className="flex items-center space-x-3 hover:text-blue-500">
