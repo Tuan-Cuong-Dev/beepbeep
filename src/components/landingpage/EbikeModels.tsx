@@ -17,9 +17,9 @@ interface EbikeModel {
   maxLoad?: number;
 }
 
-export default function EbikeModelList({ ebikemodels }: { ebikemodels: EbikeModel[] }) {
-  const router = useRouter();
+export default function EbikeModelList({ ebikemodels }: { ebikemodels?: EbikeModel[] }) {
   const [showNotice, setShowNotice] = useState(false);
+  const router = useRouter();
 
   return (
     <section className="font-sans py-10 px-4 bg-gray-100">
@@ -30,80 +30,80 @@ export default function EbikeModelList({ ebikemodels }: { ebikemodels: EbikeMode
 
         <div className="overflow-x-auto">
           <div className="flex gap-6 pb-4 md:pb-6 w-max">
-            {ebikemodels.map((model) => (
-              <div
-                key={model.id}
-                className="bg-white text-gray-800 p-5 rounded-2xl shadow-md min-w-[260px] max-w-[260px] flex-shrink-0 hover:shadow-xl transition-shadow duration-300"
-              >
-                {/* Image & Name link */}
+            {Array.isArray(ebikemodels) &&
+              ebikemodels.map((model) => (
                 <div
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/vehicle-models/${model.id}`)}
+                  key={model.id}
+                  className="bg-white text-gray-800 p-5 rounded-2xl shadow-md min-w-[260px] max-w-[260px] flex-shrink-0 hover:shadow-xl transition-shadow duration-300"
                 >
-                  {model.imageUrl ? (
-                    <Image
-                      src={model.imageUrl}
-                      alt={model.name}
-                      width={240}
-                      height={160}
-                      className="rounded-xl object-cover w-full h-40"
-                    />
-                  ) : (
-                    <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded-xl">
-                      <span className="text-gray-500">No Image</span>
-                    </div>
-                  )}
-                  <h3 className="text-lg font-semibold mt-3">{model.name}</h3>
-                </div>
-
-                <p className="text-[#00d289] text-base mt-1">
-                  {model.pricePerDay.toLocaleString()} VND/day
-                </p>
-
-                <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm text-gray-600 mt-3">
-                  {model.motorPower !== undefined && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-purple-500">⚙️</span>
-                      <span className="font-medium">{model.motorPower} W</span>
-                    </div>
-                  )}
-                  {model.topSpeed !== undefined && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-orange-500">⚡</span>
-                      <span className="font-medium">{model.topSpeed} km/h</span>
-                    </div>
-                  )}
-                  {model.range !== undefined && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-indigo-500">📏</span>
-                      <span className="font-medium">{model.range} km</span>
-                    </div>
-                  )}
-                  {model.maxLoad !== undefined && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-amber-600">🏋️</span>
-                      <span className="font-medium">{model.maxLoad} kg</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Rent Now button */}
-                <div className="mt-4 flex justify-center">
-                  <Button
-                    size="sm"
-                    variant="greenOutline"
-                    onClick={() => setShowNotice(true)}
-                    className="py-2 text-lg rounded-sm shadow-lg"
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/vehicle-models/${model.id}`)}
                   >
-                    🛵 RENT NOW
-                  </Button>
+                    {model.imageUrl ? (
+                      <Image
+                        src={model.imageUrl}
+                        alt={model.name}
+                        width={240}
+                        height={160}
+                        className="rounded-xl object-cover w-full h-40"
+                      />
+                    ) : (
+                      <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded-xl">
+                        <span className="text-gray-500">No Image</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 className="text-lg font-semibold mt-3">{model.name}</h3>
+                  <p className="text-[#00d289] text-base mt-1">
+                    {model.pricePerDay.toLocaleString()} VND/day
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm text-gray-600 mt-3">
+                    {model.motorPower !== undefined && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-purple-500">⚙️</span>
+                        <span className="font-medium">{model.motorPower} W</span>
+                      </div>
+                    )}
+                    {model.topSpeed !== undefined && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-orange-500">⚡</span>
+                        <span className="font-medium">{model.topSpeed} km/h</span>
+                      </div>
+                    )}
+                    {model.range !== undefined && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-indigo-500">📏</span>
+                        <span className="font-medium">{model.range} km</span>
+                      </div>
+                    )}
+                    {model.maxLoad !== undefined && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-amber-600">🏋️</span>
+                        <span className="font-medium">{model.maxLoad} kg</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4 flex justify-center">
+                    <Button
+                      size="sm"
+                      variant="greenOutline"
+                      onClick={() => setShowNotice(true)}
+                      className="py-2 text-lg rounded-sm shadow-lg"
+                    >
+                      🛵 RENT NOW
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>
 
+      {/* Notification Dialog */}
       <NotificationDialog
         open={showNotice}
         onClose={() => setShowNotice(false)}
