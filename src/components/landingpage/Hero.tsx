@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/src/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
-import Link from 'next/link';
 import { Button } from '@/src/components/ui/button';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 export default function Hero() {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showNotice, setShowNotice] = useState(false); // ✅ trạng thái thông báo
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -50,13 +51,25 @@ export default function Hero() {
           <span className="block">Rent your ride</span>
           <span className="block text-[#00d289]"> in a beep!</span>
         </h1>
-        {/* Button with variant */}
-        <Link href="/rent" passHref>
-          <Button variant="greenOutline" className="mt-2 text-lg px-6 py-3 rounded-sm shadow-lg">
+
+        {/* Button triggers NotificationDialog */}
+        <Button
+          variant="greenOutline"
+          onClick={() => setShowNotice(true)}
+          className="mt-2 text-lg px-6 py-3 rounded-sm shadow-lg"
+        >
           🛵 RENT A RIDE
-          </Button>
-        </Link>
+        </Button>
       </div>
+
+      {/* Dialog */}
+      <NotificationDialog
+        open={showNotice}
+        onClose={() => setShowNotice(false)}
+        type="info"
+        title="🚧 Coming Soon"
+        description="We are currently setting up our rental stations. The rent feature is not yet available."
+      />
     </section>
   );
 }

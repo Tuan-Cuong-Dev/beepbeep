@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { db } from '@/src/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
+import { Button } from '@/src/components/ui/button';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 interface EbikeModel {
   id: string;
@@ -18,7 +19,7 @@ interface EbikeModel {
 }
 
 function EbikeModelList({ ebikemodels }: { ebikemodels: EbikeModel[] }) {
-  const router = useRouter();
+  const [showNotice, setShowNotice] = useState(false);
 
   return (
     <section className="font-sans py-10 px-4 bg-gray-100">
@@ -34,10 +35,7 @@ function EbikeModelList({ ebikemodels }: { ebikemodels: EbikeModel[] }) {
                 key={model.id}
                 className="bg-white text-gray-800 p-5 rounded-2xl shadow-md min-w-[260px] max-w-[260px] flex-shrink-0 hover:shadow-xl transition-shadow duration-300"
               >
-                <div
-                  onClick={() => router.push(`/vehicle-models/${model.id}`)}
-                  className="cursor-pointer"
-                >
+                <div className="cursor-pointer">
                   {model.imageUrl ? (
                     <Image
                       src={model.imageUrl}
@@ -52,6 +50,7 @@ function EbikeModelList({ ebikemodels }: { ebikemodels: EbikeModel[] }) {
                     </div>
                   )}
                 </div>
+
                 <h3 className="text-lg font-semibold mt-3">{model.name}</h3>
                 <p className="text-[#00d289] text-base mt-1">
                   {model.pricePerDay.toLocaleString()} VND/day
@@ -84,19 +83,30 @@ function EbikeModelList({ ebikemodels }: { ebikemodels: EbikeModel[] }) {
                   )}
                 </div>
 
-
-
-                <button
-                  onClick={() => router.push(`/vehicle-models/${model.id}`)}
-                  className="mt-3 w-full py-2 bg-[#00d289] font-semibold text-white rounded-md hover:bg-[#00b577] transition"
-                >
-                  Rent Now
-                </button>
+                <div className="mt-4 flex justify-center">
+                  <Button
+                    size="sm"
+                    variant="greenOutline"
+                    onClick={() => setShowNotice(true)}
+                    className="py-2 text-lg rounded-sm shadow-lg"
+                  >
+                    🛵 RENT NOW
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Notification Dialog */}
+      <NotificationDialog
+        open={showNotice}
+        onClose={() => setShowNotice(false)}
+        type="info"
+        title="🚧 Coming Soon"
+        description="We are currently setting up our rental stations. The rent feature is not yet available."
+      />
     </section>
   );
 }

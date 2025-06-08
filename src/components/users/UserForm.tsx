@@ -19,7 +19,7 @@ export default function UserForm({ user, setUser, editingUser, setEditingUser, o
   }, [editingUser, setUser]);
 
   return (
-    <div className="mb-6 p-4 bg-gray-100 rounded">
+    <div className="mb-6 mt-6 p-4 bg-gray-100 rounded">
       <h2 className="text-xl font-semibold mb-2">
         {editingUser ? "Update User" : "Add New User"}
       </h2>
