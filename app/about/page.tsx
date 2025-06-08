@@ -1,7 +1,11 @@
 // pages/about.tsx
+import Header from '@/src/components/landingpage/Header';
+import Footer from '@/src/components/landingpage/Footer';
+
 export default function AboutPage() {
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 text-gray-800">
+    <div className="flex flex-col min-h-screen">
+      <Header />
       <h1 className="text-3xl font-bold mb-4">About Us</h1>
       <p className="mb-4">
         Welcome to Workman! We are committed to providing sustainable, smart and affordable electric mobility
@@ -15,6 +19,7 @@ export default function AboutPage() {
         Founded in 2025, Workman has quickly grown to become a trusted provider in electric bike and scooter rentals
         across Vietnam.
       </p>
-    </main>
+      <Footer />
+    </div>
   );
 }
