@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Bip Bip - Renting made as easy as a beep!",
+  title: "Bíp Bíp - Rent your ride in a beep!",
   description: "An electric vehicle rental app that's fast, simple, and convenient in Vietnam.",
 };
 
