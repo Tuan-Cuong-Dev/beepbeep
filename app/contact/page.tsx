@@ -14,7 +14,7 @@ export default function ContactPage() {
           <p>We'd love to hear from you!</p>
           <p>📧 <strong>Email:</strong> buildinglocalbrand@gmail.com</p>
           <p>📞 <strong>Phone:</strong> +84 0972 155 557</p>
-          <p>🏢 <strong>Address:</strong> 166 Nguyễn Hoàng, Da Nang, Vietnam</p>
+          <p>🏢 <strong>Address:</strong> 166 Nguyễn Hoàng, Thanh Khê, Da Nang, Vietnam</p>
         </div>
       </main>
 
