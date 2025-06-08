@@ -1,5 +1,6 @@
-"use client";
+'use client';
 
+import Link from 'next/link';
 import {
   FaTimes,
   FaGlobe,
@@ -7,7 +8,7 @@ import {
   FaInfoCircle,
   FaPhone,
   FaShieldAlt,
-} from "react-icons/fa";
+} from 'react-icons/fa';
 
 interface SidebarMenuProps {
   isOpen: boolean;
@@ -15,7 +16,6 @@ interface SidebarMenuProps {
 }
 
 export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
-  // ✅ Do not render if the sidebar is not open
   if (!isOpen) return null;
 
   return (
@@ -26,10 +26,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
       "
     >
       {/* Close Sidebar Button */}
-      <button       
-        onClick={onClose} 
-        className="absolute top-4 right-4 text-lg"
-      >
+      <button onClick={onClose} className="absolute top-4 right-4 text-lg">
         <FaTimes />
       </button>
 
@@ -46,19 +43,25 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
           <span>Home</span>
         </li>
         <hr />
-        <li className="flex items-center space-x-3 hover:text-blue-500 cursor-pointer">
+        <li className="flex items-center space-x-3 hover:text-blue-500">
           <FaInfoCircle />
-          <span>About Us</span>
+          <Link href="/about" onClick={onClose}>
+            About Us
+          </Link>
         </li>
         <hr />
-        <li className="flex items-center space-x-3 hover:text-blue-500 cursor-pointer">
+        <li className="flex items-center space-x-3 hover:text-blue-500">
           <FaPhone />
-          <span>Contact</span>
+          <Link href="/contact" onClick={onClose}>
+            Contact
+          </Link>
         </li>
         <hr />
-        <li className="flex items-center space-x-3 hover:text-blue-500 cursor-pointer">
+        <li className="flex items-center space-x-3 hover:text-blue-500">
           <FaShieldAlt />
-          <span>Policies</span>
+          <Link href="/policy" onClick={onClose}>
+            Policies
+          </Link>
         </li>
       </ul>
     </div>
