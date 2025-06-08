@@ -6,7 +6,6 @@ import ServiceSection from '../src/components/landingpage/ServiceSection';
 import EbikeModels from   '../src/components/landingpage/EbikeModels';
 import WhyChooseUs from '../src/components/landingpage/WhyChooseUs';
 import Footer from '../src/components/landingpage/Footer';
-import ReviewSection from "../src/components/landingpage/ReviewSection";
 import FAQ  from "@/src/components/landingpage/FAQ";
 import ReviewShowcase from "@/src/components/landingpage/ReviewShowcase";
 

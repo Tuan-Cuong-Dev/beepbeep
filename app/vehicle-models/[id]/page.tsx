@@ -9,6 +9,7 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { ArrowLeft, ShoppingCart, Bike, ChevronRight } from 'lucide-react';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 export default function VehicleModelDetailPage() {
   const params = useParams();
@@ -18,6 +19,7 @@ export default function VehicleModelDetailPage() {
   const [model, setModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [relatedModels, setRelatedModels] = useState<any[]>([]);
+  const [showNotice, setShowNotice] = useState(false);
 
   useEffect(() => {
     const fetchModel = async () => {
@@ -37,7 +39,6 @@ export default function VehicleModelDetailPage() {
   useEffect(() => {
     const fetchRelated = async () => {
       if (!model?.companyId || !modelId) return;
-
       try {
         const snapshot = await getDocs(
           query(collection(db, 'ebikeModels'), where('companyId', '==', model.companyId))
@@ -50,7 +51,6 @@ export default function VehicleModelDetailPage() {
         console.error('Error fetching related models:', error);
       }
     };
-
     if (model) fetchRelated();
   }, [model, modelId]);
 
@@ -115,7 +115,7 @@ export default function VehicleModelDetailPage() {
                 <ArrowLeft size={16} /> Back
               </button>
               <button
-                onClick={() => router.push(`/rent?modelId=${modelId}`)}
+                onClick={() => setShowNotice(true)}
                 className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 hover:bg-green-600 transition"
               >
                 <ShoppingCart size={18} /> Rent this vehicle
@@ -124,64 +124,69 @@ export default function VehicleModelDetailPage() {
           </div>
         </div>
 
-      <section className="mt-12">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">You Might Also Like</h2>
-        {relatedModels.length === 0 ? (
-          <p className="text-gray-500 text-sm">No other models available.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {relatedModels.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl shadow hover:shadow-md transition cursor-pointer"
-                onClick={() => router.push(`/vehicle-models/${item.id}`)}
-              >
-                <div className="relative w-full aspect-[4/3]  rounded-t-xl overflow-hidden">
-                  <Image
-                    src={item.imageUrl || '/no-image.png'}
-                    alt={item.name}
-                    fill
-                    className="object-contain p-4"
-                  />
-                </div>
+        <NotificationDialog
+          open={showNotice}
+          onClose={() => setShowNotice(false)}
+          type="info"
+          title="🚧 Rent Coming Soon"
+          description="We are currently preparing this rental feature. Please check back later or contact support."
+        />
 
-                <div className="p-4 space-y-1">
-                  <h3 className="font-semibold text-gray-700 text-base">{item.name}</h3>
-                  <p className="text-sm text-[#00d289] font-medium">{formatCurrency(item.pricePerDay)} / day</p>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mt-2">
-                    {item.motorPower !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-purple-500">⚙️</span>
-                        <span>{item.motorPower} W</span>
-                      </div>
-                    )}
-                    {item.topSpeed !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-orange-500">⚡</span>
-                        <span>{item.topSpeed} km/h</span>
-                      </div>
-                    )}
-                    {item.range !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-blue-500">📏</span>
-                        <span>{item.range} km</span>
-                      </div>
-                    )}
-                    {item.maxLoad !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-amber-600">🏋️</span>
-                        <span>{item.maxLoad} kg</span>
-                      </div>
-                    )}
+        <section className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">You Might Also Like</h2>
+          {relatedModels.length === 0 ? (
+            <p className="text-gray-500 text-sm">No other models available.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {relatedModels.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-xl shadow hover:shadow-md transition cursor-pointer"
+                  onClick={() => router.push(`/vehicle-models/${item.id}`)}
+                >
+                  <div className="relative w-full aspect-[4/3] rounded-t-xl overflow-hidden">
+                    <Image
+                      src={item.imageUrl || '/no-image.png'}
+                      alt={item.name}
+                      fill
+                      className="object-contain p-4"
+                    />
+                  </div>
+                  <div className="p-4 space-y-1">
+                    <h3 className="font-semibold text-gray-700 text-base">{item.name}</h3>
+                    <p className="text-sm text-[#00d289] font-medium">{formatCurrency(item.pricePerDay)} / day</p>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mt-2">
+                      {item.motorPower !== undefined && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-purple-500">⚙️</span>
+                          <span>{item.motorPower} W</span>
+                        </div>
+                      )}
+                      {item.topSpeed !== undefined && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-orange-500">⚡</span>
+                          <span>{item.topSpeed} km/h</span>
+                        </div>
+                      )}
+                      {item.range !== undefined && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-blue-500">📏</span>
+                          <span>{item.range} km</span>
+                        </div>
+                      )}
+                      {item.maxLoad !== undefined && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-amber-600">🏋️</span>
+                          <span>{item.maxLoad} kg</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
+              ))}
+            </div>
+          )}
+        </section>
       </main>
 
       <Footer />
