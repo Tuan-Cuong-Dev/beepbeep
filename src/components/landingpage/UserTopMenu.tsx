@@ -8,7 +8,7 @@ import {
   FaUser,
   FaUserCog,
   FaBatteryFull,
-  FaToolbox, // ✅ Icon cho Accessories
+  FaToolbox,
 } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileContract } from '@fortawesome/free-solid-svg-icons';
@@ -54,6 +54,12 @@ const menuItems: MenuItem[] = [
     roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'staff'],
   },
   {
+    label: 'Staff Management',
+    path: '/my-business/staff',
+    icon: FaUserCog,
+    roles: ['admin', 'company_owner', 'company_admin'], // ✅ mới thêm
+  },
+  {
     label: 'Battery Management',
     path: '/battery',
     icon: FaBatteryFull,
@@ -84,32 +90,32 @@ export default function UserTopMenu() {
   const { role } = useUser();
 
   if (!role) return null;
-
   const normalizedRole = role.toLowerCase();
 
-  const filteredMenu = menuItems.filter((item) =>
-    item.roles.includes(normalizedRole)
-  );
+  const filteredMenu = menuItems.filter((item) => item.roles.includes(normalizedRole));
 
   if (!filteredMenu.length) return null;
 
   return (
-    <div className="hidden md:flex font-inter bg-[#00d289] text-white w-full px-1 py-2 justify-center gap-x-8 items-center">
+    <nav className="hidden md:flex font-inter bg-[#00d289] text-white w-full px-2 py-2 justify-center gap-x-6 items-center shadow">
       {filteredMenu.map((item) => (
         <button
           key={item.label}
           onClick={() => router.push(item.path)}
-          className="flex items-center space-x-2 font-medium text-sm hover:underline"
+          className="flex items-center gap-2 font-medium text-sm hover:underline transition"
         >
-          {'icon' in item &&
-            (typeof item.icon === 'function' ? (
-              <item.icon />
-            ) : (
-              <FontAwesomeIcon icon={item.icon} className="w-4 h-4" />
-            ))}
+          {renderIcon(item.icon)}
           <span>{item.label}</span>
         </button>
       ))}
-    </div>
+    </nav>
   );
+}
+
+function renderIcon(icon: IconType | typeof faFileContract) {
+  if (typeof icon === 'function') {
+    const IconComponent = icon;
+    return <IconComponent className="w-4 h-4" />;
+  }
+  return <FontAwesomeIcon icon={icon} className="w-4 h-4" />;
 }

@@ -12,7 +12,6 @@ import {
   Bike,
   MapPin,
   Users,
-  LineChart,
   FileText,
   Wrench,
   FileTextIcon,
@@ -33,7 +32,7 @@ export default function RentalCompanyDashboard() {
     staffs: 0,
     issues: 0,
     batteries: 0,
-    accessories: 0, // ✅ phụ kiện
+    accessories: 0,
   });
 
   useEffect(() => {
@@ -64,25 +63,38 @@ export default function RentalCompanyDashboard() {
       })) as Booking[];
 
       const now = new Date();
-      const revenueThisMonth = bookings.reduce((sum, b) => {
-        if (!b.createdAt) return sum;
-        const date = b.createdAt.toDate();
-        return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()
-          ? sum + (b.totalAmount || 0)
-          : sum;
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      const monthlyBookings = bookings.filter(b => {
+        try {
+          const date =
+            b.createdAt instanceof Date
+              ? b.createdAt
+              : b.createdAt?.toDate?.();
+          return (
+            date?.getFullYear() === currentYear &&
+            date?.getMonth() === currentMonth
+          );
+        } catch (err) {
+          console.warn('⚠️ Invalid createdAt:', b);
+          return false;
+        }
+      });
+
+      const totalRevenue = monthlyBookings.reduce((sum, b) => {
+        const amount = typeof b.totalAmount === 'number' ? b.totalAmount : 0;
+        return sum + amount;
       }, 0);
 
-      const bookingThisMonth = bookings.filter(b => {
-        if (!b.createdAt) return false;
-        const date = b.createdAt.toDate();
-        return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
-      }).length;
+      console.log("📅 Monthly bookings:", monthlyBookings.length);
+      console.log("💰 Revenue items:", monthlyBookings.map(b => b.totalAmount));
 
       setStats({
         stations: stationSnap.size,
         ebikes: ebikeSnap.size,
-        bookings: bookingThisMonth,
-        revenue: revenueThisMonth,
+        bookings: monthlyBookings.length,
+        revenue: totalRevenue,
         staffs: staffSnap.size,
         issues: issuesSnap.size,
         batteries: batterySnap.size,
@@ -96,10 +108,8 @@ export default function RentalCompanyDashboard() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-
       <main className="flex-1 px-6 py-10 space-y-10">
         <h1 className="text-3xl font-bold text-center text-gray-800">🏢 Rental Company Dashboard</h1>
-
         <DashboardGrid1>
           <DashboardCard title="Stations" value={stats.stations.toString()} href="/my-business/stations" icon={<MapPin className="w-6 h-6" />} />
           <DashboardCard title="Vehicles" value={stats.ebikes.toString()} href="/vehicles" icon={<Bike className="w-6 h-6" />} />
@@ -134,15 +144,11 @@ export default function RentalCompanyDashboard() {
             <QuickAction label="Create Vehicle Model" href="/vehicles" />
             <QuickAction label="Assign Staff" href="/my-business/staff" />
             <QuickAction label="Form Builder" href="/my-business/form-builder" />
-            <QuickAction label="View Bookings" href="/bookings" />
             <QuickAction label="Upload Invoice" href="/my-business/documents" />
             <QuickAction label="View Reports" href="/reports" />
-            <QuickAction label="Manage Vehicle Issues" href="/vehicle-issues" />
-            <QuickAction label="Manage Accessories" href="/accessories" />
           </div>
         </section>
       </main>
-
       <Footer />
     </div>
   );
@@ -153,7 +159,7 @@ function DashboardGrid1({ children }: { children: React.ReactNode }) {
 }
 
 function DashboardGrid2({ children }: { children: React.ReactNode }) {
-  return <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">{children}</section>;
+  return <section className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">{children}</section>;
 }
 
 function DashboardCard({
