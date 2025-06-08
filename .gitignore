@@ -46,8 +46,4 @@ serviceAccountKey.json
 .env
 .env.local
 ocrServiceKey.json
-serviceAccountKey.json
-.env
-.env.local
-ocrServiceKey.json
-serviceAccountKey.json
+
