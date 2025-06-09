@@ -81,7 +81,7 @@ export default function VehicleIssuesManagementPage() {
     setCloseComment("");
   };
 
-  const canViewIssues = isAdmin || (!!companyId && ["company_owner", "company_admin", "technician"].includes(normalizedRole || ""));
+  const canViewIssues = isAdmin || (!!companyId && ["company_owner", "company_admin", "technician", "station_manager"].includes(normalizedRole || ""));
 
   const filteredIssues = issues.filter((issue) => {
     const matchSearch = `${issue.vin} ${issue.plateNumber} ${issue.description}`.toLowerCase().includes(searchTerm.toLowerCase());

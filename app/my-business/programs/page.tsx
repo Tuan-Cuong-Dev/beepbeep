@@ -18,7 +18,7 @@ export default function ProgramsPage() {
   const isAgent = role === 'agent';
   const isAdmin = role === 'Admin';
   const isCompanyOwner =
-  role === 'company_owner' || role === 'private_provider' || role === 'company_admin';
+  role === 'company_owner' || role === 'private_provider' || role === 'company_admin' || role === 'station_manager'; // 👈 thêm dòng này;
 
 
   function normalizeProgram(raw: any, id: string): Program {
