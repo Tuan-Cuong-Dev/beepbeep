@@ -46,4 +46,8 @@ serviceAccountKey.json
 .env
 .env.local
 ocrServiceKey.json
+# Firebase service account
+src/admin_tools/serviceAccountKey.json
+
+
 

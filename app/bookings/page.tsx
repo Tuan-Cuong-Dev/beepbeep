@@ -61,7 +61,7 @@ export default function BookingManagementPage() {
   const filteredBookings = bookings.filter((b) => {
     const matchesRole = (() => {
       if (normalizedRole === 'admin') return true;
-      if (normalizedRole === 'company_owner' || normalizedRole === 'private_provider') return b.companyId === companyId;
+      if (normalizedRole === 'company_owner' || normalizedRole === 'private_provider' || normalizedRole === 'company_admin') return b.companyId === companyId;
       if (normalizedRole === 'station_manager') return b.stationId === stationId;
       return false;
     })();

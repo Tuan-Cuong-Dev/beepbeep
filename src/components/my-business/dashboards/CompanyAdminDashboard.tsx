@@ -13,68 +13,107 @@ import {
   DollarSign,
   Users,
   FileText,
-  Wrench,
   PackagePlus,
   ClipboardList,
+  BatteryCharging,
 } from 'lucide-react';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 
 export default function CompanyAdminDashboard() {
   const { companyId } = useUser();
-  const [stationCount, setStationCount] = useState(0);
-  const [ebikeCount, setEbikeCount] = useState(0);
-  const [staffCount, setStaffCount] = useState(0);
-  const [bookingCount, setBookingCount] = useState(0);
-  const [accessoryCount, setAccessoryCount] = useState(0);
-  const [revenue, setRevenue] = useState(0);
+
+  const [stats, setStats] = useState({
+    stations: 0,
+    ebikes: 0,
+    staffs: 0,
+    bookings: 0,
+    accessories: 0,
+    batteries: 0,
+    revenue: 0,
+  });
 
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId) {
+      console.warn('❌ Missing companyId. Aborting fetch.');
+      return;
+    }
 
-    const fetchData = async () => {
-      const [stationSnap, ebikeSnap, staffSnap, bookingSnap, accessorySnap] = await Promise.all([
-        getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'staffs'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'bookings'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'accessories'), where('companyId', '==', companyId))),
-      ]);
+    console.log('🔍 Fetching stats for companyId:', companyId);
 
-      setStationCount(stationSnap.size);
-      setEbikeCount(ebikeSnap.size);
-      setStaffCount(staffSnap.size);
-      setAccessoryCount(accessorySnap.size);
+    const fetchStats = async () => {
+      try {
+        const queries = {
+          stations: query(collection(db, 'rentalStations'), where('companyId', '==', companyId)),
+          ebikes: query(collection(db, 'ebikes'), where('companyId', '==', companyId)),
+          staffs: query(collection(db, 'staffs'), where('companyId', '==', companyId)),
+          bookings: query(collection(db, 'bookings'), where('companyId', '==', companyId)),
+          accessories: query(collection(db, 'accessories'), where('companyId', '==', companyId)),
+          batteries: query(collection(db, 'batteries'), where('companyId', '==', companyId)),
+        };
 
-      const bookings = bookingSnap.docs.map(doc => doc.data());
-      const now = new Date();
-      const monthlyBookings = bookings.filter((b: any) => {
-        const date = b.createdAt?.toDate?.() || new Date(b.createdAt);
-        return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
-      });
+        const [
+          stationSnap,
+          ebikeSnap,
+          staffSnap,
+          bookingSnap,
+          accessorySnap,
+          batterySnap,
+        ] = await Promise.all([
+          getDocs(queries.stations).catch(e => { console.error('❌ rentalStations:', e); return { size: 0, docs: [] }; }),
+          getDocs(queries.ebikes).catch(e => { console.error('❌ ebikes:', e); return { size: 0, docs: [] }; }),
+          getDocs(queries.staffs).catch(e => { console.error('❌ staffs:', e); return { size: 0, docs: [] }; }),
+          getDocs(queries.bookings).catch(e => { console.error('❌ bookings:', e); return { size: 0, docs: [] }; }),
+          getDocs(queries.accessories).catch(e => { console.error('❌ accessories:', e); return { size: 0, docs: [] }; }),
+          getDocs(queries.batteries).catch(e => { console.error('❌ batteries:', e); return { size: 0, docs: [] }; }),
+        ]);
 
-      setBookingCount(monthlyBookings.length);
-      setRevenue(monthlyBookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0));
+        const bookings = bookingSnap.docs.map(doc => doc.data());
+        const now = new Date();
+
+        const monthlyBookings = bookings.filter((b: any) => {
+          const date = b.createdAt?.toDate?.() || new Date(b.createdAt);
+          return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+        });
+
+        const revenue = monthlyBookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+
+        setStats({
+          stations: stationSnap.size,
+          ebikes: ebikeSnap.size,
+          staffs: staffSnap.size,
+          bookings: monthlyBookings.length,
+          accessories: accessorySnap.size,
+          batteries: batterySnap.size,
+          revenue,
+        });
+      } catch (error) {
+        console.error('🔥 Unexpected error in fetchStats:', error);
+      }
     };
 
-    fetchData();
+    fetchStats();
   }, [companyId]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       <main className="flex-1 px-6 py-10 space-y-10">
-        <h1 className="text-3xl font-bold text-center text-gray-800">🏢 Company Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          🏢 Company Admin Dashboard
+        </h1>
 
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          <DashboardCard icon={<MapPin />} title="Stations" value={stationCount} href="/my-business/stations" />
-          <DashboardCard icon={<Bike />} title="eBikes" value={ebikeCount} href="/ebikeManagement" />
-          <DashboardCard icon={<DollarSign />} title="Revenue (This Month)" value={formatCurrency(revenue)} href="/bookings" />
-          <DashboardCard icon={<Users />} title="Staff" value={staffCount} href="/my-business/staff" />
-          <DashboardCard icon={<FileText />} title="Bookings" value={bookingCount} href="/bookings" />
-          <DashboardCard icon={<PackagePlus />} title="Accessories" value={accessoryCount} href="/accessories" />
+          <DashboardCard icon={<MapPin />} title="Stations" value={stats.stations} href="/my-business/stations" />
+          <DashboardCard icon={<Bike />} title="eBikes" value={stats.ebikes} href="/vehicles" />
+          <DashboardCard icon={<DollarSign />} title="Revenue (This Month)" value={formatCurrency(stats.revenue)} href="/bookings" />
+          <DashboardCard icon={<Users />} title="Staff" value={stats.staffs} href="/my-business/staff" />
+          <DashboardCard icon={<FileText />} title="Bookings" value={stats.bookings} href="/bookings" />
+          <DashboardCard icon={<PackagePlus />} title="Accessories" value={stats.accessories} href="/accessories" />
+          <DashboardCard icon={<BatteryCharging />} title="Batteries" value={stats.batteries} href="/battery" />
           <DashboardCard icon={<ClipboardList />} title="Programs" value="Manage" href="/my-business/programs" />
         </section>
 
+        {/* ✅ Quick Actions - GIỮ NGUYÊN */}
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -87,6 +126,7 @@ export default function CompanyAdminDashboard() {
           </div>
         </section>
 
+        {/* ✅ Recent Activity - GIỮ NGUYÊN */}
         <section className="bg-white rounded-2xl p-6 border shadow">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 Recent Activity</h2>
           <ul className="text-sm text-gray-700 space-y-2">
@@ -100,6 +140,9 @@ export default function CompanyAdminDashboard() {
     </div>
   );
 }
+
+// DashboardCard, QuickAction, RecentActivityItem giữ nguyên như bạn đã viết
+
 
 function DashboardCard({
   icon,

@@ -30,47 +30,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
+    setUser(currentUser);
 
-      if (currentUser) {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const userData = userDoc.exists() ? userDoc.data() : null;
+    if (currentUser) {
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      const userData = userDoc.exists() ? userDoc.data() : null;
 
-        if (userData) {
-          setRole(userData.role || null);
+      if (userData) {
+        const staffSnap = await getDocs(
+          query(collection(db, 'staffs'), where('userId', '==', currentUser.uid))
+        );
 
-          // 👇 Nếu là company_admin hoặc staff → lấy từ collection staffs
-          if (userData.role === 'company_admin' || userData.role === 'staff') {
-            const staffSnap = await getDocs(
-              query(collection(db, 'staffs'), where('userId', '==', currentUser.uid))
-            );
-            if (!staffSnap.empty) {
-              const staffData = staffSnap.docs[0].data();
-              setCompanyId(staffData.companyId || null);
-              setStationId(staffData.stationId || null);
-            } else {
-              setCompanyId(null);
-              setStationId(null);
-            }
-          } else {
-            // Nếu không phải staff thì có thể đọc từ users như cũ (dành cho Owner, Admin...)
-            setCompanyId(userData.companyId || null);
-            setStationId(userData.stationId || null);
-          }
+        if (!staffSnap.empty) {
+          const staffData = staffSnap.docs[0].data();
+          setRole(staffData.role || null); // ✅ lấy role từ staffs
+          setCompanyId(staffData.companyId || null);
+          setStationId(staffData.stationId || null);
         } else {
-          setCompanyId(null);
-          setStationId(null);
-          setRole(null);
+          setRole(userData.role || null); // fallback nếu không là staff
+          setCompanyId(userData.companyId || null);
+          setStationId(userData.stationId || null);
         }
       } else {
-        setUser(null);
         setCompanyId(null);
         setStationId(null);
         setRole(null);
       }
+    } else {
+      setUser(null);
+      setCompanyId(null);
+      setStationId(null);
+      setRole(null);
+    }
 
-      setLoading(false);
-    });
+    setLoading(false);
+  });
+
 
     return () => unsubscribe();
   }, []);

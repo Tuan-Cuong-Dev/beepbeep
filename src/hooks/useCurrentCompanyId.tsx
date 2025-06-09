@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '@/src/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export function useCurrentCompanyId() {
@@ -10,12 +10,27 @@ export function useCurrentCompanyId() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        const userData = userDoc.data();
-        if (userData?.companyId) {
-          setCompanyId(userData.companyId);
+        const uid = user.uid;
+
+        // 1️⃣ Kiểm tra trong staffs (ưu tiên nếu là company_admin, staff)
+        const staffSnap = await getDocs(query(
+          collection(db, 'staffs'),
+          where('userId', '==', uid)
+        ));
+
+        if (!staffSnap.empty) {
+          const staffData = staffSnap.docs[0].data();
+          setCompanyId(staffData.companyId || null);
+        } else {
+          // 2️⃣ Nếu không phải staff, fallback sang users
+          const userDoc = await getDoc(doc(db, 'users', uid));
+          const userData = userDoc.exists() ? userDoc.data() : null;
+          setCompanyId(userData?.companyId || null);
         }
+      } else {
+        setCompanyId(null);
       }
+
       setLoading(false);
     });
 

@@ -17,7 +17,7 @@ import {
 } from "firebase/firestore";
 
 // 🔐 Cấu hình Firebase (nên dùng biến môi trường trong production)
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyDZVAxSNVaAzCdZBS-5Wx1r_1aFNQgl5tE",
   authDomain: "ebikerental-e1178.firebaseapp.com",
   projectId: "ebikerental-e1178",
