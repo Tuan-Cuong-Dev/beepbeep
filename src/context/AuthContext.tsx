@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth, db } from '@/src/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 interface AuthContextType {
   user: User | null;
@@ -34,11 +34,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (currentUser) {
         const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const data = userDoc.data();
-        setCompanyId(data?.companyId || null);
-        setStationId(data?.stationId || null);
-        setRole(data?.role || null);
+        const userData = userDoc.exists() ? userDoc.data() : null;
+
+        if (userData) {
+          setRole(userData.role || null);
+
+          // 👇 Nếu là company_admin hoặc staff → lấy từ collection staffs
+          if (userData.role === 'company_admin' || userData.role === 'staff') {
+            const staffSnap = await getDocs(
+              query(collection(db, 'staffs'), where('userId', '==', currentUser.uid))
+            );
+            if (!staffSnap.empty) {
+              const staffData = staffSnap.docs[0].data();
+              setCompanyId(staffData.companyId || null);
+              setStationId(staffData.stationId || null);
+            } else {
+              setCompanyId(null);
+              setStationId(null);
+            }
+          } else {
+            // Nếu không phải staff thì có thể đọc từ users như cũ (dành cho Owner, Admin...)
+            setCompanyId(userData.companyId || null);
+            setStationId(userData.stationId || null);
+          }
+        } else {
+          setCompanyId(null);
+          setStationId(null);
+          setRole(null);
+        }
       } else {
+        setUser(null);
         setCompanyId(null);
         setStationId(null);
         setRole(null);
