@@ -91,26 +91,22 @@ export default function TechnicianDashboard() {
 
   const handlePropose = async (solution: string, cost: number) => {
     if (!proposingIssue) return;
-
     await updateIssue(proposingIssue.id, {
       status: 'proposed',
       proposedSolution: solution,
       proposedCost: cost,
     });
-
     setNotification('Proposal submitted for approval.');
     setProposingIssue(null);
   };
 
   const handleActualSubmit = async (solution: string, cost: number) => {
     if (!updatingActualIssue) return;
-
     await updateIssue(updatingActualIssue.id, {
       status: 'resolved',
       actualSolution: solution,
       actualCost: cost,
     });
-
     setNotification('Actual result submitted and issue marked resolved.');
     setUpdatingActualIssue(null);
   };
@@ -120,29 +116,30 @@ export default function TechnicianDashboard() {
       <Header />
       <UserTopMenu />
 
-      <main className="flex-1 px-6 py-10 space-y-10 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-gray-800">🛠️ Technician Dashboard</h1>
+      <main className="flex-1 px-4 sm:px-6 py-6 sm:py-10 space-y-10 max-w-7xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800">🛠️ Technician Dashboard</h1>
 
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <DashboardCard icon={<ClipboardList />} title="Assigned" value={issues.length.toString()} />
           <DashboardCard icon={<AlertTriangle />} title="Proposed" value={issues.filter(i => i.status === 'proposed').length.toString()} />
           <DashboardCard icon={<Wrench />} title="In Progress" value={issues.filter(i => i.status === 'in_progress').length.toString()} />
           <DashboardCard icon={<CheckCircle />} title="Resolved" value={issues.filter(i => i.status === 'resolved').length.toString()} />
         </section>
 
-        <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
+        <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <QuickAction label="View My Issues" href="/vehicle-issues" />
             <QuickAction label="Proposal History" href="/vehicle-issues/proposals" />
             <QuickAction label="View Reports" href="/reports" />
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
+        <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">🚧 Assigned Issues</h2>
 
-          <div className="overflow-auto border rounded-xl">
+          {/* Table for desktop */}
+          <div className="hidden md:block overflow-auto border rounded-xl">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-gray-100 text-left">
@@ -195,6 +192,37 @@ export default function TechnicianDashboard() {
                   ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Cards for mobile */}
+          <div className="md:hidden space-y-4">
+            {issues.map(issue => (
+              <div key={issue.id} className="border rounded-xl p-4 bg-white shadow">
+                <div className="text-sm font-semibold mb-2">{issue.issueType} – {renderStatusBadge(issue.status)}</div>
+                <p className="text-sm text-gray-600"><strong>VIN:</strong> {issue.vin}</p>
+                <p className="text-sm text-gray-600"><strong>Plate:</strong> {issue.plateNumber}</p>
+                <p className="text-sm text-gray-600"><strong>Description:</strong> {issue.description}</p>
+                <p className="text-sm text-gray-600"><strong>Company:</strong> {issue.companyName}</p>
+                <p className="text-sm text-gray-600"><strong>Station:</strong> {issue.stationName}</p>
+                <p className="text-sm text-gray-600"><strong>Reported:</strong> {issue.reportedAt?.toDate().toLocaleString()}</p>
+
+                <div className="mt-3 space-y-2">
+                  {issue.status === 'assigned' && (
+                    <Button className="w-full" onClick={() => setProposingIssue(issue)}>Submit Proposal</Button>
+                  )}
+                  {issue.status === 'confirmed' && (
+                    <Button className="w-full" onClick={() => handleUpdateStatus(issue, 'in_progress')}>Mark In Progress</Button>
+                  )}
+                  {issue.status === 'in_progress' && (
+                    <Button className="w-full" onClick={() => setUpdatingActualIssue(issue)}>
+                      Complete & Submit Actual Result
+                    </Button>
+                  )}
+                  {issue.status === 'proposed' && <p className="text-green-600 text-center">Waiting Approval</p>}
+                  {issue.status === 'rejected' && <p className="text-gray-400 italic text-center">No actions</p>}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </main>
