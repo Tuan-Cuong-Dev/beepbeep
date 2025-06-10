@@ -13,9 +13,9 @@ import {
 
 interface Props {
   accessories: Accessory[];
-  onEdit: (item: Accessory) => void;
-  onDelete: (id: string) => void;
-  onUpdateAccessory: (updated: Accessory) => void;
+  onEdit?: (item: Accessory) => void;
+  onDelete?: (id: string) => void;
+  onUpdateAccessory?: (updated: Accessory) => void;
 }
 
 export default function AccessoryTable({
@@ -26,11 +26,9 @@ export default function AccessoryTable({
 }: Props) {
   const [selectedAccessory, setSelectedAccessory] = useState<Accessory | null>(null);
 
-  // ✅ Sắp xếp theo tên giảm dần
-    const sortedAccessories = [...accessories].sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-
+  const sortedAccessories = [...accessories].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
   return (
     <div className="overflow-x-auto">
@@ -60,46 +58,49 @@ export default function AccessoryTable({
               </td>
               <td className="p-2 whitespace-pre-line break-words">{a.notes || '-'}</td>
               <td className="p-2">
-                <div className="flex flex-col sm:flex-row gap-2">
-
-                <Button size="sm" onClick={() => onEdit(a)}>
-                  Edit
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => onDelete(a.id)}
-                >
-                  Delete
-                </Button>
-                <Dialog
-                  onOpenChange={(open) => {
-                    if (!open) setSelectedAccessory(null);
-                  }}
-                >
-                  <DialogTrigger asChild>
+                {onEdit && onDelete && onUpdateAccessory ? (
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button size="sm" onClick={() => onEdit(a)}>
+                      Edit
+                    </Button>
                     <Button
                       size="sm"
-                      variant="secondary"
-                      onClick={() => setSelectedAccessory(a)}
+                      variant="destructive"
+                      onClick={() => onDelete(a.id)}
                     >
-                      Export
+                      Delete
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-xl">
-                    <DialogTitle>Export Accessory</DialogTitle>
-                    {selectedAccessory && (
-                      <AccessoryExportForm
-                        defaultAccessory={selectedAccessory}
-                        onComplete={(updatedAccessory: Accessory) => {
-                          onUpdateAccessory(updatedAccessory);
-                          setSelectedAccessory(null);
-                        }}
-                      />
-                    )}
-                  </DialogContent>
-                </Dialog>
-               </div>
+                    <Dialog
+                      onOpenChange={(open) => {
+                        if (!open) setSelectedAccessory(null);
+                      }}
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setSelectedAccessory(a)}
+                        >
+                          Export
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-xl">
+                        <DialogTitle>Export Accessory</DialogTitle>
+                        {selectedAccessory && (
+                          <AccessoryExportForm
+                            defaultAccessory={selectedAccessory}
+                            onComplete={(updatedAccessory: Accessory) => {
+                              onUpdateAccessory(updatedAccessory);
+                              setSelectedAccessory(null);
+                            }}
+                          />
+                        )}
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                ) : (
+                  <span className="text-gray-400">View only</span>
+                )}
               </td>
             </tr>
           ))}

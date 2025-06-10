@@ -8,12 +8,12 @@ import { Button } from '@/src/components/ui/button';
 
 interface Props {
   batteries: Battery[];
-  setBatteries: (batteries: Battery[]) => void;
-  onEdit: (battery: Battery) => void;
-  onDelete: (id: string) => void;
+  setBatteries?: (batteries: Battery[]) => void;
+  onEdit?: (battery: Battery) => void;
+  onDelete?: (id: string) => void;
 }
 
-export default function BatteryTable({ batteries, onEdit, onDelete }: Props) {
+export default function BatteryTable({ batteries, onEdit, onDelete, setBatteries }: Props) {
   const formatDate = (timestamp?: any) => {
     if (!timestamp?.toDate) return '—';
     return format(timestamp.toDate(), 'dd/MM/yyyy');
@@ -98,29 +98,35 @@ export default function BatteryTable({ batteries, onEdit, onDelete }: Props) {
               </td>
 
               <td className="border px-3 py-2 space-y-2 flex flex-col">
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => onDelete(battery.id)}
-                >
-                  Delete
-                </Button>
+                {onDelete && (
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => onDelete(battery.id)}
+                  >
+                    Delete
+                  </Button>
+                )}
 
-                <Button
-                  size="sm"
-                  className="bg-[#00d289] hover:bg-green-600 text-white"
-                  onClick={() => onEdit(battery)}
-                >
-                  Edit
-                </Button>
+                {onEdit && (
+                  <Button
+                    size="sm"
+                    className="bg-[#00d289] hover:bg-green-600 text-white"
+                    onClick={() => onEdit(battery)}
+                  >
+                    Edit
+                  </Button>
+                )}
 
-                <Button
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={() => printSingleBatteryQR(battery)}
-                >
-                  Print
-                </Button>
+                {setBatteries && (
+                  <Button
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => printSingleBatteryQR(battery)}
+                  >
+                    Print
+                  </Button>
+                )}
               </td>
             </tr>
           ))}

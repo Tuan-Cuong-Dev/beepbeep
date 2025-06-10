@@ -1,3 +1,4 @@
+// 📄 AccessoryManagementPage.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -37,6 +38,7 @@ const emptyAccessory: Accessory = {
 
 export default function AccessoryManagementPage() {
   const { user, role, companyId: contextCompanyId } = useUser();
+  const isTechnician = role?.toLowerCase() === 'technician';
   const [companyId, setCompanyId] = useState<string | null>(contextCompanyId ?? null);
   const { accessories, setAccessories } = useAccessoryData();
   const [newAccessory, setNewAccessory] = useState<Accessory>({ ...emptyAccessory });
@@ -104,6 +106,7 @@ export default function AccessoryManagementPage() {
   };
 
   const confirmDelete = (id: string) => {
+    if (isTechnician) return;
     const accessory = accessories.find((a) => a.id === id);
     if (!accessory) return;
     setDialog({
@@ -132,14 +135,21 @@ export default function AccessoryManagementPage() {
       <UserTopMenu />
 
       <div className="p-6">
+        {isTechnician && (
+          <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-md border border-yellow-300">
+            👀 You have <strong>view-only access</strong> as a Technician. You cannot add, edit, or delete accessories.
+          </div>
+        )}
+
         <h1 className="text-2xl font-semibold mb-4 border-b pb-2">Accessory Management</h1>
 
         <AccessorySearchImportExport
           accessories={accessories}
-          setAccessories={setAccessories}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
+          {...(!isTechnician && { setAccessories })}
         />
+
 
         <div className="flex gap-4 items-center mb-4">
           <label className="text-sm font-medium">Filter by status:</label>
@@ -159,21 +169,19 @@ export default function AccessoryManagementPage() {
 
         <AccessoryTable
           accessories={paginatedAccessories}
-          onEdit={(item) => {
+          onEdit={!isTechnician ? (item) => {
             setNewAccessory(item);
             setIsUpdateMode(true);
-          }}
-          onDelete={confirmDelete}
-          onUpdateAccessory={(updated) => {
+          } : undefined}
+          onDelete={!isTechnician ? confirmDelete : undefined}
+          onUpdateAccessory={!isTechnician ? (updated) => {
             setAccessories((prev) =>
               prev.map((item) =>
                 item.id === updated.id ? updated : item
               )
             );
-          }}
+          } : undefined}
         />
-
-
 
         {totalPages > 1 && (
           <Pagination
@@ -183,14 +191,16 @@ export default function AccessoryManagementPage() {
           />
         )}
 
-        <AccessoryForm
-          newAccessory={newAccessory}
-          setNewAccessory={setNewAccessory}
-          isUpdateMode={isUpdateMode}
-          setIsUpdateMode={setIsUpdateMode}
-          setAccessories={setAccessories}
-          onNotify={(msg, type = 'success') => showDialog(type, msg)}
-        />
+        {!isTechnician && (
+          <AccessoryForm
+            newAccessory={newAccessory}
+            setNewAccessory={setNewAccessory}
+            isUpdateMode={isUpdateMode}
+            setIsUpdateMode={setIsUpdateMode}
+            setAccessories={setAccessories}
+            onNotify={(msg, type = 'success') => showDialog(type, msg)}
+          />
+        )}
       </div>
 
       <Footer />

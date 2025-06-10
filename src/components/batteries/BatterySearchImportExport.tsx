@@ -22,7 +22,7 @@ import { useUser } from '@/src/context/AuthContext';
 
 interface Props {
   batteries: Battery[];
-  setBatteries: (batteries: Battery[]) => void;
+  setBatteries?: (batteries: Battery[]) => void; // ✅ optional
   searchTerm: string;
   setSearchTerm: (term: string) => void;
 }
@@ -145,10 +145,13 @@ export default function BatterySearchImportExport({
         }).filter(({ battery }) => battery.batteryCode.trim() !== '');
 
         await Promise.all(
-  imported.map(({ batteryRef, battery }) => setDoc(batteryRef, battery))
-);
+          imported.map(({ batteryRef, battery }) => setDoc(batteryRef, battery))
+        );
 
-        setBatteries(importedBatteries);
+        if (setBatteries) {
+          setBatteries(importedBatteries);
+        }
+
         showDialog('success', `✅ Imported ${importedBatteries.length} batteries.`);
       } catch (error) {
         console.error('❌ Import failed:', error);
@@ -175,7 +178,9 @@ export default function BatterySearchImportExport({
             deleteDoc(doc(db, 'batteries', docSnap.id))
           );
           await Promise.all(deletePromises);
-          setBatteries([]);
+          if (setBatteries) {
+            setBatteries([]);
+          }
           showDialog('success', '✅ All batteries deleted.');
         } catch (err) {
           console.error(err);
@@ -195,27 +200,29 @@ export default function BatterySearchImportExport({
           className="w-full max-w-md"
         />
 
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
-          <Button variant="outline" onClick={handleImport} className="w-full sm:w-auto">
-            Import
-          </Button>
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-          />
-          <Button onClick={handleExport} className="w-full sm:w-auto">
-            Export
-          </Button>
-          <Button variant="default" onClick={() => setOpenPrintModal(true)} className="w-full sm:w-auto">
-            Print QR Labels
-          </Button>
-          <Button variant="destructive" onClick={handleDeleteAll} className="w-full sm:w-auto">
-            Delete All
-          </Button>
-        </div>
+        {setBatteries && (
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
+            <Button variant="outline" onClick={handleImport} className="w-full sm:w-auto">
+              Import
+            </Button>
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+            <Button onClick={handleExport} className="w-full sm:w-auto">
+              Export
+            </Button>
+            <Button variant="default" onClick={() => setOpenPrintModal(true)} className="w-full sm:w-auto">
+              Print QR Labels
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteAll} className="w-full sm:w-auto">
+              Delete All
+            </Button>
+          </div>
+        )}
       </div>
 
       <PrintBatteryQRModal
