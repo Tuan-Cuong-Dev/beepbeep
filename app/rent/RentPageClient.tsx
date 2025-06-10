@@ -21,42 +21,42 @@ export default function RentPageClient() {
   const [stationName, setStationName] = useState<string>('');
 
   // 1. Xác định CompanyId và StationId
-  useEffect(() => {
-  const detectCompanyAndStation = async () => {
-    try {
-      // 1. Nếu có trong URL, ưu tiên dùng
-      if (companyIdFromURL) {
-        setFinalCompanyId(companyIdFromURL);
-        return;
-      }
+    useEffect(() => {
+      const detectCompanyAndStation = async () => {
+        try {
+          if (companyIdFromURL) {
+            setFinalCompanyId(companyIdFromURL);
+            return;
+          }
 
-      // 2. Nếu là STAFF, lấy từ bảng staffs
-      if (user?.uid && role === 'staff') {
-        const snap = await getDocs(query(collection(db, 'staffs'), where('userId', '==', user.uid)));
-        if (!snap.empty) {
-          const staffData = snap.docs[0].data();
-          setFinalCompanyId(staffData.companyId || null);
-          setStationId(staffData.stationId || null);
-          return;
+          const staffRoles = ['company_admin', 'station_manager', 'technician', 'support'];
+
+          if (user?.uid && staffRoles.includes(role)) {
+            const snap = await getDocs(query(collection(db, 'staffs'), where('userId', '==', user.uid)));
+            if (!snap.empty) {
+              const staffData = snap.docs[0].data();
+              setFinalCompanyId(staffData.companyId || null);
+              setStationId(staffData.stationId || null);
+              return;
+            }
+          }
+
+          if (user?.uid && role === 'company_owner') {
+            const snap = await getDocs(query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid)));
+            if (!snap.empty) {
+              setFinalCompanyId(snap.docs[0].id);
+              return;
+            }
+          }
+
+        } catch (error) {
+          console.error('🔥 Error detecting company and station:', error);
         }
-      }
+      };
 
-      // ✅ 3. Nếu là Company Owner → lấy từ bảng rentalCompanies
-      if (user?.uid && role === 'company_owner') {
-        const snap = await getDocs(query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid)));
-        if (!snap.empty) {
-          setFinalCompanyId(snap.docs[0].id);
-          return;
-        }
-      }
+      detectCompanyAndStation();
+    }, [user?.uid, companyIdFromURL, role]);
 
-    } catch (error) {
-      console.error('🔥 Error detecting company and station:', error);
-    }
-  };
-
-  detectCompanyAndStation();
-}, [user?.uid, companyIdFromURL, role]);
 
 
   // 2. Lấy CompanyName
