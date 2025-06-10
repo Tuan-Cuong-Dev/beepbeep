@@ -117,18 +117,6 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
       if (agentDisabled) return [...getCommonItems(), footerItem];
       return [...getCommonItems(), ...agentItems, { divider: true }, footerItem];
     }
-
-    if (staffRoles.includes(normalizedRole)) {
-      return [
-        { icon: FaMotorcycle, label: 'Rent a Ride', path: '/rent' },
-        { icon: FaStore, label: 'Return Vehicle', path: '/return' },
-        { icon: FaWrench, label: 'Report Issue', path: '/vehicle-issues/report' },
-        { divider: true },
-        ...getCommonItems(),
-        footerItem,
-      ];
-    }
-
     return [...getCommonItems(), footerItem];
   };
 
