@@ -36,7 +36,12 @@ export default function VehicleIssuesManagementPage() {
   const itemsPerPage = 10;
 
   const { technicianMap, loading: technicianMapLoading } = useTechnicianMap(companyId ?? undefined);
-  const { issues, loading: issuesLoading, updateIssue } = useVehicleIssues({ role: role ?? undefined, companyId: companyId ?? undefined });
+  const isTechnician = normalizedRole === 'technician';
+  const { issues, loading: issuesLoading, updateIssue } = useVehicleIssues({
+    role: role ?? undefined,
+    companyId: companyId ?? undefined,
+    technicianUserId: isTechnician ? user?.uid : undefined,
+  });
 
   const loading = userLoading || technicianMapLoading || issuesLoading;
 
