@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileContract } from '@fortawesome/free-solid-svg-icons';
 import {
   FaTimes, FaPencilAlt, FaUser, FaCalendarAlt, FaEnvelope, FaBuilding,
-  FaCog, FaStore, FaMotorcycle, FaUserCog, FaBatteryFull, FaUsers, FaDollarSign
+  FaCog, FaStore, FaMotorcycle, FaUserCog, FaBatteryFull, FaUsers, FaDollarSign, FaWrench
 } from 'react-icons/fa';
 import { useUser } from '@/src/context/AuthContext';
 import { IconType } from 'react-icons';
@@ -38,8 +38,9 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
   const [agentDisabled, setAgentDisabled] = useState(false);
 
   const normalizedRole = (role || '').toLowerCase();
+  const staffRoles = ['support', 'technician', 'station_manager', 'company_admin'];
 
-  // Realtime Earnings
+  // Realtime Earnings for agent
   useEffect(() => {
     if (normalizedRole !== 'agent' || !user?.uid) return;
 
@@ -61,7 +62,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
     return () => unsub();
   }, [normalizedRole, user]);
 
-  // Check disabled agent
+  // Check if agent is disabled
   useEffect(() => {
     if (normalizedRole !== 'agent' || !user?.uid) return;
 
@@ -78,15 +79,11 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const commonItems: MenuItem[] = [
-    { icon: FaPencilAlt, label: 'Write a review', onClick: () => {} },
-    { divider: true },
-    { icon: FaUser, label: 'Profile', path: '/profile' },
-    { icon: FaCalendarAlt, label: 'Bookings', path: '/bookings' },
-    { icon: FaEnvelope, label: 'Messages', path: '/messages' },
-    { icon: FaBuilding, label: 'My business', path: '/my-business' },
-    { divider: true },
-  ];
+  const footerItem: MenuItem = {
+    icon: FaCog,
+    label: 'Account Info',
+    path: '/account',
+  };
 
   const agentItems: MenuItem[] = [
     { icon: FaUsers, label: 'Agent Dashboard', path: '/my-business/agent' },
@@ -94,18 +91,45 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
     { icon: faFileContract, label: 'Request Payment', path: '/my-business/request-payment' },
   ];
 
-  const footerItem: MenuItem = {
-    icon: FaCog,
-    label: 'Account Info',
-    path: '/account',
+  const getCommonItems = (): MenuItem[] => {
+    const items: MenuItem[] = [
+      { icon: FaPencilAlt, label: 'Write a review', onClick: () => {} },
+      { divider: true },
+      { icon: FaUser, label: 'Profile', path: '/profile' },
+    ];
+
+    // 🔒 Ẩn Bookings nếu là support hoặc technician
+    if (!['support', 'technician'].includes(normalizedRole)) {
+      items.push({ icon: FaCalendarAlt, label: 'Bookings', path: '/bookings' });
+    }
+
+    items.push(
+      { icon: FaEnvelope, label: 'Messages', path: '/messages' },
+      { icon: FaBuilding, label: 'My business', path: '/my-business' },
+      { divider: true }
+    );
+
+    return items;
   };
 
   const getMenuItems = (): MenuItem[] => {
     if (normalizedRole === 'agent') {
-      if (agentDisabled) return [...commonItems, footerItem];
-      return [...commonItems, ...agentItems, { divider: true }, footerItem];
+      if (agentDisabled) return [...getCommonItems(), footerItem];
+      return [...getCommonItems(), ...agentItems, { divider: true }, footerItem];
     }
-    return [...commonItems, footerItem];
+
+    if (staffRoles.includes(normalizedRole)) {
+      return [
+        { icon: FaMotorcycle, label: 'Rent a Ride', path: '/rent' },
+        { icon: FaStore, label: 'Return Vehicle', path: '/return' },
+        { icon: FaWrench, label: 'Report Issue', path: '/vehicle-issues/report' },
+        { divider: true },
+        ...getCommonItems(),
+        footerItem,
+      ];
+    }
+
+    return [...getCommonItems(), footerItem];
   };
 
   const menuItems = getMenuItems();
