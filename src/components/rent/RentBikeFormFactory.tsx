@@ -1,6 +1,6 @@
 // RentBikeFormFactory.tsx
 'use client';
-// Form thuê xe mặc định 
+
 import { FC } from 'react';
 import DynamicRentalForm from './DynamicRentalForm';
 import { useUser } from '@/src/context/AuthContext';
@@ -14,12 +14,13 @@ const RentBikeFormFactory: FC<Props> = ({ role }) => {
 
   if (!user || !companyId) return <div>Missing user or companyId</div>;
 
-  switch (role.toLowerCase()) {
-    case 'staff':
-      return <DynamicRentalForm companyId={companyId} userId={user.uid} />;
-    default:
-      return <div>Unsupported role: {role}</div>;
+  const staffRoles = ['company_admin', 'station_manager', 'technician', 'support'];
+
+  if (staffRoles.includes(role.toLowerCase())) {
+    return <DynamicRentalForm companyId={companyId} userId={user.uid} />;
   }
+
+  return <div>Unsupported role: {role}</div>;
 };
 
 export default RentBikeFormFactory;

@@ -100,8 +100,8 @@ export default function StaffDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {(staff.role === 'support' || staff.role === 'station_manager') && (
                   <>
-                    <QuickAction label="🚲 Rent a Bike" href={`/rent?companyId=${staff.companyId}&stationId=${staff.stationId}`} />
-                    <QuickAction label="🔄 Return eBike" href={`/return?companyId=${staff.companyId}&stationId=${staff.stationId}`} />
+                    <QuickAction label="🚲 Rent a Ride" href={`/rent?companyId=${staff.companyId}&stationId=${staff.stationId}`} />
+                    <QuickAction label="🔄 Return Vehicle" href={`/return?companyId=${staff.companyId}&stationId=${staff.stationId}`} />
                     <QuickAction label="🚨 Report Vehicle Issue" href={`/vehicle-issues/report?companyId=${staff.companyId}&stationId=${staff.stationId}`} />
                     {staff.role === 'station_manager' && (
                       <QuickAction label="📊 View Station Stats" href={`/stats?companyId=${staff.companyId}&stationId=${staff.stationId}`} />
@@ -116,7 +116,7 @@ export default function StaffDashboard() {
                 {staff.role === 'company_admin' && (
                   <>
                     <QuickAction label="👥 Manage Staff" href="/manage-staff" />
-                    <QuickAction label="🚲 Manage eBikes" href="/ebikes" />
+                    <QuickAction label="🚲 Manage Vehicles" href="/vehicles" />
                     <QuickAction label="📦 Manage Orders" href="/rental-orders" />
                   </>
                 )}
@@ -128,7 +128,7 @@ export default function StaffDashboard() {
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 Recent Activity</h2>
           <ul className="text-sm text-gray-700 space-y-2">
-            <li className="flex items-start gap-2"><FileText className="mt-0.5" /> Completed check-in for eBike #VN0087</li>
+            <li className="flex items-start gap-2"><FileText className="mt-0.5" /> Completed check-in for Vehicle #VN0087</li>
             <li className="flex items-start gap-2"><FileText className="mt-0.5" /> New vehicle issue reported at station</li>
             <li className="flex items-start gap-2"><FileText className="mt-0.5" /> Updated rental order #RB1029</li>
           </ul>
