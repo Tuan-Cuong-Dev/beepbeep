@@ -77,6 +77,9 @@ export default function StationManagerDashboard() {
             <QuickAction label="Report Issue" href="/vehicle-issues" />
             <QuickAction label="Upload Document" href="/my-business/documents" />
             <QuickAction label="Check Accessories" href="/accessories" />
+            <QuickAction label="Rent a Ride" href="/rent" />
+            <QuickAction label="Return Vehicle" href="/return" />
+            <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />
           </div>
         </section>
 

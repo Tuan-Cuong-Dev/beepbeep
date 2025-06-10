@@ -22,28 +22,42 @@ export default function RentPageClient() {
 
   // 1. Xác định CompanyId và StationId
   useEffect(() => {
-    const detectCompanyAndStation = async () => {
-      try {
-        if (companyIdFromURL) {
-          setFinalCompanyId(companyIdFromURL);
-          return;
-        }
+  const detectCompanyAndStation = async () => {
+    try {
+      // 1. Nếu có trong URL, ưu tiên dùng
+      if (companyIdFromURL) {
+        setFinalCompanyId(companyIdFromURL);
+        return;
+      }
 
-        if (!user?.uid || role !== 'staff') return;
-
+      // 2. Nếu là STAFF, lấy từ bảng staffs
+      if (user?.uid && role === 'staff') {
         const snap = await getDocs(query(collection(db, 'staffs'), where('userId', '==', user.uid)));
         if (!snap.empty) {
           const staffData = snap.docs[0].data();
           setFinalCompanyId(staffData.companyId || null);
-          setStationId(staffData.stationId || null); // ✅ Thêm setStationId ở đây
+          setStationId(staffData.stationId || null);
+          return;
         }
-      } catch (error) {
-        console.error('🔥 Error detecting company and station:', error);
       }
-    };
 
-    detectCompanyAndStation();
-  }, [user?.uid, companyIdFromURL, role]);
+      // ✅ 3. Nếu là Company Owner → lấy từ bảng rentalCompanies
+      if (user?.uid && role === 'company_owner') {
+        const snap = await getDocs(query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid)));
+        if (!snap.empty) {
+          setFinalCompanyId(snap.docs[0].id);
+          return;
+        }
+      }
+
+    } catch (error) {
+      console.error('🔥 Error detecting company and station:', error);
+    }
+  };
+
+  detectCompanyAndStation();
+}, [user?.uid, companyIdFromURL, role]);
+
 
   // 2. Lấy CompanyName
   useEffect(() => {
@@ -86,7 +100,7 @@ export default function RentPageClient() {
         {role === 'staff' ? (
           <DynamicRentalForm companyId={finalCompanyId} userId={user.uid} />
         ) : (
-          <RentBikeFormFactory role={role} />
+          <RentBikeFormFactory role={role} companyId={finalCompanyId} />
         )}
       </main>
       <Footer />

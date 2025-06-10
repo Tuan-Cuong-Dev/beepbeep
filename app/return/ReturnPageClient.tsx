@@ -168,7 +168,7 @@ export default function ReturnPageClient() {
     if (!ebikeSnap.empty) {
       const ebikeDoc = ebikeSnap.docs[0];
       await updateDoc(doc(db, 'ebikes', ebikeDoc.id), {
-        status: 'available',
+        status: 'Available',
         updatedAt: Timestamp.now(),
       });
     }
