@@ -78,15 +78,6 @@ export default function StaffDashboard() {
 
       <main className="flex-1 p-6 space-y-10 max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-center text-gray-800">👷 Staff Dashboard</h1>
-
-        {/* Overview */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <DashboardCard icon={<Building2 />} title="Companies" value={new Set(staffRoles.map(r => r.companyId)).size.toString()} />
-          <DashboardCard icon={<MapPin />} title="Stations" value={staffRoles.filter(r => r.stationId).length.toString()} />
-          <DashboardCard icon={<Users />} title="Total Roles" value={staffRoles.length.toString()} />
-          <DashboardCard icon={<Wrench />} title="Technician Roles" value={staffRoles.filter(r => r.role === 'technician').length.toString()} />
-        </section>
-
         {/* Staff Role Actions */}
         <section className="space-y-6">
           {staffRoles.map((staff) => (
@@ -123,15 +114,6 @@ export default function StaffDashboard() {
               </div>
             </div>
           ))}
-        </section>
-
-        <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 Recent Activity</h2>
-          <ul className="text-sm text-gray-700 space-y-2">
-            <li className="flex items-start gap-2"><FileText className="mt-0.5" /> Completed check-in for Vehicle #VN0087</li>
-            <li className="flex items-start gap-2"><FileText className="mt-0.5" /> New vehicle issue reported at station</li>
-            <li className="flex items-start gap-2"><FileText className="mt-0.5" /> Updated rental order #RB1029</li>
-          </ul>
         </section>
       </main>
 
