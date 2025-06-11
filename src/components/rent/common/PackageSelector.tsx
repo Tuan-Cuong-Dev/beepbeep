@@ -29,13 +29,14 @@ export default function PackageSelector({
       try {
         const q = query(
           collection(db, 'subscriptionPackages'),
-          where('companyId', '==', companyId)
+          where('companyId', '==', companyId),
+          where('status', '==', 'available') // ✅ chỉ lấy gói đang hoạt động
         );
         const snap = await getDocs(q);
         const list = snap.docs.map((doc) => {
           const data = doc.data();
           return {
-            label: `${data.name} (${data.durationType}) `,
+            label: `${data.name} (${data.durationType})`,
             value: doc.id,
           };
         });

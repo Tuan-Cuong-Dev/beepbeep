@@ -41,9 +41,6 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
   return (
     <div className="bg-white p-6 rounded-xl shadow mt-6 overflow-x-auto">
       <h2 className="text-xl font-semibold mb-4">Subscription Packages List</h2>
-
-// ... (giữ nguyên phần import và setup useEffect)
-
       <table className="min-w-full text-sm border border-gray-200">
         <thead className="bg-gray-100 text-gray-700">
           <tr>
