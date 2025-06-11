@@ -10,7 +10,7 @@ export const predefinedFormTemplates: PredefinedSection[] = [
       { key: 'idImage', label: 'Upload ID', type: 'upload' },
       { key: 'fullName', label: 'Full Name', type: 'text' },
       { key: 'channel', label: 'Channel', type: 'select', options: ['Facebook', 'Instagram', 'KakaoTalk', 'Phone number', 'WeChat', 'WhatsApp', 'Zalo'] },
-      { key: 'phone', label: 'Phone Number', type: 'text' },
+      { key: 'phone', label: 'Add or Search by Phone Number', type: 'text' },
       { key: 'idNumber', label: 'ID Number', type: 'text' },
       { key: 'address', label: 'Address', type: 'text' },
     ],

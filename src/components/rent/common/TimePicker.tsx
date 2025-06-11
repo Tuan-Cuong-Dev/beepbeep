@@ -1,5 +1,5 @@
 'use client';
-// Trường xữ lý dữ liệu thời gian.
+// Trường xử lý dữ liệu thời gian.
 import { useEffect, useState } from 'react';
 import { Calendar } from '@/src/components/ui/calendar';
 import { Popover, PopoverTrigger, PopoverContent } from '@/src/components/ui/popover';
@@ -10,10 +10,10 @@ import { cn } from '@/src/lib/utils';
 import { format } from 'date-fns';
 
 interface TimePickerProps {
-  onTimeSelected: (timeRange: { 
-    rentalStartDate: string; 
-    rentalStartHour: string; 
-    rentalDays: number; 
+  onTimeSelected: (timeRange: {
+    rentalStartDate: string;
+    rentalStartHour: string;
+    rentalDays: number;
     rentalEndDate: string;
   }) => void;
 }
@@ -129,4 +129,3 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
     </div>
   );
 }
-
