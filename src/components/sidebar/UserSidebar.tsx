@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { signOutUser } from '@/src/components/auth/authService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileContract, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faFileContract } from '@fortawesome/free-solid-svg-icons';
 import {
   FaTimes, FaPencilAlt, FaUser, FaCalendarAlt, FaEnvelope, FaBuilding,
   FaCog, FaUsers, FaDollarSign
@@ -13,6 +13,7 @@ import { useUser } from '@/src/context/AuthContext';
 import { IconType } from 'react-icons';
 import { db } from '@/src/firebaseConfig';
 import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/firestore';
+import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog'; // ✅ Import
 
 interface UserSidebarProps {
   user: any;
@@ -36,7 +37,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
 
   const [agentStats, setAgentStats] = useState({ total: 0, pending: 0 });
   const [agentDisabled, setAgentDisabled] = useState(false);
-  const [showComingSoon, setShowComingSoon] = useState(false); // 🆕
+  const [showComingSoon, setShowComingSoon] = useState(false); // ✅
 
   const normalizedRole = (role || '').toLowerCase();
   const staffRoles = ['support', 'technician', 'station_manager', 'company_admin'];
@@ -194,26 +195,14 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
         </div>
       </div>
 
-      {/* Coming Soon Modal */}
-      {showComingSoon && (
-        <div className="fixed inset-0 z-[200] bg-black/50 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full text-center">
-            <div className="text-blue-500 text-3xl mb-3">
-              <FontAwesomeIcon icon={faInfoCircle} />
-            </div>
-            <h2 className="text-lg font-bold mb-2">🚧 Coming Soon</h2>
-            <p className="text-gray-600 text-sm mb-4">
-              We are currently setting up our rental stations. The rent feature is not yet available.
-            </p>
-            <button
-              className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded"
-              onClick={() => setShowComingSoon(false)}
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ✅ NotificationDialog */}
+      <NotificationDialog
+        open={showComingSoon}
+        type="info"
+        title="🚧 Coming Soon"
+        description="We are currently setting up our rental stations. The rent feature is not yet available."
+        onClose={() => setShowComingSoon(false)}
+      />
     </>
   );
 };
