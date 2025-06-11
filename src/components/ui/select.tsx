@@ -8,16 +8,6 @@ interface SelectItemProps {
   onSelect: (value: string, label: string) => void;
 }
 
-export const Select = ({
-  className = '',
-  children,
-}: {
-  className?: string;
-  children: ReactNode;
-}) => {
-  return <div className={`relative ${className}`}>{children}</div>;
-};
-
 export const SelectTrigger = ({
   className = '',
   value,
@@ -33,7 +23,7 @@ export const SelectTrigger = ({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-left px-4 py-2 border rounded-sm ${className}`}
+      className={`w-full text-left px-3 py-2 border rounded text-base bg-white text-gray-900 appearance-none ${className}`}
     >
       {value || placeholder || 'Select...'}
     </button>
@@ -52,7 +42,7 @@ export const SelectContent = ({
   if (!open) return null;
   return (
     <div
-      className={`absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg ${className}`}
+      className={`absolute z-10 mt-2 w-full bg-white rounded border shadow-sm ${className}`}
     >
       {children}
     </div>
@@ -71,7 +61,6 @@ export const SelectItem = ({ value, children, onSelect }: SelectItemProps) => {
   );
 };
 
-// ✅ Phiên bản SimpleSelect hoàn toàn controlled
 export const SimpleSelect = ({
   options,
   placeholder = 'Select...',
@@ -106,28 +95,26 @@ export const SimpleSelect = ({
   }, []);
 
   return (
-    <Select className={className}>
-      <div ref={wrapperRef}>
-        <SelectTrigger
-          value={selectedLabel}
-          placeholder={placeholder}
-          onClick={() => setOpen(!open)}
-        />
-        <SelectContent open={open}>
-          {options.map((opt) => (
-            <SelectItem
-              key={opt.value}
-              value={opt.value}
-              onSelect={(val, label) => {
-                onChange(val);
-                setOpen(false);
-              }}
-            >
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </div>
-    </Select>
+    <div className={`relative w-full ${className}`} ref={wrapperRef}>
+      <SelectTrigger
+        value={selectedLabel}
+        placeholder={placeholder}
+        onClick={() => setOpen(!open)}
+      />
+      <SelectContent open={open}>
+        {options.map((opt) => (
+          <SelectItem
+            key={opt.value}
+            value={opt.value}
+            onSelect={(val, label) => {
+              onChange(val);
+              setOpen(false);
+            }}
+          >
+            {opt.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </div>
   );
 };
