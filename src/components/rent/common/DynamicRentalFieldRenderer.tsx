@@ -240,14 +240,20 @@ export function DynamicRentalFieldRenderer({
       );
     case 'select':
       return (
-        <SimpleSelect
-          key={field.key}
-          options={(field.options || []).map(opt => ({ label: opt, value: opt }))}
-          value={formData[field.key] || ''}
-          onChange={(val) => handleChange(field.key, val)}
-          placeholder={field.label}
-        />
+        <div key={field.key} className="flex flex-col space-y-1 w-full">
+          <label htmlFor={field.key} className="text-sm font-medium text-gray-700 block">
+            {field.label}
+          </label>
+          <SimpleSelect
+            options={(field.options || []).map(opt => ({ label: opt, value: opt }))}
+            value={formData[field.key] || ''}
+            onChange={(val) => handleChange(field.key, val)}
+            placeholder={`-- Select ${field.label} --`}
+            className="w-full text-base appearance-none px-3 py-2 border rounded"
+          />
+        </div>
       );
+
     default:
       return null;
   }
