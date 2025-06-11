@@ -13,7 +13,7 @@ import { useUser } from '@/src/context/AuthContext';
 import { IconType } from 'react-icons';
 import { db } from '@/src/firebaseConfig';
 import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/firestore';
-import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog'; // ✅ Import
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 interface UserSidebarProps {
   user: any;
@@ -40,7 +40,6 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
   const [showComingSoon, setShowComingSoon] = useState(false); // ✅
 
   const normalizedRole = (role || '').toLowerCase();
-  const staffRoles = ['support', 'technician', 'station_manager', 'company_admin'];
 
   useEffect(() => {
     if (normalizedRole !== 'agent' || !user?.uid) return;
@@ -93,7 +92,11 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
 
   const getCommonItems = (): MenuItem[] => {
     const items: MenuItem[] = [
-      { icon: FaPencilAlt, label: 'Write a review', onClick: () => setShowComingSoon(true) }, // ✅
+      {
+        icon: FaPencilAlt,
+        label: 'Write a review',
+        onClick: () => setShowComingSoon(true), // ✅ phản hồi tức thì
+      },
       { divider: true },
       { icon: FaUser, label: 'Profile', path: '/profile' },
     ];
@@ -159,9 +162,12 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
               <button
                 key={index}
                 onClick={() => {
-                  if (item.path) router.push(item.path);
-                  item.onClick?.();
-                  onClose();
+                  if (item.path) {
+                    router.push(item.path);
+                    onClose(); // ✅ chỉ đóng khi có đường dẫn
+                  } else {
+                    item.onClick?.(); // ✅ không gọi onClose() nếu chỉ mở dialog
+                  }
                 }}
                 className={`flex items-center space-x-3 w-full text-left rounded-lg px-3 py-2 transition ${
                   pathname === item.path
