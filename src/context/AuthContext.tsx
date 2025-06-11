@@ -7,65 +7,64 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 
 interface AuthContextType {
   user: User | null;
-  companyId: string | null;
-  stationId: string | null;
-  role: string | null;
+  companyId: string;
+  stationId: string;
+  role: string;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  companyId: null,
-  stationId: null,
-  role: null,
+  companyId: '',
+  stationId: '',
+  role: '',
   loading: true,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [companyId, setCompanyId] = useState<string | null>(null);
-  const [stationId, setStationId] = useState<string | null>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [companyId, setCompanyId] = useState<string>('');
+  const [stationId, setStationId] = useState<string>('');
+  const [role, setRole] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-    setUser(currentUser);
+      setUser(currentUser);
 
-    if (currentUser) {
-      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-      const userData = userDoc.exists() ? userDoc.data() : null;
+      if (currentUser) {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        const userData = userDoc.exists() ? userDoc.data() : null;
 
-      if (userData) {
-        const staffSnap = await getDocs(
-          query(collection(db, 'staffs'), where('userId', '==', currentUser.uid))
-        );
+        if (userData) {
+          const staffSnap = await getDocs(
+            query(collection(db, 'staffs'), where('userId', '==', currentUser.uid))
+          );
 
-        if (!staffSnap.empty) {
-          const staffData = staffSnap.docs[0].data();
-          setRole(staffData.role || null); // ✅ lấy role từ staffs
-          setCompanyId(staffData.companyId || null);
-          setStationId(staffData.stationId || null);
+          if (!staffSnap.empty) {
+            const staffData = staffSnap.docs[0].data();
+            setRole(staffData.role || '');
+            setCompanyId(staffData.companyId || '');
+            setStationId(staffData.stationId || '');
+          } else {
+            setRole(userData.role || '');
+            setCompanyId(userData.companyId || '');
+            setStationId(userData.stationId || '');
+          }
         } else {
-          setRole(userData.role || null); // fallback nếu không là staff
-          setCompanyId(userData.companyId || null);
-          setStationId(userData.stationId || null);
+          setCompanyId('');
+          setStationId('');
+          setRole('');
         }
       } else {
-        setCompanyId(null);
-        setStationId(null);
-        setRole(null);
+        setUser(null);
+        setCompanyId('');
+        setStationId('');
+        setRole('');
       }
-    } else {
-      setUser(null);
-      setCompanyId(null);
-      setStationId(null);
-      setRole(null);
-    }
 
-    setLoading(false);
-  });
-
+      setLoading(false);
+    });
 
     return () => unsubscribe();
   }, []);

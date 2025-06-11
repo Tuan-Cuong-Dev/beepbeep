@@ -91,7 +91,7 @@ export default function EbikeSearchImportExport({
       if (isAdmin) {
         count = await deleteAllEbikes(role);
       } else {
-        count = await deleteAllEbikesByCompany(companyId, role!);
+        count = await deleteAllEbikesByCompany(companyId, role);
       }
       setEbikes([]);
       showNotify('success', 'Deleted All', `${count} eBikes deleted successfully.`);
