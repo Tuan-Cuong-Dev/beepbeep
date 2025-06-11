@@ -49,7 +49,12 @@ export default function NotificationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-md p-6 rounded-2xl space-y-5 pb-8">
+      <DialogContent
+        className={cn(
+          'w-full max-w-md p-6 rounded-2xl space-y-5 pb-8',
+          'transition-none duration-0 animate-none data-[state=open]:animate-none'
+        )}
+      >
         <DialogHeader className="flex items-center gap-3">
           {renderIcon()}
           <DialogTitle className="text-lg sm:text-xl">
