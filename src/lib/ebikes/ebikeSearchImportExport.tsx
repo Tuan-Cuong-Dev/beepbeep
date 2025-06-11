@@ -50,7 +50,6 @@ export default function EbikeSearchImportExport({
 }: Props) {
   const { role } = useUser();
   const isAdmin = role === 'admin';
-  const isCompanyOwner = role === 'company_owner';
 
   const [importFile, setImportFile] = useState<File | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -87,20 +86,27 @@ export default function EbikeSearchImportExport({
 
   const handleDeleteAll = async () => {
     setDeleting(true);
-    if (isAdmin) {
-      await deleteAllEbikes();
-    } else {
-      await deleteAllEbikesByCompany(companyId);
+    try {
+      let count = 0;
+      if (isAdmin) {
+        count = await deleteAllEbikes(role);
+      } else {
+        count = await deleteAllEbikesByCompany(companyId, role!);
+      }
+      setEbikes([]);
+      showNotify('success', 'Deleted All', `${count} eBikes deleted successfully.`);
+    } catch (error) {
+      console.error(error);
+      showNotify('error', 'Delete Failed', 'An error occurred while deleting eBikes.');
+    } finally {
+      setDeleting(false);
+      setOpenDeleteDialog(false);
     }
-    setEbikes([]);
-    setDeleting(false);
-    setOpenDeleteDialog(false);
-    showNotify('success', 'Deleted All', 'eBikes deleted successfully.');
   };
 
   return (
     <>
-      {/* 🔍 Filters */}
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-4 mt-4">
         <input
           type="text"
@@ -136,7 +142,7 @@ export default function EbikeSearchImportExport({
         </select>
       </div>
 
-      {/* 🔘 Actions */}
+      {/* Actions */}
       <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto mb-4">
         <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full sm:w-auto">
           Import
@@ -164,7 +170,6 @@ export default function EbikeSearchImportExport({
           Delete All
         </Button>
 
-        {/* ✅ NEW: Apply Pricing Button */}
         <ApplyModelPricingButton />
       </div>
 

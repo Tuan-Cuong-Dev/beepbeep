@@ -206,7 +206,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
         open={showComingSoon}
         type="info"
         title="🚧 Coming Soon"
-        description="We are currently setting up our rental stations. The rent feature is not yet available."
+        description="We are currently setting up our rental stations. The Write a review feature is not yet available."
         onClose={() => setShowComingSoon(false)}
       />
     </>
