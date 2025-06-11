@@ -3,6 +3,8 @@ import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { SimpleSelect } from '@/src/components/ui/select';
+import { formatCurrency } from '@/src/utils/formatCurrency';
+
 import {
   SubscriptionPackage,
   DurationType,
@@ -100,26 +102,28 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
             handleChange('kmLimit', val === '' ? null : parseInt(val));
           }}
         />
-
         <Input
-          type="number"
+          type="text"
           placeholder="Base Price (VND)"
-          value={form.basePrice === 0 ? '' : form.basePrice}
+          value={form.basePrice ? formatCurrency(form.basePrice) : ''}
           onChange={(e) => {
-            const val = e.target.value;
+            const val = e.target.value.replace(/[^\d]/g, '');
             handleChange('basePrice', val === '' ? 0 : parseInt(val));
           }}
         />
 
         <Input
-          type="number"
+          type="text"
           placeholder="Overage Rate (VND/km)"
-          value={form.overageRate !== null ? form.overageRate : ''}
+          value={
+            form.overageRate !== null ? formatCurrency(form.overageRate) : ''
+          }
           onChange={(e) => {
-            const val = e.target.value;
+            const val = e.target.value.replace(/[^\d]/g, '');
             handleChange('overageRate', val === '' ? null : parseInt(val));
           }}
         />
+
 
         <SimpleSelect
           value={form.status}
