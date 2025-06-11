@@ -1,11 +1,14 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { SimpleSelect } from '@/src/components/ui/select';
-import { SubscriptionPackage, DurationType, ChargingMethod } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
+import {
+  SubscriptionPackage,
+  DurationType,
+  ChargingMethod,
+  SubscriptionPackageStatus,
+} from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 
 interface Props {
   initialData?: SubscriptionPackage;
@@ -25,6 +28,7 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
     basePrice: 0,
     overageRate: null,
     note: '',
+    status: 'available', // ✅ mặc định là available
   });
 
   useEffect(() => {
@@ -115,6 +119,16 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
             const val = e.target.value;
             handleChange('overageRate', val === '' ? null : parseInt(val));
           }}
+        />
+
+        <SimpleSelect
+          value={form.status}
+          onChange={(val) => handleChange('status', val as SubscriptionPackageStatus)}
+          options={[
+            { label: 'Available', value: 'available' },
+            { label: 'Inactive', value: 'inactive' },
+          ]}
+          placeholder="Select Status"
         />
 
         <Textarea

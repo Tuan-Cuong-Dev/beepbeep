@@ -10,9 +10,11 @@ export interface SubscriptionPackage {
   basePrice: number;
   overageRate: number | null;
   note?: string;
+  status: SubscriptionPackageStatus; // ✅ Thêm trạng thái
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
 
 export type DurationType = 'daily' | 'monthly';
 export type ChargingMethod = 'swap' | 'self';
+export type SubscriptionPackageStatus = 'available' | 'inactive'; // ✅ Trạng thái gói

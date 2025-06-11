@@ -6,7 +6,13 @@ import { importSubscriptionPackagesFromExcel } from '@/src/lib/subscriptionPacka
 import { exportSubscriptionPackagesToExcel } from '@/src/lib/subscriptionPackages/exportSubscriptionPackages';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/src/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/src/components/ui/dialog';
 
 interface Props {
   packages: SubscriptionPackage[];
@@ -14,8 +20,12 @@ interface Props {
   setSearchTerm: (term: string) => void;
   durationFilter: string;
   setDurationFilter: (val: string) => void;
+  statusFilter: string;
+  setStatusFilter: (val: string) => void;
   onExport: () => void;
-  onImportComplete: (imported: Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<void>;
+  onImportComplete: (
+    imported: Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>[]
+  ) => Promise<void>;
   onDeleteAll: () => Promise<void>;
   companyId: string;
 }
@@ -26,6 +36,8 @@ export default function SubscriptionPackageSearchImportExport({
   setSearchTerm,
   durationFilter,
   setDurationFilter,
+  statusFilter,
+  setStatusFilter,
   onExport,
   onImportComplete,
   onDeleteAll,
@@ -87,9 +99,18 @@ export default function SubscriptionPackageSearchImportExport({
             onChange={(e) => setDurationFilter(e.target.value)}
             className="border border-gray-300 rounded-md px-3 py-2 text-sm"
           >
-            <option value="">All</option>
+            <option value="">All Durations</option>
             <option value="daily">Daily</option>
             <option value="monthly">Monthly</option>
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+          >
+            <option value="">All Status</option>
+            <option value="available">Available</option>
+            <option value="inactive">Inactive</option>
           </select>
         </div>
 
@@ -118,39 +139,54 @@ export default function SubscriptionPackageSearchImportExport({
         </div>
       </div>
 
-      {/* Common Dialog */}
+      {/* Dialogs */}
       <Dialog open={openDialog !== null} onOpenChange={() => setOpenDialog(null)}>
         <DialogContent>
           {openDialog === 'import' && (
             <>
-              <DialogHeader><DialogTitle>Import Confirmation</DialogTitle></DialogHeader>
+              <DialogHeader>
+                <DialogTitle>Import Confirmation</DialogTitle>
+              </DialogHeader>
               <p>Are you sure you want to import packages from this file?</p>
               <DialogFooter>
-                <Button variant="ghost" onClick={() => setOpenDialog(null)}>Cancel</Button>
+                <Button variant="ghost" onClick={() => setOpenDialog(null)}>
+                  Cancel
+                </Button>
                 <Button onClick={handleImport}>Confirm Import</Button>
               </DialogFooter>
             </>
           )}
           {openDialog === 'export' && (
             <>
-              <DialogHeader><DialogTitle>Export Confirmation</DialogTitle></DialogHeader>
-              <p>You are about to export <strong>{packages.length}</strong> subscription packages.</p>
+              <DialogHeader>
+                <DialogTitle>Export Confirmation</DialogTitle>
+              </DialogHeader>
+              <p>
+                You are about to export <strong>{packages.length}</strong> subscription packages.
+              </p>
               <DialogFooter>
-                <Button variant="ghost" onClick={() => setOpenDialog(null)}>Cancel</Button>
+                <Button variant="ghost" onClick={() => setOpenDialog(null)}>
+                  Cancel
+                </Button>
                 <Button onClick={handleExport}>Confirm Export</Button>
               </DialogFooter>
             </>
           )}
           {openDialog === 'delete' && (
             <>
-              <DialogHeader><DialogTitle className="text-red-600">Delete All Packages</DialogTitle></DialogHeader>
+              <DialogHeader>
+                <DialogTitle className="text-red-600">Delete All Packages</DialogTitle>
+              </DialogHeader>
               <p className="text-sm text-muted-foreground mt-2">
-                Are you sure you want to permanently delete <strong>{packages.length}</strong> subscription packages?
+                Are you sure you want to permanently delete{' '}
+                <strong>{packages.length}</strong> subscription packages?
                 <br />
                 This action <span className="text-red-600 font-semibold">cannot be undone</span>.
               </p>
               <DialogFooter className="mt-4">
-                <Button variant="ghost" onClick={() => setOpenDialog(null)}>Cancel</Button>
+                <Button variant="ghost" onClick={() => setOpenDialog(null)}>
+                  Cancel
+                </Button>
                 <Button variant="destructive" onClick={handleDeleteAll} disabled={deleting}>
                   {deleting ? 'Deleting...' : 'Yes, Delete All'}
                 </Button>

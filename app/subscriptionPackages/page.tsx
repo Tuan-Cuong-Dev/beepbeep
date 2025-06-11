@@ -1,4 +1,3 @@
-// 📄 pages/SubscriptionPackageManagerPage.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -38,6 +37,7 @@ export default function SubscriptionPackageManagerPage() {
   const [editingPackage, setEditingPackage] = useState<SubscriptionPackage | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [durationFilter, setDurationFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -51,7 +51,7 @@ export default function SubscriptionPackageManagerPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, durationFilter]);
+  }, [searchTerm, durationFilter, statusFilter]);
 
   if (userLoading) {
     return <div className="flex justify-center items-center h-screen">Loading user info...</div>;
@@ -64,7 +64,8 @@ export default function SubscriptionPackageManagerPage() {
   const filteredPackages = packages.filter((pkg) => {
     const matchesSearch = pkg.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDuration = durationFilter ? pkg.durationType === durationFilter : true;
-    return matchesSearch && matchesDuration;
+    const matchesStatus = statusFilter ? pkg.status === statusFilter : true;
+    return matchesSearch && matchesDuration && matchesStatus;
   });
 
   const totalPages = Math.ceil(filteredPackages.length / itemsPerPage);
@@ -132,6 +133,8 @@ export default function SubscriptionPackageManagerPage() {
           setSearchTerm={setSearchTerm}
           durationFilter={durationFilter}
           setDurationFilter={setDurationFilter}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
           onExport={() => exportSubscriptionPackagesToExcel(filteredPackages)}
           onImportComplete={handleImportComplete}
           onDeleteAll={async () => {
@@ -174,7 +177,6 @@ export default function SubscriptionPackageManagerPage() {
             onCancel={() => setEditingPackage(null)}
           />
         </div>
-
       </main>
 
       <Footer />

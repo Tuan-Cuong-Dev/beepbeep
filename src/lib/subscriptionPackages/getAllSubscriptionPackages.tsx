@@ -11,7 +11,7 @@ import { SubscriptionPackage } from './subscriptionPackagesType';
 export async function getAllSubscriptionPackages(): Promise<SubscriptionPackage[]> {
   try {
     const snapshot = await getDocs(collection(db, 'subscriptionPackages'));
-    
+
     const packages: SubscriptionPackage[] = snapshot.docs.map((doc) => {
       const data = doc.data();
 
@@ -25,6 +25,7 @@ export async function getAllSubscriptionPackages(): Promise<SubscriptionPackage[
         basePrice: data.basePrice ?? 0,
         overageRate: data.overageRate ?? null,
         note: data.note ?? '',
+        status: data.status ?? 'available', // ✅ Thêm dòng này để lấy trạng thái
         createdAt: data.createdAt ?? null,
         updatedAt: data.updatedAt ?? null,
       };

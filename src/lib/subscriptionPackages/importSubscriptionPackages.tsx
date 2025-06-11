@@ -1,7 +1,5 @@
-'use client';
-
 import * as XLSX from 'xlsx';
-import { SubscriptionPackage, DurationType, ChargingMethod } from './subscriptionPackagesType';
+import { SubscriptionPackage, DurationType, ChargingMethod, SubscriptionPackageStatus } from './subscriptionPackagesType';
 
 export async function importSubscriptionPackagesFromExcel(file: File, companyId: string) {
   return new Promise<Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>[]>((resolve, reject) => {
@@ -29,9 +27,12 @@ export async function importSubscriptionPackagesFromExcel(file: File, companyId:
           const basePriceRaw = row['Base Price (VND)'];
           const kmLimitRaw = row['KM Limit'];
           const overageRateRaw = row['Overage Rate (VND/km)'];
+          const statusRaw = row['Status']?.toString().toLowerCase();
 
           const durationType: DurationType = durationTypeRaw === 'monthly' ? 'monthly' : 'daily';
           const chargingMethod: ChargingMethod = chargingMethodRaw === 'self' ? 'self' : 'swap';
+          const status: SubscriptionPackageStatus =
+            statusRaw === 'inactive' ? 'inactive' : 'available';
 
           if (!name) {
             throw new Error(`❌ Missing "Package Name" at row ${index + 2}`);
@@ -47,7 +48,8 @@ export async function importSubscriptionPackagesFromExcel(file: File, companyId:
             overageRate: overageRateRaw === '-' || overageRateRaw === undefined
               ? null
               : parseIntSafe(overageRateRaw),
-            note: row['Note']?.toString().trim() || '', // ✅ Thêm đúng dòng này!
+            note: row['Note']?.toString().trim() || '',
+            status, // ✅ Thêm dòng này để lưu trạng thái
           };
         });
 
@@ -57,7 +59,7 @@ export async function importSubscriptionPackagesFromExcel(file: File, companyId:
       }
     };
 
-    reader.onerror = (err) => {
+    reader.onerror = () => {
       reject(new Error('❌ Failed to read file.'));
     };
 

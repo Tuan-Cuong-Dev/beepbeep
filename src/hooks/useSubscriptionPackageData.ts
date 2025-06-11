@@ -2,19 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '@/src/firebaseConfig';
-import { 
-  collection, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDocs, 
-  doc, 
-  query, 
-  where, 
-  serverTimestamp, 
-  Timestamp 
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  doc,
+  query,
+  where,
+  serverTimestamp,
+  Timestamp,
 } from 'firebase/firestore';
-import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
+import {
+  SubscriptionPackage,
+  SubscriptionPackageStatus,
+} from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 
 export function useSubscriptionPackageData(companyId: string) {
   const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
@@ -24,18 +27,20 @@ export function useSubscriptionPackageData(companyId: string) {
   const fetchPackages = async () => {
     setLoading(true);
     try {
-      let q;
-      if (companyId) {
-        q = query(collection(db, 'subscriptionPackages'), where('companyId', '==', companyId));
-      } else {
-        q = collection(db, 'subscriptionPackages');
-      }
+      const q = companyId
+        ? query(collection(db, 'subscriptionPackages'), where('companyId', '==', companyId))
+        : collection(db, 'subscriptionPackages');
 
       const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...(docSnap.data() as Omit<SubscriptionPackage, 'id'>),
-      }));
+      const data = querySnapshot.docs.map((docSnap) => {
+        const docData = docSnap.data() as Omit<SubscriptionPackage, 'id'>;
+        return {
+          id: docSnap.id,
+          ...docData,
+          status: docData.status ?? 'available', // ✅ đảm bảo luôn có status
+        };
+      });
+
       setPackages(data);
     } catch (err) {
       console.error('❌ Failed to fetch subscription packages:', err);
@@ -45,22 +50,27 @@ export function useSubscriptionPackageData(companyId: string) {
     }
   };
 
-  const createPackage = async (pkg: Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const createPackage = async (
+    pkg: Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>
+  ) => {
     try {
+      const now = Timestamp.now();
       const newDoc = {
         ...pkg,
+        status: pkg.status ?? 'available',
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
       const docRef = await addDoc(collection(db, 'subscriptionPackages'), newDoc);
 
-      setPackages(prev => [
+      setPackages((prev) => [
         ...prev,
         {
           ...pkg,
           id: docRef.id,
-          createdAt: Timestamp.now(),
-          updatedAt: Timestamp.now(),
+          status: pkg.status ?? 'available',
+          createdAt: now,
+          updatedAt: now,
         },
       ]);
     } catch (err) {
@@ -76,8 +86,17 @@ export function useSubscriptionPackageData(companyId: string) {
         ...pkg,
         updatedAt: serverTimestamp(),
       });
-      setPackages(prev =>
-        prev.map(p => (p.id === id ? { ...p, ...pkg, updatedAt: Timestamp.now() } : p))
+
+      setPackages((prev) =>
+        prev.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                ...pkg,
+                updatedAt: Timestamp.now(),
+              }
+            : p
+        )
       );
     } catch (err) {
       console.error('❌ Failed to update subscription package:', err);
@@ -87,9 +106,8 @@ export function useSubscriptionPackageData(companyId: string) {
 
   const deletePackage = async (id: string) => {
     try {
-      const docRef = doc(db, 'subscriptionPackages', id);
-      await deleteDoc(docRef);
-      setPackages(prev => prev.filter(p => p.id !== id));
+      await deleteDoc(doc(db, 'subscriptionPackages', id));
+      setPackages((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       console.error('❌ Failed to delete subscription package:', err);
       setError('Failed to delete package.');

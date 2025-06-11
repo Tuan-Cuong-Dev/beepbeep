@@ -16,6 +16,7 @@ export function exportSubscriptionPackagesToExcel(packages: SubscriptionPackage[
     'Base Price (VND)': pkg.basePrice,
     'Overage Rate (VND/km)': pkg.overageRate !== null ? pkg.overageRate : '-',
     'Note': pkg.note ?? '',
+    'Status': pkg.status ?? 'available', // ✅ Thêm cột trạng thái
     'Created At': pkg.createdAt?.toDate ? formatDate(pkg.createdAt.toDate()) : '',
     'Updated At': pkg.updatedAt?.toDate ? formatDate(pkg.updatedAt.toDate()) : '',
   }));
