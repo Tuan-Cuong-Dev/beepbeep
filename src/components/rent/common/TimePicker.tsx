@@ -40,21 +40,21 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
     const endDateTime = new Date(startDateTime);
     endDateTime.setDate(endDateTime.getDate() + rentalDays);
 
-    const startDateStr = formatDateTimeLocal(startDateTime); // ví dụ "2025-04-27T08:30"
+    const startDateStr = formatDateTimeLocal(startDateTime);
 
     onTimeSelected({
-      rentalStartDate: startDateStr.split('T')[0], // "2025-04-27"
-      rentalStartHour: startDateStr.split('T')[1].slice(0, 5), // "08:30"
+      rentalStartDate: startDateStr.split('T')[0],
+      rentalStartHour: startDateStr.split('T')[1].slice(0, 5),
       rentalDays,
-      rentalEndDate: formatDateTimeLocal(endDateTime).split('T')[0], // "2025-04-30"
+      rentalEndDate: formatDateTimeLocal(endDateTime).split('T')[0],
     });
   }, [selectedDate, selectedHour, selectedMinute, rentalDays, onTimeSelected]);
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        {/* 📅 Chọn ngày */}
+
+        {/* 📅 Start Date */}
         <div className="space-y-2">
           <Label>Start Date</Label>
           <Popover>
@@ -80,10 +80,10 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
           </Popover>
         </div>
 
-        {/* 🕒 Chọn giờ */}
+        {/* 🕒 Start Time */}
         <div className="space-y-2">
           <Label>Start Time</Label>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
               type="number"
               min={0}
@@ -93,8 +93,8 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
                 const val = parseInt(e.target.value);
                 if (!isNaN(val)) setSelectedHour(Math.max(0, Math.min(23, val)));
               }}
-              className="w-1/2"
               placeholder="Hour"
+              className="w-full sm:w-1/2"
             />
             <Input
               type="number"
@@ -105,14 +105,14 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
                 const val = parseInt(e.target.value);
                 if (!isNaN(val)) setSelectedMinute(Math.max(0, Math.min(59, val)));
               }}
-              className="w-1/2"
               placeholder="Minute"
+              className="w-full sm:w-1/2"
             />
           </div>
         </div>
       </div>
 
-      {/* 📅 Số ngày thuê */}
+      {/* 📅 Rental Days */}
       <div className="space-y-2">
         <Label>Rental Days</Label>
         <Input
@@ -123,8 +123,10 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
             const val = parseInt(e.target.value);
             setRentalDays(isNaN(val) || val <= 0 ? 1 : val);
           }}
+          placeholder="Number of Rental Days"
         />
       </div>
     </div>
   );
 }
+

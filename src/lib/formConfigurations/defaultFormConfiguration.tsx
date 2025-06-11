@@ -13,7 +13,7 @@ export const DEFAULT_FORM_CONFIG: FormConfiguration = {
         { key: 'idImage', label: 'Upload ID', type: 'upload', required: false, visible: true },
         { key: 'fullName', label: 'Full Name', type: 'text', required: true, visible: true },
         { key: 'channel', label: 'Channel', type: 'select', required: true, visible: true, options: ['Facebook', 'Instagram', 'KakaoTalk', 'Phone', 'WeChat', 'WhatsApp', 'Zalo'] },
-        { key: 'phone', label: 'Phone Number', type: 'text', required: true, visible: true },
+        { key: 'phone', label: 'Add or Search by Phone Number', type: 'text', required: true, visible: true },
         { key: 'idNumber', label: 'ID Number', type: 'text', required: true, visible: true },
         { key: 'address', label: 'Address', type: 'text', required: false, visible: true },
       ],
