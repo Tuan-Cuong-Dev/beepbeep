@@ -194,7 +194,6 @@ export default function EbikeManagementPage() {
         />
 
 
-
         <EbikeTable
           ebikes={paginatedEbikes}
           models={ebikeModels}

@@ -64,115 +64,115 @@ export function useRentalForm(companyId: string, userId: string, options?: UseRe
   }, [companyId]);
 
   const handleChange = (key: string, value: any) => {
-    const trimmedValue = typeof value === 'string' ? value.trim() : value;
+  const processedValue = value; // ✅ Không trim ở đây để giữ nguyên input người dùng
 
-    // 1. Cập nhật ngay lập tức vào form
-    setFormData(prev => {
-      const updated = { ...prev, [key]: trimmedValue };
+  setFormData(prev => {
+    const updated = { ...prev, [key]: processedValue };
 
-      // ✅ Gán thông tin gói thuê nếu chọn package
-      if (key.startsWith('package')) {
-        const selectedPackage = packages.find(pkg => pkg.id === trimmedValue);
-        if (selectedPackage) {
-          updated.basePrice = selectedPackage.basePrice;
-          updated.kmLimit = selectedPackage.kmLimit ?? 'Unlimited';
-          updated.overageRate = selectedPackage.overageRate ?? '-';
-          updated.chargingMethod = selectedPackage.chargingMethod;
-        }
-      }
-
-      // ✅ Tự động gán info khi chọn xe
-      if (key === 'vehicleSearch') {
-        const selectedBike = allBikes.find(bike => bike.vehicleID === trimmedValue);
-        if (selectedBike) {
-          updated.stationId = selectedBike.stationId || '';
-          updated.vin = selectedBike.vehicleID || '';
-          updated.vehicleModel = selectedBike.modelName || '';
-          updated.vehicleColor = selectedBike.color || '';
-          updated.licensePlate = selectedBike.plateNumber || '';
-        }
-      }
-
-      // ✅ Tính tiền thuê
-      const rentalDays = Number(updated.rentalDays) || 0;
-      const basePrice = Number(updated.basePrice) || 0;
-      const batteryFee = Number(updated.batteryFee) || 0;
-      const deposit = Number(updated.deposit) || 0;
-
-      if (rentalDays && (basePrice || batteryFee)) {
-        const totalAmount = rentalDays * basePrice + batteryFee;
-        updated.totalAmount = totalAmount;
-        updated.remainingBalance = totalAmount - deposit;
-      }
-
-      if (key === 'deposit' && updated.totalAmount) {
-        updated.remainingBalance = updated.totalAmount - deposit;
-      }
-
-      // ✅ Tính ngày kết thúc thuê
-      if (
-        ['rentalStartDate', 'rentalStartHour', 'rentalDays'].includes(key) ||
-        (updated.rentalStartDate && updated.rentalStartHour && updated.rentalDays)
-      ) {
-        const startDateStr = updated.rentalStartDate;
-        const startHourStr = updated.rentalStartHour;
-        const days = Number(updated.rentalDays) || 0;
-
-        if (startDateStr && startHourStr && days) {
-          const start = new Date(`${startDateStr}T${startHourStr}:00`);
-          const end = new Date(start);
-          end.setDate(start.getDate() + days);
-
-          const yyyy = end.getFullYear();
-          const mm = String(end.getMonth() + 1).padStart(2, '0');
-          const dd = String(end.getDate()).padStart(2, '0');
-
-          updated.rentalEndDate = `${yyyy}-${mm}-${dd}`;
-        }
-      }
-
-      return updated;
-    });
-
-    // 2. ✅ Kiểm tra battery code bất đồng bộ
-    if (key.startsWith('batteryCode')) {
-      if (trimmedValue.length > 4) {
-        checkBatteryCode(trimmedValue).then((battery) => {
-          if (!battery || battery.status !== 'in_stock') {
-            setFormData(current => ({
-              ...current,
-              [key]: '',
-            }));
-            onNotify?.(`Battery ${trimmedValue} is not available or already in use.`, 'error');
-          }
-        });
+    // ✅ Gán thông tin gói thuê nếu chọn package
+    if (key.startsWith('package')) {
+      const selectedPackage = packages.find(pkg => pkg.id === processedValue);
+      if (selectedPackage) {
+        updated.basePrice = selectedPackage.basePrice;
+        updated.kmLimit = selectedPackage.kmLimit ?? 'Unlimited';
+        updated.overageRate = selectedPackage.overageRate ?? '-';
+        updated.chargingMethod = selectedPackage.chargingMethod;
       }
     }
 
-    // 3. ✅ Kiểm tra số điện thoại tự động tìm khách hàng
-    if (key === 'phone') {
-      if (trimmedValue.length >= 9) {
-        checkCustomerByPhone(trimmedValue).then((customer) => {
-          if (customer) {
-            setFormData(current => ({
-              ...current,
-              phone: customer.phone,
-              fullName: customer.name || '',
-              email: customer.email || '',
-              address: customer.address || '',
-              idNumber: customer.idNumber || '',
-              driverLicense: customer.driverLicense || '',
-              dateOfBirth: customer.dateOfBirth || '',
-              nationality: customer.nationality || '',
-              sex: customer.sex || '',
-              placeOfOrigin: customer.placeOfOrigin || '',
-              placeOfResidence: customer.placeOfResidence || '',
-            }));
-          }
-        });
+    // ✅ Tự động gán info khi chọn xe
+    if (key === 'vehicleSearch') {
+      const selectedBike = allBikes.find(bike => bike.vehicleID === processedValue);
+      if (selectedBike) {
+        updated.stationId = selectedBike.stationId || '';
+        updated.vin = selectedBike.vehicleID || '';
+        updated.vehicleModel = selectedBike.modelName || '';
+        updated.vehicleColor = selectedBike.color || '';
+        updated.licensePlate = selectedBike.plateNumber || '';
       }
     }
-  };
+
+    // ✅ Tính tiền thuê
+    const rentalDays = Number(updated.rentalDays) || 0;
+    const basePrice = Number(updated.basePrice) || 0;
+    const batteryFee = Number(updated.batteryFee) || 0;
+    const deposit = Number(updated.deposit) || 0;
+
+    if (rentalDays && (basePrice || batteryFee)) {
+      const totalAmount = rentalDays * basePrice + batteryFee;
+      updated.totalAmount = totalAmount;
+      updated.remainingBalance = totalAmount - deposit;
+    }
+
+    if (key === 'deposit' && updated.totalAmount) {
+      updated.remainingBalance = updated.totalAmount - deposit;
+    }
+
+    // ✅ Tính ngày kết thúc thuê
+    if (
+      ['rentalStartDate', 'rentalStartHour', 'rentalDays'].includes(key) ||
+      (updated.rentalStartDate && updated.rentalStartHour && updated.rentalDays)
+    ) {
+      const startDateStr = updated.rentalStartDate;
+      const startHourStr = updated.rentalStartHour;
+      const days = Number(updated.rentalDays) || 0;
+
+      if (startDateStr && startHourStr && days) {
+        const start = new Date(`${startDateStr}T${startHourStr}:00`);
+        const end = new Date(start);
+        end.setDate(start.getDate() + days);
+
+        const yyyy = end.getFullYear();
+        const mm = String(end.getMonth() + 1).padStart(2, '0');
+        const dd = String(end.getDate()).padStart(2, '0');
+
+        updated.rentalEndDate = `${yyyy}-${mm}-${dd}`;
+      }
+    }
+
+    return updated;
+  });
+
+  // ✅ Kiểm tra battery code
+  if (key.startsWith('batteryCode')) {
+    if (typeof processedValue === 'string' && processedValue.length > 4) {
+      checkBatteryCode(processedValue).then((battery) => {
+        if (!battery || battery.status !== 'in_stock') {
+          setFormData(current => ({
+            ...current,
+            [key]: '',
+          }));
+          onNotify?.(`Battery ${processedValue} is not available or already in use.`, 'error');
+        }
+      });
+    }
+  }
+
+  // ✅ Kiểm tra số điện thoại tự động tìm khách hàng
+  if (key === 'phone') {
+    if (typeof processedValue === 'string' && processedValue.length >= 9) {
+      checkCustomerByPhone(processedValue).then((customer) => {
+        if (customer) {
+          setFormData(current => ({
+            ...current,
+            phone: customer.phone,
+            fullName: customer.name || '',
+            email: customer.email || '',
+            address: customer.address || '',
+            idNumber: customer.idNumber || '',
+            driverLicense: customer.driverLicense || '',
+            dateOfBirth: customer.dateOfBirth || '',
+            nationality: customer.nationality || '',
+            sex: customer.sex || '',
+            placeOfOrigin: customer.placeOfOrigin || '',
+            placeOfResidence: customer.placeOfResidence || '',
+          }));
+        }
+      });
+    }
+  }
+};
+
 
 
   const resetForm = () => setFormData({});
