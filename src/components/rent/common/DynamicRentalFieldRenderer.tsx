@@ -172,9 +172,12 @@ export function DynamicRentalFieldRenderer({
   // ✅ Custom render cho từng field ngày/giờ
     if (field.key === 'rentalStartDate' || field.key === 'rentalEndDate') {
       return (
-        <div key={field.key} className="space-y-1">
-          <label className="text-sm text-gray-600 font-medium">{field.label}</label>
+        <div key={field.key} className="flex flex-col space-y-1 w-full">
+          <label htmlFor={field.key} className="text-sm font-medium text-gray-700 block">
+            {field.label}
+          </label>
           <Input
+            id={field.key}
             type="date"
             value={formData[field.key] || ''}
             onChange={(e) => handleChange(field.key, e.target.value)}
@@ -184,20 +187,22 @@ export function DynamicRentalFieldRenderer({
       );
     }
 
-    if (field.key === 'rentalStartHour') {
-      return (
-        <div key={field.key} className="space-y-1">
-          <label className="text-sm text-gray-600 font-medium">{field.label}</label>
-          <Input
-            type="time"
-            value={formData[field.key] || ''}
-            onChange={(e) => handleChange(field.key, e.target.value)}
-            className="w-full text-base appearance-none px-3 py-2 border rounded"
-          />
-        </div>
-      );
-    }
-
+  if (field.key === 'rentalStartHour') {
+    return (
+      <div key={field.key} className="flex flex-col space-y-1 w-full">
+        <label htmlFor={field.key} className="text-sm font-medium text-gray-700 block">
+          {field.label}
+        </label>
+        <Input
+          id={field.key}
+          type="time"
+          value={formData[field.key] || ''}
+          onChange={(e) => handleChange(field.key, e.target.value)}
+          className="w-full text-base appearance-none px-3 py-2 border rounded"
+        />
+      </div>
+    );
+  }
 
   switch (field.type) {
     case 'text':
