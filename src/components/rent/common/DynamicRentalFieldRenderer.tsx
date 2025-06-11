@@ -169,20 +169,49 @@ export function DynamicRentalFieldRenderer({
   );
 
   }
+  // ✅ Custom render cho từng field ngày/giờ
+    if (field.key === 'rentalStartDate' || field.key === 'rentalEndDate') {
+      return (
+        <div key={field.key} className="space-y-1">
+          <label className="text-sm text-gray-600 font-medium">{field.label}</label>
+          <Input
+            type="date"
+            value={formData[field.key] || ''}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            className="w-full text-base appearance-none px-3 py-2 border rounded"
+          />
+        </div>
+      );
+    }
+
+    if (field.key === 'rentalStartHour') {
+      return (
+        <div key={field.key} className="space-y-1">
+          <label className="text-sm text-gray-600 font-medium">{field.label}</label>
+          <Input
+            type="time"
+            value={formData[field.key] || ''}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            className="w-full text-base appearance-none px-3 py-2 border rounded"
+          />
+        </div>
+      );
+    }
+
 
   switch (field.type) {
     case 'text':
     case 'number':
-    case 'date':
-    case 'time':
       return (
-        <Input
-          key={field.key}
-          type={field.type}
-          placeholder={field.label}
-          value={formData[field.key] || ''}
-          onChange={(e) => handleChange(field.key, e.target.value)}
-        />
+        <div key={field.key} className="space-y-1">
+          <label className="text-sm text-gray-600 font-medium">{field.label}</label>
+          <Input
+            type={field.type}
+            value={formData[field.key] || ''}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            className="w-full text-base appearance-none px-3 py-2 border rounded"
+          />
+        </div>
       );
     case 'textarea':
       return (
@@ -191,6 +220,7 @@ export function DynamicRentalFieldRenderer({
           placeholder={field.label}
           value={formData[field.key] || ''}
           onChange={(e) => handleChange(field.key, e.target.value)}
+          className="w-full text-base appearance-none px-3 py-2 border rounded"
         />
       );
     case 'checkbox':
