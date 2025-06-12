@@ -65,7 +65,7 @@ export default function StationManagerDashboard() {
         <h1 className="text-3xl font-bold text-center text-gray-800">🏬 Station Manager Dashboard</h1>
 
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          <DashboardCard icon={<Bike />} title="eBikes" value={ebikeCount} href="/vehicles" />
+          <DashboardCard icon={<Bike />} title="Vehicles" value={ebikeCount} href="/vehicles" />
           <DashboardCard icon={<DollarSign />} title="Revenue (This Month)" value={formatCurrency(revenue)} href="/bookings" />
           <DashboardCard icon={<FileText />} title="Bookings" value={bookingCount} href="/bookings" />
           <DashboardCard icon={<Wrench />} title="Vehicle Issues" value={issueCount} href="/vehicle-issues" />
@@ -77,7 +77,7 @@ export default function StationManagerDashboard() {
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <QuickAction label="Add eBike" href="/vehicles" />
+            <QuickAction label="Add Vehicle" href="/vehicles" />
             <QuickAction label="View Bookings" href="/bookings" />
             <QuickAction label="Manage Subscriptions" href="/subscriptionPackages" />
             <QuickAction label="Report Issue" href="/vehicle-issues" />

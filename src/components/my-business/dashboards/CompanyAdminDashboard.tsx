@@ -114,7 +114,7 @@ export default function CompanyAdminDashboard() {
 
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <DashboardCard icon={<MapPin />} title="Stations" value={stats.stations} href="/my-business/stations" />
-          <DashboardCard icon={<Bike />} title="eBikes" value={stats.ebikes} href="/vehicles" />
+          <DashboardCard icon={<Bike />} title="Vehicles" value={stats.ebikes} href="/vehicles" />
           <DashboardCard icon={<DollarSign />} title="Revenue (This Month)" value={formatCurrency(stats.revenue)} href="/bookings" />
           <DashboardCard icon={<Users />} title="Staff" value={stats.staffs} href="/my-business/staff" />
           <DashboardCard icon={<FileText />} title="Bookings" value={stats.bookings} href="/bookings" />

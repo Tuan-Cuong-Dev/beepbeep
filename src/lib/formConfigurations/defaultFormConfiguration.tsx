@@ -55,7 +55,7 @@ export const DEFAULT_FORM_CONFIG: FormConfiguration = {
       fields: [
         { key: 'package', label: 'Rental Package', type: 'select', required: true, visible: true },
         { key: 'basePrice', label: 'Base Price (VND)', type: 'number', required: false, visible: true },
-        { key: 'batteryFee', label: 'Battery Rental Fee (VND)', type: 'number', required: false, visible: true }, // 👈 thêm phí thuê pin
+        { key: 'batteryFee', label: 'Battery Rental or Insurance Fee (VND)', type: 'number', required: false, visible: true }, // 👈 thêm phí thuê pin
         { key: 'totalAmount', label: 'Total Amount (VND)', type: 'number', required: false, visible: true },
         { key: 'deposit', label: 'Deposit (VND)', type: 'number', required: false, visible: true },
         { key: 'remainingBalance', label: 'Remaining Balance (VND)', type: 'number', required: false, visible: true },

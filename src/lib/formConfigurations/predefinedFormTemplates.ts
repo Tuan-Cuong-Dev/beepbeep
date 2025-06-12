@@ -52,7 +52,7 @@ export const predefinedFormTemplates: PredefinedSection[] = [
     fields: [
       { key: 'package', label: 'Rental Package', type: 'select' },
       { key: 'basePrice', label: 'Base Price (VND)', type: 'number' },
-      { key: 'batteryFee', label: 'Battery Rental Fee (VND)', type: 'number' }, // 👈 bổ sung rõ tên
+      { key: 'batteryFee', label: 'Battery Rental or Insurance Fee (VND)', type: 'number' }, // 👈 bổ sung rõ tên
       { key: 'totalAmount', label: 'Total Amount (VND)', type: 'number' },
       { key: 'deposit', label: 'Deposit (VND)', type: 'number' },
       { key: 'remainingBalance', label: 'Remaining Balance (VND)', type: 'number' },

@@ -122,7 +122,7 @@ export default function PrivateProviderDashboard() {
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <QuickAction label="Add New eBike" href="/ebikes" />
+            <QuickAction label="Add New Vehicle" href="/ebikes" />
             <QuickAction label="Check Reviews" href="/reviews" />
             <QuickAction label="Form Builder" href="/my-business/form-builder" />
             <QuickAction label="View Reports" href="/reports" />
