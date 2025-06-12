@@ -16,6 +16,8 @@ import {
   PackagePlus,
   ClipboardList,
   BatteryCharging,
+  Boxes,
+  Wrench,
 } from 'lucide-react';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 
@@ -30,6 +32,8 @@ export default function CompanyAdminDashboard() {
     accessories: 0,
     batteries: 0,
     revenue: 0,
+    subscriptionPackages: 0,
+    vehicleIssues: 0,
   });
 
   useEffect(() => {
@@ -37,8 +41,6 @@ export default function CompanyAdminDashboard() {
       console.warn('❌ Missing companyId. Aborting fetch.');
       return;
     }
-
-    console.log('🔍 Fetching stats for companyId:', companyId);
 
     const fetchStats = async () => {
       try {
@@ -49,6 +51,8 @@ export default function CompanyAdminDashboard() {
           bookings: query(collection(db, 'bookings'), where('companyId', '==', companyId)),
           accessories: query(collection(db, 'accessories'), where('companyId', '==', companyId)),
           batteries: query(collection(db, 'batteries'), where('companyId', '==', companyId)),
+          subscriptionPackages: query(collection(db, 'subscriptionPackages'), where('companyId', '==', companyId)),
+          vehicleIssues: query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId)),
         };
 
         const [
@@ -58,13 +62,17 @@ export default function CompanyAdminDashboard() {
           bookingSnap,
           accessorySnap,
           batterySnap,
+          packageSnap,
+          issueSnap,
         ] = await Promise.all([
-          getDocs(queries.stations).catch(e => { console.error('❌ rentalStations:', e); return { size: 0, docs: [] }; }),
-          getDocs(queries.ebikes).catch(e => { console.error('❌ ebikes:', e); return { size: 0, docs: [] }; }),
-          getDocs(queries.staffs).catch(e => { console.error('❌ staffs:', e); return { size: 0, docs: [] }; }),
-          getDocs(queries.bookings).catch(e => { console.error('❌ bookings:', e); return { size: 0, docs: [] }; }),
-          getDocs(queries.accessories).catch(e => { console.error('❌ accessories:', e); return { size: 0, docs: [] }; }),
-          getDocs(queries.batteries).catch(e => { console.error('❌ batteries:', e); return { size: 0, docs: [] }; }),
+          getDocs(queries.stations),
+          getDocs(queries.ebikes),
+          getDocs(queries.staffs),
+          getDocs(queries.bookings),
+          getDocs(queries.accessories),
+          getDocs(queries.batteries),
+          getDocs(queries.subscriptionPackages),
+          getDocs(queries.vehicleIssues),
         ]);
 
         const bookings = bookingSnap.docs.map(doc => doc.data());
@@ -85,6 +93,8 @@ export default function CompanyAdminDashboard() {
           accessories: accessorySnap.size,
           batteries: batterySnap.size,
           revenue,
+          subscriptionPackages: packageSnap.size,
+          vehicleIssues: issueSnap.size,
         });
       } catch (error) {
         console.error('🔥 Unexpected error in fetchStats:', error);
@@ -111,9 +121,10 @@ export default function CompanyAdminDashboard() {
           <DashboardCard icon={<PackagePlus />} title="Accessories" value={stats.accessories} href="/accessories" />
           <DashboardCard icon={<BatteryCharging />} title="Batteries" value={stats.batteries} href="/battery" />
           <DashboardCard icon={<ClipboardList />} title="Programs" value="Manage" href="/my-business/programs" />
+          <DashboardCard icon={<Boxes />} title="Subscription Packages" value={stats.subscriptionPackages} href="/subscriptionPackages" />
+          <DashboardCard icon={<Wrench />} title="Vehicle Issues" value={stats.vehicleIssues} href="/vehicle-issues" />
         </section>
 
-        {/* ✅ Quick Actions - GIỮ NGUYÊN */}
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -126,10 +137,11 @@ export default function CompanyAdminDashboard() {
             <QuickAction label="Rent a Ride" href="/rent" />
             <QuickAction label="Return Vehicle" href="/return" />
             <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />
+            <QuickAction label="Manage Subscription Packages" href="/subscriptionPackages" />
+            <QuickAction label="View Vehicle Issues" href="/vehicle-issues" />
           </div>
         </section>
 
-        {/* ✅ Recent Activity - GIỮ NGUYÊN */}
         <section className="bg-white rounded-2xl p-6 border shadow">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 Recent Activity</h2>
           <ul className="text-sm text-gray-700 space-y-2">
@@ -143,9 +155,6 @@ export default function CompanyAdminDashboard() {
     </div>
   );
 }
-
-// DashboardCard, QuickAction, RecentActivityItem giữ nguyên như bạn đã viết
-
 
 function DashboardCard({
   icon,

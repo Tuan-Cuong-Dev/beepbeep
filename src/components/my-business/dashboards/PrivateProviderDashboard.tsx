@@ -15,12 +15,14 @@ import {
   Wrench,
   ClipboardList,
   PackagePlus,
+  Boxes,
 } from 'lucide-react';
 
 interface DashboardStats {
   ebikes: number;
   issues: number;
   accessories: number;
+  subscriptionPackages: number;
 }
 
 export default function PrivateProviderDashboard() {
@@ -29,6 +31,7 @@ export default function PrivateProviderDashboard() {
     ebikes: 0,
     issues: 0,
     accessories: 0,
+    subscriptionPackages: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -43,20 +46,23 @@ export default function PrivateProviderDashboard() {
 
       const companyId = companySnap.docs[0].id;
 
-      const ebikeSnap = await getDocs(
-        query(collection(db, 'ebikes'), where('companyId', '==', companyId))
-      );
-      const issuesSnap = await getDocs(
-        query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId))
-      );
-      const accessoriesSnap = await getDocs(
-        query(collection(db, 'accessories'), where('companyId', '==', companyId))
-      );
+      const [
+        ebikeSnap,
+        issuesSnap,
+        accessoriesSnap,
+        packageSnap,
+      ] = await Promise.all([
+        getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'accessories'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'subscriptionPackages'), where('companyId', '==', companyId))),
+      ]);
 
       setStats({
         ebikes: ebikeSnap.size,
         issues: issuesSnap.size,
         accessories: accessoriesSnap.size,
+        subscriptionPackages: packageSnap.size,
       });
 
       setLoading(false);
@@ -76,9 +82,9 @@ export default function PrivateProviderDashboard() {
 
         <DashboardGrid>
           <DashboardCard
-            title="My eBikes"
+            title="My Vehicle"
             value={stats.ebikes.toString()}
-            href="/ebikes"
+            href="/vehicles"
             icon={<Bike className="w-6 h-6" />}
           />
           <DashboardCard
@@ -94,16 +100,16 @@ export default function PrivateProviderDashboard() {
             icon={<PackagePlus className="w-6 h-6" />}
           />
           <DashboardCard
+            title="Subscription Packages"
+            value={stats.subscriptionPackages.toString()}
+            href="/subscriptionPackages"
+            icon={<Boxes className="w-6 h-6" />}
+          />
+          <DashboardCard
             title="Ratings & Reviews"
             value="4.7/5"
             href="/reviews"
             icon={<Star className="w-6 h-6" />}
-          />
-          <DashboardCard
-            title="Earnings Overview"
-            value="$1,280"
-            href="/reports"
-            icon={<LineChart className="w-6 h-6" />}
           />
           <DashboardCard
             icon={<ClipboardList className="w-6 h-6" />}
@@ -121,6 +127,7 @@ export default function PrivateProviderDashboard() {
             <QuickAction label="Form Builder" href="/my-business/form-builder" />
             <QuickAction label="View Reports" href="/reports" />
             <QuickAction label="Manage Vehicle Issues" href="/vehicle-issues" />
+            <QuickAction label="Manage Packages" href="/subscriptionPackages" />
             <QuickAction label="Rent a Ride" href="/rent" />
             <QuickAction label="Return Vehicle" href="/return" />
             <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />

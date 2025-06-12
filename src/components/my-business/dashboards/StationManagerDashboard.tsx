@@ -14,6 +14,7 @@ import {
   Wrench,
   PackagePlus,
   ClipboardList,
+  Boxes,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -24,21 +25,24 @@ export default function StationManagerDashboard() {
   const [revenue, setRevenue] = useState(0);
   const [issueCount, setIssueCount] = useState(0);
   const [accessoryCount, setAccessoryCount] = useState(0);
+  const [subscriptionCount, setSubscriptionCount] = useState(0);
 
   useEffect(() => {
     if (!stationId) return;
 
     const fetchData = async () => {
-      const [ebikeSnap, bookingSnap, issueSnap, accessorySnap] = await Promise.all([
+      const [ebikeSnap, bookingSnap, issueSnap, accessorySnap, packageSnap] = await Promise.all([
         getDocs(query(collection(db, 'ebikes'), where('stationId', '==', stationId))),
         getDocs(query(collection(db, 'bookings'), where('stationId', '==', stationId))),
         getDocs(query(collection(db, 'vehicleIssues'), where('stationId', '==', stationId))),
         getDocs(query(collection(db, 'accessories'), where('stationId', '==', stationId))),
+        getDocs(query(collection(db, 'subscriptionPackages'), where('stationId', '==', stationId))),
       ]);
 
       setEbikeCount(ebikeSnap.size);
       setIssueCount(issueSnap.size);
       setAccessoryCount(accessorySnap.size);
+      setSubscriptionCount(packageSnap.size);
 
       const bookings = bookingSnap.docs.map(doc => doc.data());
       const now = new Date();
@@ -66,6 +70,7 @@ export default function StationManagerDashboard() {
           <DashboardCard icon={<FileText />} title="Bookings" value={bookingCount} href="/bookings" />
           <DashboardCard icon={<Wrench />} title="Vehicle Issues" value={issueCount} href="/vehicle-issues" />
           <DashboardCard icon={<PackagePlus />} title="Accessories" value={accessoryCount} href="/accessories" />
+          <DashboardCard icon={<Boxes />} title="Subscription Packages" value={subscriptionCount} href="/subscriptionPackages" />
           <DashboardCard icon={<ClipboardList />} title="Programs" value="Manage" href="/my-business/programs" />
         </section>
 
@@ -74,6 +79,7 @@ export default function StationManagerDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <QuickAction label="Add eBike" href="/vehicles" />
             <QuickAction label="View Bookings" href="/bookings" />
+            <QuickAction label="Manage Subscriptions" href="/subscriptionPackages" />
             <QuickAction label="Report Issue" href="/vehicle-issues" />
             <QuickAction label="Upload Document" href="/my-business/documents" />
             <QuickAction label="Check Accessories" href="/accessories" />

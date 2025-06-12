@@ -120,6 +120,7 @@ export default function RentalCompanyDashboard() {
           <DashboardCard title="Vehicle Issues" value={stats.issues.toString()} href="/vehicle-issues" icon={<Wrench className="w-6 h-6" />} />
           <DashboardCard title="Batteries" value={stats.batteries.toString()} href="/battery" icon={<BatteryCharging className="w-6 h-6" />} />
           <DashboardCard title="Accessories" value={stats.accessories.toString()} href="/accessories" icon={<Package className="w-6 h-6" />} />
+          <DashboardCard title="Subscription Packages" value="Manage" href="/subscriptionPackages" icon={<ClipboardList className="w-6 h-6" />} />
         </DashboardGrid1>
 
         <DashboardGrid2>
