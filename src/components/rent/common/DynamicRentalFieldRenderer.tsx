@@ -11,6 +11,8 @@ import PackageSelector from './PackageSelector';
 import TimePicker from './TimePicker';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css'
 
 interface Props {
   field: FormField;
@@ -170,22 +172,55 @@ export function DynamicRentalFieldRenderer({
 
   }
   // ✅ Custom render cho từng field ngày/giờ
+    // Xử lý ngày
     if (field.key === 'rentalStartDate' || field.key === 'rentalEndDate') {
       return (
         <div key={field.key} className="flex flex-col space-y-1 w-full">
           <label htmlFor={field.key} className="text-sm font-medium text-gray-700 block">
             {field.label}
           </label>
-          <Input
+          <DatePicker
             id={field.key}
-            type="date"
-            value={formData[field.key] || ''}
-            onChange={(e) => handleChange(field.key, e.target.value)}
+            selected={formData[field.key] ? new Date(formData[field.key]) : null}
+            onChange={(date) =>
+              handleChange(field.key, date?.toISOString().slice(0, 10) || '')
+            }
+            placeholderText="Select date"
+            dateFormat="yyyy-MM-dd"
             className="w-full text-base appearance-none px-3 py-2 border rounded"
           />
         </div>
       );
     }
+
+    // Xử lý giờ
+    if (field.key === 'rentalStartHour') {
+      return (
+        <div key={field.key} className="flex flex-col space-y-1 w-full">
+          <label htmlFor={field.key} className="text-sm font-medium text-gray-700 block">
+            {field.label}
+          </label>
+          <DatePicker
+            selected={
+              formData[field.key]
+                ? new Date(`1970-01-01T${formData[field.key]}`)
+                : null
+            }
+            onChange={(date) => {
+              const formatted = date?.toTimeString().slice(0, 5); // HH:mm
+              handleChange(field.key, formatted || '');
+            }}
+            showTimeSelect
+            showTimeSelectOnly
+            timeIntervals={15}
+            timeCaption="Time"
+            dateFormat="HH:mm"
+            className="w-full text-base appearance-none px-3 py-2 border rounded"
+          />
+        </div>
+      );
+    }
+
 
   if (field.key === 'rentalStartHour') {
     return (
