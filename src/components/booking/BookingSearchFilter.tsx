@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface Props {
   onSearchChange: (searchText: string) => void;
@@ -19,8 +21,8 @@ export default function BookingSearchFilter({
 }: Props) {
   const [searchText, setSearchText] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('All');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
@@ -33,16 +35,20 @@ export default function BookingSearchFilter({
     onStatusFilterChange(status);
   };
 
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setStartDate(value);
-    onDateRangeChange(value, endDate);
+  const handleStartDateChange = (date: Date | null) => {
+    setStartDate(date);
+    onDateRangeChange(
+      date ? date.toISOString().slice(0, 10) : '',
+      endDate ? endDate.toISOString().slice(0, 10) : ''
+    );
   };
 
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEndDate(value);
-    onDateRangeChange(startDate, value);
+  const handleEndDateChange = (date: Date | null) => {
+    setEndDate(date);
+    onDateRangeChange(
+      startDate ? startDate.toISOString().slice(0, 10) : '',
+      date ? date.toISOString().slice(0, 10) : ''
+    );
   };
 
   return (
@@ -53,19 +59,20 @@ export default function BookingSearchFilter({
           placeholder="Search by name, phone, or VIN..."
           value={searchText}
           onChange={handleSearchChange}
-          className="w-full"
         />
-        <Input
-          type="date"
-          value={startDate}
+        <DatePicker
+          selected={startDate}
           onChange={handleStartDateChange}
-          className="w-full sm:w-1/2 border rounded-md p-2 text-sm"
+          placeholderText="Start date"
+          dateFormat="yyyy-MM-dd"
+          className="w-full border rounded p-2 text-sm"
         />
-        <Input
-          type="date"
-          value={endDate}
+        <DatePicker
+          selected={endDate}
           onChange={handleEndDateChange}
-          className="w-full sm:w-1/2 border rounded-md p-2 text-sm"
+          placeholderText="End date"
+          dateFormat="yyyy-MM-dd"
+          className="w-full border rounded p-2 text-sm"
         />
       </div>
 
