@@ -59,13 +59,13 @@ export default function BookingSearchFilter({
           type="date"
           value={startDate}
           onChange={handleStartDateChange}
-          className="w-full"
+          className="w-full sm:w-1/2 border rounded-md p-2 text-sm"
         />
         <Input
           type="date"
           value={endDate}
           onChange={handleEndDateChange}
-          className="w-full"
+          className="w-full sm:w-1/2 border rounded-md p-2 text-sm"
         />
       </div>
 
