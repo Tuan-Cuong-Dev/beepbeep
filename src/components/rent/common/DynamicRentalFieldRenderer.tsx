@@ -136,7 +136,7 @@ export function DynamicRentalFieldRenderer({
 
   const placeholderMap: Record<string, string> = {
     basePrice: 'Base rental price (₫/day)',
-    batteryFee: 'Battery rental fee (₫)',
+    batteryFee: 'Battery Rental or Insurance Fee (₫)',
     deposit: 'Deposit amount (₫)',
     totalAmount: 'Total amount (auto-calculated)',
     remainingBalance: 'Remaining balance (auto-calculated)',
