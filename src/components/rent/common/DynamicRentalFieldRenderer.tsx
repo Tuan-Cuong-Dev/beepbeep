@@ -206,6 +206,7 @@ export function DynamicRentalFieldRenderer({
                 ? new Date(`1970-01-01T${formData[field.key]}`)
                 : null
             }
+            placeholderText="Select hour"
             onChange={(date) => {
               const formatted = date?.toTimeString().slice(0, 5); // HH:mm
               handleChange(field.key, formatted || '');

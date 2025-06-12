@@ -60,7 +60,7 @@ export default function SignupPopup({ onClose, onSwitchToSignin }: SignupPopupPr
 
         {/* Logo */}
         <div className="flex justify-center mb-4">
-          <img src="/assets/images/BipBip_logo1.jpg" alt="Logo" className="w-24 h-10" />
+          <img src="/assets/images/BipBip_logo1.png" alt="Logo" className="w-24 h-10" />
         </div>
 
         {/* Title */}
