@@ -10,7 +10,6 @@ interface Props {
   onDateRangeChange: (startDate: string, endDate: string) => void;
 }
 
-// ✅ Đã thêm trạng thái "Returned"
 const statusOptions = ['All', 'Draft', 'Confirmed', 'Returned', 'Completed', 'Cancelled'];
 
 export default function BookingSearchFilter({
@@ -48,7 +47,7 @@ export default function BookingSearchFilter({
 
   return (
     <div className="space-y-4 mb-6">
-      {/* Row 1: Search + From Date + To Date */}
+      {/* Row 1: Search + Dates */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Input
           placeholder="Search by name, phone, or VIN..."
@@ -56,21 +55,34 @@ export default function BookingSearchFilter({
           onChange={handleSearchChange}
           className="w-full"
         />
-        <Input type="date" value={startDate} onChange={handleStartDateChange} className="w-full" />
-        <Input type="date" value={endDate} onChange={handleEndDateChange} className="w-full" />
+        <Input
+          type="date"
+          value={startDate}
+          onChange={handleStartDateChange}
+          className="w-full"
+        />
+        <Input
+          type="date"
+          value={endDate}
+          onChange={handleEndDateChange}
+          className="w-full"
+        />
       </div>
 
       {/* Row 2: Status Filter Buttons */}
-      <div className="flex flex-wrap gap-2">
-        {statusOptions.map((status) => (
-          <Button
-            key={status}
-            variant={selectedStatus === status ? 'default' : 'outline'}
-            onClick={() => handleStatusChange(status)}
-          >
-            {status}
-          </Button>
-        ))}
+      <div className="overflow-x-auto pb-1">
+        <div className="flex gap-2 min-w-[500px] sm:min-w-0">
+          {statusOptions.map((status) => (
+            <Button
+              key={status}
+              variant={selectedStatus === status ? 'default' : 'outline'}
+              onClick={() => handleStatusChange(status)}
+              className="whitespace-nowrap"
+            >
+              {status}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );
