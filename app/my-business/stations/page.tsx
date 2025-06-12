@@ -1,30 +1,34 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import CreateStationForm from '@/src/components/stations/CreateStationForm';
+import EditStationForm from '@/src/components/stations/EditStationForm';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useCurrentCompanyId } from '@/src/hooks/useCurrentCompanyId';
-import Link from 'next/link';
+import { Station } from '@/src/lib/stations/stationTypes';
 import { Button } from '@/src/components/ui/button';
-import EditStationForm from '@/src/components/stations/EditStationForm';
-
-interface Station {
-  id: string;
-  name: string;
-  displayAddress: string;
-  mapAddress: string;
-  location: string;
-}
+import { Input } from '@/src/components/ui/input';
+import Link from 'next/link';
 
 export default function StationManagementPage() {
   const { companyId, loading } = useCurrentCompanyId();
   const [stations, setStations] = useState<Station[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
   const [editingStation, setEditingStation] = useState<Station | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
   const [dialog, setDialog] = useState({
     open: false,
     type: 'info' as 'success' | 'error' | 'info',
@@ -42,12 +46,11 @@ export default function StationManagementPage() {
     try {
       const q = query(collection(db, 'rentalStations'), where('companyId', '==', companyId));
       const snapshot = await getDocs(q);
-      const list: Station[] = snapshot.docs.map((doc) => ({
+      const result: Station[] = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<Station, 'id'>),
       }));
-      setStations(list);
-      showDialog('success', 'Success', 'Stations loaded successfully.');
+      setStations(result);
     } catch (err) {
       console.error('❌ Failed to load stations:', err);
       showDialog('error', 'Load Failed', 'Could not load stations. Please try again.');
@@ -56,9 +59,26 @@ export default function StationManagementPage() {
     }
   }, [companyId]);
 
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'rentalStations', id));
+      showDialog('success', 'Deleted', 'Station deleted successfully.');
+      await fetchStations();
+    } catch (err) {
+      console.error('❌ Failed to delete station:', err);
+      showDialog('error', 'Delete Failed', 'Could not delete station.');
+    } finally {
+      setConfirmDeleteId(null);
+    }
+  };
+
   useEffect(() => {
     fetchStations();
   }, [fetchStations]);
+
+  const filteredStations = stations.filter((station) =>
+    station.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div
@@ -94,28 +114,45 @@ export default function StationManagementPage() {
               )}
 
               <div className="pt-6 border-t border-gray-300 space-y-4">
-                <h2 className="text-lg font-semibold">📍 Existing Stations</h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold">📍 Existing Stations</h2>
+                  <Input
+                    type="text"
+                    placeholder="Search by name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-64"
+                  />
+                </div>
 
                 {refreshing ? (
                   <p className="text-sm text-gray-500">🔄 Refreshing station list...</p>
-                ) : stations.length === 0 ? (
-                  <p className="text-sm text-gray-500">No stations created yet.</p>
+                ) : filteredStations.length === 0 ? (
+                  <p className="text-sm text-gray-500">No stations match the search.</p>
                 ) : (
                   <ul className="space-y-3">
-                    {stations.map((station) => (
+                    {filteredStations.map((station) => (
                       <li
                         key={station.id}
                         className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm text-sm"
                       >
-                        <div className="flex justify-between items-center">
-                          <div>
+                        <div className="flex justify-between items-start gap-4">
+                          <div className="flex-1">
                             <p className="font-semibold text-gray-800">{station.name}</p>
                             <p className="text-gray-700">{station.displayAddress}</p>
                             <p className="text-gray-600 text-xs mt-1">📍 {station.location}</p>
                           </div>
-                          <Button variant="outline" onClick={() => setEditingStation(station)}>
-                            Edit
-                          </Button>
+                          <div className="space-x-2">
+                            <Button variant="outline" onClick={() => setEditingStation(station)}>
+                              Edit
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={() => setConfirmDeleteId(station.id)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
                         </div>
                       </li>
                     ))}
@@ -148,6 +185,23 @@ export default function StationManagementPage() {
         description={dialog.description}
         onClose={() => setDialog((prev) => ({ ...prev, open: false }))}
       />
+
+      {confirmDeleteId && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg space-y-4 max-w-sm w-full">
+            <h2 className="text-lg font-semibold text-gray-800">❗ Confirm Deletion</h2>
+            <p className="text-sm text-gray-600">Are you sure you want to delete this station?</p>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setConfirmDeleteId(null)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={() => handleDelete(confirmDeleteId)}>
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

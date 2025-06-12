@@ -15,6 +15,7 @@ import {
 import { getIdTokenResult } from 'firebase/auth';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
+import { StationFormValues } from '@/src/lib/stations/stationTypes';
 
 interface Props {
   companyId: string;
@@ -25,12 +26,14 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
   const [companyName, setCompanyName] = useState('');
   const [userRole, setUserRole] = useState<string | null>(null);
 
-  const [name, setName] = useState('');
-  const [displayAddress, setDisplayAddress] = useState('');
-  const [mapAddress, setMapAddress] = useState('');
-  const [location, setLocation] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formValues, setFormValues] = useState<StationFormValues>({
+    name: '',
+    displayAddress: '',
+    mapAddress: '',
+    location: '',
+  });
 
+  const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     open: false,
     type: 'info' as 'success' | 'error' | 'info',
@@ -50,19 +53,20 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
 
   useEffect(() => {
     if (coords) {
-      setLocation(`${coords.lat},${coords.lng}`);
+      setFormValues((prev) => ({
+        ...prev,
+        location: `${coords.lat},${coords.lng}`,
+      }));
     }
   }, [coords]);
 
-  // 📦 Lấy tên công ty
   useEffect(() => {
     const fetchCompanyName = async () => {
       try {
         const docRef = doc(db, 'rentalCompanies', companyId);
         const snap = await getDoc(docRef);
         if (snap.exists()) {
-          const data = snap.data();
-          setCompanyName(data.name || '');
+          setCompanyName(snap.data().name || '');
         }
       } catch (err) {
         console.error('❌ Failed to load company name:', err);
@@ -72,7 +76,6 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
     if (companyId) fetchCompanyName();
   }, [companyId]);
 
-  // 🔐 Lấy role người dùng hiện tại từ custom claims
   useEffect(() => {
     const fetchRole = async () => {
       const user = auth.currentUser;
@@ -85,10 +88,12 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
   }, []);
 
   const handleGeocode = () => {
-    if (mapAddress.trim()) geocode(mapAddress);
+    if (formValues.mapAddress.trim()) geocode(formValues.mapAddress);
   };
 
   const handleCreate = async () => {
+    const { name, displayAddress, mapAddress, location } = formValues;
+
     if (!name.trim() || !displayAddress.trim() || !mapAddress.trim() || !location.trim()) {
       return showDialog('error', 'Missing Data', 'Please fill in all required fields.');
     }
@@ -111,14 +116,12 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
         displayAddress,
         mapAddress,
         location: formattedLocation,
+        status: 'active', // ✅ Mặc định là active
         createdAt: serverTimestamp(),
       });
 
       showDialog('success', 'Station Created', '✅ The station was added successfully.');
-      setName('');
-      setDisplayAddress('');
-      setMapAddress('');
-      setLocation('');
+      setFormValues({ name: '', displayAddress: '', mapAddress: '', location: '' });
       if (onCreated) onCreated();
     } catch (err) {
       console.error('❌ Error creating station:', err);
@@ -148,28 +151,34 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
 
         <Input
           placeholder="Station Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={formValues.name}
+          onChange={(e) => setFormValues((prev) => ({ ...prev, name: e.target.value }))}
         />
 
         <Textarea
           placeholder="Display Address (shown to users)"
-          value={displayAddress}
-          onChange={(e) => setDisplayAddress(e.target.value)}
+          value={formValues.displayAddress}
+          onChange={(e) =>
+            setFormValues((prev) => ({ ...prev, displayAddress: e.target.value }))
+          }
         />
 
         <Textarea
           placeholder="Map Address (Google Maps link with coordinates)"
-          value={mapAddress}
-          onChange={(e) => setMapAddress(e.target.value)}
+          value={formValues.mapAddress}
+          onChange={(e) =>
+            setFormValues((prev) => ({ ...prev, mapAddress: e.target.value }))
+          }
           onBlur={handleGeocode}
         />
 
         <Input
           placeholder="Coordinates (lat,lng)"
-          value={location}
+          value={formValues.location}
           readOnly={!!coords}
-          onChange={(e) => setLocation(e.target.value)}
+          onChange={(e) =>
+            setFormValues((prev) => ({ ...prev, location: e.target.value }))
+          }
         />
 
         {geoLoading && <p className="text-sm text-gray-500">📍 Detecting coordinates...</p>}
