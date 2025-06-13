@@ -14,6 +14,7 @@ import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import CustomerForm from '@/src/components/customers/customerForm';
 import CustomerTable from '@/src/components/customers/customerTable';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
+import { useUser } from '@/src/context/AuthContext';
 
 const initialCustomer = {
   userId: '',
@@ -28,11 +29,13 @@ const initialCustomer = {
   sex: '',
   placeOfOrigin: '',
   placeOfResidence: '',
+  companyId: '', // 👈 Thêm trường này
 };
 
 const ITEMS_PER_PAGE = 10;
 
 export default function CustomersPage() {
+  const { companyId } = useUser(); // 👈 Lấy companyId
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -82,26 +85,35 @@ export default function CustomersPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getAllCustomers();
+      if (!companyId) return;
+      const data = await getAllCustomers(companyId); // ✅ Lấy trực tiếp theo companyId
       setCustomers(data);
       setCurrentPage(1);
     };
     fetchData();
-  }, []);
+  }, [companyId]);
 
   const saveCustomer = async () => {
     try {
+      if (!companyId) {
+        showDialog('error', 'Missing companyId');
+        return;
+      }
+
+      const customerData = { ...newCustomer, companyId };
+
       if (editingCustomer) {
-        await updateCustomer(editingCustomer.id, newCustomer);
-        setCustomers(customers.map(c => c.id === editingCustomer.id ? { ...c, ...newCustomer } : c));
+        await updateCustomer(editingCustomer.id, customerData);
+        setCustomers(customers.map(c => c.id === editingCustomer.id ? { ...c, ...customerData } : c));
         showDialog('success', 'Customer updated successfully');
         setEditingCustomer(null);
       } else {
-        const created = await createCustomer(newCustomer);
+        const created = await createCustomer(customerData);
         setCustomers([...customers, created]);
         showDialog('success', 'Customer added successfully');
       }
-      setNewCustomer(initialCustomer);
+
+      setNewCustomer({ ...initialCustomer, companyId });
     } catch (error) {
       console.error('❌ Error in saveCustomer:', error);
       showDialog('error', 'Failed to save customer');
@@ -149,7 +161,6 @@ export default function CustomersPage() {
           </button>
         </div>
 
-
         <CustomerForm
           editingCustomer={editingCustomer}
           newCustomer={newCustomer}
@@ -157,7 +168,7 @@ export default function CustomersPage() {
           onSave={saveCustomer}
           onCancel={() => {
             setEditingCustomer(null);
-            setNewCustomer(initialCustomer);
+            setNewCustomer({ ...initialCustomer, companyId: companyId || '' });
           }}
         />
       </div>

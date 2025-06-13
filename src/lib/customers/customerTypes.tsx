@@ -16,6 +16,7 @@ export interface Customer {
   sex?: string;                 // Giới tính
   placeOfOrigin?: string;       // Quê quán
   placeOfResidence?: string;    // Nơi thường trú
+  companyId: string; // ✅ thêm dòng này
   createdAt: Date;
   updatedAt: Date;
 }

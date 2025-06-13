@@ -15,14 +15,21 @@ import { Customer } from '@/src/lib/customers/customerTypes';
 
 const customersCollection = collection(db, 'customers');
 
-export const getAllCustomers = async (): Promise<Customer[]> => {
-  const snapshot = await getDocs(customersCollection);
+// ✅ Lấy danh sách khách hàng theo companyId (nếu có)
+export const getAllCustomers = async (companyId?: string): Promise<Customer[]> => {
+  const q = companyId
+    ? query(customersCollection, where('companyId', '==', companyId)) // 👈 Trả về Query
+    : customersCollection; // 👈 Đây là CollectionReference
+
+  const snapshot = await getDocs(q); // 👈 getDocs nhận được cả Query và CollectionReference
   return snapshot.docs.map((docSnap) => ({
     ...(docSnap.data() as Omit<Customer, 'id'>),
     id: docSnap.id,
   }));
 };
 
+
+// ✅ Lấy khách hàng theo ID
 export const getCustomerById = async (id: string): Promise<Customer | null> => {
   const docRef = doc(db, 'customers', id);
   const docSnap = await getDoc(docRef);
@@ -32,6 +39,7 @@ export const getCustomerById = async (id: string): Promise<Customer | null> => {
   return null;
 };
 
+// ✅ Tạo mới khách hàng
 export const createCustomer = async (
   data: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Customer> => {
@@ -58,6 +66,7 @@ export const createCustomer = async (
   };
 };
 
+// ✅ Cập nhật khách hàng
 export const updateCustomer = async (
   id: string,
   data: Partial<Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>>
@@ -91,10 +100,12 @@ export const updateCustomer = async (
   }
 };
 
+// ✅ Xoá khách hàng
 export const deleteCustomer = async (id: string): Promise<void> => {
   await deleteDoc(doc(db, 'customers', id));
 };
 
+// ✅ Đảm bảo có customer theo userId (nếu chưa có thì tạo mới)
 export async function ensureCustomerByUserId(userId: string, customerData: Partial<Customer>): Promise<void> {
   const customerRef = collection(db, 'customers');
   const q = query(customerRef, where('userId', '==', userId));
@@ -115,6 +126,7 @@ export async function ensureCustomerByUserId(userId: string, customerData: Parti
   }
 }
 
+// ✅ Kiểm tra khách hàng theo số điện thoại
 export async function checkCustomerByPhone(phone: string): Promise<Customer | null> {
   const customerRef = collection(db, 'customers');
   const q = query(customerRef, where('phone', '==', phone));
