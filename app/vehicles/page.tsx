@@ -46,6 +46,7 @@ export default function EbikeManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [stationFilter, setStationFilter] = useState('');
+  const [companyFilter, setCompanyFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -80,7 +81,6 @@ export default function EbikeManagementPage() {
   const modelPageSize = 5;
 
   useEffect(() => {
-    console.log('🧾 companyId:', companyId);
     if (companyId || isAdmin) {
       setNewEbike({ ...emptyEbike, companyId: companyId || '', stationId: stationId || '' });
     }
@@ -137,7 +137,9 @@ export default function EbikeManagementPage() {
       bike.currentLocation?.toLowerCase().includes(term);
     const matchesStatus = statusFilter === 'All' ? true : bike.status === statusFilter;
     const matchesStation = stationFilter === '' ? true : bike.stationId === stationFilter;
-    return matchesSearch && matchesStatus && matchesStation;
+    const matchesCompany = isAdmin ? (companyFilter === '' || bike.companyId === companyFilter) : true;
+
+    return matchesSearch && matchesStatus && matchesStation && matchesCompany;
   });
 
   const totalPages = Math.ceil(filteredEbikes.length / pageSize);
@@ -191,8 +193,9 @@ export default function EbikeManagementPage() {
           stations={stations}
           onPrintAll={() => setQrModalOpen(true)}
           companyId={companyId || ''}
+          companyFilter={companyFilter}
+          setCompanyFilter={setCompanyFilter}
         />
-
 
         <EbikeTable
           ebikes={paginatedEbikes}
