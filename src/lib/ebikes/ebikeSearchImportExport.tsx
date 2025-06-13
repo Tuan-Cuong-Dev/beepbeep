@@ -53,7 +53,7 @@ export default function EbikeSearchImportExport({
   setCompanyFilter,
 }: Props) {
   const { role } = useUser();
-  const isAdmin = role === 'admin';
+  const isAdmin = role === 'Admin';
 
   const [importFile, setImportFile] = useState<File | null>(null);
   const [deleting, setDeleting] = useState(false);
