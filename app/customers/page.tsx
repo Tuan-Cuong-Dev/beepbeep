@@ -35,7 +35,7 @@ const initialCustomer = {
 const ITEMS_PER_PAGE = 10;
 
 export default function CustomersPage() {
-  const { companyId } = useUser(); // 👈 Lấy companyId
+  const { companyId, role } = useUser(); // 👈 Lấy companyId
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -85,13 +85,13 @@ export default function CustomersPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!companyId) return;
-      const data = await getAllCustomers(companyId); // ✅ Lấy trực tiếp theo companyId
+      const data = await getAllCustomers(companyId, role); // 👈 truyền cả role
       setCustomers(data);
       setCurrentPage(1);
     };
     fetchData();
-  }, [companyId]);
+  }, [companyId, role]);
+
 
   const saveCustomer = async () => {
     try {

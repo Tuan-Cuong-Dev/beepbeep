@@ -16,17 +16,31 @@ import { Customer } from '@/src/lib/customers/customerTypes';
 const customersCollection = collection(db, 'customers');
 
 // ✅ Lấy danh sách khách hàng theo companyId (nếu có)
-export const getAllCustomers = async (companyId?: string): Promise<Customer[]> => {
-  const q = companyId
-    ? query(customersCollection, where('companyId', '==', companyId)) // 👈 Trả về Query
-    : customersCollection; // 👈 Đây là CollectionReference
+export const getAllCustomers = async (
+  companyId?: string,
+  role?: string
+): Promise<Customer[]> => {
+  // Nếu là Admin => lấy tất cả
+  if (role === 'Admin') {
+    const snapshot = await getDocs(customersCollection);
+    return snapshot.docs.map((docSnap) => ({
+      ...(docSnap.data() as Omit<Customer, 'id'>),
+      id: docSnap.id,
+    }));
+  }
 
-  const snapshot = await getDocs(q); // 👈 getDocs nhận được cả Query và CollectionReference
+  // Nếu có companyId => chỉ lấy theo công ty
+  const q = companyId
+    ? query(customersCollection, where('companyId', '==', companyId))
+    : customersCollection;
+
+  const snapshot = await getDocs(q);
   return snapshot.docs.map((docSnap) => ({
     ...(docSnap.data() as Omit<Customer, 'id'>),
     id: docSnap.id,
   }));
 };
+
 
 
 // ✅ Lấy khách hàng theo ID
