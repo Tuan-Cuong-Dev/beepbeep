@@ -10,17 +10,17 @@ import {
   query,
   where,
   Timestamp,
+  Query,
 } from 'firebase/firestore';
 import { Customer } from '@/src/lib/customers/customerTypes';
 
 const customersCollection = collection(db, 'customers');
 
-// ✅ Lấy danh sách khách hàng theo companyId (nếu có)
+// ✅ Lấy danh sách khách hàng theo companyId hoặc tất cả nếu là Admin
 export const getAllCustomers = async (
   companyId?: string,
   role?: string
 ): Promise<Customer[]> => {
-  // Nếu là Admin => lấy tất cả
   if (role === 'Admin') {
     const snapshot = await getDocs(customersCollection);
     return snapshot.docs.map((docSnap) => ({
@@ -29,19 +29,15 @@ export const getAllCustomers = async (
     }));
   }
 
-  // Nếu có companyId => chỉ lấy theo công ty
-  const q = companyId
-    ? query(customersCollection, where('companyId', '==', companyId))
-    : customersCollection;
+  if (!companyId) return [];
 
+  const q: Query = query(customersCollection, where('companyId', '==', companyId));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((docSnap) => ({
     ...(docSnap.data() as Omit<Customer, 'id'>),
     id: docSnap.id,
   }));
 };
-
-
 
 // ✅ Lấy khách hàng theo ID
 export const getCustomerById = async (id: string): Promise<Customer | null> => {
@@ -103,11 +99,7 @@ export const updateCustomer = async (
           : null;
     }
 
-    console.log('📤 Updating doc:', id);
-    console.log('🧾 Payload:', updatePayload);
-
     await updateDoc(docRef, updatePayload);
-    console.log('✅ Update successful');
   } catch (error) {
     console.error('❌ Error in updateCustomer:', error);
     throw error;
