@@ -130,35 +130,66 @@ export default function EbikeForm({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <h3 className="col-span-3 font-semibold text-gray-700">Basic Information</h3>
-        {isAdmin && (
-          <Input placeholder="Company ID" value={newEbike.companyId} onChange={(e) => handleChange('companyId', e.target.value)} />
-        )}
-        <SimpleSelect options={models.map((m) => ({ label: m.name, value: m.id }))} placeholder="Select Model" value={newEbike.modelId || ''} onChange={handleModelChange} />
-        {showStationSelect && (
-          <SimpleSelect options={stations.map((s) => ({ label: s.name, value: s.id }))} placeholder="Select Station" value={newEbike.stationId || ''} onChange={(val) => handleChange('stationId', val)} />
-        )}
-        <Input placeholder="Serial Number" value={newEbike.serialNumber} onChange={(e) => handleChange('serialNumber', e.target.value)} />
-        <Input placeholder="Vehicle ID (VIN)" value={newEbike.vehicleID} onChange={(e) => handleChange('vehicleID', e.target.value)} />
-        <Input placeholder="Plate Number" value={newEbike.plateNumber} onChange={(e) => handleChange('plateNumber', e.target.value)} />
+      {/* Basic Info Header */}
+      <h3 className="col-span-1 md:col-span-3 font-semibold text-gray-700">Basic Information</h3>
 
-        <h3 className="col-span-3 font-semibold text-gray-700 mt-6">Specifications</h3>
-        <Input type="number" placeholder="ODO (km)" value={newEbike.odo || ''} onChange={(e) => handleChange('odo', isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber)} />
-        <Input placeholder="Color" value={newEbike.color} onChange={(e) => handleChange('color', e.target.value)} />
-        <Input type="text" placeholder="Battery Capacity (e.g. 72V22Ah)" value={newEbike.batteryCapacity || ''} onChange={(e) => handleChange('batteryCapacity', e.target.value)} />
-        <Input type="number" placeholder="Range (km)" value={newEbike.range || ''} onChange={(e) => handleChange('range', isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber)} />
-        <SimpleSelect options={statusOptions.map((s) => ({ label: s, value: s }))} placeholder="Select Status" value={newEbike.status} onChange={(val) => handleChange('status', val as EbikeStatus)} />
-        <Textarea placeholder="Current Location" value={newEbike.currentLocation} onChange={(e) => handleChange('currentLocation', e.target.value)} />
+      {isAdmin && (
+        <Input
+          placeholder="Company ID"
+          value={newEbike.companyId}
+          onChange={(e) => handleChange('companyId', e.target.value)}
+          className="col-span-1"
+        />
+      )}
 
-        <h3 className="col-span-3 font-semibold text-gray-700 mt-6">Pricing</h3>
-        <Input type="text" placeholder="Price/Hour (VNĐ)" value={pricePerHourInput} onChange={(e) => { setPricePerHourInput(e.target.value); handleChange('pricePerHour', parseCurrencyString(e.target.value)); }} onFocus={(e) => { e.target.select(); setPricePerHourInput((newEbike.pricePerHour || 0).toString()); }} onBlur={() => setPricePerHourInput(formatCurrency(newEbike.pricePerHour || 0))} />
-        <Input type="text" placeholder="Price/Day (VNĐ)" value={pricePerDayInput} onChange={(e) => { setPricePerDayInput(e.target.value); handleChange('pricePerDay', parseCurrencyString(e.target.value)); }} onFocus={(e) => { e.target.select(); setPricePerDayInput((newEbike.pricePerDay || 0).toString()); }} onBlur={() => setPricePerDayInput(formatCurrency(newEbike.pricePerDay || 0))} />
-        <Input type="text" placeholder="Price/Week (VNĐ)" value={pricePerWeekInput} onChange={(e) => { setPricePerWeekInput(e.target.value); handleChange('pricePerWeek', parseCurrencyString(e.target.value)); }} onFocus={(e) => { e.target.select(); setPricePerWeekInput((newEbike.pricePerWeek || 0).toString()); }} onBlur={() => setPricePerWeekInput(formatCurrency(newEbike.pricePerWeek || 0))} />
-        <Input type="text" placeholder="Price/Month (VNĐ)" value={pricePerMonthInput} onChange={(e) => { setPricePerMonthInput(e.target.value); handleChange('pricePerMonth', parseCurrencyString(e.target.value)); }} onFocus={(e) => { e.target.select(); setPricePerMonthInput((newEbike.pricePerMonth || 0).toString()); }} onBlur={() => setPricePerMonthInput(formatCurrency(newEbike.pricePerMonth || 0))} />
+      <SimpleSelect
+        options={models.map((m) => ({ label: m.name, value: m.id }))}
+        placeholder="Select Model"
+        value={newEbike.modelId || ''}
+        onChange={handleModelChange}
+        className="col-span-1"
+      />
 
-        <h3 className="col-span-3 font-semibold text-gray-700 mt-6">Additional Note</h3>
-        <Textarea placeholder="Note (optional)" value={newEbike.note || ''} onChange={(e) => handleChange('note', e.target.value)} />
-      </div>
+      {showStationSelect && (
+        <SimpleSelect
+          options={stations.map((s) => ({ label: s.name, value: s.id }))}
+          placeholder="Select Station"
+          value={newEbike.stationId || ''}
+          onChange={(val) => handleChange('stationId', val)}
+          className="col-span-1"
+        />
+      )}
+
+      <Input placeholder="Serial Number" value={newEbike.serialNumber} onChange={(e) => handleChange('serialNumber', e.target.value)} />
+      <Input placeholder="Vehicle ID (VIN)" value={newEbike.vehicleID} onChange={(e) => handleChange('vehicleID', e.target.value)} />
+      <Input placeholder="Plate Number" value={newEbike.plateNumber} onChange={(e) => handleChange('plateNumber', e.target.value)} />
+
+      {/* Specifications */}
+      <h3 className="col-span-1 md:col-span-3 font-semibold text-gray-700 mt-6">Specifications</h3>
+
+      <Input type="number" placeholder="ODO (km)" value={newEbike.odo || ''} onChange={(e) => handleChange('odo', e.target.valueAsNumber || 0)} />
+      <Input placeholder="Color" value={newEbike.color} onChange={(e) => handleChange('color', e.target.value)} />
+      <Input placeholder="Battery Capacity (e.g. 72V22Ah)" value={newEbike.batteryCapacity || ''} onChange={(e) => handleChange('batteryCapacity', e.target.value)} />
+      <Input type="number" placeholder="Range (km)" value={newEbike.range || ''} onChange={(e) => handleChange('range', e.target.valueAsNumber || 0)} />
+      <SimpleSelect options={statusOptions.map((s) => ({ label: s, value: s }))} placeholder="Select Status" value={newEbike.status} onChange={(val) => handleChange('status', val as EbikeStatus)} />
+      <Textarea placeholder="Current Location" value={newEbike.currentLocation} onChange={(e) => handleChange('currentLocation', e.target.value)} />
+
+      {/* Pricing */}
+      <h3 className="col-span-1 md:col-span-3 font-semibold text-gray-700 mt-6">Pricing</h3>
+
+      <Input type="text" placeholder="Price/Hour (VNĐ)" value={pricePerHourInput} onChange={(e) => { setPricePerHourInput(e.target.value); handleChange('pricePerHour', parseCurrencyString(e.target.value)); }} onFocus={(e) => { e.target.select(); setPricePerHourInput((newEbike.pricePerHour || 0).toString()); }} onBlur={() => setPricePerHourInput(formatCurrency(newEbike.pricePerHour || 0))} />
+
+      <Input type="text" placeholder="Price/Day (VNĐ)" value={pricePerDayInput} onChange={(e) => { setPricePerDayInput(e.target.value); handleChange('pricePerDay', parseCurrencyString(e.target.value)); }} onFocus={(e) => { e.target.select(); setPricePerDayInput((newEbike.pricePerDay || 0).toString()); }} onBlur={() => setPricePerDayInput(formatCurrency(newEbike.pricePerDay || 0))} />
+
+      <Input type="text" placeholder="Price/Week (VNĐ)" value={pricePerWeekInput} onChange={(e) => { setPricePerWeekInput(e.target.value); handleChange('pricePerWeek', parseCurrencyString(e.target.value)); }} onFocus={(e) => { e.target.select(); setPricePerWeekInput((newEbike.pricePerWeek || 0).toString()); }} onBlur={() => setPricePerWeekInput(formatCurrency(newEbike.pricePerWeek || 0))} />
+
+      <Input type="text" placeholder="Price/Month (VNĐ)" value={pricePerMonthInput} onChange={(e) => { setPricePerMonthInput(e.target.value); handleChange('pricePerMonth', parseCurrencyString(e.target.value)); }} onFocus={(e) => { e.target.select(); setPricePerMonthInput((newEbike.pricePerMonth || 0).toString()); }} onBlur={() => setPricePerMonthInput(formatCurrency(newEbike.pricePerMonth || 0))} />
+
+      {/* Note */}
+      <h3 className="col-span-1 md:col-span-3 font-semibold text-gray-700 mt-6">Additional Note</h3>
+      <Textarea placeholder="Note (optional)" value={newEbike.note || ''} onChange={(e) => handleChange('note', e.target.value)} />
+    </div>
+
 
       <Button onClick={handleSubmit} className="mt-6">
         {isUpdateMode ? 'Save Changes' : 'Add Vehicle'}
