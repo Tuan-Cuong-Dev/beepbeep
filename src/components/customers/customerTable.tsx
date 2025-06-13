@@ -1,7 +1,6 @@
 'use client';
 
 import { Customer } from '@/src/lib/customers/customerTypes';
-import { format } from 'date-fns';
 import { Button } from '@/src/components/ui/button';
 
 type Props = {
@@ -10,9 +9,10 @@ type Props = {
   onDelete: (id: string) => void;
   searchTerm: string;
   setSearchTerm: (val: string) => void;
+  companyMap: Record<string, string>;
 };
 
-export default function CustomerTable({ customers, onEdit, onDelete, searchTerm, setSearchTerm }: Props) {
+export default function CustomerTable({ customers, onEdit, onDelete, searchTerm, setSearchTerm, companyMap }: Props) {
   const filtered = customers.filter(
     (c) =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -36,6 +36,7 @@ export default function CustomerTable({ customers, onEdit, onDelete, searchTerm,
               <th className="border px-3 py-1">Name</th>
               <th className="border px-3 py-1">Email</th>
               <th className="border px-3 py-1">Phone</th>
+              <th className="border px-3 py-1">Company</th> {/* ✅ Thêm cột */}
               <th className="border px-3 py-1">Address</th>
               <th className="border px-3 py-1 whitespace-nowrap">Place of Residence</th>
               <th className="border px-3 py-1 whitespace-nowrap">Place of Origin</th>
@@ -52,6 +53,9 @@ export default function CustomerTable({ customers, onEdit, onDelete, searchTerm,
                 <td className="border px-3 py-1 whitespace-nowrap">{c.name}</td>
                 <td className="border px-3 py-1">{c.email}</td>
                 <td className="border px-3 py-1">{c.phone}</td>
+                <td className="border px-3 py-1 whitespace-nowrap">
+                  {companyMap[c.companyId] || 'Unknown'} {/* ✅ Hiển thị tên công ty */}
+                </td>
                 <td className="border px-3 py-1 whitespace-nowrap">{c.address}</td>
                 <td className="border px-3 py-1 whitespace-nowrap">{c.placeOfResidence || ''}</td>
                 <td className="border px-3 py-1 whitespace-nowrap">{c.placeOfOrigin || ''}</td>

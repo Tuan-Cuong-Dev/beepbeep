@@ -11,6 +11,7 @@ type Props = {
   setNewCustomer: (c: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onSave: () => void;
   onCancel: () => void;
+  companyMap: Record<string, string>; // 👈 Thêm map từ companyId => companyName
 };
 
 export default function CustomerForm({
@@ -19,6 +20,7 @@ export default function CustomerForm({
   setNewCustomer,
   onSave,
   onCancel,
+  companyMap,
 }: Props) {
   const handleDateChange = (value: string) => {
     const date = value ? new Date(value + 'T00:00:00') : null;
@@ -60,6 +62,14 @@ export default function CustomerForm({
           value={newCustomer.phone ?? ''}
           onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
           className="border p-2 rounded w-full"
+        />
+        {/* 👇 Trường Company Name readonly */}
+        <input
+          type="text"
+          placeholder="Company Name"
+          value={companyMap[newCustomer.companyId] || 'Unknown Company'}
+          disabled
+          className="border p-2 rounded w-full bg-gray-100 text-gray-700 font-medium"
         />
         <input
           type="text"

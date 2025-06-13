@@ -15,6 +15,8 @@ import CustomerForm from '@/src/components/customers/customerForm';
 import CustomerTable from '@/src/components/customers/customerTable';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
+import { db } from '@/src/firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
 const initialCustomer = {
   userId: '',
@@ -29,18 +31,19 @@ const initialCustomer = {
   sex: '',
   placeOfOrigin: '',
   placeOfResidence: '',
-  companyId: '', // 👈 Thêm trường này
+  companyId: '',
 };
 
 const ITEMS_PER_PAGE = 10;
 
 export default function CustomersPage() {
-  const { companyId, role } = useUser(); // 👈 Lấy companyId
+  const { companyId, role } = useUser();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [newCustomer, setNewCustomer] = useState<Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>>(initialCustomer);
   const [currentPage, setCurrentPage] = useState(1);
+  const [companyMap, setCompanyMap] = useState<Record<string, string>>({});
 
   const [dialog, setDialog] = useState({
     open: false,
@@ -85,13 +88,25 @@ export default function CustomersPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getAllCustomers(companyId, role); // 👈 truyền cả role
+      const data = await getAllCustomers(companyId, role);
       setCustomers(data);
       setCurrentPage(1);
     };
     fetchData();
   }, [companyId, role]);
 
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      const snapshot = await getDocs(collection(db, 'rentalCompanies'));
+      const map: Record<string, string> = {};
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        map[doc.id] = data.name;
+      });
+      setCompanyMap(map);
+    };
+    fetchCompanies();
+  }, []);
 
   const saveCustomer = async () => {
     try {
@@ -139,6 +154,7 @@ export default function CustomersPage() {
           onDelete={confirmDelete}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
+          companyMap={companyMap} // ✅ truyền thêm
         />
 
         <div className="flex justify-center items-center gap-4 mt-4 text-sm">
@@ -170,6 +186,7 @@ export default function CustomersPage() {
             setEditingCustomer(null);
             setNewCustomer({ ...initialCustomer, companyId: companyId || '' });
           }}
+          companyMap={companyMap} // ✅ truyền thêm
         />
       </div>
       <Footer />
