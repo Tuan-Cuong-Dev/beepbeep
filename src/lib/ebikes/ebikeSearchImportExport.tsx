@@ -29,11 +29,12 @@ interface Props {
   setStatusFilter: (status: string) => void;
   stationFilter: string;
   setStationFilter: (station: string) => void;
+  companyFilter: string;
+  setCompanyFilter: (val: string) => void;
+  companyMap: Record<string, string>;
   stations: RentalStation[];
   onPrintAll: () => void;
   companyId: string;
-  companyFilter?: string;
-  setCompanyFilter?: (id: string) => void;
 }
 
 export default function EbikeSearchImportExport({
@@ -46,11 +47,12 @@ export default function EbikeSearchImportExport({
   setStatusFilter,
   stationFilter,
   setStationFilter,
+  companyFilter,
+  setCompanyFilter,
+  companyMap,
   stations,
   onPrintAll,
   companyId,
-  companyFilter,
-  setCompanyFilter,
 }: Props) {
   const { role } = useUser();
   const isAdmin = role === 'Admin';
@@ -110,7 +112,21 @@ export default function EbikeSearchImportExport({
 
   return (
     <>
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-4 mt-4">
+        {isAdmin && (
+          <select
+            value={companyFilter}
+            onChange={(e) => setCompanyFilter(e.target.value)}
+            className="px-3 py-2 border rounded w-full sm:w-[33.33%]"
+          >
+            <option value="">All Companies</option>
+            {Object.entries(companyMap).map(([id, name]) => (
+              <option key={id} value={id}>{name}</option>
+            ))}
+          </select>
+        )}
+
         <input
           type="text"
           placeholder="Search..."
@@ -143,21 +159,9 @@ export default function EbikeSearchImportExport({
             <option key={s.id} value={s.id}>{s.name}</option>
           ))}
         </select>
-
-        {isAdmin && setCompanyFilter && (
-          <select
-            value={companyFilter}
-            onChange={(e) => setCompanyFilter(e.target.value)}
-            className="px-3 py-2 border rounded w-full sm:w-[33.33%]"
-          >
-            <option value="">All Companies</option>
-            {[...new Set(ebikes.map((b) => b.companyId))].map((cid) => (
-              <option key={cid} value={cid}>{cid}</option>
-            ))}
-          </select>
-        )}
       </div>
 
+      {/* Actions */}
       <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto mb-4">
         <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full sm:w-auto">
           Import
@@ -188,6 +192,7 @@ export default function EbikeSearchImportExport({
         <ApplyModelPricingButton />
       </div>
 
+      {/* Dialogs */}
       <Dialog open={openExportDialog} onOpenChange={setOpenExportDialog}>
         <DialogContent>
           <DialogHeader>

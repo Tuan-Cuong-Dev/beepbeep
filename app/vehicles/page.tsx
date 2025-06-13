@@ -14,12 +14,13 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import Pagination from '@/src/components/ui/pagination';
 import EbikeSummaryCard from '@/src/components/ebikes/EbikeSummaryCard';
 import { Ebike } from '@/src/lib/ebikes/ebikeTypes';
-import { deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { deleteDoc, doc, Timestamp, collection, getDocs } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
 import { useEbikeData } from '@/src/hooks/useEbikeData';
 import { useEbikeModelForm } from '@/src/hooks/useEbikeModel';
 import { useRentalStations } from '@/src/hooks/useRentalStations';
 import { db } from '@/src/firebaseConfig';
+import { Company } from '@/src/lib/rentalCompanies/rentalCompanyTypes';
 
 const emptyEbike: Ebike = {
   id: '',
@@ -47,6 +48,7 @@ export default function EbikeManagementPage() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [stationFilter, setStationFilter] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
+  const [companyMap, setCompanyMap] = useState<Record<string, string>>({});
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -85,6 +87,20 @@ export default function EbikeManagementPage() {
       setNewEbike({ ...emptyEbike, companyId: companyId || '', stationId: stationId || '' });
     }
   }, [companyId, stationId, isAdmin]);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      if (!isAdmin) return;
+      const snapshot = await getDocs(collection(db, 'rentalCompanies'));
+      const map: Record<string, string> = {};
+      snapshot.forEach((doc) => {
+        const data = doc.data() as Company;
+        map[doc.id] = data.name;
+      });
+      setCompanyMap(map);
+    };
+    fetchCompanies();
+  }, [isAdmin]);
 
   const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
     setDialog({ open: true, type, title, description, onConfirm: undefined });
@@ -138,7 +154,6 @@ export default function EbikeManagementPage() {
     const matchesStatus = statusFilter === 'All' ? true : bike.status === statusFilter;
     const matchesStation = stationFilter === '' ? true : bike.stationId === stationFilter;
     const matchesCompany = isAdmin ? (companyFilter === '' || bike.companyId === companyFilter) : true;
-
     return matchesSearch && matchesStatus && matchesStation && matchesCompany;
   });
 
@@ -195,6 +210,7 @@ export default function EbikeManagementPage() {
           companyId={companyId || ''}
           companyFilter={companyFilter}
           setCompanyFilter={setCompanyFilter}
+          companyMap={companyMap}
         />
 
         <EbikeTable

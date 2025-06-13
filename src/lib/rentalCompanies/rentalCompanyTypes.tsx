@@ -15,3 +15,9 @@ export interface RentalCompany {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+
+export interface Company {
+  id: string;
+  name: string;
+  [key: string]: any; // hoặc các field cụ thể như address, ownerId, ...
+}
