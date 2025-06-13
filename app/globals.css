@@ -2,15 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 🌞 Default: Light mode */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/* 🌙 Dark mode support (tự động theo thiết bị) */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+  }
+
+  /* 💡 DatePicker tối màu trong dark mode */
+  .react-datepicker,
+  .react-datepicker__header {
+    background-color: #1a1a1a !important;
+    color: #00d289 !important;
+  }
+
+  .react-datepicker__day {
+    color: #dddddd !important;
+  }
+
+  .react-datepicker__day--selected {
+    background-color: #00d289 !important;
+    color: #ffffff !important;
+  }
+
+  .react-datepicker__day--today {
+    color: #00d289 !important;
+    font-weight: bold;
+  }
+
+  .react-datepicker__day:hover {
+    background-color: #00d289 !important;
+    color: #ffffff !important;
+  }
+
+  .react-datepicker__day-name,
+  .react-datepicker__current-month {
+    color: #00d289 !important;
   }
 }
 
@@ -25,58 +58,50 @@ body {
   overflow-x: hidden;
 }
 
-
-/* Thay đổi màu nền của DatePicker */
+/* 📅 Style chuẩn cho DatePicker (áp dụng cả sáng/tối) */
 .react-datepicker {
-  background-color: white !important;; /* Màu nền */
-  color: #00d289 !important; /* Màu chữ */ 
-  border-radius: 8px; /* Bo góc */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+  background-color: white !important;
+  color: #00d289 !important;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Màu của phần header */
 .react-datepicker__header {
-  background-color: white !important; /* Nền trắng */
-  color: #00d289 !important; /* Màu chữ xanh */
+  background-color: white !important;
+  color: #00d289 !important;
   border-bottom: 2px solid #00d289;
 }
 
-/* Ngày trong lịch */
 .react-datepicker__day {
-  color: #333; /* Màu chữ ngày */
+  color: #333;
 }
 
-/* Ngày được chọn */
 .react-datepicker__day--selected {
-  background-color: #00d289 !important; /* Màu nền ngày được chọn */
-  color: white !important; /* Màu chữ */
+  background-color: #00d289 !important;
+  color: white !important;
   border-radius: 50%;
 }
-/* Màu chữ của tháng + năm trong header */
-.react-datepicker__current-month, 
-.react-datepicker-time__header, 
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
 .react-datepicker-year-header {
-  color: #00d289 !important; /* Màu chữ xanh */
+  color: #00d289 !important;
 }
 
-/* Màu chữ của các ngày trong header (T2, T3, ...) */
 .react-datepicker__day-name {
-  color: #00d289 !important; /* Màu chữ xanh */
+  color: #00d289 !important;
 }
 
-/* Ngày hôm nay */
 .react-datepicker__day--today {
   font-weight: bold;
-  color: white !important; /* Màu ngày hôm nay */
+  color: white !important;
 }
 
-/* Hover vào ngày */
 .react-datepicker__day:hover {
   background-color: #00d289 !important;
   color: white !important;
 }
 
-/* Nút điều hướng */
 .react-datepicker__navigation {
   top: 12px;
 }
@@ -88,5 +113,3 @@ body {
 .react-datepicker__navigation--next {
   right: 10px;
 }
-
-
