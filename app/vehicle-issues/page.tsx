@@ -9,7 +9,7 @@ import Pagination from "@/src/components/ui/pagination";
 import { useUser } from "@/src/context/AuthContext";
 import { useVehicleIssues } from "@/src/hooks/useVehicleIssues";
 import { useTechnicianMap } from "@/src/hooks/useTechnicianMap";
-import { ExtendedVehicleIssue } from "@/src/lib/vehicleIssues/vehicleIssueTypes";
+import { ExtendedVehicleIssue, VehicleIssueStatus } from "@/src/lib/vehicleIssues/vehicleIssueTypes";
 import { Button } from "@/src/components/ui/button";
 import AssignTechnicianForm from "@/src/components/vehicleIssues/AssignTechnicianForm";
 import VehicleIssuesSummaryCard from "@/src/components/vehicleIssues/VehicleIssuesSummaryCard";
@@ -17,11 +17,14 @@ import VehicleIssuesSearchFilter from "@/src/components/vehicleIssues/VehicleIss
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/src/components/ui/dialog";
 import { Timestamp } from "firebase/firestore";
 import VehicleIssueTable from "@/src/components/vehicleIssues/VehicleIssueTable";
+import ProposalPopup from "@/src/components/vehicleIssues/ProposalPopup";
+import ActualResultPopup from "@/src/components/vehicleIssues/ActualResultPopup";
 
 export default function VehicleIssuesManagementPage() {
   const { role, companyId, user, loading: userLoading } = useUser();
   const normalizedRole = role?.toLowerCase();
-  const isAdmin = normalizedRole === "admin";
+  const isAdmin = normalizedRole === "Admin";
+  const isTechnician = normalizedRole === 'technician';
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -32,11 +35,12 @@ export default function VehicleIssuesManagementPage() {
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closingIssue, setClosingIssue] = useState<ExtendedVehicleIssue | null>(null);
   const [closeComment, setCloseComment] = useState("");
+  const [proposingIssue, setProposingIssue] = useState<ExtendedVehicleIssue | null>(null);
+  const [updatingActualIssue, setUpdatingActualIssue] = useState<ExtendedVehicleIssue | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const { technicianMap, loading: technicianMapLoading } = useTechnicianMap(companyId ?? undefined);
-  const isTechnician = normalizedRole === 'technician';
   const { issues, loading: issuesLoading, updateIssue } = useVehicleIssues({
     role: role ?? undefined,
     companyId: companyId ?? undefined,
@@ -86,6 +90,28 @@ export default function VehicleIssuesManagementPage() {
     setCloseComment("");
   };
 
+  const handlePropose = async (solution: string, cost: number) => {
+    if (!proposingIssue) return;
+    await updateIssue(proposingIssue.id, {
+      status: 'proposed',
+      proposedSolution: solution,
+      proposedCost: cost,
+    });
+    showDialog("success", "Proposal submitted for approval");
+    setProposingIssue(null);
+  };
+
+  const handleActualSubmit = async (solution: string, cost: number) => {
+    if (!updatingActualIssue) return;
+    await updateIssue(updatingActualIssue.id, {
+      status: 'resolved',
+      actualSolution: solution,
+      actualCost: cost,
+    });
+    showDialog("success", "Actual result submitted");
+    setUpdatingActualIssue(null);
+  };
+
   const canViewIssues = isAdmin || (!!companyId && ["company_owner", "company_admin", "technician", "station_manager"].includes(normalizedRole || ""));
 
   const filteredIssues = issues.filter((issue) => {
@@ -105,7 +131,6 @@ export default function VehicleIssuesManagementPage() {
     label: name,
     value: name,
   }));
-
 
   useEffect(() => {
     setCurrentPage(1);
@@ -145,6 +170,9 @@ export default function VehicleIssuesManagementPage() {
             setShowForm={setShowForm}
             normalizedRole={normalizedRole}
             isAdmin={isAdmin}
+            isTechnician={isTechnician}
+            setProposingIssue={setProposingIssue}
+            setUpdatingActualIssue={setUpdatingActualIssue}
             searchTerm={searchTerm}
             statusFilter={statusFilter}
             stationFilter={stationFilter}
@@ -201,6 +229,17 @@ export default function VehicleIssuesManagementPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ProposalPopup
+        open={!!proposingIssue}
+        onClose={() => setProposingIssue(null)}
+        onSubmit={handlePropose}
+      />
+      <ActualResultPopup
+        open={!!updatingActualIssue}
+        onClose={() => setUpdatingActualIssue(null)}
+        onSubmit={handleActualSubmit}
+      />
     </div>
   );
 }
