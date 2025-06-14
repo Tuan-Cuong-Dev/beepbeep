@@ -62,7 +62,7 @@ export function useCompanyAndStation(): CompanyAndStation {
       }
 
       // --- Nếu là staff hoặc technician ---
-      if (user?.uid && ["staff", "technician"].includes(role || "")) {
+      if (user?.uid && ["staff", "technician", "company_admin","station_manager"].includes(role || "")) {
         const staffSnap = await getDocs(query(collection(db, "staffs"), where("userId", "==", user.uid)));
         if (!staffSnap.empty) {
           const staffData = staffSnap.docs[0].data();
