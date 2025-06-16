@@ -66,6 +66,7 @@ export default function VehicleIssueTable({
             <th className="p-2">Plate</th>
             <th className="p-2">Station</th>
             <th className="p-2">Type</th>
+            <th className="p-2">Descriptions</th>
             <th className="p-2">Status</th>
             <th className="p-2">Assigned To</th>
             <th className="p-2">Proposal</th>
@@ -84,6 +85,7 @@ export default function VehicleIssueTable({
               <td className="p-2">{issue.plateNumber}</td>
               <td className="p-2">{issue.stationName}</td>
               <td className="p-2">{issue.issueType}</td>
+              <td className="p-2">{issue.description || '-'}</td>
               <td className="p-2">{renderStatusBadge(issue.status)}</td>
               <td className="p-2">{issue.assignedToName || '-'}</td>
               <td className="p-2">
