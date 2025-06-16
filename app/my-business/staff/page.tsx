@@ -30,7 +30,10 @@ export default function StaffManagementPage() {
   const { role, companyId, loading } = useUser();
   const normalizedRole = role?.toLowerCase();
   const isAdmin = normalizedRole === 'admin';
-  const canViewStaff = isAdmin || (!!companyId && ['company_owner', 'company_admin', 'technician_assistant'].includes(normalizedRole || ''));
+  const canViewStaff =
+  isAdmin ||
+  normalizedRole === 'technician_assistant' ||
+  (['company_owner', 'company_admin'].includes(normalizedRole || '') && !!companyId);
 
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -47,15 +50,18 @@ export default function StaffManagementPage() {
   const [refreshInvites, setRefreshInvites] = useState(false);
 
   const { staffs, loading: staffLoading, handleUpdate, handleDelete } = useStaffData(
-    canViewStaff ? { role: role ?? undefined, companyId: companyId ?? undefined } : undefined
+  isAdmin || normalizedRole === 'technician_assistant'
+    ? undefined // Load tất cả
+      : { role: role ?? undefined, companyId: companyId ?? undefined }
   );
+
 
   useEffect(() => {
     if (!loading && canViewStaff) {
-      if (isAdmin) {
-        loadAllCompanyNames();
-        loadAllStations();
-      } else if (companyId) {
+      if (isAdmin || normalizedRole === 'technician_assistant') {
+      loadAllCompanyNames();
+      loadAllStations();
+    } else if (companyId) {
         loadCompanyName(companyId);
         loadStations(companyId);
         loadPendingInvitations(companyId);
