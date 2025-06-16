@@ -176,12 +176,12 @@ export default function AccessoryManagementPage() {
           onDelete={!isTechnician ? confirmDelete : undefined}
           onUpdateAccessory={!isTechnician ? (updated) => {
             setAccessories((prev) =>
-              prev.map((item) =>
-                item.id === updated.id ? updated : item
-              )
+              prev.map((item) => (item.id === updated.id ? updated : item))
             );
           } : undefined}
+          normalizedRole={isTechnician ? 'technician' : 'other'}
         />
+
 
         {totalPages > 1 && (
           <Pagination

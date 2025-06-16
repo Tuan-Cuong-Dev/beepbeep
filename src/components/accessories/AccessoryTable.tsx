@@ -17,6 +17,7 @@ interface Props {
   onEdit?: (item: Accessory) => void;
   onDelete?: (id: string) => void;
   onUpdateAccessory?: (updated: Accessory) => void;
+  normalizedRole?: string; // 👈 thêm để xác định role
 }
 
 export default function AccessoryTable({
@@ -24,6 +25,7 @@ export default function AccessoryTable({
   onEdit,
   onDelete,
   onUpdateAccessory,
+  normalizedRole,
 }: Props) {
   const [selectedAccessory, setSelectedAccessory] = useState<Accessory | null>(null);
 
@@ -41,7 +43,9 @@ export default function AccessoryTable({
             <th className="p-2 text-left">Code / Quantity</th>
             <th className="p-2 text-left">Status</th>
             <th className="p-2 text-left">Import Date</th>
-            <th className="p-2 text-left">Import Price</th>
+            {normalizedRole !== 'technician' && (
+              <th className="p-2 text-left">Import Price</th>
+            )}
             <th className="p-2 text-left">Retail Price</th>
             <th className="p-2 text-left">Notes</th>
             <th className="p-2 text-left">Actions</th>
@@ -59,9 +63,11 @@ export default function AccessoryTable({
               <td className="p-2">
                 {a.importDate?.toDate().toLocaleDateString('en-GB') || '-'}
               </td>
-              <td className="p-2">
-                {a.importPrice != null ? formatCurrency(a.importPrice) : '-'}
-              </td>
+              {normalizedRole !== 'technician' && (
+                <td className="p-2">
+                  {a.importPrice != null ? formatCurrency(a.importPrice) : '-'}
+                </td>
+              )}
               <td className="p-2">
                 {a.retailPrice != null ? formatCurrency(a.retailPrice) : '-'}
               </td>
@@ -120,3 +126,4 @@ export default function AccessoryTable({
     </div>
   );
 }
+  
