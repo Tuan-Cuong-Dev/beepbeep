@@ -57,7 +57,9 @@ export default function AccessoryForm({
 
     try {
       const id = isUpdateMode ? newAccessory.id : uuidv4();
-      const payload: Accessory = {
+
+      // Bước 1: tạo payload gốc
+      const rawPayload: Partial<Accessory> = {
         ...newAccessory,
         id,
         updatedAt: serverTimestamp(),
@@ -65,6 +67,13 @@ export default function AccessoryForm({
         importPrice: newAccessory.importPrice || 0,
         retailPrice: newAccessory.retailPrice || 0,
       };
+
+      // Bước 2: loại bỏ các field undefined
+      const payload = Object.fromEntries(
+        Object.entries(rawPayload).filter(([_, v]) => v !== undefined)
+      ) as unknown as Accessory;
+
+      console.log('📤 Saving accessory:', payload);
 
       await setDoc(doc(db, 'accessories', id), payload, { merge: true });
 
@@ -91,7 +100,7 @@ export default function AccessoryForm({
       setIsUpdateMode(false);
       onNotify?.('Accessory saved successfully', 'success');
     } catch (error) {
-      console.error('Error saving accessory:', error);
+      console.error('❌ Error saving accessory:', error);
       onNotify?.('Failed to save accessory', 'error');
     }
   };
