@@ -51,8 +51,8 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         </select>
       </div>
 
-      {/* Bảng mã lỗi */}
-      <div className="overflow-x-auto">
+      {/* Hiển thị cho desktop */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full text-sm border">
           <thead className="bg-gray-100">
             <tr>
@@ -86,6 +86,38 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Hiển thị dạng thẻ cho mobile */}
+      <div className="sm:hidden space-y-4">
+        {filtered.map((item) => (
+          <div key={item.id} className="border rounded-xl p-4 shadow bg-white">
+            <div className="text-blue-600 font-semibold text-base mb-2">{item.code}</div>
+            <div className="text-sm text-gray-800 mb-1">
+              <strong>Description:</strong> {item.description}
+            </div>
+            <div className="text-sm text-gray-700 mb-1">
+              <strong>Solution:</strong> {item.recommendedSolution}
+            </div>
+            <div className="text-sm text-gray-600">
+              <strong>Brand:</strong> {item.brand || '-'}
+            </div>
+            <div className="text-sm text-gray-600">
+              <strong>Model:</strong> {item.modelName || '-'}
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              {item.createdAt?.toDate().toLocaleString()}
+            </div>
+            <div className="mt-3 flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => onEdit(item)} className="w-full">
+                Edit
+              </Button>
+              <Button size="sm" variant="destructive" onClick={() => onDelete(item)} className="w-full">
+                Delete
+              </Button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -75,18 +75,47 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
   };
 
   return (
-    <div className="space-y-4 max-w-xl">
-      <h2 className="text-xl font-semibold">
+    <div className="space-y-4 w-full sm:max-w-xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow">
+      <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
         {existing ? '✏️ Edit Error Code' : '➕ Add New Error Code'}
       </h2>
-      <Input placeholder="Error Code (e.g. E01)" value={code} onChange={(e) => setCode(e.target.value)} />
-      <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-      <Textarea placeholder="Recommended Solution" value={recommendedSolution} onChange={(e) => setRecommendedSolution(e.target.value)} />
-      <Input placeholder="Brand (e.g. Selex)" value={brand} onChange={(e) => setBrand(e.target.value)} />
-      <Input placeholder="Model Name (e.g. Camel 2)" value={modelName} onChange={(e) => setModelName(e.target.value)} />
-      <Button onClick={handleSubmit} disabled={loading}>
-        {loading ? 'Saving...' : existing ? 'Update Code' : 'Save Error Code'}
-      </Button>
+
+      <Input
+        className="w-full"
+        placeholder="Error Code (e.g. E01)"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+      />
+      <Textarea
+        className="w-full"
+        placeholder="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <Textarea
+        className="w-full"
+        placeholder="Recommended Solution"
+        value={recommendedSolution}
+        onChange={(e) => setRecommendedSolution(e.target.value)}
+      />
+      <Input
+        className="w-full"
+        placeholder="Brand (e.g. Selex)"
+        value={brand}
+        onChange={(e) => setBrand(e.target.value)}
+      />
+      <Input
+        className="w-full"
+        placeholder="Model Name (e.g. Camel 2)"
+        value={modelName}
+        onChange={(e) => setModelName(e.target.value)}
+      />
+
+      <div className="pt-2">
+        <Button className="w-full sm:w-auto" onClick={handleSubmit} disabled={loading}>
+          {loading ? 'Saving...' : existing ? 'Update Code' : 'Save Error Code'}
+        </Button>
+      </div>
     </div>
   );
 }
