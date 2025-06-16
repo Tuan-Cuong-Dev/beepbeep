@@ -23,18 +23,19 @@ export function useStaffData(options?: Options) {
 
   const normalizedRole = options?.role?.toLowerCase();
   const isAdmin = normalizedRole === 'admin';
+  const isTechnicianAssistant = normalizedRole === 'technician_assistant';
   const companyId = options?.companyId;
 
   useEffect(() => {
     // 🚨 Nếu không phải admin mà không có companyId thì KHÔNG query
-    if (!isAdmin && !companyId) {
+    if (!isAdmin && !isTechnicianAssistant && !companyId) {
       setStaffs([]);
       setLoading(false);
       return;
     }
 
     // ✅ Xác định query
-    const q = isAdmin
+    const q = (isAdmin || isTechnicianAssistant)
       ? query(collection(db, 'staffs')) // Admin → get all
       : query(collection(db, 'staffs'), where('companyId', '==', companyId!)); // Company → get by companyId
 
