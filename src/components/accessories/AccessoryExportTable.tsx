@@ -1,117 +1,90 @@
 'use client';
 
-import { useState } from 'react';
-import { Accessory } from '@/src/lib/accessories/accessoryTypes';
-import { Button } from '@/src/components/ui/button';
-import AccessoryExportForm from '@/src/components/accessories/AccessoryExportForm';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-} from '@/src/components/ui/dialog';
-import { formatCurrency } from '@/src/utils/formatCurrency'; // ✅ Thêm nếu bạn đã có
+import { useEffect, useState } from 'react';
+import { AccessoryExport } from '@/src/lib/accessories/accessoryExportTypes';
+import { getUserNameById } from '@/src/lib/services/users/userService';
+import { format } from 'date-fns';
+import { Input } from '@/src/components/ui/input';
+import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Props {
-  accessories: Accessory[];
-  onEdit?: (item: Accessory) => void;
-  onDelete?: (id: string) => void;
-  onUpdateAccessory?: (updated: Accessory) => void;
+  exports: AccessoryExport[];
 }
 
-export default function AccessoryTable({
-  accessories,
-  onEdit,
-  onDelete,
-  onUpdateAccessory,
-}: Props) {
-  const [selectedAccessory, setSelectedAccessory] = useState<Accessory | null>(null);
+export default function AccessoryExportTable({ exports }: Props) {
+  const [exportedByMap, setExportedByMap] = useState<Record<string, string>>({});
+  const [searchName, setSearchName] = useState('');
+  const [searchTarget, setSearchTarget] = useState('');
 
-  const sortedAccessories = [...accessories].sort((a, b) =>
-    a.name.localeCompare(b.name)
+  useEffect(() => {
+    const fetchUserNames = async () => {
+      const uniqueIds = [...new Set(exports.map((e) => e.exportedBy))];
+      const map: Record<string, string> = {};
+
+      for (const uid of uniqueIds) {
+        const name = await getUserNameById(uid);
+        map[uid] = name;
+      }
+
+      setExportedByMap(map);
+    };
+
+    fetchUserNames();
+  }, [exports]);
+
+  const filteredExports = exports.filter((item) =>
+    item.accessoryName.toLowerCase().includes(searchName.toLowerCase()) &&
+    (item.target || '').toLowerCase().includes(searchTarget.toLowerCase())
   );
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border text-sm">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 text-left">Name</th>
-            <th className="p-2 text-left">Type</th>
-            <th className="p-2 text-left">Code / Quantity</th>
-            <th className="p-2 text-left">Status</th>
-            <th className="p-2 text-left">Import Date</th>
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <Input
+          placeholder="Search by accessory name..."
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+          className="w-full md:w-64"
+        />
+        <Input
+          placeholder="Search by target..."
+          value={searchTarget}
+          onChange={(e) => setSearchTarget(e.target.value)}
+          className="w-full md:w-64"
+        />
+      </div>
+
+      <table className="w-full text-sm border">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="p-2 text-left">Accessory</th>
+            <th className="p-2 text-left">Quantity</th>
+            <th className="p-2 text-left">Target</th>
             <th className="p-2 text-left">Import Price</th>
             <th className="p-2 text-left">Retail Price</th>
-            <th className="p-2 text-left">Notes</th>
-            <th className="p-2 text-left">Actions</th>
+            <th className="p-2 text-left">Note</th>
+            <th className="p-2 text-left">Exported By</th>
+            <th className="p-2 text-left">Date</th>
           </tr>
         </thead>
         <tbody>
-          {sortedAccessories.map((a) => (
-            <tr key={a.id} className="border-t hover:bg-gray-50">
-              <td className="p-2">{a.name}</td>
-              <td className="p-2 capitalize">{a.type}</td>
+          {filteredExports.map((item) => (
+            <tr key={item.id} className="border-t hover:bg-gray-50">
+              <td className="p-2">{item.accessoryName}</td>
+              <td className="p-2">{item.quantity}</td>
+              <td className="p-2">{item.target || '-'}</td>
               <td className="p-2">
-                {a.type === 'tracked' ? a.code : `${a.quantity ?? 0} pcs`}
-              </td>
-              <td className="p-2 capitalize">{a.status}</td>
-              <td className="p-2">
-                {a.importDate?.toDate().toLocaleDateString('en-GB') || '-'}
+                {item.importPrice != null ? formatCurrency(item.importPrice) : '-'}
               </td>
               <td className="p-2">
-                {a.importPrice != null ? formatCurrency(a.importPrice) : '-'}
+                {item.retailPrice != null ? formatCurrency(item.retailPrice) : '-'}
               </td>
+              <td className="p-2 whitespace-pre-line break-words">{item.note || '-'}</td>
+              <td className="p-2">{exportedByMap[item.exportedBy] || '...'}</td>
               <td className="p-2">
-                {a.retailPrice != null ? formatCurrency(a.retailPrice) : '-'}
-              </td>
-              <td className="p-2 whitespace-pre-line break-words">
-                {a.notes || '-'}
-              </td>
-              <td className="p-2">
-                {onEdit && onDelete && onUpdateAccessory ? (
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Button size="sm" onClick={() => onEdit(a)}>
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => onDelete(a.id)}
-                    >
-                      Delete
-                    </Button>
-                    <Dialog
-                      onOpenChange={(open) => {
-                        if (!open) setSelectedAccessory(null);
-                      }}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => setSelectedAccessory(a)}
-                        >
-                          Export
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-xl">
-                        <DialogTitle>Export Accessory</DialogTitle>
-                        {selectedAccessory && (
-                          <AccessoryExportForm
-                            defaultAccessory={selectedAccessory}
-                            onComplete={(updatedAccessory: Accessory) => {
-                              onUpdateAccessory(updatedAccessory);
-                              setSelectedAccessory(null);
-                            }}
-                          />
-                        )}
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                ) : (
-                  <span className="text-gray-400">View only</span>
-                )}
+                {item.exportedAt?.toDate
+                  ? format(item.exportedAt.toDate(), 'dd/MM/yyyy')
+                  : '-'}
               </td>
             </tr>
           ))}

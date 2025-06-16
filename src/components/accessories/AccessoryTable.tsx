@@ -17,7 +17,7 @@ interface Props {
   onEdit?: (item: Accessory) => void;
   onDelete?: (id: string) => void;
   onUpdateAccessory?: (updated: Accessory) => void;
-  normalizedRole?: string; // 👈 thêm để xác định role
+  normalizedRole?: string;
 }
 
 export default function AccessoryTable({
@@ -34,10 +34,10 @@ export default function AccessoryTable({
   );
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border text-sm">
-        <thead>
-          <tr className="bg-gray-100">
+    <div className="overflow-x-auto border rounded-lg bg-white shadow">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-100">
+          <tr>
             <th className="p-2 text-left">Name</th>
             <th className="p-2 text-left">Type</th>
             <th className="p-2 text-left">Code / Quantity</th>
@@ -126,4 +126,3 @@ export default function AccessoryTable({
     </div>
   );
 }
-  
