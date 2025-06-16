@@ -10,4 +10,8 @@ export interface AccessoryExport {
   note?: string;               // Ghi chú lý do xuất
   target?: string;             // Xuất cho ai (xe nào, trạm nào, kỹ thuật viên...)
   companyId: string;
+
+  // ✅ Giá tại thời điểm xuất (snapshot)
+  importPrice?: number;        // Giá nhập
+  retailPrice?: number;        // Giá bán đề xuất
 }

@@ -10,6 +10,8 @@ export const exportAccessoriesToExcel = (accessories: Accessory[]) => {
     quantity: a.type === 'bulk' ? a.quantity : '',
     status: a.status,
     importDate: a.importDate?.toDate().toISOString().split('T')[0] || '',
+    importPrice: a.importPrice ?? '',
+    retailPrice: a.retailPrice ?? '',
     notes: a.notes || '',
   }));
 

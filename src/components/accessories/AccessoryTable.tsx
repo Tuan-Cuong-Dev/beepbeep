@@ -10,6 +10,7 @@ import {
   DialogTrigger,
   DialogTitle,
 } from '@/src/components/ui/dialog';
+import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Props {
   accessories: Accessory[];
@@ -40,6 +41,8 @@ export default function AccessoryTable({
             <th className="p-2 text-left">Code / Quantity</th>
             <th className="p-2 text-left">Status</th>
             <th className="p-2 text-left">Import Date</th>
+            <th className="p-2 text-left">Import Price</th>
+            <th className="p-2 text-left">Retail Price</th>
             <th className="p-2 text-left">Notes</th>
             <th className="p-2 text-left">Actions</th>
           </tr>
@@ -56,7 +59,15 @@ export default function AccessoryTable({
               <td className="p-2">
                 {a.importDate?.toDate().toLocaleDateString('en-GB') || '-'}
               </td>
-              <td className="p-2 whitespace-pre-line break-words">{a.notes || '-'}</td>
+              <td className="p-2">
+                {a.importPrice != null ? formatCurrency(a.importPrice) : '-'}
+              </td>
+              <td className="p-2">
+                {a.retailPrice != null ? formatCurrency(a.retailPrice) : '-'}
+              </td>
+              <td className="p-2 whitespace-pre-line break-words">
+                {a.notes || '-'}
+              </td>
               <td className="p-2">
                 {onEdit && onDelete && onUpdateAccessory ? (
                   <div className="flex flex-col sm:flex-row gap-2">

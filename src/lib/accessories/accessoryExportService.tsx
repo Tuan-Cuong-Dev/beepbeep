@@ -1,4 +1,3 @@
-// 📁 lib/accessories/accessoryExportService.ts
 import {
   addDoc,
   getDocs,
@@ -8,6 +7,7 @@ import {
   where,
   collection,
   doc,
+  Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { AccessoryExport } from './accessoryExportTypes';
@@ -16,25 +16,34 @@ import { AccessoryExport } from './accessoryExportTypes';
  * Tạo mới export và cập nhật tồn kho phụ kiện
  */
 export async function exportAccessory(data: Omit<AccessoryExport, 'id'>) {
-  const docRef = await addDoc(collection(db, 'accessoryExports'), data);
+  let finalData: Omit<AccessoryExport, 'id'> = { ...data };
 
-  // Nếu có mã phụ kiện (tracked), thì trừ số lượng
-  if (data.accessoryId && data.quantity) {
+  // 👉 Nếu có accessoryId thì lấy thêm giá nhập và giá bán từ accessories
+  if (data.accessoryId) {
     const accessoryRef = doc(db, 'accessories', data.accessoryId);
-    const accessorySnap = await getDoc(accessoryRef);
+    const snap = await getDoc(accessoryRef);
+    if (snap.exists()) {
+      const accessory = snap.data();
 
-    if (accessorySnap.exists()) {
-      const current = accessorySnap.data();
-      const currentQty = current.quantity || 0;
-      const newQty = Math.max(currentQty - data.quantity, 0); // không cho nhỏ hơn 0
+      finalData = {
+        ...finalData,
+        importPrice: accessory.importPrice ?? undefined,
+        retailPrice: accessory.retailPrice ?? undefined,
+      };
 
-      await updateDoc(accessoryRef, {
-        quantity: newQty,
-        updatedAt: new Date(),
-      });
+      // 👉 Nếu là loại bulk và có quantity thì trừ số lượng
+      if (accessory.type === 'bulk' && data.quantity) {
+        const currentQty = accessory.quantity || 0;
+        const newQty = Math.max(currentQty - data.quantity, 0);
+        await updateDoc(accessoryRef, {
+          quantity: newQty,
+          updatedAt: Timestamp.now(),
+        });
+      }
     }
   }
 
+  const docRef = await addDoc(collection(db, 'accessoryExports'), finalData);
   return docRef.id;
 }
 

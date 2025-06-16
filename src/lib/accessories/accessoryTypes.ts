@@ -14,20 +14,23 @@ export interface Accessory {
   companyId: string;
   name: string;
 
-  // Dạng theo loại:
   type: AccessoryType;
 
-  // Dùng nếu loại là 'tracked' (có mã định danh riêng)
+  // Nếu là 'tracked' (có mã riêng)
   code?: string;
 
-  // Dùng nếu loại là 'bulk' (quản lý theo số lượng)
+  // Nếu là 'bulk' (quản lý theo số lượng)
   quantity?: number;
 
   status: AccessoryStatus;
 
   importDate: Timestamp;
-  importedDate?: Timestamp; // ✅ thêm dòng này
+  importedDate?: Timestamp;
   exportDate?: Timestamp;
+
+  importPrice?: number; // 💰 Giá nhập
+  retailPrice?: number; // 💰 Giá bán
+
   notes?: string;
-  updatedAt?: Timestamp | FieldValue; 
+  updatedAt?: Timestamp | FieldValue;
 }

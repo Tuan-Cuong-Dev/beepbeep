@@ -5,6 +5,7 @@ import { AccessoryExport } from '@/src/lib/accessories/accessoryExportTypes';
 import { getUserNameById } from '@/src/lib/services/users/userService';
 import { format } from 'date-fns';
 import { Input } from '@/src/components/ui/input';
+import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Props {
   exports: AccessoryExport[];
@@ -59,6 +60,8 @@ export default function AccessoryExportTable({ exports }: Props) {
             <th className="p-2 text-left">Accessory</th>
             <th className="p-2 text-left">Quantity</th>
             <th className="p-2 text-left">Target</th>
+            <th className="p-2 text-left">Import Price</th>
+            <th className="p-2 text-left">Retail Price</th>
             <th className="p-2 text-left">Note</th>
             <th className="p-2 text-left">Exported By</th>
             <th className="p-2 text-left">Date</th>
@@ -70,6 +73,12 @@ export default function AccessoryExportTable({ exports }: Props) {
               <td className="p-2">{item.accessoryName}</td>
               <td className="p-2">{item.quantity}</td>
               <td className="p-2">{item.target || '-'}</td>
+              <td className="p-2">
+                {item.importPrice != null ? formatCurrency(item.importPrice) : '-'}
+              </td>
+              <td className="p-2">
+                {item.retailPrice != null ? formatCurrency(item.retailPrice) : '-'}
+              </td>
               <td className="p-2 whitespace-pre-line break-words">{item.note || '-'}</td>
               <td className="p-2">{exportedByMap[item.exportedBy] || '...'}</td>
               <td className="p-2">

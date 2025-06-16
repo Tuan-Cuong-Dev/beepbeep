@@ -33,6 +33,11 @@ export default function AccessoryExportForm({ defaultAccessory, onComplete }: Pr
     companyId: companyId || '',
   });
 
+  const [accessoryInfo, setAccessoryInfo] = useState<{
+    importPrice?: number;
+    retailPrice?: number;
+  }>({});
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -43,6 +48,20 @@ export default function AccessoryExportForm({ defaultAccessory, onComplete }: Pr
         accessoryName: defaultAccessory.name,
         accessoryId: defaultAccessory.id,
       }));
+
+      const fetchAccessoryDetails = async () => {
+        const ref = doc(db, 'accessories', defaultAccessory.id);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data();
+          setAccessoryInfo({
+            importPrice: data.importPrice,
+            retailPrice: data.retailPrice,
+          });
+        }
+      };
+
+      fetchAccessoryDetails();
     }
   }, [defaultAccessory]);
 
@@ -119,6 +138,18 @@ export default function AccessoryExportForm({ defaultAccessory, onComplete }: Pr
             min={1}
           />
         </div>
+
+        {/** 💵 Hiển thị giá nếu có */}
+        {(accessoryInfo.importPrice || accessoryInfo.retailPrice) && (
+          <div className="md:col-span-2 text-sm text-gray-600 px-1">
+            {accessoryInfo.importPrice != null && (
+              <p>💰 Import Price: {accessoryInfo.importPrice.toLocaleString('vi-VN')} VNĐ</p>
+            )}
+            {accessoryInfo.retailPrice != null && (
+              <p>🏷️ Retail Price: {accessoryInfo.retailPrice.toLocaleString('vi-VN')} VNĐ</p>
+            )}
+          </div>
+        )}
 
         <div>
           <Label>Target (e.g. Technician, Vehicle)</Label>

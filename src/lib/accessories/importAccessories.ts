@@ -1,10 +1,9 @@
 // 📁 lib/accessories/importAccessories.ts
 import { db } from '@/src/firebaseConfig';
-import { collection, setDoc, doc } from 'firebase/firestore';
+import { collection, setDoc, doc, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import * as XLSX from 'xlsx';
 import { Accessory } from './accessoryTypes';
-import { Timestamp } from 'firebase/firestore';
 
 export const importAccessories = async (file: File): Promise<Accessory[]> => {
   const data = await file.arrayBuffer();
@@ -26,6 +25,8 @@ export const importAccessories = async (file: File): Promise<Accessory[]> => {
         ? Timestamp.fromDate(new Date(row.importDate))
         : Timestamp.fromDate(new Date()),
       notes: row.notes || '',
+      importPrice: row.importPrice ? parseFloat(row.importPrice) : undefined,
+      retailPrice: row.retailPrice ? parseFloat(row.retailPrice) : undefined,
     };
 
     if (type === 'tracked') {

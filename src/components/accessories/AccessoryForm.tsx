@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Timestamp, setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { Accessory, AccessoryType } from '@/src/lib/accessories/accessoryTypes';
@@ -19,6 +19,16 @@ interface Props {
   setIsUpdateMode: (v: boolean) => void;
   setAccessories: Dispatch<SetStateAction<Accessory[]>>;
   onNotify?: (msg: string, type?: 'success' | 'error') => void;
+}
+
+/**
+ * Parse chuỗi tiền (ví dụ '1.250.000 ₫') thành số nguyên 1250000
+ */
+function parseCurrencyString(value: string): number {
+  if (!value) return 0;
+  const numericString = value.replace(/[^\d]/g, '');
+  const number = parseInt(numericString, 10);
+  return isNaN(number) ? 0 : number;
 }
 
 export default function AccessoryForm({
@@ -52,6 +62,8 @@ export default function AccessoryForm({
         id,
         updatedAt: serverTimestamp(),
         importDate: newAccessory.importDate || Timestamp.fromDate(new Date()),
+        importPrice: newAccessory.importPrice || 0,
+        retailPrice: newAccessory.retailPrice || 0,
       };
 
       await setDoc(doc(db, 'accessories', id), payload, { merge: true });
@@ -71,6 +83,8 @@ export default function AccessoryForm({
         quantity: undefined,
         status: 'in_stock',
         importDate: Timestamp.fromDate(new Date()),
+        importPrice: undefined,
+        retailPrice: undefined,
         notes: '',
       });
 
@@ -150,7 +164,9 @@ export default function AccessoryForm({
           <select
             className="w-full border px-3 py-2 rounded"
             value={newAccessory.status}
-            onChange={(e) => setNewAccessory({ ...newAccessory, status: e.target.value as Accessory['status'] })}
+            onChange={(e) =>
+              setNewAccessory({ ...newAccessory, status: e.target.value as Accessory['status'] })
+            }
           >
             <option value="in_stock">In Stock</option>
             <option value="in_use">In Use</option>
@@ -176,6 +192,35 @@ export default function AccessoryForm({
           />
         </div>
 
+        <div>
+          <Label>Import Price (VNĐ)</Label>
+          <Input
+            type="text"
+            value={newAccessory.importPrice?.toLocaleString('vi-VN') ?? ''}
+            onChange={(e) =>
+              setNewAccessory({
+                ...newAccessory,
+                importPrice: parseCurrencyString(e.target.value),
+              })
+            }
+            placeholder="e.g., 1.000.000 ₫"
+          />
+        </div>
+
+        <div>
+          <Label>Retail Price (VNĐ)</Label>
+          <Input
+            type="text"
+            value={newAccessory.retailPrice?.toLocaleString('vi-VN') ?? ''}
+            onChange={(e) =>
+              setNewAccessory({
+                ...newAccessory,
+                retailPrice: parseCurrencyString(e.target.value),
+              })
+            }
+            placeholder="e.g., 1.500.000 ₫"
+          />
+        </div>
 
         <div className="md:col-span-2">
           <Label>Notes</Label>
@@ -203,6 +248,8 @@ export default function AccessoryForm({
                 quantity: undefined,
                 status: 'in_stock',
                 importDate: Timestamp.fromDate(new Date()),
+                importPrice: undefined,
+                retailPrice: undefined,
                 notes: '',
               });
               setIsUpdateMode(false);
