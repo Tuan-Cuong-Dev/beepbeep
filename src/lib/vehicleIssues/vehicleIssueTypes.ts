@@ -1,4 +1,3 @@
-// 📄 lib/vehicleIssues/vehicleIssueTypes.ts
 import { Timestamp } from "firebase/firestore";
 
 export type VehicleIssueStatus = 
@@ -31,6 +30,14 @@ export interface VehicleIssueCore {
   // ✅ Thông tin khi đóng sự cố
   closedAt?: Timestamp;
   closedBy?: string;
+
+  // ✅ Mở rộng cho khách hàng lẻ
+  customerName?: string;
+  customerPhone?: string;
+  vehicleBrand?: string;
+  vehicleModel?: string;
+  vehicleLicensePlate?: string;
+  customerLocation?: string;
 }
 
 export type VehicleIssue = VehicleIssueCore;

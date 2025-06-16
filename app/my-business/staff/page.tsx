@@ -30,7 +30,7 @@ export default function StaffManagementPage() {
   const { role, companyId, loading } = useUser();
   const normalizedRole = role?.toLowerCase();
   const isAdmin = normalizedRole === 'admin';
-  const canViewStaff = isAdmin || (!!companyId && ['company_owner', 'company_admin'].includes(normalizedRole || ''));
+  const canViewStaff = isAdmin || (!!companyId && ['company_owner', 'company_admin', 'technician_assistant'].includes(normalizedRole || ''));
 
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [showForm, setShowForm] = useState(false);

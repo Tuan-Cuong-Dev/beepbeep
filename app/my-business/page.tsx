@@ -14,8 +14,8 @@ import StaffDashboard from '@/src/components/my-business/dashboards/StaffDashboa
 import TechnicianDashboard from '@/src/components/my-business/dashboards/TechnicianDashboard';
 import CompanyAdminDashboard from '@/src/components/my-business/dashboards/CompanyAdminDashboard';
 import StationManagerDashboard from '@/src/components/my-business/dashboards/StationManagerDashboard';
+import TechnicianAssistantDashboard from '@/src/components/my-business/dashboards/TechnicianAssistantDashboard'; // ✅ Mới thêm
 
-// Type cho staff
 interface StaffEntry {
   id: string;
   role: string;
@@ -28,6 +28,7 @@ export default function MyBusinessPage() {
 
   const [businessType, setBusinessType] = useState<
     'admin' |
+    'technician_assistant' |
     'rental_company_owner' |
     'private_provider' |
     'agent' |
@@ -43,13 +44,18 @@ export default function MyBusinessPage() {
   useEffect(() => {
     if (loading || !user) return;
 
+    // Ưu tiên nếu là Technician Assistant
+    if (role === 'technician_assistant') {
+      setBusinessType('technician_assistant');
+      return;
+    }
+
     if (role === 'Admin') {
       setBusinessType('admin');
       return;
     }
 
     const fetchData = async () => {
-      // Check owner roles
       const rentalQuery = query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid));
       const agentQuery = query(collection(db, 'agents'), where('ownerId', '==', user.uid));
       const providerQuery = query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid));
@@ -75,7 +81,6 @@ export default function MyBusinessPage() {
         return;
       }
 
-      // Check staff
       const staffQuery = query(collection(db, 'staffs'), where('userId', '==', user.uid));
       const staffSnap = await getDocs(staffQuery);
 
@@ -91,7 +96,6 @@ export default function MyBusinessPage() {
         setStaffRoles(staffData);
 
         const staffRole = staffData[0]?.role?.toLowerCase() || '';
-
         switch (staffRole) {
           case 'technician':
             setBusinessType('technician');
@@ -109,7 +113,6 @@ export default function MyBusinessPage() {
         return;
       }
 
-      // No role → redirect to create business
       router.replace('/my-business/create');
     };
 
@@ -127,6 +130,7 @@ export default function MyBusinessPage() {
   return (
     <main className="min-h-screen space-y-6 bg-gray-50">
       {businessType === 'admin' && <AdminDashboard />}
+      {businessType === 'technician_assistant' && <TechnicianAssistantDashboard />} {/* ✅ Mới thêm */}
       {businessType === 'rental_company_owner' && <RentalCompanyDashboard />}
       {businessType === 'private_provider' && <PrivateProviderDashboard />}
       {businessType === 'agent' && <AgentDashboard />}
