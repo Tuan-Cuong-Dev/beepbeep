@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,24 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 
+/**
+ * Parse chuỗi tiền (ví dụ '1.250.000 ₫') thành số nguyên 1250000
+ */
+function parseCurrencyString(value: string): number {
+  if (!value) return 0;
+  const numericString = value.replace(/[^\d]/g, '');
+  const number = parseInt(numericString, 10);
+  return isNaN(number) ? 0 : number;
+}
+
+/**
+ * Format số thành chuỗi tiền tệ
+ */
+function formatCurrency(value: string): string {
+  const number = parseCurrencyString(value);
+  return number.toLocaleString('vi-VN');
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -22,8 +40,15 @@ export default function ActualResultPopup({ open, onClose, onSubmit }: Props) {
   const [solution, setSolution] = useState('');
   const [cost, setCost] = useState('');
 
+  useEffect(() => {
+    if (!open) {
+      setSolution('');
+      setCost('');
+    }
+  }, [open]);
+
   const handleSubmit = () => {
-    const costNumber = parseInt(cost.replace(/\D/g, ''), 10) || 0;
+    const costNumber = parseCurrencyString(cost);
     onSubmit(solution.trim(), costNumber);
     setSolution('');
     setCost('');
@@ -52,9 +77,9 @@ export default function ActualResultPopup({ open, onClose, onSubmit }: Props) {
             <Input
               type="text"
               inputMode="numeric"
-              value={cost}
+              value={formatCurrency(cost)}
               onChange={(e) => setCost(e.target.value)}
-              placeholder="e.g. 500000"
+              placeholder="e.g. 500.000 ₫"
             />
           </div>
         </div>
@@ -63,7 +88,11 @@ export default function ActualResultPopup({ open, onClose, onSubmit }: Props) {
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button className="bg-[#00d289] text-white hover:bg-[#00b67a]" onClick={handleSubmit}>
+          <Button
+            className="bg-[#00d289] text-white hover:bg-[#00b67a]"
+            disabled={!solution || !cost}
+            onClick={handleSubmit}
+          >
             Submit
           </Button>
         </DialogFooter>

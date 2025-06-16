@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
 import { useState, useEffect } from "react";
+import { parseCurrencyString } from "@/src/utils/parseCurrencyString"; // 🔁 Đường dẫn đúng file của bạn
 
 interface Props {
   open: boolean;
@@ -12,24 +13,23 @@ interface Props {
   onSubmit: (solution: string, cost: number) => void;
 }
 
-function formatCurrency(value: string) {
-  const number = parseInt(value.replace(/\D/g, "")) || 0;
-  return number.toLocaleString("vi-VN");
+function formatCurrency(value: number): string {
+  return value.toLocaleString("vi-VN");
 }
 
 export default function ProposalPopup({ open, onClose, onSubmit }: Props) {
   const [solution, setSolution] = useState("");
-  const [cost, setCost] = useState("");
+  const [costRaw, setCostRaw] = useState("0");
 
   useEffect(() => {
     if (!open) {
       setSolution("");
-      setCost("");
+      setCostRaw("0");
     }
   }, [open]);
 
   const handleSubmit = () => {
-    const numericCost = parseInt(cost.replace(/\D/g, "")) || 0;
+    const numericCost = parseCurrencyString(costRaw);
     onSubmit(solution, numericCost);
   };
 
@@ -49,10 +49,10 @@ export default function ProposalPopup({ open, onClose, onSubmit }: Props) {
           <Input
             placeholder="Proposed Cost (VNĐ)"
             inputMode="numeric"
-            value={formatCurrency(cost)}
-            onChange={(e) => setCost(e.target.value)}
+            value={formatCurrency(parseCurrencyString(costRaw))}
+            onChange={(e) => setCostRaw(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && solution && cost) {
+              if (e.key === "Enter" && solution && parseCurrencyString(costRaw) > 0) {
                 e.preventDefault();
                 handleSubmit();
               }
@@ -62,7 +62,10 @@ export default function ProposalPopup({ open, onClose, onSubmit }: Props) {
 
         <DialogFooter className="mt-4">
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button disabled={!solution || !cost} onClick={handleSubmit}>
+          <Button
+            disabled={!solution || parseCurrencyString(costRaw) <= 0}
+            onClick={handleSubmit}
+          >
             Submit Proposal
           </Button>
         </DialogFooter>
