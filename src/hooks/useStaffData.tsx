@@ -22,41 +22,40 @@ export function useStaffData(options?: Options) {
   const [loading, setLoading] = useState(true);
 
   const normalizedRole = options?.role?.toLowerCase();
-  const isAdmin = normalizedRole === 'admin';
-  const isTechnicianAssistant = normalizedRole === 'technician_assistant';
-  const companyId = options?.companyId;
+const isAdmin = normalizedRole === 'admin';
+const isTechnicianAssistant = normalizedRole === 'technician_assistant';
+const companyId = options?.companyId;
 
-  useEffect(() => {
-    // 🚨 Nếu không phải admin mà không có companyId thì KHÔNG query
-    if (!isAdmin && !isTechnicianAssistant && !companyId) {
-      setStaffs([]);
+useEffect(() => {
+  if (!isAdmin && !isTechnicianAssistant && !companyId) {
+    setStaffs([]);
+    setLoading(false);
+    return;
+  }
+
+  const q = (isAdmin || isTechnicianAssistant)
+    ? query(collection(db, 'staffs'))
+    : query(collection(db, 'staffs'), where('companyId', '==', companyId!));
+
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const updatedStaffs: Staff[] = snapshot.docs.map((doc) => ({
+        ...(doc.data() as Staff),
+        id: doc.id,
+      }));
+      setStaffs(updatedStaffs);
       setLoading(false);
-      return;
+    },
+    (error) => {
+      console.error('Realtime fetch staff error:', error);
+      setLoading(false);
     }
+  );
 
-    // ✅ Xác định query
-    const q = (isAdmin || isTechnicianAssistant)
-      ? query(collection(db, 'staffs')) // Admin → get all
-      : query(collection(db, 'staffs'), where('companyId', '==', companyId!)); // Company → get by companyId
+  return () => unsubscribe();
+}, [isAdmin, isTechnicianAssistant, companyId]);
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const updatedStaffs: Staff[] = snapshot.docs.map((doc) => ({
-          ...(doc.data() as Staff),
-          id: doc.id,
-        }));
-        setStaffs(updatedStaffs);
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Realtime fetch staff error:', error);
-        setLoading(false);
-      }
-    );
-
-    return () => unsubscribe();
-  }, [isAdmin, companyId]);
 
   const handleCreate = async () => {
     console.warn('handleCreate is disabled. Staffs should be invited via invitation flow.');
