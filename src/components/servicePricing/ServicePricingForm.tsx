@@ -93,23 +93,27 @@ export default function ServicePricingForm({ existing, onSaved, onRefresh }: Pro
       <h2 className="text-xl font-semibold">
         {existing ? 'Edit Service Package' : 'Add Service Package'}
       </h2>
-      <Input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-      <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+      <Input placeholder="Tên gói dịch vụ (VD: Bảo trì cơ bản)" value={title} onChange={(e) => setTitle(e.target.value)} />
       <Textarea
-        placeholder="Features (one per line)"
+        placeholder="Mô tả ngắn gọn về gói dịch vụ, mục đích sử dụng và lợi ích dành cho khách hàng."
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <Textarea
+        placeholder="Các bước công việc hoặc hạng mục thực hiện, mỗi dòng là 1 tính năng.\nVD:\n- Kiểm tra hệ thống điện\n- Tra dầu phanh"
         value={featuresText}
         onChange={(e) => setFeaturesText(e.target.value)}
       />
       <Input
         type="number"
-        placeholder="Price (VND)"
+        placeholder="Giá dịch vụ (VND)"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
       />
       <div className="space-y-1">
         <label className="text-sm font-medium">Category</label>
         <SimpleSelect
-          placeholder="Select Category"
+          placeholder="Chọn loại dịch vụ"
           value={category}
           onChange={(val) => setCategory(val)}
           options={categories.map((cat) => ({ label: cat, value: cat }))}
@@ -117,12 +121,12 @@ export default function ServicePricingForm({ existing, onSaved, onRefresh }: Pro
       </div>
 
       <Input
-        placeholder="Estimated Duration (e.g. 30 phút, 1 giờ)"
+        placeholder="Thời gian ước tính (VD: 30 phút, 1 giờ)"
         value={durationEstimate}
         onChange={(e) => setDurationEstimate(e.target.value)}
       />
       <Input
-        placeholder="Image URL (optional)"
+        placeholder="URL hình ảnh đại diện (tùy chọn)"
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
       />
