@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { ErrorCode } from '@/src/lib/errorCodes/errorCodeTypes';
 import { Button } from '@/src/components/ui/button';
-import { Pencil, Trash } from 'lucide-react';
+import { Input } from '@/src/components/ui/input';
+import { Pencil, Trash, ExternalLink } from 'lucide-react';
 
 interface Props {
   errorCodes: ErrorCode[];
@@ -14,6 +15,7 @@ interface Props {
 export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) {
   const [brandFilter, setBrandFilter] = useState('');
   const [modelFilter, setModelFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const uniqueBrands = Array.from(new Set(errorCodes.map(e => e.brand).filter(Boolean)));
   const uniqueModels = Array.from(new Set(errorCodes.map(e => e.modelName).filter(Boolean)));
@@ -21,12 +23,18 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
   const filtered = errorCodes.filter((e) => {
     const matchBrand = brandFilter ? e.brand === brandFilter : true;
     const matchModel = modelFilter ? e.modelName === modelFilter : true;
-    return matchBrand && matchModel;
+    const matchSearch = searchTerm
+      ? (e.code + e.description + e.recommendedSolution)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      : true;
+
+    return matchBrand && matchModel && matchSearch;
   });
 
   return (
     <div className="space-y-4">
-      {/* Bộ lọc */}
+      {/* Bộ lọc và tìm kiếm */}
       <div className="flex flex-wrap gap-4">
         <select
           className="border p-2 rounded-md"
@@ -49,9 +57,16 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
             <option key={model} value={model}>{model}</option>
           ))}
         </select>
+
+        <Input
+          className="border p-2 rounded-md w-full sm:w-64"
+          placeholder="Search by code, description or solution"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
-      {/* Hiển thị cho desktop */}
+      {/* Hiển thị bảng desktop */}
       <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full text-sm border">
           <thead className="bg-gray-100">
@@ -61,6 +76,8 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
               <th className="p-2 text-left">Solution</th>
               <th className="p-2 text-left">Brand</th>
               <th className="p-2 text-left">Model</th>
+              <th className="p-2 text-left">Video</th>
+              <th className="p-2 text-left">Suggestions</th>
               <th className="p-2 text-left">Created At</th>
               <th className="p-2 text-left">Actions</th>
             </tr>
@@ -73,6 +90,23 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                 <td className="p-2">{item.recommendedSolution}</td>
                 <td className="p-2">{item.brand || '-'}</td>
                 <td className="p-2">{item.modelName || '-'}</td>
+                <td className="p-2">
+                  {item.tutorialVideoUrl ? (
+                    <a
+                      href={item.tutorialVideoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline inline-flex items-center gap-1"
+                    >
+                      YouTube <ExternalLink className="w-4 h-4 inline" />
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 italic">No link</span>
+                  )}
+                </td>
+                <td className="p-2 text-center">
+                  {item.technicianSuggestions?.length ?? 0}
+                </td>
                 <td className="p-2">{item.createdAt?.toDate().toLocaleString()}</td>
                 <td className="p-2 flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => onEdit(item)}>
@@ -88,7 +122,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         </table>
       </div>
 
-      {/* Hiển thị dạng thẻ cho mobile */}
+      {/* Hiển thị mobile dạng thẻ */}
       <div className="sm:hidden space-y-4">
         {filtered.map((item) => (
           <div key={item.id} className="border rounded-xl p-4 shadow bg-white">
@@ -104,6 +138,21 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
             </div>
             <div className="text-sm text-gray-600">
               <strong>Model:</strong> {item.modelName || '-'}
+            </div>
+            {item.tutorialVideoUrl && (
+              <div className="text-sm text-blue-500 mt-1">
+                <a
+                  href={item.tutorialVideoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline inline-flex items-center gap-1"
+                >
+                  Watch Video <ExternalLink className="w-4 h-4 inline" />
+                </a>
+              </div>
+            )}
+            <div className="text-sm text-gray-500">
+              <strong>Suggestions:</strong> {item.technicianSuggestions?.length ?? 0}
             </div>
             <div className="text-xs text-gray-400 mt-1">
               {item.createdAt?.toDate().toLocaleString()}

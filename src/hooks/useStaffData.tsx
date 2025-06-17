@@ -21,7 +21,7 @@ export function useStaffData(options?: Options) {
   const [staffs, setStaffs] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const normalizedRole = options?.role?.toLowerCase();
+const normalizedRole = options?.role?.toLowerCase();
 const isAdmin = normalizedRole === 'admin';
 const isTechnicianAssistant = normalizedRole === 'technician_assistant';
 const companyId = options?.companyId;
@@ -34,8 +34,8 @@ useEffect(() => {
   }
 
   const q = (isAdmin || isTechnicianAssistant)
-    ? query(collection(db, 'staffs'))
-    : query(collection(db, 'staffs'), where('companyId', '==', companyId!));
+  ? query(collection(db, 'staffs'))
+  : query(collection(db, 'staffs'), where('companyId', '==', companyId!));
 
   const unsubscribe = onSnapshot(
     q,

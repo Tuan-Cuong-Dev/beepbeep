@@ -1,13 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ErrorCode } from '@/src/lib/errorCodes/errorCodeTypes';
+import { ErrorCode, TechnicianSuggestion } from '@/src/lib/errorCodes/errorCodeTypes';
 import { db } from '@/src/firebaseConfig';
-import { collection, addDoc, updateDoc, doc, Timestamp } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  Timestamp,
+} from 'firebase/firestore';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { useUser } from '@/src/context/AuthContext';
+import TechnicianSuggestionList from './TechnicianSuggestionList';
+import TechnicianSuggestionForm from './TechnicianSuggestionForm';
 
 interface Props {
   onSaved?: () => void;
@@ -21,6 +29,8 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
   const [recommendedSolution, setRecommendedSolution] = useState('');
   const [brand, setBrand] = useState('');
   const [modelName, setModelName] = useState('');
+  const [tutorialVideoUrl, setTutorialVideoUrl] = useState('');
+  const [technicianSuggestions, setTechnicianSuggestions] = useState<TechnicianSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,37 +40,54 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
       setRecommendedSolution(existing.recommendedSolution);
       setBrand(existing.brand || '');
       setModelName(existing.modelName || '');
+      setTutorialVideoUrl(existing.tutorialVideoUrl || '');
+      setTechnicianSuggestions(existing.technicianSuggestions || []);
     } else {
       setCode('');
       setDescription('');
       setRecommendedSolution('');
       setBrand('');
       setModelName('');
+      setTutorialVideoUrl('');
+      setTechnicianSuggestions([]);
     }
   }, [existing]);
+
+  const handleAddSuggestion = (comment: string) => {
+    if (!user?.uid) return;
+
+    const suggestion: TechnicianSuggestion = {
+      userId: user.uid,
+      name: user.displayName || 'Unknown',
+      comment,
+      timestamp: Timestamp.now(),
+    };
+
+    setTechnicianSuggestions((prev) => [...prev, suggestion]);
+  };
 
   const handleSubmit = async () => {
     if (!code || !description || !recommendedSolution || !user?.uid) return;
     setLoading(true);
 
     try {
+      const data = {
+        code,
+        description,
+        recommendedSolution,
+        brand,
+        modelName,
+        tutorialVideoUrl,
+        technicianSuggestions,
+        updatedAt: Timestamp.now(),
+      };
+
       if (existing?.id) {
         const ref = doc(db, 'errorCodes', existing.id);
-        await updateDoc(ref, {
-          code,
-          description,
-          recommendedSolution,
-          brand,
-          modelName,
-          updatedAt: Timestamp.now(),
-        });
+        await updateDoc(ref, data);
       } else {
         await addDoc(collection(db, 'errorCodes'), {
-          code,
-          description,
-          recommendedSolution,
-          brand,
-          modelName,
+          ...data,
           createdBy: user.uid,
           createdAt: Timestamp.now(),
         });
@@ -68,7 +95,7 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
 
       if (onSaved) onSaved();
     } catch (error) {
-      console.error('Error saving code:', error);
+      console.error('Error saving error code:', error);
     } finally {
       setLoading(false);
     }
@@ -110,6 +137,18 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
         value={modelName}
         onChange={(e) => setModelName(e.target.value)}
       />
+      <Input
+        className="w-full"
+        placeholder="Tutorial Video URL (YouTube)"
+        value={tutorialVideoUrl}
+        onChange={(e) => setTutorialVideoUrl(e.target.value)}
+      />
+
+      <div className="space-y-2">
+        <h3 className="font-semibold">💡 Technician Suggestions</h3>
+        <TechnicianSuggestionForm onSubmit={handleAddSuggestion} />
+        <TechnicianSuggestionList suggestions={technicianSuggestions} />
+      </div>
 
       <div className="pt-2">
         <Button className="w-full sm:w-auto" onClick={handleSubmit} disabled={loading}>

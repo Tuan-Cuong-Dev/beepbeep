@@ -27,7 +27,17 @@ interface Invitation {
 }
 
 export default function StaffManagementPage() {
-  const { role, companyId, loading } = useUser();
+  const { role, companyId, loading,user } = useUser();
+
+  // Debug 
+  useEffect(() => {
+  console.log('👤 Debug User:', {
+    uid: user?.uid,
+    role,
+    companyId,
+  });
+}, [user, role, companyId]);
+
   const normalizedRole = role?.toLowerCase();
   const isAdmin = normalizedRole === 'admin';
   const canViewStaff =
