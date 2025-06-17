@@ -12,34 +12,47 @@ import {
 } from 'firebase/firestore';
 import { ServicePricing } from '@/src/lib/servicePricing/servicePricingTypes';
 
+// Define reusable types
+export type NewServicePricing = Omit<ServicePricing, 'id' | 'createdAt' | 'updatedAt'>;
+export type UpdateServicePricing = Partial<ServicePricing>;
+
 export function useServicePricings() {
   const [servicePricings, setServicePricings] = useState<ServicePricing[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchServicePricings();
-  }, []);
 
   const fetchServicePricings = async () => {
     setLoading(true);
     const q = query(collection(db, 'servicePricings'));
     const snap = await getDocs(q);
-    const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as ServicePricing));
+    const data = snap.docs.map((docSnap) => {
+      const raw = docSnap.data();
+      return {
+        id: docSnap.id,
+        ...raw,
+      } as ServicePricing;
+    });
     setServicePricings(data);
     setLoading(false);
   };
 
-  const createServicePricing = async (data: Omit<ServicePricing, 'id' | 'createdAt'>) => {
-    const docRef = await addDoc(collection(db, 'servicePricings'), {
+  useEffect(() => {
+    fetchServicePricings();
+  }, []);
+
+  const createServicePricing = async (data: NewServicePricing) => {
+    await addDoc(collection(db, 'servicePricings'), {
       ...data,
       createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
     });
     await fetchServicePricings();
-    return docRef.id;
   };
 
-  const updateServicePricing = async (id: string, data: Partial<ServicePricing>) => {
-    await updateDoc(doc(db, 'servicePricings', id), data);
+  const updateServicePricing = async (id: string, data: UpdateServicePricing) => {
+    await updateDoc(doc(db, 'servicePricings', id), {
+      ...data,
+      updatedAt: Timestamp.now(),
+    });
     await fetchServicePricings();
   };
 
@@ -51,6 +64,7 @@ export function useServicePricings() {
   return {
     servicePricings,
     loading,
+    fetchServicePricings,
     createServicePricing,
     updateServicePricing,
     deleteServicePricing,
