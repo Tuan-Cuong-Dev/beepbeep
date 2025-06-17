@@ -26,7 +26,7 @@ export default function ServicePricingManagementPage() {
     updateServicePricing,
     deleteServicePricing,
     loading,
-    fetchServicePricings, // 👈 cần destructure dòng này
+    fetchServicePricings,
   } = useServicePricings();
 
   const [selected, setSelected] = useState<ServicePricing | null>(null);
@@ -50,6 +50,7 @@ export default function ServicePricingManagementPage() {
     }
 
     setSelected(null);
+    fetchServicePricings();
   };
 
   return (
@@ -82,7 +83,7 @@ export default function ServicePricingManagementPage() {
               existing={selected}
               onSaved={() => {
                 setSelected(null);
-                fetchServicePricings(); // 👈 gọi lại bảng
+                fetchServicePricings();
               }}
             />
           </section>

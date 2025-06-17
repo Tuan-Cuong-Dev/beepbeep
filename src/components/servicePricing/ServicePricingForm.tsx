@@ -13,7 +13,7 @@ import { SimpleSelect } from '@/src/components/ui/select';
 interface Props {
   existing?: ServicePricing | null;
   onSaved?: () => void;
-  onRefresh?: () => void; // ✅ thêm prop mới
+  onRefresh?: () => void;
 }
 
 const categories = ['Sửa chữa', 'Bảo trì', 'Vệ sinh', 'Thay thế linh kiện', 'Bảo hiểm'];
@@ -85,7 +85,7 @@ export default function ServicePricingForm({ existing, onSaved, onRefresh }: Pro
     setIsActive(true);
     setLoading(false);
     if (onSaved) onSaved();
-    if (onRefresh) onRefresh(); // ✅ gọi lại fetch nếu có
+    if (onRefresh) onRefresh();
   };
 
   return (
@@ -130,7 +130,7 @@ export default function ServicePricingForm({ existing, onSaved, onRefresh }: Pro
         <label className="text-sm">Hiển thị dịch vụ</label>
         <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
       </div>
-      <Button onClick={handleSave} disabled={loading}>
+      <Button onClick={handleSave} disabled={loading} className="w-full sm:w-auto">
         {loading ? 'Saving...' : existing ? 'Update Package' : 'Save Package'}
       </Button>
     </div>

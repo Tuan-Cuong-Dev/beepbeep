@@ -51,18 +51,18 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
   return (
     <div className="space-y-4">
       {/* Bộ lọc + tìm kiếm */}
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <Input
           placeholder="Search by title..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-64"
+          className="sm:w-64"
         />
 
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="border px-3 py-2 rounded w-full sm:w-auto"
         >
           <option value="">All Categories</option>
           {uniqueCategories.map((cat) => (
@@ -75,20 +75,55 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
         <select
           value={activeFilter}
           onChange={(e) => setActiveFilter(e.target.value as 'all' | 'active' | 'inactive')}
-          className="border px-3 py-2 rounded"
+          className="border px-3 py-2 rounded w-full sm:w-auto"
         >
           <option value="all">All Status</option>
           <option value="active">Active Only</option>
           <option value="inactive">Inactive Only</option>
         </select>
 
-        <Button variant="outline" onClick={handleExport}>
+        <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto">
           Export to Excel
         </Button>
       </div>
 
-      {/* Bảng dữ liệu */}
-      <div className="overflow-x-auto border rounded-lg">
+      {/* Bảng dữ liệu responsive */}
+      <div className="grid gap-4 sm:hidden">
+        {filtered.map((item) => (
+          <div key={item.id} className="border rounded-lg p-4 bg-white shadow">
+            <div className="font-semibold text-base mb-1">{item.title}</div>
+            <div className="text-sm text-gray-600">Category: {item.category || '-'}</div>
+            <div className="text-sm text-gray-600">Duration: {item.durationEstimate || '-'}</div>
+            <div className="text-sm text-gray-600">
+              Price: {item.price.toLocaleString('vi-VN')} VND
+            </div>
+            <div className="text-sm text-gray-600">
+              Active:{' '}
+              <span
+                className={`px-2 py-0.5 rounded text-xs font-medium inline-block mt-1 ${
+                  item.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                }`}
+              >
+                {item.isActive ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+            <div className="text-sm text-gray-600 mt-2">
+              Features: {item.features?.join(', ') || '-'}
+            </div>
+            <div className="mt-3 flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
+                Edit
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
+                Delete
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Bảng cho desktop */}
+      <div className="hidden sm:block overflow-x-auto border rounded-lg">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
