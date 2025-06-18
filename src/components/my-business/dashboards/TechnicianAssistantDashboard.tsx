@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/src/firebaseConfig';
-import { collection, getCountFromServer, query, where } from 'firebase/firestore';
+import { collection, getCountFromServer, getDocs, query, where } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
@@ -10,8 +10,6 @@ import Link from 'next/link';
 import {
   ClipboardList,
   FileText,
-  BookOpenText,
-  PlusCircle,
   Wrench,
 } from 'lucide-react';
 
@@ -31,11 +29,12 @@ export default function TechnicianAssistantDashboard() {
 
     const fetchStats = async () => {
       try {
-        const q1 = query(
-          collection(db, 'vehicleIssues'),
-          where('status', '==', 'pending'),
-          where('assignedTo', '==', null)
-        );
+        // ✅ Lấy toàn bộ vehicleIssues để lọc assignedTo == null client-side
+        const allIssuesSnap = await getDocs(collection(db, 'vehicleIssues'));
+        const unassignedIssuesCount = allIssuesSnap.docs.filter((doc) => {
+          const data = doc.data();
+          return data.status === 'pending' && (data.assignedTo === null || data.assignedTo === undefined);
+        }).length;
 
         const q2 = query(
           collection(db, 'staffs'),
@@ -48,14 +47,13 @@ export default function TechnicianAssistantDashboard() {
           where('assignedAt', '>=', todayStart)
         );
 
-        const [snap1, snap2, snap3] = await Promise.all([
-          getCountFromServer(q1),
+        const [snap2, snap3] = await Promise.all([
           getCountFromServer(q2),
           getCountFromServer(q3),
         ]);
 
         setStats({
-          unassignedIssues: snap1.data().count,
+          unassignedIssues: unassignedIssuesCount,
           technicians: snap2.data().count,
           assignedToday: snap3.data().count,
         });
@@ -77,22 +75,22 @@ export default function TechnicianAssistantDashboard() {
 
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <DashboardCard
-            icon={<ClipboardList />} 
-            title="Unassigned Issues" 
-            value={stats.unassignedIssues} 
-            href="/assistant/dispatch" 
+            icon={<ClipboardList />}
+            title="Unassigned Issues"
+            value={stats.unassignedIssues}
+            href="/assistant/dispatch"
           />
           <DashboardCard
-            icon={<Wrench />} 
-            title="Technicians" 
-            value={stats.technicians} 
-            href="/my-business/staff" 
+            icon={<Wrench />}
+            title="Technicians"
+            value={stats.technicians}
+            href="/my-business/staff"
           />
           <DashboardCard
-            icon={<FileText />} 
-            title="Assigned Today" 
-            value={stats.assignedToday} 
-            href="/assistant/dispatch" 
+            icon={<FileText />}
+            title="Assigned Today"
+            value={stats.assignedToday}
+            href="/assistant/dispatch"
           />
         </section>
 
@@ -111,7 +109,17 @@ export default function TechnicianAssistantDashboard() {
   );
 }
 
-function DashboardCard({ icon, title, value, href }: { icon: JSX.Element; title: string; value: string | number; href: string; }) {
+function DashboardCard({
+  icon,
+  title,
+  value,
+  href,
+}: {
+  icon: JSX.Element;
+  title: string;
+  value: string | number;
+  href: string;
+}) {
   return (
     <Link
       href={href}
