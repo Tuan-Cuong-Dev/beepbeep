@@ -136,7 +136,7 @@ export default function VehicleIssueTable({
                     </>
                   ) : (
                     <>
-                      {issue.status === 'pending' && (
+                      {(issue.status === 'pending' || issue.status === 'assigned') && (
                         <Button size="sm" variant="outline" onClick={() => { setEditingIssue(issue); setShowForm(true); }}>
                           Assign
                         </Button>
