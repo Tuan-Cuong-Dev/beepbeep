@@ -43,7 +43,7 @@ const mockReviews = [
     review: 'Loved the power and design!',
     reviewerName: 'Tomoko',
     createdAt: '2025-04-12T15:09:27.649316',
-    imageUrl: 'https://cdn.example.com/images/selex-camel-2.jpg'
+    imageUrl: 'https://drive.google.com/uc?export=view&id=1_C7kuF2PPnQnr-q3rda1a5z38gA2t0ir'
   },
   {
     id: 'ead7f09f-4793-4979-8c64-3c2b1c7dfc0d',
@@ -54,7 +54,7 @@ const mockReviews = [
     review: 'Fast delivery and clean bikes.',
     reviewerName: 'Minh Nguyen',
     createdAt: '2025-04-12T15:12:11.141097',
-    imageUrl: 'https://cdn.example.com/images/selex-camel-2.jpg'
+    imageUrl: 'https://drive.google.com/uc?export=view&id=1_C7kuF2PPnQnr-q3rda1a5z38gA2t0ir'
   },
   {
     id: 'extra-fake-id-123',
@@ -65,7 +65,7 @@ const mockReviews = [
     review: 'Smooth ride and easy process.',
     reviewerName: 'Anna T.',
     createdAt: '2025-04-12T15:12:11.141300',
-    imageUrl: 'https://cdn.example.com/images/selex-camel-2.jpg'
+    imageUrl: 'https://drive.google.com/uc?export=view&id=1_C7kuF2PPnQnr-q3rda1a5z38gA2t0ir'
   },
 ];
 
