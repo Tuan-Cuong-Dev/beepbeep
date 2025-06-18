@@ -59,12 +59,10 @@ export default function StaffManagementPage() {
   const [companyNames, setCompanyNames] = useState<Record<string, string>>({});
   const [refreshInvites, setRefreshInvites] = useState(false);
 
-  const { staffs, loading: staffLoading, handleUpdate, handleDelete } = useStaffData(
-  isAdmin || normalizedRole === 'technician_assistant'
-    ? undefined // Load tất cả
-      : { role: role ?? undefined, companyId: companyId ?? undefined }
-  );
-
+  const { staffs, loading: staffLoading, handleUpdate, handleDelete } = useStaffData({
+    role: role ?? undefined,
+    companyId: companyId ?? undefined,
+  });
 
   useEffect(() => {
     if (!loading && canViewStaff) {
