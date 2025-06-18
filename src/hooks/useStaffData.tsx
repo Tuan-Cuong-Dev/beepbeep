@@ -21,41 +21,45 @@ export function useStaffData(options?: Options) {
   const [staffs, setStaffs] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
 
-const normalizedRole = options?.role?.toLowerCase();
-const isAdmin = normalizedRole === 'admin';
-const isTechnicianAssistant = normalizedRole === 'technician_assistant';
-const companyId = options?.companyId;
+  const normalizedRole = options?.role?.toLowerCase();
+  const isAdmin = normalizedRole === 'admin';
+  const isTechnicianAssistant = normalizedRole === 'technician_assistant';
+  const companyId = options?.companyId;
 
-useEffect(() => {
-  if (!isAdmin && !isTechnicianAssistant && !companyId) {
-    setStaffs([]);
-    setLoading(false);
-    return;
-  }
-
-  const q = (isAdmin || isTechnicianAssistant)
-  ? query(collection(db, 'staffs'))
-  : query(collection(db, 'staffs'), where('companyId', '==', companyId!));
-
-  const unsubscribe = onSnapshot(
-    q,
-    (snapshot) => {
-      const updatedStaffs: Staff[] = snapshot.docs.map((doc) => ({
-        ...(doc.data() as Staff),
-        id: doc.id,
-      }));
-      setStaffs(updatedStaffs);
+  useEffect(() => {
+    if (!isAdmin && !isTechnicianAssistant && !companyId) {
+      setStaffs([]);
       setLoading(false);
-    },
-    (error) => {
-      console.error('Realtime fetch staff error:', error);
-      setLoading(false);
+      return;
     }
-  );
 
-  return () => unsubscribe();
-}, [isAdmin, isTechnicianAssistant, companyId]);
+    let q;
+    if (isAdmin) {
+      q = query(collection(db, 'staffs')); // Admin: tất cả
+    } else if (isTechnicianAssistant) {
+      q = query(collection(db, 'staffs'), where('role', '==', 'technician')); // Tech Assistant: chỉ technician
+    } else {
+      q = query(collection(db, 'staffs'), where('companyId', '==', companyId!)); // Các role khác: theo công ty
+    }
 
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const updatedStaffs: Staff[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as Staff),
+          id: doc.id,
+        }));
+        setStaffs(updatedStaffs);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Realtime fetch staff error:', error);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [isAdmin, isTechnicianAssistant, companyId]);
 
   const handleCreate = async () => {
     console.warn('handleCreate is disabled. Staffs should be invited via invitation flow.');
