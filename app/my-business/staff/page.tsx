@@ -168,7 +168,7 @@ export default function StaffManagementPage() {
             companyNames={companyNames}
           />
 
-                    {showForm && (
+          {showForm && (
             <StaffForm
               editingStaff={editingStaff}
               companyId={companyId || ''}
