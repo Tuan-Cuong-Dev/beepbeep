@@ -122,14 +122,15 @@ export default function TechnicianDashboard() {
           <DashboardCard icon={<CheckCircle />} title="Resolved" value={issues.filter(i => i.status === 'resolved').length.toString()} />
         </section>
 
-        <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            <QuickAction label="View My Issues" href="/vehicle-issues" />
-            <QuickAction label="Proposal History" href="/vehicle-issues/proposals" />
-            <QuickAction label="View Reports" href="/reports" />
-          </div>
-        </section>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <QuickAction label="View My Issues" href="/vehicle-issues" />
+        <QuickAction label="Proposal History" href="/vehicle-issues/proposals" />
+        <QuickAction label="View Reports" href="/reports" />
+        <QuickAction label="Error Codes" href="/assistant/error-codes" />
+        <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
+        <QuickAction label="Suggest Error Fix" href="/suggest-error" />
+      </div>
+
 
         <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">🚧 Assigned Issues</h2>

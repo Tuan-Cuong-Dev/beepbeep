@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ErrorCode } from '@/src/lib/errorCodes/errorCodeTypes';
+import { useUser } from '@/src/context/AuthContext';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import { Pencil, Trash, ExternalLink } from 'lucide-react';
@@ -13,6 +14,9 @@ interface Props {
 }
 
 export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) {
+  const { role } = useUser();
+  const isTechnician = role === 'technician';
+
   const [brandFilter, setBrandFilter] = useState('');
   const [modelFilter, setModelFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,7 +83,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
               <th className="p-2 text-left">Video</th>
               <th className="p-2 text-left">Suggestions</th>
               <th className="p-2 text-left">Created At</th>
-              <th className="p-2 text-left">Actions</th>
+              {!isTechnician && <th className="p-2 text-left">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -108,14 +112,16 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                   {item.technicianSuggestions?.length ?? 0}
                 </td>
                 <td className="p-2">{item.createdAt?.toDate().toLocaleString()}</td>
-                <td className="p-2 flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => onEdit(item)}>
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => onDelete(item)}>
-                    <Trash className="w-4 h-4" />
-                  </Button>
-                </td>
+                {!isTechnician && (
+                  <td className="p-2 flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => onEdit(item)}>
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => onDelete(item)}>
+                      <Trash className="w-4 h-4" />
+                    </Button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -157,14 +163,16 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
             <div className="text-xs text-gray-400 mt-1">
               {item.createdAt?.toDate().toLocaleString()}
             </div>
-            <div className="mt-3 flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => onEdit(item)} className="w-full">
-                Edit
-              </Button>
-              <Button size="sm" variant="destructive" onClick={() => onDelete(item)} className="w-full">
-                Delete
-              </Button>
-            </div>
+            {!isTechnician && (
+              <div className="mt-3 flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => onEdit(item)} className="w-full">
+                  Edit
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => onDelete(item)} className="w-full">
+                  Delete
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </div>

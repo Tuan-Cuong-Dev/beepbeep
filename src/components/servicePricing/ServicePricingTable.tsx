@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useUser } from '@/src/context/AuthContext';
 import { ServicePricing } from '@/src/lib/servicePricing/servicePricingTypes';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
@@ -13,6 +14,9 @@ interface Props {
 }
 
 export default function ServicePricingTable({ servicePricings, onEdit, onDelete }: Props) {
+  const { role } = useUser();
+  const isTechnician = role === 'technician';
+
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
@@ -82,12 +86,14 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
           <option value="inactive">Inactive Only</option>
         </select>
 
-        <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto">
-          Export to Excel
-        </Button>
+        {!isTechnician && (
+          <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto">
+            Export to Excel
+          </Button>
+        )}
       </div>
 
-      {/* Bảng dữ liệu responsive */}
+      {/* Mobile View */}
       <div className="grid gap-4 sm:hidden">
         {filtered.map((item) => (
           <div key={item.id} className="border rounded-lg p-4 bg-white shadow">
@@ -110,19 +116,21 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
             <div className="text-sm text-gray-600 mt-2">
               Features: {item.features?.join(', ') || '-'}
             </div>
-            <div className="mt-3 flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
-                Edit
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
-                Delete
-              </Button>
-            </div>
+            {!isTechnician && (
+              <div className="mt-3 flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
+                  Edit
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
+                  Delete
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Bảng cho desktop */}
+      {/* Desktop View */}
       <div className="hidden sm:block overflow-x-auto border rounded-lg">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-100 text-gray-700">
@@ -133,7 +141,7 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
               <th className="p-2 text-left">Price</th>
               <th className="p-2 text-left">Active</th>
               <th className="p-2 text-left">Features</th>
-              <th className="p-2 text-right">Actions</th>
+              {!isTechnician && <th className="p-2 text-right">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -142,9 +150,7 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
                 <td className="p-2 font-medium">{item.title}</td>
                 <td className="p-2">{item.category || '-'}</td>
                 <td className="p-2">{item.durationEstimate || '-'}</td>
-                <td className="p-2 text-right">
-                  {item.price.toLocaleString('vi-VN')} VND
-                </td>
+                <td className="p-2 text-right">{item.price.toLocaleString('vi-VN')} VND</td>
                 <td className="p-2">
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${
@@ -155,14 +161,16 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
                   </span>
                 </td>
                 <td className="p-2">{item.features?.join(', ') || '-'}</td>
-                <td className="p-2 text-right space-x-2 whitespace-nowrap">
-                  <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
-                    Edit
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
-                    Delete
-                  </Button>
-                </td>
+                {!isTechnician && (
+                  <td className="p-2 text-right space-x-2 whitespace-nowrap">
+                    <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
+                      Edit
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
+                      Delete
+                    </Button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
