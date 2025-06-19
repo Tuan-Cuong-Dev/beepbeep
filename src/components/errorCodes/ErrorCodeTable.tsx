@@ -73,8 +73,56 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         />
       </div>
 
-      {/* Hiển thị bảng cho cả desktop và mobile */}
-      <div className="overflow-x-auto">
+      {/* Mobile View */}
+      <div className="grid gap-4 sm:hidden">
+        {filtered.map((item) => (
+          <div key={item.id} className="border rounded-lg p-4 bg-white shadow">
+            <div className="font-semibold text-base mb-1 text-blue-600">{item.code}</div>
+            <div className="text-sm text-gray-700">{item.description}</div>
+            <div className="text-sm text-gray-600">Solution: {item.recommendedSolution}</div>
+            <div className="text-sm text-gray-600">Brand: {item.brand || '-'}</div>
+            <div className="text-sm text-gray-600">Model: {item.modelName || '-'}</div>
+            <div className="text-sm text-gray-600">
+              Video: {item.tutorialVideoUrl ? (
+                <a
+                  href={item.tutorialVideoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 underline"
+                >
+                  YouTube <ExternalLink className="inline w-4 h-4" />
+                </a>
+              ) : 'No link'}
+            </div>
+            <div className="text-sm text-gray-600">
+              Suggestions: {(item.technicianSuggestions?.length ?? 0) > 0 ? (
+                <button
+                  onClick={() => setSelectedForSuggestion(item)}
+                  className="text-blue-600 underline hover:text-blue-800"
+                >
+                  {item.technicianSuggestions?.length ?? 0} suggestion(s)
+                </button>
+              ) : '0'}
+            </div>
+            <div className="text-xs text-gray-400">
+              {item.createdAt?.toDate().toLocaleString()}
+            </div>
+            {!isTechnician && (
+              <div className="mt-3 flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
+                  Edit
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => onDelete(item)}>
+                  Delete
+                </Button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full text-sm border">
           <thead className="bg-gray-100">
             <tr>
