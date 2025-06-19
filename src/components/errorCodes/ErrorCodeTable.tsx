@@ -73,8 +73,8 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         />
       </div>
 
-      {/* Hiển thị bảng desktop */}
-      <div className="hidden sm:block overflow-x-auto">
+      {/* Hiển thị bảng cho cả desktop và mobile */}
+      <div className="overflow-x-auto">
         <table className="min-w-full text-sm border">
           <thead className="bg-gray-100">
             <tr>
