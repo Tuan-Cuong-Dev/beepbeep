@@ -23,7 +23,7 @@ import ActualResultPopup from "@/src/components/vehicleIssues/ActualResultPopup"
 export default function VehicleIssuesManagementPage() {
   const { role, companyId, user, loading: userLoading } = useUser();
   const normalizedRole = role?.toLowerCase();
-  const isAdmin = normalizedRole === "Admin";
+  const isAdmin = normalizedRole === "admin";
   const isTechnician = normalizedRole === 'technician';
 
   const [searchTerm, setSearchTerm] = useState('');
