@@ -143,9 +143,16 @@ export default function StaffManagementPage() {
           <h1 className="text-2xl font-bold text-gray-800">
             {isAdmin ? '👥 All Staff (Admin)' : '👥 Staff Management'}
           </h1>
-          <Button onClick={() => { setEditingStaff(null); setShowForm(true); }}>
-            + Add Staff
-          </Button>
+
+          {/* ✅ Ẩn nút nếu là technician_assistant */}
+          {role !== 'technician_assistant' && (
+            <Button onClick={() => {
+              setEditingStaff(null);
+              setShowForm(true);
+            }}>
+              + Add Staff
+            </Button>
+          )}
         </div>
 
         <StaffSummaryCard staffs={staffs} />
