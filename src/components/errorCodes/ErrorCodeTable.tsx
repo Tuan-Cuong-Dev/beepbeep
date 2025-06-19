@@ -77,7 +77,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
       <div className="grid gap-4 sm:hidden">
         {filtered.map((item) => (
           <div key={item.id} className="border rounded-lg p-4 bg-white shadow">
-            <div className="font-semibold text-base mb-1 text-blue-600">{item.code}</div>
+            <div className="font-semibold text-base mb-1 text-[#00d289]">{item.code}</div>
             <div className="text-sm text-gray-700">{item.description}</div>
             <div className="text-sm text-gray-600">Solution: {item.recommendedSolution}</div>
             <div className="text-sm text-gray-600">Brand: {item.brand || '-'}</div>
@@ -88,7 +88,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                   href={item.tutorialVideoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500 underline"
+                  className="text-[#00d289] underline"
                 >
                   YouTube <ExternalLink className="inline w-4 h-4" />
                 </a>
@@ -98,7 +98,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
               Suggestions: {(item.technicianSuggestions?.length ?? 0) > 0 ? (
                 <button
                   onClick={() => setSelectedForSuggestion(item)}
-                  className="text-blue-600 underline hover:text-blue-800"
+                  className="text-[#00d289] underline hover:text-[#00d289]"
                 >
                   {item.technicianSuggestions?.length ?? 0} suggestion(s)
                 </button>
@@ -140,7 +140,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
           <tbody>
             {filtered.map((item) => (
               <tr key={item.id} className="border-b">
-                <td className="p-2 font-semibold text-blue-600">{item.code}</td>
+                <td className="p-2 font-semibold text-[#00d289]">{item.code}</td>
                 <td className="p-2">{item.description}</td>
                 <td className="p-2">{item.recommendedSolution}</td>
                 <td className="p-2">{item.brand || '-'}</td>
@@ -151,7 +151,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                       href={item.tutorialVideoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 underline inline-flex items-center gap-1"
+                      className="text-[#00d289] underline inline-flex items-center gap-1"
                     >
                       YouTube <ExternalLink className="w-4 h-4 inline" />
                     </a>
@@ -163,7 +163,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                   {(item.technicianSuggestions?.length ?? 0) > 0 ? (
                     <button
                       onClick={() => setSelectedForSuggestion(item)}
-                      className="text-blue-600 underline hover:text-blue-800"
+                      className="text-[#00d289] underline hover:text-[#00d289]"
                     >
                       {item.technicianSuggestions?.length ?? 0}
                     </button>
@@ -194,7 +194,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                💬 Suggestions for <span className="text-blue-600">{selectedForSuggestion.code}</span>
+                💬 Suggestions for <span className="text-[#00d289]">{selectedForSuggestion.code}</span>
               </DialogTitle>
             </DialogHeader>
             <TechnicianSuggestionList suggestions={selectedForSuggestion.technicianSuggestions || []} />
