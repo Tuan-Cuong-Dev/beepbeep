@@ -6,6 +6,8 @@ import { useUser } from '@/src/context/AuthContext';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import { Pencil, Trash, ExternalLink } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
+import TechnicianSuggestionList from './TechnicianSuggestionList';
 
 interface Props {
   errorCodes: ErrorCode[];
@@ -20,6 +22,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
   const [brandFilter, setBrandFilter] = useState('');
   const [modelFilter, setModelFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedForSuggestion, setSelectedForSuggestion] = useState<ErrorCode | null>(null);
 
   const uniqueBrands = Array.from(new Set(errorCodes.map(e => e.brand).filter(Boolean)));
   const uniqueModels = Array.from(new Set(errorCodes.map(e => e.modelName).filter(Boolean)));
@@ -109,7 +112,16 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                   )}
                 </td>
                 <td className="p-2 text-center">
-                  {item.technicianSuggestions?.length ?? 0}
+                  {(item.technicianSuggestions?.length ?? 0) > 0 ? (
+                    <button
+                      onClick={() => setSelectedForSuggestion(item)}
+                      className="text-blue-600 underline hover:text-blue-800"
+                    >
+                      {item.technicianSuggestions?.length ?? 0}
+                    </button>
+                  ) : (
+                    <span className="text-gray-500">0</span>
+                  )}
                 </td>
                 <td className="p-2">{item.createdAt?.toDate().toLocaleString()}</td>
                 {!isTechnician && (
@@ -128,54 +140,19 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         </table>
       </div>
 
-      {/* Hiển thị mobile dạng thẻ */}
-      <div className="sm:hidden space-y-4">
-        {filtered.map((item) => (
-          <div key={item.id} className="border rounded-xl p-4 shadow bg-white">
-            <div className="text-blue-600 font-semibold text-base mb-2">{item.code}</div>
-            <div className="text-sm text-gray-800 mb-1">
-              <strong>Description:</strong> {item.description}
-            </div>
-            <div className="text-sm text-gray-700 mb-1">
-              <strong>Solution:</strong> {item.recommendedSolution}
-            </div>
-            <div className="text-sm text-gray-600">
-              <strong>Brand:</strong> {item.brand || '-'}
-            </div>
-            <div className="text-sm text-gray-600">
-              <strong>Model:</strong> {item.modelName || '-'}
-            </div>
-            {item.tutorialVideoUrl && (
-              <div className="text-sm text-blue-500 mt-1">
-                <a
-                  href={item.tutorialVideoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline inline-flex items-center gap-1"
-                >
-                  Watch Video <ExternalLink className="w-4 h-4 inline" />
-                </a>
-              </div>
-            )}
-            <div className="text-sm text-gray-500">
-              <strong>Suggestions:</strong> {item.technicianSuggestions?.length ?? 0}
-            </div>
-            <div className="text-xs text-gray-400 mt-1">
-              {item.createdAt?.toDate().toLocaleString()}
-            </div>
-            {!isTechnician && (
-              <div className="mt-3 flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => onEdit(item)} className="w-full">
-                  Edit
-                </Button>
-                <Button size="sm" variant="destructive" onClick={() => onDelete(item)} className="w-full">
-                  Delete
-                </Button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Dialog xem suggestion */}
+      {selectedForSuggestion && (
+        <Dialog open={!!selectedForSuggestion} onOpenChange={() => setSelectedForSuggestion(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                💬 Suggestions for <span className="text-blue-600">{selectedForSuggestion.code}</span>
+              </DialogTitle>
+            </DialogHeader>
+            <TechnicianSuggestionList suggestions={selectedForSuggestion.technicianSuggestions || []} />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
