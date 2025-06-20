@@ -23,6 +23,7 @@ interface Props {
   searchTerm: string;
   statusFilter: string;
   stationFilter: string;
+  refetchIssues: () => Promise<void>; // 👈 thêm dòng này
 }
 
 export default function VehicleIssueTable({

@@ -43,7 +43,7 @@ export default function VehicleIssueDispatchPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { issues, loading } = useVehicleIssuesToDispatch();
+  const { issues, loading, fetchVehicleIssues } = useVehicleIssuesToDispatch();
   const updateIssue = async (
     id: string,
     data: Partial<ExtendedVehicleIssue>
@@ -74,6 +74,7 @@ export default function VehicleIssueDispatchPage() {
       showDialog('success', 'Technician assigned successfully');
       setShowForm(false);
       setEditingIssue(null);
+      await fetchVehicleIssues();
     } catch {
       showDialog('error', 'Failed to assign technician');
     }
@@ -166,6 +167,7 @@ export default function VehicleIssueDispatchPage() {
               searchTerm={searchTerm}
               statusFilter={statusFilter}
               stationFilter={stationFilter}
+              refetchIssues={fetchVehicleIssues}
             />
           </div>
         )}
@@ -199,6 +201,7 @@ export default function VehicleIssueDispatchPage() {
             searchTerm={searchTerm}
             statusFilter={statusFilter}
             stationFilter={stationFilter}
+            refetchIssues={fetchVehicleIssues}
           />
         </div>
 
