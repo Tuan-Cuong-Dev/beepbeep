@@ -18,6 +18,8 @@ import VehicleIssueTable from '@/src/components/vehicleIssues/VehicleIssueTable'
 import ProposalPopup from '@/src/components/vehicleIssues/ProposalPopup';
 import ActualResultPopup from '@/src/components/vehicleIssues/ActualResultPopup';
 import { Timestamp } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
 
 export default function VehicleIssueDispatchPage() {
   const { role, companyId, user, loading: userLoading } = useUser();
@@ -42,8 +44,12 @@ export default function VehicleIssueDispatchPage() {
   const itemsPerPage = 10;
 
   const { issues, loading } = useVehicleIssuesToDispatch();
-  const updateIssue = async (id: string, data: Partial<ExtendedVehicleIssue>) => {
-    // TODO: Replace with shared update logic if needed
+  const updateIssue = async (
+    id: string,
+    data: Partial<ExtendedVehicleIssue>
+  ): Promise<void> => {
+    const ref = doc(db, 'vehicleIssues', id);
+    await updateDoc(ref, data);
   };
 
   const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
