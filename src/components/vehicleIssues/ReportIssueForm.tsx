@@ -33,7 +33,7 @@ export default function ReportIssueForm({
   stationName,
   onReported,
 }: ReportIssueFormProps) {
-  const { user } = useUser();
+  const { user, role } = useUser();
   const { ebikes } = useEbikeData({ companyId });
 
   const [selectedEbike, setSelectedEbike] = useState<{ id: string; vin: string; plateNumber?: string } | null>(null);
@@ -54,7 +54,9 @@ export default function ReportIssueForm({
   }, [searchText, ebikes]);
 
   const handleSubmit = async () => {
-    if (!companyId || !companyName) {
+    const isGlobalRole = role === 'admin' || role === 'technician_assistant';
+
+    if (!isGlobalRole && (!companyId || !companyName)) {
       alert("Company information is missing. Please check your account setup.");
       return;
     }
@@ -73,8 +75,8 @@ export default function ReportIssueForm({
 
     try {
       await addDoc(collection(db, "vehicleIssues"), {
-        companyId,
-        companyName,
+        companyId: companyId || "",         // <-- fallback để đảm bảo không undefined
+        companyName: companyName || "",     // <-- fallback
         stationId: stationId || "",
         stationName: stationName || "",
         ebikeId: selectedEbike.id,
@@ -102,6 +104,7 @@ export default function ReportIssueForm({
     setSubmitting(false);
     setTimeout(() => setSuccess(false), 3000);
   };
+
 
   return (
     <div className="space-y-8 max-w-lg mx-auto">
