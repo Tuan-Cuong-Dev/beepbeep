@@ -6,6 +6,7 @@ import { getUserNameById } from '@/src/lib/services/users/userService';
 import { format } from 'date-fns';
 import { Input } from '@/src/components/ui/input';
 import { formatCurrency } from '@/src/utils/formatCurrency';
+import Pagination from '@/src/components/ui/pagination'; // 👈 nếu bạn có component này
 
 interface Props {
   exports: AccessoryExport[];
@@ -15,6 +16,8 @@ export default function AccessoryExportTable({ exports }: Props) {
   const [exportedByMap, setExportedByMap] = useState<Record<string, string>>({});
   const [searchName, setSearchName] = useState('');
   const [searchTarget, setSearchTarget] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchUserNames = async () => {
@@ -32,10 +35,28 @@ export default function AccessoryExportTable({ exports }: Props) {
     fetchUserNames();
   }, [exports]);
 
-  const filteredExports = exports.filter((item) =>
-    item.accessoryName.toLowerCase().includes(searchName.toLowerCase()) &&
-    (item.target || '').toLowerCase().includes(searchTarget.toLowerCase())
+  // 🔽 Filter + Sort
+  const filteredExports = exports
+    .filter((item) =>
+      item.accessoryName.toLowerCase().includes(searchName.toLowerCase()) &&
+      (item.target || '').toLowerCase().includes(searchTarget.toLowerCase())
+    )
+    .sort((a, b) => {
+      const dateA = a.exportedAt?.toDate?.().getTime() ?? 0;
+      const dateB = b.exportedAt?.toDate?.().getTime() ?? 0;
+      return dateB - dateA; // newest first
+    });
+
+  // 🔽 Pagination
+  const totalPages = Math.ceil(filteredExports.length / itemsPerPage);
+  const paginatedExports = filteredExports.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchName, searchTarget]);
 
   return (
     <div className="overflow-x-auto">
@@ -68,7 +89,7 @@ export default function AccessoryExportTable({ exports }: Props) {
           </tr>
         </thead>
         <tbody>
-          {filteredExports.map((item) => (
+          {paginatedExports.map((item) => (
             <tr key={item.id} className="border-t hover:bg-gray-50">
               <td className="p-2">{item.accessoryName}</td>
               <td className="p-2">{item.quantity}</td>
@@ -90,6 +111,16 @@ export default function AccessoryExportTable({ exports }: Props) {
           ))}
         </tbody>
       </table>
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 }
