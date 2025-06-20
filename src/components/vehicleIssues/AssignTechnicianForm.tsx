@@ -5,6 +5,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/src/firebaseConfig";
 import { Button } from "../ui/button";
 import { SimpleSelect } from "../ui/select";
+import { useUser } from "@/src/context/AuthContext";
 
 interface Props {
   companyId: string;
@@ -17,33 +18,46 @@ interface Technician {
 }
 
 export default function AssignTechnicianForm({ companyId, onAssign }: Props) {
+  const { role } = useUser();
+  const isGlobalRole = role === 'admin' || role === 'technician_assistant';
+
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
-  // Fetch technicians of the company
   useEffect(() => {
     const fetchTechnicians = async () => {
-      if (!companyId) return;
+      let q;
 
-      const q = query(
-        collection(db, "staffs"),
-        where("companyId", "==", companyId),
-        where("role", "in", ["technician", "Technician"])
-      );
+      if (isGlobalRole) {
+        // ✅ Lấy tất cả kỹ thuật viên trên hệ thống
+        q = query(
+          collection(db, "staffs"),
+          where("role", "in", ["technician", "Technician"])
+        );
+      } else if (companyId) {
+        // ✅ Lấy kỹ thuật viên trong công ty
+        q = query(
+          collection(db, "staffs"),
+          where("companyId", "==", companyId),
+          where("role", "in", ["technician", "Technician"])
+        );
+      } else {
+        setTechnicians([]);
+        return;
+      }
 
       const snap = await getDocs(q);
       const techs: Technician[] = snap.docs.map(doc => ({
         userId: doc.data().userId,
-        displayName: doc.data().name || "(Unnamed Technician)", // <-- Đây mới đúng
-      }));      
+        displayName: doc.data().name || "(Unnamed Technician)",
+      }));
 
       setTechnicians(techs);
     };
 
     fetchTechnicians();
-  }, [companyId]);
+  }, [companyId, isGlobalRole]);
 
-  // Auto select first technician if available
   useEffect(() => {
     if (technicians.length > 0 && !selectedUserId) {
       setSelectedUserId(technicians[0].userId);
