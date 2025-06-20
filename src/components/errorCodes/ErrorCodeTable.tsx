@@ -23,6 +23,8 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
   const [modelFilter, setModelFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedForSuggestion, setSelectedForSuggestion] = useState<ErrorCode | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const uniqueBrands = Array.from(new Set(errorCodes.map(e => e.brand).filter(Boolean)));
   const uniqueModels = Array.from(new Set(errorCodes.map(e => e.modelName).filter(Boolean)));
@@ -39,14 +41,19 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
     return matchBrand && matchModel && matchSearch;
   });
 
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedData = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <div className="space-y-4">
-      {/* Bộ lọc và tìm kiếm */}
       <div className="flex flex-wrap gap-4">
         <select
           className="border p-2 rounded-md"
           value={brandFilter}
-          onChange={(e) => setBrandFilter(e.target.value)}
+          onChange={(e) => {
+            setBrandFilter(e.target.value);
+            setCurrentPage(1);
+          }}
         >
           <option value="">All Brands</option>
           {uniqueBrands.map((brand) => (
@@ -57,7 +64,10 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         <select
           className="border p-2 rounded-md"
           value={modelFilter}
-          onChange={(e) => setModelFilter(e.target.value)}
+          onChange={(e) => {
+            setModelFilter(e.target.value);
+            setCurrentPage(1);
+          }}
         >
           <option value="">All Models</option>
           {uniqueModels.map((model) => (
@@ -69,13 +79,15 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
           className="border p-2 rounded-md w-full sm:w-64"
           placeholder="Search by code, description or solution"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
         />
       </div>
 
-      {/* Mobile View */}
       <div className="grid gap-4 sm:hidden">
-        {filtered.map((item) => (
+        {paginatedData.map((item) => (
           <div key={item.id} className="border rounded-lg p-4 bg-white shadow">
             <div className="font-semibold text-base mb-1 text-[#00d289]">{item.code}</div>
             <div className="text-sm text-gray-700">{item.description}</div>
@@ -121,7 +133,6 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         ))}
       </div>
 
-      {/* Desktop View */}
       <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full text-sm border">
           <thead className="bg-gray-100">
@@ -138,7 +149,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
             </tr>
           </thead>
           <tbody>
-            {filtered.map((item) => (
+            {paginatedData.map((item) => (
               <tr key={item.id} className="border-b">
                 <td className="p-2 font-semibold text-[#00d289]">{item.code}</td>
                 <td className="p-2">{item.description}</td>
@@ -188,7 +199,37 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         </table>
       </div>
 
-      {/* Dialog xem suggestion */}
+      <div className="flex justify-center items-center gap-6 mt-6 text-gray-700 text-sm">
+        <button
+          className={`px-4 py-1 rounded border ${
+            currentPage === 1
+              ? 'text-gray-400 border-gray-200 cursor-not-allowed bg-gray-50'
+              : 'hover:bg-gray-100 border-gray-300'
+          }`}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+
+        <span>
+          Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+        </span>
+
+        <button
+          className={`px-4 py-1 rounded border ${
+            currentPage === totalPages
+              ? 'text-gray-400 border-gray-200 cursor-not-allowed bg-gray-50'
+              : 'hover:bg-gray-100 border-gray-300'
+          }`}
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+
+
       {selectedForSuggestion && (
         <Dialog open={!!selectedForSuggestion} onOpenChange={() => setSelectedForSuggestion(null)}>
           <DialogContent>
