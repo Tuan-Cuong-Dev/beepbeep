@@ -95,14 +95,15 @@ export default function TechnicianAssistantDashboard() {
         </section>
 
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <QuickAction label="Dispatch Issues" href="/assistant/dispatch" />
-            <QuickAction label="Manage Error Codes" href="/assistant/error-codes" />
-            <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
-            <QuickAction label="Add Technician" href="/assistant/add-technician" />
-          </div>
-        </section>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <QuickAction label="Dispatch Issues" href="/assistant/dispatch" />
+          <QuickAction label="Manage Error Codes" href="/assistant/error-codes" />
+          <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
+          <QuickAction label="Add Technician" href="/assistant/add-technician" />
+          <QuickAction label="Report Issue" href="vehicle-issues/report" />
+        </div>
+      </section>
       </main>
       <Footer />
     </div>

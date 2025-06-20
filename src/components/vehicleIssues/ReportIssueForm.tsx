@@ -60,7 +60,7 @@ export default function ReportIssueForm({
     }
 
     if (!selectedEbike) {
-      alert("Please select an ebike.");
+      alert("Please select a Vehicle.");
       return;
     }
 
@@ -108,24 +108,24 @@ export default function ReportIssueForm({
 
       {/* Ebike VIN Select */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">Select Ebike (VIN)</label>
+        <label className="block text-sm font-medium text-gray-700">Select Vehicle (VIN)</label>
         <div className="relative">
           <button
             onClick={() => setEbikeDropdownOpen(!ebikeDropdownOpen)}
             className="w-full h-12 text-base border rounded-lg px-4 flex items-center justify-between bg-white"
           >
-            {selectedEbike ? `🚲 ${selectedEbike.vin} (Plate: ${selectedEbike.plateNumber || '-'})` : "Select Ebike"}
+            {selectedEbike ? `🚲 ${selectedEbike.vin} (Plate: ${selectedEbike.plateNumber || '-'})` : "Select Vehicle"}
             <span>▼</span>
           </button>
           {ebikeDropdownOpen && (
             <div className="absolute z-10 bg-white border rounded-lg shadow mt-2 w-full max-h-72 overflow-y-auto p-2">
               <Input
-                placeholder="Search Ebike..."
+                placeholder="Search Vehicles..."
                 className="w-full h-10 mb-2"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
               />
-              {filteredEbikes.length === 0 && <div className="p-2 text-gray-500">No Ebikes found</div>}
+              {filteredEbikes.length === 0 && <div className="p-2 text-gray-500">No Vehicles found</div>}
               {filteredEbikes.map((ebike) => (
                 <div
                   key={ebike.id}
