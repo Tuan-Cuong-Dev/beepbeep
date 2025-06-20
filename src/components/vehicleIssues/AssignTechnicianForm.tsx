@@ -8,7 +8,7 @@ import { SimpleSelect } from "../ui/select";
 import { useUser } from "@/src/context/AuthContext";
 
 interface Props {
-  companyId: string;
+  companyId?: string; // 👈 optional
   onAssign: (userId: string) => void;
 }
 

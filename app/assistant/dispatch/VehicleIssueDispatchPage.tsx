@@ -202,15 +202,27 @@ export default function VehicleIssueDispatchPage() {
           </div>
         )}
 
-        {showForm && editingIssue && (
-          <div className="bg-white border rounded-xl shadow p-6 space-y-6">
-            <h2 className="text-2xl font-bold">Assign Technician</h2>
-            <AssignTechnicianForm companyId={companyId || ''} onAssign={handleAssignTechnician} />
-            <div className="flex justify-end">
-              <Button variant="ghost" onClick={() => { setShowForm(false); setEditingIssue(null); }}>Cancel</Button>
-            </div>
+      {showForm && editingIssue && (
+        <div className="bg-white border rounded-xl shadow p-6 space-y-6">
+          <h2 className="text-2xl font-bold">Assign Technician</h2>
+          <AssignTechnicianForm
+            companyId={['admin', 'technician_assistant'].includes(role) ? undefined : companyId}
+            onAssign={handleAssignTechnician}
+          />
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowForm(false);
+                setEditingIssue(null);
+              }}
+            >
+              Cancel
+            </Button>
           </div>
-        )}
+        </div>
+      )}
+
       </main>
       <Footer />
       <NotificationDialog open={dialog.open} type={dialog.type} title={dialog.title} description={dialog.description} onClose={() => setDialog(prev => ({ ...prev, open: false }))} />
