@@ -98,22 +98,21 @@ export default function VehicleIssuesSummaryCard({ issues }: Props) {
   ];
 
   return (
-  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-9 gap-3 mb-6">
-    {items.map((item, idx) => (
-      <Card
-        key={idx}
-        className={`flex flex-col justify-between rounded-2xl p-4 shadow-sm border ${item.bg}`}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-            {item.title}
-          </span>
-          {item.icon}
-        </div>
-        <p className={`text-3xl font-bold ${item.color}`}>{item.value}</p>
-      </Card>
-    ))}
-  </div>
-);
-
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-3 mb-6">
+      {items.map((item, idx) => (
+        <Card
+          key={idx}
+          className={`flex flex-col justify-between rounded-2xl p-4 shadow-sm border ${item.bg}`}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              {item.title}
+            </span>
+            {item.icon}
+          </div>
+          <p className={`text-2xl sm:text-3xl font-bold ${item.color}`}>{item.value}</p>
+        </Card>
+      ))}
+    </div>
+  );
 }
