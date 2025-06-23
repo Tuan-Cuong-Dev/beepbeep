@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { WorkingHours } from '@/src/lib/technicianPartners/workingHoursTypes';
 import { Input } from '@/src/components/ui/input';
@@ -25,13 +25,24 @@ const defaultWorkingHours: WorkingHours[] = daysOfWeek.map((day) => ({
   endTime: '',
 }));
 
-export default function TechnicianPartnerForm({ initialData = {}, onSave }: Props) {
-  const [formData, setFormData] = useState<Partial<TechnicianPartner>>({
+export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
+  const isEditMode = !!initialData?.id;
+
+  const [formData, setFormData] = useState<Partial<TechnicianPartner>>(() => ({
     ...initialData,
-    workingHours: initialData.workingHours || defaultWorkingHours,
-    assignedRegions: initialData.assignedRegions || [],
-    type: initialData.type || 'mobile',
-  });
+    workingHours: initialData?.workingHours ?? defaultWorkingHours,
+    assignedRegions: initialData?.assignedRegions ?? [],
+    type: initialData?.type ?? 'mobile',
+  }));
+
+  useEffect(() => {
+    setFormData({
+      ...initialData,
+      workingHours: initialData?.workingHours ?? defaultWorkingHours,
+      assignedRegions: initialData?.assignedRegions ?? [],
+      type: initialData?.type ?? 'mobile',
+    });
+  }, [initialData]);
 
   const updateField = (field: keyof TechnicianPartner, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -43,8 +54,8 @@ export default function TechnicianPartnerForm({ initialData = {}, onSave }: Prop
     updateField('workingHours', updated);
   };
 
-  const handleRegionInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const regions = event.target.value.split('\n').map((r) => r.trim()).filter(Boolean);
+  const handleRegionInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const regions = e.target.value.split('\n').map((r) => r.trim()).filter(Boolean);
     updateField('assignedRegions', regions);
   };
 
@@ -143,7 +154,9 @@ export default function TechnicianPartnerForm({ initialData = {}, onSave }: Prop
         </div>
       </div>
 
-      <Button type="submit">Save Technician Partner</Button>
+      <Button type="submit">
+        {isEditMode ? 'Update Technician Partner' : 'Add Technician Partner'}
+      </Button>
     </form>
   );
 }
