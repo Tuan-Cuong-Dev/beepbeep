@@ -33,15 +33,12 @@ export default function AccessoryExportTable({ exports }: Props) {
     const fetchUserNames = async () => {
       const uniqueIds = [...new Set(exports.map((e) => e.exportedBy))];
       const map: Record<string, string> = {};
-
       for (const uid of uniqueIds) {
         const name = await getUserNameById(uid);
         map[uid] = name || uid;
       }
-
       setExportedByMap(map);
     };
-
     fetchUserNames();
   }, [exports]);
 
@@ -110,7 +107,7 @@ export default function AccessoryExportTable({ exports }: Props) {
                 <td className="p-2 whitespace-nowrap">{exportedByMap[item.exportedBy] || item.exportedBy}</td>
                 <td className="p-2 whitespace-nowrap">{format(item.exportedAt.toDate(), 'dd/MM/yyyy')}</td>
                 <td className="p-2 text-right">
-                  <Dialog>
+                  <Dialog open={selectedItem?.id === item.id} onOpenChange={(open) => !open && setSelectedItem(null)}>
                     <DialogTrigger asChild>
                       <Button
                         size="sm"
@@ -126,15 +123,15 @@ export default function AccessoryExportTable({ exports }: Props) {
                         <DialogTitle>Confirm Import Back</DialogTitle>
                         <DialogDescription>
                           Are you sure you want to return{' '}
-                          <strong>{selectedItem?.accessoryName}</strong> (qty: {selectedItem?.quantity}) into stock?
+                          <strong>{item.accessoryName}</strong> (qty: {item.quantity}) into stock?
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setSelectedItem(null)}>
                           Cancel
                         </Button>
-                        <Button onClick={handleImportConfirm} disabled={importingId === selectedItem?.id}>
-                          {importingId === selectedItem?.id ? 'Importing...' : 'Confirm'}
+                        <Button onClick={handleImportConfirm} disabled={importingId === item.id}>
+                          {importingId === item.id ? 'Importing...' : 'Confirm'}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
