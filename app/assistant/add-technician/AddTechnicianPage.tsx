@@ -1,3 +1,6 @@
+// Chúng ta sẽ khóa không cho Techinician Assistant có thể điều kiển 
+// Các Technician của các Stations; Họ chỉ quản lý Kênh Technician Partner thôi
+
 'use client';
 
 import { useEffect, useState } from 'react';

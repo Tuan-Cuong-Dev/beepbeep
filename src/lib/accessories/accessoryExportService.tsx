@@ -3,6 +3,7 @@ import {
   getDocs,
   getDoc,
   updateDoc,
+  deleteDoc, 
   query,
   where,
   collection,
@@ -60,4 +61,39 @@ export async function getAccessoryExports(companyId?: string): Promise<Accessory
     id: doc.id,
     ...doc.data(),
   })) as AccessoryExport[];
+}
+
+/**
+ * Xóa bản ghi xuất phụ kiện
+ */
+export async function deleteAccessoryExport(id: string): Promise<void> {
+  const ref = doc(db, 'accessoryExports', id);
+  await deleteDoc(ref);
+}
+
+/**
+ * Nhập lại phụ kiện vào kho và xóa bản ghi xuất kho tương ứng
+ */
+export async function importBackAccessory(exportData: AccessoryExport): Promise<void> {
+  const { accessoryId, quantity, id } = exportData;
+
+  if (!accessoryId || !quantity || !id) return;
+
+  // 1. Cộng lại số lượng vào phụ kiện gốc nếu là loại bulk
+  const accessoryRef = doc(db, 'accessories', accessoryId);
+  const snap = await getDoc(accessoryRef);
+
+  if (snap.exists()) {
+    const accessory = snap.data();
+    if (accessory.type === 'bulk') {
+      const currentQty = accessory.quantity || 0;
+      await updateDoc(accessoryRef, {
+        quantity: currentQty + quantity,
+        updatedAt: Timestamp.now(),
+      });
+    }
+  }
+
+  // 2. Xóa bản ghi xuất kho
+  await deleteDoc(doc(db, 'accessoryExports', id));
 }

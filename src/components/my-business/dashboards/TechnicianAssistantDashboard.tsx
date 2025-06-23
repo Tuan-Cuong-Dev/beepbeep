@@ -100,7 +100,7 @@ export default function TechnicianAssistantDashboard() {
           <QuickAction label="Dispatch Issues" href="/assistant/dispatch" />
           <QuickAction label="Manage Error Codes" href="/assistant/error-codes" />
           <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
-          <QuickAction label="Add Technician" href="/assistant/add-technician" />
+          <QuickAction label="Add Technician Partner" href="/assistant/add-technician-partner" />
           <QuickAction label="Report Issue" href="vehicle-issues/report" />
         </div>
       </section>
