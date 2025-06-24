@@ -132,27 +132,44 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
                 <span className="capitalize font-semibold">{item.day}</span>
                 <Checkbox
                   checked={item.isWorking}
-                  onCheckedChange={(val) => updateWorkingHours(idx, 'isWorking', !!val)}
+                  onCheckedChange={(val) =>
+                    updateWorkingHours(idx, 'isWorking', !!val)
+                  }
                 />
               </div>
               {item.isWorking && (
-                <div className="flex gap-2">
-                  <Input
-                    type="time"
-                    value={item.startTime}
-                    onChange={(e) => updateWorkingHours(idx, 'startTime', e.target.value)}
-                  />
-                  <Input
-                    type="time"
-                    value={item.endTime}
-                    onChange={(e) => updateWorkingHours(idx, 'endTime', e.target.value)}
-                  />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium">Start</label>
+                    <input
+                      type="time"
+                      step="60"
+                      value={item.startTime}
+                      className="w-full border rounded px-2 py-1"
+                      onChange={(e) =>
+                        updateWorkingHours(idx, 'startTime', e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium">End</label>
+                    <input
+                      type="time"
+                      step="60"
+                      value={item.endTime}
+                      className="w-full border rounded px-2 py-1"
+                      onChange={(e) =>
+                        updateWorkingHours(idx, 'endTime', e.target.value)
+                      }
+                    />
+                  </div>
                 </div>
               )}
             </div>
           ))}
         </div>
       </div>
+
 
       <Button type="submit">
         {isEditMode ? 'Update Technician Partner' : 'Add Technician Partner'}
