@@ -8,6 +8,10 @@ import { Button } from '@/src/components/ui/button';
 import { Textarea } from '@/src/components/ui/textarea';
 import { SimpleSelect } from '@/src/components/ui/select';
 import { Checkbox } from '@/src/components/ui/checkbox';
+import dynamic from 'next/dynamic';
+
+const MapPicker = dynamic(() => import('@/src/components/map/MapPicker'), { ssr: false });
+const Select = dynamic(() => import('react-select'), { ssr: false });
 
 interface Props {
   initialData?: Partial<TechnicianPartner>;
@@ -25,15 +29,17 @@ const defaultWorkingHours: WorkingHours[] = daysOfWeek.map((day) => ({
   endTime: '',
 }));
 
+const serviceOptions = [
+  { label: 'Battery', value: 'battery' },
+  { label: 'Brake', value: 'brake' },
+  { label: 'Flat Tire', value: 'flat_tire' },
+  { label: 'Motor', value: 'motor' },
+  { label: 'Electrical', value: 'electrical' },
+];
+
 export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
   const isEditMode = !!initialData?.id;
-
-  const [formData, setFormData] = useState<Partial<TechnicianPartner>>(() => ({
-    ...initialData,
-    workingHours: initialData?.workingHours ?? defaultWorkingHours,
-    assignedRegions: initialData?.assignedRegions ?? [],
-    type: initialData?.type ?? 'mobile',
-  }));
+  const [formData, setFormData] = useState<Partial<TechnicianPartner>>({});
 
   useEffect(() => {
     setFormData({
@@ -65,7 +71,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         e.preventDefault();
         onSave(formData);
       }}
-      className="space-y-4"
+      className="space-y-6"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
@@ -92,8 +98,8 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
               { label: 'Shop-based Technician', value: 'shop' },
               { label: 'Mobile Technician', value: 'mobile' },
             ]}
-            value={formData.type}
-            onChange={(val) => updateField('type', val)}
+            value={formData.type || ''}
+            onChange={(val: string) => updateField('type', val)}
           />
         </div>
 
@@ -113,6 +119,17 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         )}
       </div>
 
+      {formData.type === 'shop' && (
+        <div className="space-y-2">
+          <label className="font-medium">Shop Location (Pick on Map)</label>
+          <MapPicker
+            lat={formData.geo?.lat}
+            lng={formData.geo?.lng}
+            onChange={(coords) => updateField('geo', coords)}
+          />
+        </div>
+      )}
+
       <div>
         <label className="font-medium">Assigned Regions (one per line)</label>
         <Textarea
@@ -120,6 +137,24 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
           placeholder="DaNang/ThanhKhe/ThanhKheTay\nDaNang/HaiChau/BinhHien"
           value={(formData.assignedRegions || []).join('\n')}
           onChange={handleRegionInput}
+        />
+      </div>
+
+      <div>
+        <label className="font-medium block mb-1">Service Categories</label>
+        <Select
+          isMulti
+          options={serviceOptions}
+          value={serviceOptions.filter((opt) =>
+            (formData.serviceCategories || []).includes(opt.value)
+          )}
+          onChange={(selected) => {
+            const selectedOptions = selected as { label: string; value: string }[];
+            updateField(
+              'serviceCategories',
+              selectedOptions.map((s) => s.value)
+            );
+          }}
         />
       </div>
 
@@ -169,7 +204,6 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
           ))}
         </div>
       </div>
-
 
       <Button type="submit">
         {isEditMode ? 'Update Technician Partner' : 'Add Technician Partner'}

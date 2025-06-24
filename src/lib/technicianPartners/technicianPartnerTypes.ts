@@ -2,16 +2,18 @@ import { Timestamp } from 'firebase/firestore';
 import { WorkingHours } from './workingHoursTypes';
 
 export interface TechnicianPartner {
-  id: string;
-  userId: string;
+  id?: string; // Firebase sẽ tự sinh khi tạo mới
+  userId?: string; // Liên kết với user (gán sau khi tạo user Firebase)
+  createdBy: string; // userId của Technician Assistant tạo hồ sơ
+
   name: string;
   phone: string;
   email?: string;
 
-  // Phân loại: Có cửa hàng hay di động
+  // Loại kỹ thuật viên: shop có cửa hàng, mobile là lưu động
   type: 'shop' | 'mobile';
 
-  // Nếu có cửa hàng
+  // Nếu là shop thì có thêm thông tin cửa hàng
   shopName?: string;
   shopAddress?: string;
   geo?: {
@@ -19,10 +21,10 @@ export interface TechnicianPartner {
     lng: number;
   };
 
-  // Vùng do technician chọn (text)
-  assignedRegions: string[]; // VD: ['DaNang/ThanhKhe/ThanhKheTay']
+  // Vùng tự nhận xử lý (do technician điền)
+  assignedRegions: string[];
 
-  // Vùng do assistant/admin gán (geoBox)
+  // Vùng được gán bởi Assistant/Admin (để phân công theo vùng)
   geoBox?: {
     latMin: number;
     latMax: number;
@@ -30,17 +32,17 @@ export interface TechnicianPartner {
     lngMax: number;
   };
 
-  // Dịch vụ họ nhận xử lý
-  serviceCategories?: string[]; // VD: ['battery', 'brake', 'flat_tire']
+  // Các loại dịch vụ hỗ trợ (sửa pin, phanh, lốp, v.v.)
+  serviceCategories?: string[];
 
   // Thời gian làm việc trong tuần
   workingHours: WorkingHours[];
 
-  // Đánh giá
+  // Đánh giá từ khách hàng hoặc hệ thống
   averageRating?: number;
   ratingCount?: number;
 
-  isActive: boolean;
+  isActive: boolean; // Kích hoạt hay không
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

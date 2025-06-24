@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import 'leaflet/dist/leaflet.css';
 import "./globals.css";
 import { AuthProvider } from "@/src/context/AuthContext"; // hoặc "@/context/AuthContext" tùy vị trí
 
