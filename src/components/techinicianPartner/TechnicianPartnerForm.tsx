@@ -15,7 +15,9 @@ const Select = dynamic(() => import('react-select'), { ssr: false });
 
 interface Props {
   initialData?: Partial<TechnicianPartner>;
-  onSave: (data: Partial<TechnicianPartner>) => void;
+  onSave: (
+    data: Partial<TechnicianPartner & { email: string; password: string; role: 'technician_partner' }>
+  ) => void;
 }
 
 const daysOfWeek: WorkingHours['day'][] = [
@@ -39,7 +41,9 @@ const serviceOptions = [
 
 export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
   const isEditMode = !!initialData?.id;
-  const [formData, setFormData] = useState<Partial<TechnicianPartner>>({});
+  const [formData, setFormData] = useState<
+    Partial<TechnicianPartner & { email: string; password: string; role: 'technician_partner' }>
+  >({});
 
   useEffect(() => {
     setFormData({
@@ -50,7 +54,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     });
   }, [initialData]);
 
-  const updateField = (field: keyof TechnicianPartner, value: any) => {
+  const updateField = (field: keyof typeof formData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -69,7 +73,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSave(formData);
+        onSave({ ...formData, role: 'technician_partner' });
       }}
       className="space-y-6"
     >
@@ -85,9 +89,15 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
           onChange={(e) => updateField('phone', e.target.value)}
         />
         <Input
-          placeholder="Email"
+          placeholder="Email (for login)"
           value={formData.email || ''}
           onChange={(e) => updateField('email', e.target.value)}
+        />
+        <Input
+          placeholder="Password (for login)"
+          type="password"
+          value={formData.password || ''}
+          onChange={(e) => updateField('password', e.target.value)}
         />
 
         <div>
@@ -167,9 +177,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
                 <span className="capitalize font-semibold">{item.day}</span>
                 <Checkbox
                   checked={item.isWorking}
-                  onCheckedChange={(val) =>
-                    updateWorkingHours(idx, 'isWorking', !!val)
-                  }
+                  onCheckedChange={(val) => updateWorkingHours(idx, 'isWorking', !!val)}
                 />
               </div>
               {item.isWorking && (
@@ -206,7 +214,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       </div>
 
       <Button type="submit">
-        {isEditMode ? 'Update Technician Partner' : 'Add Technician Partner'}
+        {isEditMode ? 'Update Technician Partner' : 'Create Technician Partner Account'}
       </Button>
     </form>
   );

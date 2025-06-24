@@ -7,15 +7,14 @@ import {
   deleteDoc,
   doc,
   Timestamp,
-  query,
-  where,
 } from 'firebase/firestore';
-import { db } from '@/src/firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { db, auth } from '@/src/firebaseConfig';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
-import { useUser } from '@/src/context/AuthContext'; // Lấy userId của technician_assistant
+import { useUser } from '@/src/context/AuthContext';
 
 export function useTechnicianPartners() {
-  const { user } = useUser(); // 👈 Lấy thông tin người đang đăng nhập
+  const { user } = useUser();
   const [partners, setPartners] = useState<TechnicianPartner[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,22 +36,32 @@ export function useTechnicianPartners() {
   };
 
   const addPartner = async (
-    partner: Omit<TechnicianPartner, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'createdBy'>
+    partner: Omit<TechnicianPartner, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'createdBy'> & {
+      email: string;
+      password: string;
+    }
   ) => {
     try {
       if (!user?.uid) throw new Error('Missing creator userId');
       const now = Timestamp.now();
+
+      // 👉 Tạo tài khoản Firebase Auth trước
+      const cred = await createUserWithEmailAndPassword(auth, partner.email, partner.password);
+      const newUserId = cred.user.uid;
+
+      // 👉 Sau đó lưu hồ sơ partner
       const newDoc = await addDoc(collection(db, 'technicianPartners'), {
         ...partner,
-        userId: '', // Để trống, sẽ gán sau khi tạo user Firebase
-        createdBy: user.uid, // 👈 Ghi nhận người tạo
+        userId: newUserId,
+        createdBy: user.uid,
         createdAt: now,
         updatedAt: now,
       });
+
       await fetchPartners();
       return newDoc.id;
     } catch (error) {
-      console.error('❌ Failed to add technician partner:', error);
+      console.error('❌ Failed to create technician partner:', error);
       throw error;
     }
   };

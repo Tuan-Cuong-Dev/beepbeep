@@ -1,3 +1,4 @@
+// Không đổi phần đầu
 'use client';
 
 import { useState } from 'react';
@@ -38,6 +39,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
       WorkingDays: (p.workingHours || []).filter((d) => d.isWorking).map((d) => d.day).join(', '),
       Services: (p.serviceCategories || []).join(', '),
       Rating: p.averageRating || 'N/A',
+      Active: p.isActive ? 'Yes' : 'No',
     }));
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -95,12 +97,11 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
             <div><strong>Working Days:</strong> {(partner.workingHours || []).filter((d) => d.isWorking).map((d) => d.day.slice(0, 3)).join(', ')}</div>
             <div><strong>Service Categories:</strong> {(partner.serviceCategories || []).join(', ') || '-'}</div>
             <div><strong>Rating:</strong> {partner.averageRating ? `${partner.averageRating.toFixed(1)}★` : 'N/A'}</div>
+            <div><strong>Active:</strong> {partner.isActive ? 'Yes' : 'No'}</div>
             <div className="flex gap-2 justify-end pt-2">
               <Button size="sm" onClick={() => onEdit(partner)}>Edit</Button>
               {onDelete && partner.id && (
-                <Button size="sm" variant="destructive" onClick={() => onDelete(partner.id!)}>
-                  Delete
-                </Button>
+                <Button size="sm" variant="destructive" onClick={() => onDelete(partner.id!)}>Delete</Button>
               )}
             </div>
           </div>
@@ -122,6 +123,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
               <th className="p-2 text-left">Working Days</th>
               <th className="p-2 text-left">Service Categories</th>
               <th className="p-2 text-left">Rating</th>
+              <th className="p-2 text-left">Active</th>
               <th className="p-2 text-right">Actions</th>
             </tr>
           </thead>
@@ -137,16 +139,13 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
                 <td className="p-2">{(partner.assignedRegions || []).join(', ')}</td>
                 <td className="p-2">{(partner.workingHours || []).filter((d) => d.isWorking).map((d) => d.day.slice(0, 3)).join(', ')}</td>
                 <td className="p-2">{(partner.serviceCategories || []).join(', ') || '-'}</td>
-                <td className="p-2">
-                  {partner.averageRating ? `${partner.averageRating.toFixed(1)}★` : 'N/A'}
-                </td>
+                <td className="p-2">{partner.averageRating ? `${partner.averageRating.toFixed(1)}★` : 'N/A'}</td>
+                <td className="p-2">{partner.isActive ? 'Yes' : 'No'}</td>
                 <td className="p-2">
                   <div className="flex items-center justify-end gap-2">
                     <Button size="sm" onClick={() => onEdit(partner)}>Edit</Button>
                     {onDelete && partner.id && (
-                      <Button size="sm" variant="destructive" onClick={() => onDelete(partner.id!)}>
-                        Delete
-                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => onDelete(partner.id!)}>Delete</Button>
                     )}
                   </div>
                 </td>
