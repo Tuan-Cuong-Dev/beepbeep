@@ -16,7 +16,7 @@ interface Props {
 
 export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: Props) {
   const [typeFilter, setTypeFilter] = useState<'all' | 'mobile' | 'shop'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'rating'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'rating' | 'assignedRegions'>('name');
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -25,15 +25,24 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
     const matchesType = typeFilter === 'all' || p.type === typeFilter;
     const matchesSearch =
       p.name?.toLowerCase().includes(search.toLowerCase()) ||
-      p.email?.toLowerCase().includes(search.toLowerCase());
+      p.email?.toLowerCase().includes(search.toLowerCase()) ||
+      p.phone?.toLowerCase().includes(search.toLowerCase()) ||
+      p.shopName?.toLowerCase().includes(search.toLowerCase()) ||
+      p.shopAddress?.toLowerCase().includes(search.toLowerCase());
     return matchesType && matchesSearch;
   });
 
   const sortedPartners = [...filteredPartners].sort((a, b) => {
     if (sortBy === 'name') return a.name.localeCompare(b.name);
     if (sortBy === 'rating') return (b.averageRating || 0) - (a.averageRating || 0);
+    if (sortBy === 'assignedRegions') {
+      const aRegion = (a.assignedRegions?.[0] || '').toLowerCase();
+      const bRegion = (b.assignedRegions?.[0] || '').toLowerCase();
+      return aRegion.localeCompare(bRegion, 'vi', { sensitivity: 'base' });
+    }
     return 0;
   });
+
 
   const paginatedPartners = sortedPartners.slice(
     (currentPage - 1) * itemsPerPage,
@@ -65,7 +74,6 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
 
   return (
     <div className="space-y-6">
-      {/* Header + Filter */}
       <div className="bg-white border rounded-lg p-4 shadow-sm space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <SimpleSelect
@@ -84,13 +92,14 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
             options={[
               { label: 'Name', value: 'name' },
               { label: 'Rating', value: 'rating' },
+              { label: 'Assigned Regions', value: 'assignedRegions' },
             ]}
             value={sortBy}
-            onChange={(val) => setSortBy(val as 'name' | 'rating')}
+            onChange={(val) => setSortBy(val as 'name' | 'rating' | 'assignedRegions')}
           />
 
           <Input
-            placeholder="Search by name or email"
+            placeholder="Search by name, email, phone, shop name, or address"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -101,11 +110,9 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
         </div>
       </div>
 
-      
-
-      {/* Mobile view */}
+      {/* Mobile View */}
       <div className="block md:hidden space-y-4">
-        {sortedPartners.map((partner) => (
+        {paginatedPartners.map((partner) => (
           <div key={partner.id} className="border rounded-lg p-4 shadow-sm space-y-2 text-sm">
             <div><strong>Name:</strong> {partner.name}</div>
             <div><strong>Phone:</strong> {partner.phone}</div>
@@ -133,7 +140,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
         ))}
       </div>
 
-      {/* Desktop view */}
+      {/* Desktop View */}
       <div className="hidden md:block overflow-x-auto border rounded-lg">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-100">
@@ -154,7 +161,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
             </tr>
           </thead>
           <tbody>
-            {sortedPartners.map((partner) => (
+            {paginatedPartners.map((partner) => (
               <tr key={partner.id} className="border-b">
                 <td className="p-2 font-medium">{partner.name}</td>
                 <td className="p-2">{partner.phone}</td>
@@ -181,7 +188,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
           </tbody>
         </table>
       </div>
-      {/* Pagination control */}
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
