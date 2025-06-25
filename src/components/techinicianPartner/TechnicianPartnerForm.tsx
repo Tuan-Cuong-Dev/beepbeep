@@ -110,7 +110,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
           onChange={(e) => updateField('email', e.target.value)}
         />
         <Input
-          placeholder="Password (for login)"
+          placeholder="Password (for login) "
           type="password"
           value={formData.password || ''}
           onChange={(e) => updateField('password', e.target.value)}

@@ -9,29 +9,82 @@ import TechnicianPartnerTable from '@/src/components/techinicianPartner/Technici
 import { useTechnicianPartners } from '@/src/hooks/useTechnicianPartners';
 import { Wrench } from 'lucide-react';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
+import { serverTimestamp } from 'firebase/firestore';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/src/components/ui/dialog';
 
 export default function AddTechnicianPartnerPage() {
-  const { partners, loading, fetchPartners, addPartner, updatePartner, deletePartner } = useTechnicianPartners();
+  const {
+    partners,
+    loading,
+    fetchPartners,
+    addPartner,
+    updatePartner,
+    deletePartner,
+  } = useTechnicianPartners();
+
   const [editingPartner, setEditingPartner] = useState<TechnicianPartner | null>(null);
+
+  // Dialog state
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const handleEdit = (partner: TechnicianPartner) => {
     setEditingPartner(partner);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this technician partner?')) {
-      await deletePartner(id);
+  const handleDelete = (id: string) => {
+    setDeleteTargetId(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteTargetId) {
+      await deletePartner(deleteTargetId);
+      fetchPartners();
+      setDeleteTargetId(null);
+      setShowDeleteDialog(false);
     }
   };
 
-  const handleSave = async (data: Partial<TechnicianPartner>) => {
-    if (editingPartner?.id) {
-      await updatePartner(editingPartner.id, data);
+  const handleSave = async (
+    data: Partial<TechnicianPartner & { email?: string; password?: string }>
+  ) => {
+    const isEditing = !!editingPartner?.id;
+
+    const finalData: Partial<TechnicianPartner> = {
+      ...data,
+      role: 'technician_partner',
+      updatedAt: serverTimestamp(),
+    };
+
+    if (isEditing) {
+      await updatePartner(editingPartner.id, finalData);
+      setSuccessMessage('Technician partner updated successfully!');
     } else {
-      await addPartner(data as any); // addPartner expects extra fields for auth
+      const hasLogin = !!data.email && !!data.password;
+      await addPartner({
+        ...finalData,
+        ...(hasLogin && {
+          email: data.email!,
+          password: data.password!,
+        }),
+        createdAt: serverTimestamp(),
+      });
+      setSuccessMessage('Technician partner created successfully!');
     }
+
     fetchPartners();
     setEditingPartner(null);
+    setShowSuccessDialog(true);
   };
 
   return (
@@ -66,6 +119,50 @@ export default function AddTechnicianPartnerPage() {
       </main>
 
       <Footer />
+
+      {/* ✅ Dialog xác nhận xoá */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this technician partner? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+              onClick={confirmDelete}
+            >
+              Delete
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ✅ Dialog thông báo thành công */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Success</DialogTitle>
+            <DialogDescription>{successMessage}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              onClick={() => setShowSuccessDialog(false)}
+            >
+              OK
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

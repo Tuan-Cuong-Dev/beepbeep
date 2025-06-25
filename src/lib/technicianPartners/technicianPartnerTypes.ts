@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp,FieldValue } from 'firebase/firestore';
 import { WorkingHours } from './workingHoursTypes';
 
 export interface TechnicianPartner {
@@ -53,6 +53,6 @@ export interface TechnicianPartner {
 
   isActive: boolean;
 
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: Timestamp | FieldValue;
+  updatedAt: Timestamp | FieldValue;
 }

@@ -1,10 +1,11 @@
-// Không đổi phần đầu
 'use client';
 
 import { useState } from 'react';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { Button } from '@/src/components/ui/button';
 import { SimpleSelect } from '@/src/components/ui/select';
+import { Input } from '@/src/components/ui/input';
+import Pagination from '@/src/components/ui/pagination';
 import * as XLSX from 'xlsx';
 
 interface Props {
@@ -16,16 +17,29 @@ interface Props {
 export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: Props) {
   const [typeFilter, setTypeFilter] = useState<'all' | 'mobile' | 'shop'>('all');
   const [sortBy, setSortBy] = useState<'name' | 'rating'>('name');
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  const filteredPartners = partners.filter((p) =>
-    typeFilter === 'all' ? true : p.type === typeFilter
-  );
+  const filteredPartners = partners.filter((p) => {
+    const matchesType = typeFilter === 'all' || p.type === typeFilter;
+    const matchesSearch =
+      p.name?.toLowerCase().includes(search.toLowerCase()) ||
+      p.email?.toLowerCase().includes(search.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
   const sortedPartners = [...filteredPartners].sort((a, b) => {
     if (sortBy === 'name') return a.name.localeCompare(b.name);
     if (sortBy === 'rating') return (b.averageRating || 0) - (a.averageRating || 0);
     return 0;
   });
+
+  const paginatedPartners = sortedPartners.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const totalPages = Math.ceil(sortedPartners.length / itemsPerPage);
 
   const handleExportCSV = () => {
     const data = sortedPartners.map((p) => ({
@@ -53,7 +67,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
     <div className="space-y-6">
       {/* Header + Filter */}
       <div className="bg-white border rounded-lg p-4 shadow-sm space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <SimpleSelect
             placeholder="Filter by type"
             options={[
@@ -74,11 +88,20 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
             value={sortBy}
             onChange={(val) => setSortBy(val as 'name' | 'rating')}
           />
+
+          <Input
+            placeholder="Search by name or email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
           <Button className="w-full" variant="outline" onClick={handleExportCSV}>
             Export CSV
           </Button>
         </div>
       </div>
+
+      
 
       {/* Mobile view */}
       <div className="block md:hidden space-y-4">
@@ -158,6 +181,12 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
           </tbody>
         </table>
       </div>
+      {/* Pagination control */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

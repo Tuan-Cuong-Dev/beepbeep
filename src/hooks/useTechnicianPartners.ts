@@ -36,30 +36,34 @@ export function useTechnicianPartners() {
   };
 
   const addPartner = async (
-    partner: Omit<
-      TechnicianPartner,
-      'id' | 'createdAt' | 'updatedAt' | 'userId' | 'createdBy'
-    > & {
-      email: string;
-      password: string;
+    partner: Partial<TechnicianPartner> & {
+      email?: string;
+      password?: string;
     }
   ) => {
     try {
       if (!user?.uid) throw new Error('Missing creator userId');
+
       const now = Timestamp.now();
+      let userId = partner.userId || '';
 
-      // 👉 Tạo tài khoản Firebase Auth trước
-      const cred = await createUserWithEmailAndPassword(auth, partner.email, partner.password);
-      const newUserId = cred.user.uid;
+      // ✅ Chỉ tạo user nếu có đủ email và password
+      if (partner.email?.trim() && partner.password?.trim()) {
+        const cred = await createUserWithEmailAndPassword(
+          auth,
+          partner.email,
+          partner.password
+        );
+        userId = cred.user.uid;
+      }
 
-      // 👉 Sau đó lưu hồ sơ partner
       const newDoc = await addDoc(collection(db, 'technicianPartners'), {
         ...partner,
-        userId: newUserId,
+        userId,
         createdBy: user.uid,
+        isActive: partner.isActive ?? true,
         createdAt: now,
         updatedAt: now,
-        isActive: true,
       });
 
       await fetchPartners();
@@ -71,9 +75,14 @@ export function useTechnicianPartners() {
   };
 
   const updatePartner = async (
-    id: string,
+    id: string | undefined,
     updates: Partial<Omit<TechnicianPartner, 'createdAt' | 'createdBy' | 'id'>>
   ) => {
+    if (!id) {
+      console.error('❌ Missing partner ID when updating');
+      return;
+    }
+
     try {
       await updateDoc(doc(db, 'technicianPartners', id), {
         ...updates,
