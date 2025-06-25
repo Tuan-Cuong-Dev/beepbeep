@@ -35,6 +35,8 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
       Type: p.type,
       ShopName: p.shopName || '',
       ShopAddress: p.shopAddress || '',
+      MapAddress: p.mapAddress || '',
+      Coordinates: p.coordinates ? `${p.coordinates.lat}, ${p.coordinates.lng}` : '',
       AssignedRegions: (p.assignedRegions || []).join(', '),
       WorkingDays: (p.workingHours || []).filter((d) => d.isWorking).map((d) => d.day).join(', '),
       Services: (p.serviceCategories || []).join(', '),
@@ -72,7 +74,6 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
             value={sortBy}
             onChange={(val) => setSortBy(val as 'name' | 'rating')}
           />
-
           <Button className="w-full" variant="outline" onClick={handleExportCSV}>
             Export CSV
           </Button>
@@ -93,6 +94,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
                 <div><strong>Shop Address:</strong> {partner.shopAddress || '-'}</div>
               </>
             )}
+            <div><strong>Coordinates:</strong> {partner.coordinates ? `${partner.coordinates.lat}, ${partner.coordinates.lng}` : '-'}</div>
             <div><strong>Assigned Regions:</strong> {(partner.assignedRegions || []).join(', ')}</div>
             <div><strong>Working Days:</strong> {(partner.workingHours || []).filter((d) => d.isWorking).map((d) => d.day.slice(0, 3)).join(', ')}</div>
             <div><strong>Service Categories:</strong> {(partner.serviceCategories || []).join(', ') || '-'}</div>
@@ -119,6 +121,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
               <th className="p-2 text-left">Type</th>
               <th className="p-2 text-left">Shop Name</th>
               <th className="p-2 text-left">Shop Address</th>
+              <th className="p-2 text-left">Coordinates</th>
               <th className="p-2 text-left">Assigned Regions</th>
               <th className="p-2 text-left">Working Days</th>
               <th className="p-2 text-left">Service Categories</th>
@@ -136,6 +139,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
                 <td className="p-2 capitalize">{partner.type}</td>
                 <td className="p-2">{partner.shopName || '-'}</td>
                 <td className="p-2">{partner.shopAddress || '-'}</td>
+                <td className="p-2">{partner.coordinates ? `${partner.coordinates.lat}, ${partner.coordinates.lng}` : '-'}</td>
                 <td className="p-2">{(partner.assignedRegions || []).join(', ')}</td>
                 <td className="p-2">{(partner.workingHours || []).filter((d) => d.isWorking).map((d) => d.day.slice(0, 3)).join(', ')}</td>
                 <td className="p-2">{(partner.serviceCategories || []).join(', ') || '-'}</td>

@@ -17,6 +17,14 @@ export interface TechnicianPartner {
   // Shop-specific info
   shopName?: string;
   shopAddress?: string;
+
+  // Google Maps location
+  mapAddress?: string; // 🌐 New field: Google Maps link or formatted address
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+
   geo?: {
     lat: number;
     lng: number;

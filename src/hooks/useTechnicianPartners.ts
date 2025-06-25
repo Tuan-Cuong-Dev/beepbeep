@@ -36,7 +36,10 @@ export function useTechnicianPartners() {
   };
 
   const addPartner = async (
-    partner: Omit<TechnicianPartner, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'createdBy'> & {
+    partner: Omit<
+      TechnicianPartner,
+      'id' | 'createdAt' | 'updatedAt' | 'userId' | 'createdBy'
+    > & {
       email: string;
       password: string;
     }
@@ -56,6 +59,7 @@ export function useTechnicianPartners() {
         createdBy: user.uid,
         createdAt: now,
         updatedAt: now,
+        isActive: true,
       });
 
       await fetchPartners();

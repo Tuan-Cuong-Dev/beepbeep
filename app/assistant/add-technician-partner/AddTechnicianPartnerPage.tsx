@@ -27,8 +27,8 @@ export default function AddTechnicianPartnerPage() {
   const handleSave = async (data: Partial<TechnicianPartner>) => {
     if (editingPartner?.id) {
       await updatePartner(editingPartner.id, data);
-    }else {
-      await addPartner(data as TechnicianPartner);
+    } else {
+      await addPartner(data as any); // addPartner expects extra fields for auth
     }
     fetchPartners();
     setEditingPartner(null);

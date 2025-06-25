@@ -1,3 +1,4 @@
+// Không đổi phần đầu
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,6 +10,7 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { SimpleSelect } from '@/src/components/ui/select';
 import { Checkbox } from '@/src/components/ui/checkbox';
 import dynamic from 'next/dynamic';
+import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 
 const MapPicker = dynamic(() => import('@/src/components/map/MapPicker'), { ssr: false });
 const Select = dynamic(() => import('react-select'), { ssr: false });
@@ -45,14 +47,24 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     Partial<TechnicianPartner & { email: string; password: string; role: 'technician_partner' }>
   >({});
 
+  const { geocode, coords, error: geoError, loading: geoLoading } = useGeocodeAddress();
+
   useEffect(() => {
     setFormData({
       ...initialData,
       workingHours: initialData?.workingHours ?? defaultWorkingHours,
       assignedRegions: initialData?.assignedRegions ?? [],
       type: initialData?.type ?? 'mobile',
+      mapAddress: initialData?.mapAddress ?? '',
+      coordinates: initialData?.coordinates ?? undefined,
     });
   }, [initialData]);
+
+  useEffect(() => {
+    if (coords) {
+      setFormData((prev) => ({ ...prev, coordinates: coords }));
+    }
+  }, [coords]);
 
   const updateField = (field: keyof typeof formData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -67,6 +79,10 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
   const handleRegionInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const regions = e.target.value.split('\n').map((r) => r.trim()).filter(Boolean);
     updateField('assignedRegions', regions);
+  };
+
+  const handleGeocode = () => {
+    if (formData.mapAddress?.trim()) geocode(formData.mapAddress);
   };
 
   return (
@@ -120,6 +136,25 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
               value={formData.shopName || ''}
               onChange={(e) => updateField('shopName', e.target.value)}
             />
+            <Textarea
+              placeholder="Map Address (Google Maps link with coordinates)"
+              value={formData.mapAddress || ''}
+              onChange={(e) => updateField('mapAddress', e.target.value)}
+              onBlur={handleGeocode}
+            />
+            <Input
+              placeholder="Coordinates (lat,lng)"
+              value={formData.coordinates ? `${formData.coordinates.lat}, ${formData.coordinates.lng}` : ''}
+              readOnly={!!coords}
+              onChange={(e) => {
+                const parts = e.target.value.split(',');
+                const lat = parseFloat(parts[0]);
+                const lng = parseFloat(parts[1]);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                  updateField('coordinates', { lat, lng });
+                }
+              }}
+            />
             <Input
               placeholder="Shop Address"
               value={formData.shopAddress || ''}
@@ -129,15 +164,22 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         )}
       </div>
 
-      {formData.type === 'shop' && (
-        <div className="space-y-2">
-          <label className="font-medium">Shop Location (Pick on Map)</label>
-          <MapPicker
-            lat={formData.geo?.lat}
-            lng={formData.geo?.lng}
-            onChange={(coords) => updateField('geo', coords)}
-          />
-        </div>
+      {formData.type === 'shop' && coords && (
+        <>
+          <p className="text-sm text-gray-600">
+            📌 Detected: {coords.lat}° N, {coords.lng}° E
+          </p>
+          <iframe
+            title="Map Preview"
+            width="100%"
+            height="200"
+            className="rounded-xl"
+            style={{ border: 0 }}
+            loading="lazy"
+            allowFullScreen
+            src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&hl=vi&z=16&output=embed`}
+          ></iframe>
+        </>
       )}
 
       <div>
