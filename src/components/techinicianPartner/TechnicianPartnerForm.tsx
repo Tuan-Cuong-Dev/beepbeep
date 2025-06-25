@@ -1,4 +1,3 @@
-// Không đổi phần đầu
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -19,7 +18,7 @@ interface Props {
   initialData?: Partial<TechnicianPartner>;
   onSave: (
     data: Partial<TechnicianPartner & { email: string; password: string; role: 'technician_partner' }>
-  ) => void;
+  ) => Promise<void>;
 }
 
 const daysOfWeek: WorkingHours['day'][] = [
@@ -85,11 +84,29 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     if (formData.mapAddress?.trim()) geocode(formData.mapAddress);
   };
 
+  const resetForm = () => {
+    setFormData({
+      workingHours: defaultWorkingHours,
+      assignedRegions: [],
+      type: 'mobile',
+      mapAddress: '',
+      coordinates: undefined,
+      name: '',
+      phone: '',
+      email: '',
+      password: '',
+      serviceCategories: [],
+      shopName: '',
+      shopAddress: '',
+    });
+  };
+
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        onSave({ ...formData, role: 'technician_partner' });
+        await onSave({ ...formData, role: 'technician_partner' });
+        if (!isEditMode) resetForm();
       }}
       className="space-y-6"
     >
