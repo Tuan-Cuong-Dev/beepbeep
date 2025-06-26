@@ -5,10 +5,19 @@ import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartne
 import { useEffect, useState } from 'react';
 import L from 'leaflet';
 
-// ✅ Import icon Leaflet từ /public
+// ✅ Tạo icon riêng cho người dùng và kỹ thuật viên
 const userIcon = L.icon({
-  iconUrl: '/user-location.png',
+  iconUrl: '/assets/images/user-icon.png', // bạn có thể thay bằng icon người dùng riêng nếu có
   iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+const technicianIcon = L.icon({
+  iconUrl: '/assets/images/Logo-xanh.png', // icon kỹ thuật viên
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
 });
 
 interface Props {
@@ -32,8 +41,8 @@ export default function TechnicianMap({ partners }: Props) {
   if (typeof window === 'undefined') return null;
 
   return (
-    <div className="h-[500px] w-full rounded-xl overflow-hidden mb-8">
-      <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom className="h-full w-full">
+    <div className="h-[500px] w-full rounded-xl overflow-hidden mb-8 z-0">
+      <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom className="h-full w-full z-0">
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="© OpenStreetMap contributors"
@@ -53,11 +62,12 @@ export default function TechnicianMap({ partners }: Props) {
             <Marker
               key={p.id}
               position={[p.coordinates!.lat, p.coordinates!.lng]}
+              icon={technicianIcon} // ✅ sử dụng icon tuỳ chỉnh
             >
               <Popup>
                 <strong>{p.name}</strong>
                 <br />
-                {p.type} technician
+                {p.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
               </Popup>
             </Marker>
           ))}
