@@ -203,7 +203,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         <label className="font-medium">Assigned Regions (one per line)</label>
         <Textarea
           rows={4}
-          placeholder="DaNang/ThanhKhe/ThanhKheTay\nDaNang/HaiChau/BinhHien"
+          placeholder="DaNang/ThanhKhe/ThanhKheTay \nDaNang/HaiChau/BinhHien"
           value={(formData.assignedRegions || []).join('\n')}
           onChange={handleRegionInput}
         />
