@@ -7,7 +7,7 @@ import L from 'leaflet';
 
 // ✅ Tạo icon riêng cho người dùng và kỹ thuật viên
 const userIcon = L.icon({
-  iconUrl: '/assets/images/user-icon.png', // bạn có thể thay bằng icon người dùng riêng nếu có
+  iconUrl: '/assets/images/usericon.png', // bạn có thể thay bằng icon người dùng riêng nếu có
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
