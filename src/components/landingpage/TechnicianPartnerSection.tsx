@@ -1,12 +1,10 @@
 'use client';
 
-import Image from 'next/image';
-import { useState } from 'react';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { Button } from '@/src/components/ui/button';
 import { useRouter } from 'next/navigation';
-// import defaultAvatar from '@/public/default-avatar.png'; // dùng nếu bạn có ảnh mặc định
+import { useState } from 'react';
 
 export default function TechnicianPartnerSection() {
   const { partners, loading } = usePublicTechnicianPartners();
@@ -34,25 +32,18 @@ export default function TechnicianPartnerSection() {
                       key={partner.id}
                       className="bg-white text-gray-800 p-5 rounded-2xl shadow-md min-w-[260px] max-w-[260px] flex-shrink-0 hover:shadow-xl transition-shadow duration-300"
                     >
-                      {/* Avatar (bật nếu cần) */}
-                      {/* 
-                      <div className="w-full h-40 bg-gray-100 rounded-xl mb-3 flex justify-center items-center">
-                        <Image
-                          src={defaultAvatar}
-                          alt={partner.name}
-                          width={100}
-                          height={100}
-                          className="rounded-full object-cover"
-                        />
-                      </div> 
-                      */}
-
+                      {/* 👤 Tên và loại */}
                       <h3 className="text-lg font-semibold">{partner.name}</h3>
-                      <p className="text-sm text-gray-600 capitalize">{partner.type} technician</p>
+                      <p className="text-sm text-gray-600 capitalize">
+                        {partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
+                      </p>
+
+                      {/* 📍 Khu vực */}
                       <p className="text-sm mt-1 text-green-600">
                         {partner.assignedRegions?.join(', ') || 'N/A'}
                       </p>
 
+                      {/* 🛠️ Dịch vụ */}
                       {services.length > 0 && (
                         <div className="text-xs text-gray-600 mt-2 space-y-1">
                           <p className="font-medium text-gray-700">Services:</p>
@@ -64,10 +55,12 @@ export default function TechnicianPartnerSection() {
                         </div>
                       )}
 
+                      {/* ⭐ Đánh giá */}
                       <p className="text-sm mt-2 text-yellow-600">
                         ⭐ {partner.averageRating?.toFixed(1) || 'N/A'} ({partner.ratingCount || 0})
                       </p>
 
+                      {/* 📞 Nút liên hệ */}
                       <div className="mt-4 flex justify-center">
                         <Button
                           size="sm"
@@ -84,7 +77,7 @@ export default function TechnicianPartnerSection() {
               </div>
             </div>
 
-            {/* 🔍 Nút Xem tất cả */}
+            {/* 🔍 Nút "Xem tất cả" */}
             <div className="mt-6 text-center">
               <Button
                 size="sm"
@@ -92,14 +85,14 @@ export default function TechnicianPartnerSection() {
                 onClick={() => router.push('/technician-partners')}
                 className="text-white bg-[#00d289] hover:bg-[#00b47a] rounded-full px-6 py-2 text-sm shadow"
               >
-                🔍 Xem tất cả
+                🔍 View All Technicians
               </Button>
             </div>
           </>
         )}
       </div>
 
-      {/* Notification */}
+      {/* 🔔 Thông báo */}
       <NotificationDialog
         open={showNotice}
         onClose={() => setShowNotice(false)}

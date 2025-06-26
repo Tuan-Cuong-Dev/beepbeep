@@ -5,20 +5,21 @@ import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartne
 import { useEffect, useState } from 'react';
 import L from 'leaflet';
 
+// ✅ Import icon Leaflet từ /public
+const userIcon = L.icon({
+  iconUrl: '/user-location.png',
+  iconSize: [32, 32],
+});
+
 interface Props {
   partners: TechnicianPartner[];
 }
-
-const userIcon = L.icon({
-  iconUrl: '/user-location.png', // 👉 bạn cần đặt icon này trong /public
-  iconSize: [32, 32],
-});
 
 export default function TechnicianMap({ partners }: Props) {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
   useEffect(() => {
-    if (navigator.geolocation) {
+    if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         setUserLocation([pos.coords.latitude, pos.coords.longitude]);
       });
@@ -26,6 +27,9 @@ export default function TechnicianMap({ partners }: Props) {
   }, []);
 
   const defaultCenter: [number, number] = userLocation ?? [16.0471, 108.2062]; // Đà Nẵng fallback
+
+  // ❗ Ngăn render khi đang ở SSR
+  if (typeof window === 'undefined') return null;
 
   return (
     <div className="h-[500px] w-full rounded-xl overflow-hidden mb-8">
@@ -35,18 +39,21 @@ export default function TechnicianMap({ partners }: Props) {
           attribution="© OpenStreetMap contributors"
         />
 
-        {/* Marker người dùng */}
+        {/* Vị trí người dùng */}
         {userLocation && (
           <Marker position={userLocation} icon={userIcon}>
             <Popup>You are here</Popup>
           </Marker>
         )}
 
-        {/* Marker technician */}
+        {/* Vị trí Technician */}
         {partners
           .filter((p) => p.coordinates)
           .map((p) => (
-            <Marker key={p.id} position={[p.coordinates!.lat, p.coordinates!.lng]}>
+            <Marker
+              key={p.id}
+              position={[p.coordinates!.lat, p.coordinates!.lng]}
+            >
               <Popup>
                 <strong>{p.name}</strong>
                 <br />

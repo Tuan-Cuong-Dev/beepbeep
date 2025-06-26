@@ -113,3 +113,16 @@ body {
 .react-datepicker__navigation--next {
   right: 10px;
 }
+
+/* 🗺️ Fix bản đồ Leaflet đè lên các dropdown hoặc select */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+/* 📍 Nếu dropdown hoặc popup cần nổi lên trên map */
+.dropdown-menu,
+.select-popover,
+.react-select__menu {
+  z-index: 1000 !important;
+  position: relative;
+}

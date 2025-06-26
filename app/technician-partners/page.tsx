@@ -1,15 +1,19 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
 import { useState, useMemo } from 'react';
 import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
-import Image from 'next/image';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Input } from '@/src/components/ui/input';
 import { SimpleSelect } from '@/src/components/ui/select';
-import TechnicianPartnerMap from '@/src/components/techinicianPartner/TechnicianPartnerMap';
+
+// Dynamic import để tắt SSR cho bản đồ
+const TechnicianPartnerMap = dynamic(() => import('@/src/components/techinicianPartner/TechnicianPartnerMap'), {
+  ssr: false,
+});
 
 export default function TechnicianPartnerPage() {
   const { partners, loading } = usePublicTechnicianPartners();
@@ -18,7 +22,6 @@ export default function TechnicianPartnerPage() {
   const [regionFilter, setRegionFilter] = useState('');
   const [serviceFilter, setServiceFilter] = useState('');
 
-  // Extract unique filter options
   const regions = useMemo(() => {
     const allRegions = partners.flatMap((p) => p.assignedRegions || []);
     return Array.from(new Set(allRegions)).sort();
@@ -76,7 +79,6 @@ export default function TechnicianPartnerPage() {
             options={[{ label: 'All regions', value: '' }, ...regions.map(r => ({ label: r, value: r }))]}
             className="w-full md:w-1/4"
           />
-
           <SimpleSelect
             value={serviceFilter}
             onChange={setServiceFilter}
@@ -84,10 +86,9 @@ export default function TechnicianPartnerPage() {
             options={[{ label: 'All services', value: '' }, ...services.map(s => ({ label: s, value: s }))]}
             className="w-full md:w-1/4"
           />
-
         </div>
-        
-        {/* Danh sách kỹ thuật viên trên MAP */}
+
+        {/* Bản đồ kỹ thuật viên */}
         <TechnicianPartnerMap partners={filteredPartners} />
 
         {/* Danh sách kỹ thuật viên */}
@@ -107,19 +108,6 @@ export default function TechnicianPartnerPage() {
                   key={partner.id}
                   className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-5 flex flex-col items-center text-center"
                 >
-                  {/* Avatar (tuỳ chọn mở lại) */}
-                  {/* 
-                  <div className="w-24 h-24 mb-3">
-                    <Image
-                      src={defaultAvatar}
-                      alt={partner.name}
-                      width={96}
-                      height={96}
-                      className="rounded-full object-cover"
-                    />
-                  </div> 
-                  */}
-
                   <h3 className="text-lg font-semibold">{partner.name}</h3>
                   <p className="text-sm text-gray-600 capitalize mb-1">
                     {partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
