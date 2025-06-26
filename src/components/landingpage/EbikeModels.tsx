@@ -27,10 +27,6 @@ function EbikeModelList({ ebikemodels }: { ebikemodels: EbikeModel[] }) {
   return (
     <section className="font-sans py-10 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 text-center">
-          Choose Your Electric Ride
-        </h2>
-
         <div className="overflow-x-auto">
           <div className="flex gap-6 pb-4 md:pb-6 w-max">
             {ebikemodels.map((model) => (
