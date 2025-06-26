@@ -108,6 +108,13 @@ export default function TechnicianPartnerPage() {
                   key={partner.id}
                   className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-5 flex flex-col items-center text-center"
                 >
+                  {/* ✅ Avatar */}
+                  <img
+                    src={partner.avatarUrl || '/assets/images/technician.png'}
+                    alt={partner.name}
+                    className="w-20 h-20 rounded-full object-cover mb-3 border-2 border-[#00d289]"
+                  />
+
                   <h3 className="text-lg font-semibold">{partner.name}</h3>
                   <p className="text-sm text-gray-600 capitalize mb-1">
                     {partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}

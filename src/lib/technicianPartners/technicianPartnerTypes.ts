@@ -55,4 +55,5 @@ export interface TechnicianPartner {
 
   createdAt: Timestamp | FieldValue;
   updatedAt: Timestamp | FieldValue;
+  avatarUrl?: string; // ✅ thêm dòng này
 }

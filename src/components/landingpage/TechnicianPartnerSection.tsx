@@ -32,14 +32,23 @@ export default function TechnicianPartnerSection() {
                       key={partner.id}
                       className="bg-white text-gray-800 p-5 rounded-2xl shadow-md min-w-[260px] max-w-[260px] flex-shrink-0 hover:shadow-xl transition-shadow duration-300"
                     >
+                      {/* 🖼️ Avatar */}
+                      <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-3 border border-gray-300">
+                        <img
+                          src={partner.avatarUrl || '/assets/images/technician.png'}
+                          alt={`${partner.name}'s avatar`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
                       {/* 👤 Tên và loại */}
-                      <h3 className="text-lg font-semibold">{partner.name}</h3>
-                      <p className="text-sm text-gray-600 capitalize">
+                      <h3 className="text-lg font-semibold text-center">{partner.name}</h3>
+                      <p className="text-sm text-gray-600 capitalize text-center">
                         {partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
                       </p>
 
                       {/* 📍 Khu vực */}
-                      <p className="text-sm mt-1 text-green-600">
+                      <p className="text-sm mt-1 text-green-600 text-center">
                         {partner.assignedRegions?.join(', ') || 'N/A'}
                       </p>
 
@@ -56,7 +65,7 @@ export default function TechnicianPartnerSection() {
                       )}
 
                       {/* ⭐ Đánh giá */}
-                      <p className="text-sm mt-2 text-yellow-600">
+                      <p className="text-sm mt-2 text-yellow-600 text-center">
                         ⭐ {partner.averageRating?.toFixed(1) || 'N/A'} ({partner.ratingCount || 0})
                       </p>
 

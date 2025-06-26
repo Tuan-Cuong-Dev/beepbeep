@@ -14,8 +14,8 @@ const userIcon = L.icon({
 });
 
 const technicianIcon = L.icon({
-  iconUrl: '/assets/images/Logo-xanh.png', // icon kỹ thuật viên
-  iconSize: [32, 32],
+  iconUrl: '/assets/images/technician.png', // icon kỹ thuật viên
+  iconSize: [32, 38],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
 });
