@@ -1,3 +1,4 @@
+// Nào có dữ liệu thực mới cho xuất hiện trong landingpage
 'use client';
 
 import { useState, useEffect } from 'react';
