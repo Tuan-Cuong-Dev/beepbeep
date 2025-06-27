@@ -87,7 +87,7 @@ export default function TechnicianMap({ partners }: Props) {
                   <p className="text-gray-700 text-xs mb-1">
                     {p.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
                   </p>
-                  <p className="text-gray-600 text-xs">📍 {p.mapAddress || p.shopAddress || 'No address'}</p>
+                  <p className="text-gray-600 text-xs">📍 {p.shopAddress || 'No address'}</p>
                   <p className="text-gray-600 text-xs mb-1">📞 {p.phone || 'No phone'}</p>
 
                   {p.phone && (
