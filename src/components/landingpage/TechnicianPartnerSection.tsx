@@ -5,6 +5,7 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { Button } from '@/src/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
 
 export default function TechnicianPartnerSection() {
   const { partners, loading } = usePublicTechnicianPartners();
@@ -24,69 +25,15 @@ export default function TechnicianPartnerSection() {
           <>
             <div className="overflow-x-auto">
               <div className="flex gap-6 pb-4 md:pb-6 w-max">
-                {partners.slice(0, 6).map((partner) => {
-                  const services = partner.serviceCategories ?? [];
-
-                  return (
-                    <div
-                      key={partner.id}
-                      className="bg-white text-gray-800 p-5 rounded-2xl shadow-md min-w-[260px] max-w-[260px] flex-shrink-0 hover:shadow-xl transition-shadow duration-300"
-                    >
-                      {/* 🖼️ Avatar */}
-                      <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-3 border border-gray-300">
-                        <img
-                          src={partner.avatarUrl || '/assets/images/technician.png'}
-                          alt={`${partner.name}'s avatar`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-
-                      {/* 👤 Tên và loại */}
-                      <h3 className="text-lg font-semibold text-center">{partner.name}</h3>
-                      <p className="text-sm text-gray-600 capitalize text-center">
-                        {partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
-                      </p>
-
-                      {/* 📍 Khu vực */}
-                      <p className="text-sm mt-1 text-green-600 text-center">
-                        {partner.assignedRegions?.join(', ') || 'N/A'}
-                      </p>
-
-                      {/* 🛠️ Dịch vụ */}
-                      {services.length > 0 && (
-                        <div className="text-xs text-gray-600 mt-2 space-y-1">
-                          <p className="font-medium text-gray-700">Services:</p>
-                          <ul className="list-disc list-inside">
-                            {services.slice(0, 3).map((cat, i) => (
-                              <li key={i}>{cat}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {/* ⭐ Đánh giá */}
-                      <p className="text-sm mt-2 text-yellow-600 text-center">
-                        ⭐ {partner.averageRating?.toFixed(1) || 'N/A'} ({partner.ratingCount || 0})
-                      </p>
-
-                      {/* 📞 Nút liên hệ */}
-                      <div className="mt-4 flex justify-center">
-                        <Button
-                          size="sm"
-                          variant="greenOutline"
-                          onClick={() => setShowNotice(true)}
-                          className="py-2 text-lg rounded-sm shadow-lg"
-                        >
-                          📞 Contact
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
+                {partners.slice(0, 6).map((partner) => (
+                  <div key={partner.id} className="min-w-[260px] max-w-[260px] flex-shrink-0">
+                    <TechnicianPartnerCard partner={partner} onContact={() => setShowNotice(true)} />
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* 🔍 Nút "Xem tất cả" */}
+            {/* 🔍 View All Button */}
             <div className="mt-6 text-center">
               <Button
                 size="sm"
@@ -101,7 +48,7 @@ export default function TechnicianPartnerSection() {
         )}
       </div>
 
-      {/* 🔔 Thông báo */}
+      {/* 🔔 Contact Notice */}
       <NotificationDialog
         open={showNotice}
         onClose={() => setShowNotice(false)}
