@@ -36,17 +36,41 @@ export function useTechnicianPartners() {
     }
   };
 
-  const createFirebaseUser = async ({ email, password, name }: { email: string; password: string; name: string }) => {
+  const createFirebaseUser = async ({
+    email,
+    password,
+    name,
+  }: {
+    email: string;
+    password: string;
+    name: string;
+  }) => {
     const res = await fetch('/api/createUser', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name }),
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Unknown error');
-    return data.uid;
+    const contentType = res.headers.get('content-type');
+
+    // Nếu là lỗi, thì đọc text để debug lỗi rõ ràng hơn
+    if (!res.ok) {
+      const errorText = contentType?.includes('application/json')
+        ? (await res.json()).error
+        : await res.text();
+
+      throw new Error(errorText || 'Unknown error');
+    }
+
+    // Nếu đúng là JSON thì parse, còn không thì trả lỗi
+    if (contentType?.includes('application/json')) {
+      const data = await res.json();
+      return data.uid;
+    } else {
+      throw new Error('Unexpected response format (not JSON)');
+    }
   };
+
 
   const addPartner = async (
     partner: Partial<TechnicianPartner> & { email?: string; password?: string }
