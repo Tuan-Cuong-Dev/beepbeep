@@ -36,6 +36,18 @@ export function useTechnicianPartners() {
     }
   };
 
+  const createFirebaseUser = async ({ email, password, name }: { email: string; password: string; name: string }) => {
+    const res = await fetch('/api/createUser', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, name }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Unknown error');
+    return data.uid;
+  };
+
   const addPartner = async (
     partner: Partial<TechnicianPartner> & { email?: string; password?: string }
   ) => {
@@ -76,43 +88,25 @@ export function useTechnicianPartners() {
 
       let userId = updates.userId || existingPartner?.userId;
 
-      // ✅ Nếu chưa có userId & có email/password → gọi API tạo tài khoản
       if (!userId && updates.email?.trim() && updates.password?.trim()) {
         try {
-          const response = await fetch('/api/createUser', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: updates.email,
-              password: updates.password,
-              name: updates.name || existingPartner?.name || '',
-              role: 'technician_partner',
-            }),
+          userId = await createFirebaseUser({
+            email: updates.email,
+            password: updates.password,
+            name: updates.name ?? existingPartner?.name ?? '',
           });
 
-          const result = await response.json();
-
-          if (!response.ok) {
-            console.error('❌ API createUser failed:', result.error);
-            alert('❌ Tạo tài khoản thất bại: ' + result.error);
-            throw new Error(result.error);
-          }
-
-          userId = result.uid;
-
-          // ✅ Sync thông tin người dùng vào Firestore
           if (!userId) {
-            throw new Error('❌ Missing userId when updating Firestore user document.');
+            throw new Error('Missing userId when writing to Firestore');
           }
 
           await setDoc(doc(db, 'users', userId), {
             email: updates.email,
-            name: updates.name || existingPartner?.name || '',
+            name: updates.name ?? existingPartner?.name ?? '',
             role: 'technician_partner',
             createdAt: existingPartner?.createdAt || Timestamp.now(),
             updatedAt: Timestamp.now(),
           }, { merge: true });
-
 
         } catch (err: any) {
           if (err.message.includes('email-already-in-use')) {
@@ -124,7 +118,6 @@ export function useTechnicianPartners() {
         }
       }
 
-      // ✅ Cập nhật document technicianPartners
       await updateDoc(partnerRef, {
         ...updates,
         ...(userId ? { userId } : {}),
