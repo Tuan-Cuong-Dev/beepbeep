@@ -52,24 +52,23 @@ export function useTechnicianPartners() {
     });
 
     const contentType = res.headers.get('content-type');
+    const isJson = contentType?.includes('application/json');
 
-    // Nếu là lỗi, thì đọc text để debug lỗi rõ ràng hơn
     if (!res.ok) {
-      const errorText = contentType?.includes('application/json')
+      const errorMessage = isJson
         ? (await res.json()).error
-        : await res.text();
+        : await res.text(); // dùng .text() để xem lỗi HTML nếu có
 
-      throw new Error(errorText || 'Unknown error');
+      console.error('❌ API /createUser error:', errorMessage);
+      throw new Error(errorMessage || 'Unknown error');
     }
 
-    // Nếu đúng là JSON thì parse, còn không thì trả lỗi
-    if (contentType?.includes('application/json')) {
-      const data = await res.json();
-      return data.uid;
-    } else {
-      throw new Error('Unexpected response format (not JSON)');
-    }
+    const data = isJson ? await res.json() : null;
+
+    if (!data?.uid) throw new Error('Missing uid from response');
+    return data.uid;
   };
+
 
 
   const addPartner = async (
