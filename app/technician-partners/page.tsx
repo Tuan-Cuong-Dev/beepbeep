@@ -3,8 +3,6 @@
 import dynamic from 'next/dynamic';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
 import { useState, useMemo } from 'react';
-import { Button } from '@/src/components/ui/button';
-import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Input } from '@/src/components/ui/input';

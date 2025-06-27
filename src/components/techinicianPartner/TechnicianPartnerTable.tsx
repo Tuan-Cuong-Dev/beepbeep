@@ -50,7 +50,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
   );
   const totalPages = Math.ceil(sortedPartners.length / itemsPerPage);
 
-  const handleExportCSV = () => {
+  const handleExportXLSX = () => {
     const data = sortedPartners.map((p) => ({
       Name: p.name,
       Phone: p.phone,
@@ -69,7 +69,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Technicians');
-    XLSX.writeFile(workbook, 'technician_partners.csv');
+    XLSX.writeFile(workbook, 'technician_partners.xlsx', { bookType: 'xlsx' });
   };
 
   return (
@@ -104,8 +104,8 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          <Button className="w-full" variant="outline" onClick={handleExportCSV}>
-            Export CSV
+          <Button className="w-full" variant="outline" onClick={handleExportXLSX}>
+            Export EXCEL
           </Button>
         </div>
       </div>

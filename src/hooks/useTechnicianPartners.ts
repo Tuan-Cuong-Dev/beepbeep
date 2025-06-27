@@ -7,9 +7,10 @@ import {
   deleteDoc,
   doc,
   Timestamp,
+  setDoc,
+  getDoc,
 } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { db, auth } from '@/src/firebaseConfig';
+import { db } from '@/src/firebaseConfig';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { useUser } from '@/src/context/AuthContext';
 
@@ -36,30 +37,15 @@ export function useTechnicianPartners() {
   };
 
   const addPartner = async (
-    partner: Partial<TechnicianPartner> & {
-      email?: string;
-      password?: string;
-    }
+    partner: Partial<TechnicianPartner> & { email?: string; password?: string }
   ) => {
     try {
       if (!user?.uid) throw new Error('Missing creator userId');
 
       const now = Timestamp.now();
-      let userId = partner.userId || '';
-
-      // ✅ Chỉ tạo user nếu có đủ email và password
-      if (partner.email?.trim() && partner.password?.trim()) {
-        const cred = await createUserWithEmailAndPassword(
-          auth,
-          partner.email,
-          partner.password
-        );
-        userId = cred.user.uid;
-      }
-
       const newDoc = await addDoc(collection(db, 'technicianPartners'), {
         ...partner,
-        userId,
+        userId: '',
         createdBy: user.uid,
         isActive: partner.isActive ?? true,
         createdAt: now,
@@ -76,7 +62,7 @@ export function useTechnicianPartners() {
 
   const updatePartner = async (
     id: string | undefined,
-    updates: Partial<Omit<TechnicianPartner, 'createdAt' | 'createdBy' | 'id'>>
+    updates: Partial<Omit<TechnicianPartner, 'createdAt' | 'createdBy' | 'id'> & { email: string; password: string }>
   ) => {
     if (!id) {
       console.error('❌ Missing partner ID when updating');
@@ -84,22 +70,91 @@ export function useTechnicianPartners() {
     }
 
     try {
-      await updateDoc(doc(db, 'technicianPartners', id), {
+      const partnerRef = doc(db, 'technicianPartners', id);
+      const partnerSnap = await getDoc(partnerRef);
+      const existingPartner = partnerSnap.exists() ? partnerSnap.data() as TechnicianPartner : null;
+
+      let userId = updates.userId || existingPartner?.userId;
+
+      // ✅ Nếu chưa có userId & có email/password → gọi API tạo tài khoản
+      if (!userId && updates.email?.trim() && updates.password?.trim()) {
+        try {
+          const response = await fetch('/api/createUser', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: updates.email,
+              password: updates.password,
+              name: updates.name || existingPartner?.name || '',
+              role: 'technician_partner',
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            console.error('❌ API createUser failed:', result.error);
+            alert('❌ Tạo tài khoản thất bại: ' + result.error);
+            throw new Error(result.error);
+          }
+
+          userId = result.uid;
+
+          // ✅ Sync thông tin người dùng vào Firestore
+          if (!userId) {
+            throw new Error('❌ Missing userId when updating Firestore user document.');
+          }
+
+          await setDoc(doc(db, 'users', userId), {
+            email: updates.email,
+            name: updates.name || existingPartner?.name || '',
+            role: 'technician_partner',
+            createdAt: existingPartner?.createdAt || Timestamp.now(),
+            updatedAt: Timestamp.now(),
+          }, { merge: true });
+
+
+        } catch (err: any) {
+          if (err.message.includes('email-already-in-use')) {
+            alert('❌ Email đã được sử dụng cho tài khoản khác.');
+          } else {
+            alert('❌ Lỗi tạo tài khoản: ' + err.message);
+          }
+          throw err;
+        }
+      }
+
+      // ✅ Cập nhật document technicianPartners
+      await updateDoc(partnerRef, {
         ...updates,
+        ...(userId ? { userId } : {}),
         updatedAt: Timestamp.now(),
       });
+
+      console.log('✅ Partner updated successfully:', id);
       await fetchPartners();
+
     } catch (error) {
       console.error('❌ Failed to update technician partner:', error);
+      throw error;
     }
   };
 
-  const deletePartner = async (id: string) => {
+  const deletePartner = async (id: string, userId?: string) => {
     try {
+      if (userId) {
+        await setDoc(doc(db, 'users', userId), {
+          role: 'customer',
+          updatedAt: Timestamp.now(),
+        }, { merge: true });
+      }
+
       await deleteDoc(doc(db, 'technicianPartners', id));
       await fetchPartners();
+
+      console.log('✅ Technician partner removed and user downgraded to customer.');
     } catch (error) {
-      console.error('❌ Failed to delete technician partner:', error);
+      console.error('❌ Failed to remove partner or update user:', error);
     }
   };
 

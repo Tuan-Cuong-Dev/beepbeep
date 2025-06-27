@@ -11,7 +11,6 @@ import { Checkbox } from '@/src/components/ui/checkbox';
 import dynamic from 'next/dynamic';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 
-const MapPicker = dynamic(() => import('@/src/components/map/MapPicker'), { ssr: false });
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
 interface Props {
@@ -181,10 +180,10 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         )}
       </div>
 
-      {formData.type === 'shop' && coords && (
+      {formData.type === 'shop' && formData.coordinates && (
         <>
           <p className="text-sm text-gray-600">
-            📌 Detected: {coords.lat}° N, {coords.lng}° E
+            📌 Detected: {formData.coordinates.lat}° N, {formData.coordinates.lng}° E
           </p>
           <iframe
             title="Map Preview"
@@ -194,10 +193,11 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
             style={{ border: 0 }}
             loading="lazy"
             allowFullScreen
-            src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&hl=vi&z=16&output=embed`}
-          ></iframe>
+            src={`https://www.google.com/maps?q=${formData.coordinates.lat},${formData.coordinates.lng}&hl=vi&z=16&output=embed`}
+          />
         </>
       )}
+
 
       <div>
         <label className="font-medium">Assigned Regions (one per line)</label>

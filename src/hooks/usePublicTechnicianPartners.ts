@@ -1,5 +1,6 @@
 // hooks/usePublicTechnicianPartners.ts
-// ạo Hook chỉ fetch các TechnicianPartner đang hoạt động (isActive = true)
+// Tạo Hook chỉ fetch các TechnicianPartner đang hoạt động (isActive = true)
+
 import { useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
