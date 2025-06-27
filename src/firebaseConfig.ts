@@ -26,15 +26,11 @@ export const firebaseConfig = {
   appId: "1:319881394948:web:a2141deb07a03c5054ae51",
 };
 
-// ✅ Khởi tạo Firebase App
 const app = initializeApp(firebaseConfig);
-
-// ✅ Khởi tạo các dịch vụ Firebase cần dùng
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// ✅ Export các thành phần cần dùng
 export {
   auth,
   db,
