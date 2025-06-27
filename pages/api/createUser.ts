@@ -1,15 +1,13 @@
-// pages/api/createUser.ts
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import serviceAccount from '@/src/firebaseAdminConfig.json';
 import type { ServiceAccount } from 'firebase-admin';
 
-
 if (!getApps().length) {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_CONFIG || '{}') as ServiceAccount;
+
   initializeApp({
-    credential: cert(serviceAccount as ServiceAccount),
+    credential: cert(serviceAccount),
   });
 }
 

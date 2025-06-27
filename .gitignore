@@ -48,7 +48,6 @@ serviceAccountKey.json
 ocrServiceKey.json
 # Firebase service account
 src/admin_tools/serviceAccountKey.json
-src/firebaseAdminConfig.json
 
 
 
