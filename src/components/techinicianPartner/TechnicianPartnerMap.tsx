@@ -82,19 +82,25 @@ export default function TechnicianMap({ partners }: Props) {
               icon={technicianIcon}
             >
               <Popup>
-                <div className="text-sm leading-snug max-w-[200px]">
+                <div className="text-sm leading-snug max-w-[220px]">
                   <p className="font-semibold text-black">{p.name}</p>
                   <p className="text-gray-700 text-xs mb-1">
                     {p.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
                   </p>
-                  <p className="text-gray-600 text-xs">
-                    📍 {p.shopAddress || 'Address not available'}
-                  </p>
-                  <p className="text-gray-600 text-xs">
-                    📞 {p.phone || 'Phone not available'}
-                  </p>
+                  <p className="text-gray-600 text-xs">📍 {p.mapAddress || p.shopAddress || 'No address'}</p>
+                  <p className="text-gray-600 text-xs mb-1">📞 {p.phone || 'No phone'}</p>
+
+                  {p.phone && (
+                    <a
+                      href={`tel:${p.phone}`}
+                      className="inline-block text-xs text-white bg-green-500 px-3 py-1 rounded mt-1 hover:bg-green-600"
+                    >
+                      📞 Call Now
+                    </a>
+                  )}
                 </div>
               </Popup>
+
             </Marker>
           ))}
       </MapContainer>

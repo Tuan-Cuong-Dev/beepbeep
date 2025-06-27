@@ -110,14 +110,6 @@ export default function TechnicianPartnerPage() {
       </div>
 
       <Footer />
-
-      <NotificationDialog
-        open={showNotice}
-        onClose={() => setShowNotice(false)}
-        type="info"
-        title="📞 Contact Technician"
-        description="We are building a contact system so you can reach technicians directly. Coming soon!"
-      />
     </div>
   );
 }
