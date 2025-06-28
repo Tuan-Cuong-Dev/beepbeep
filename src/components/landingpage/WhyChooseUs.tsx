@@ -57,7 +57,7 @@ export default function WhyChooseUs() {
   return (
     <section className="font-sans px-4 py-10 bg-gray-50 text-center">
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Why Everyone Benefits from Our Platform</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-8">Why Everyone Benefits from Our Platform</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {roles.map((role) => (
             <div
