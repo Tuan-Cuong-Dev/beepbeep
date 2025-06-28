@@ -15,6 +15,8 @@ export default function UserSummaryCard({ users }: Props) {
     staff: 'Staff',
     investor: 'Investor',
     customer: 'Customer',
+    technician_assistant: 'Technician Assistant',
+    technician_partner: 'Technician Partner',
   };
 
   const roleColors: Record<string, string> = {
@@ -25,6 +27,8 @@ export default function UserSummaryCard({ users }: Props) {
     staff: 'text-purple-600',
     investor: 'text-teal-500',
     customer: 'text-gray-700',
+    technician_assistant: 'text-indigo-600',
+    technician_partner: 'text-yellow-600',
   };
 
   const counts: Record<string, number> = {};
@@ -38,19 +42,19 @@ export default function UserSummaryCard({ users }: Props) {
   const totalUsers = users.length;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div className="bg-white shadow rounded-xl p-4 text-center border">
-        <h3 className="text-sm text-gray-500">Total Users</h3>
-        <p className="text-2xl font-semibold text-[#00d289]">{totalUsers}</p>
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-4">
+      <div className="bg-white rounded-lg border p-3 text-center shadow-sm">
+        <h3 className="text-xs text-gray-500">Total Users</h3>
+        <p className="text-xl font-bold text-[#00d289]">{totalUsers}</p>
       </div>
 
       {Object.entries(roleLabels).map(([roleKey, label]) => (
         <div
           key={roleKey}
-          className="bg-white shadow rounded-xl p-4 text-center border"
+          className="bg-white rounded-lg border p-3 text-center shadow-sm"
         >
-          <h3 className="text-sm text-gray-500">{label}</h3>
-          <p className={`text-2xl font-semibold ${roleColors[roleKey]}`}>
+          <h3 className="text-xs text-gray-500 truncate">{label}</h3>
+          <p className={`text-xl font-bold ${roleColors[roleKey]}`}>
             {counts[roleKey] || 0}
           </p>
         </div>
