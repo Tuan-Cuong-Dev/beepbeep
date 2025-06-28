@@ -147,7 +147,7 @@ export default function EbikeModelsPage() {
   return (
     <div className="bg-gray-100 min-h-screen">
       <header className="text-center py-6">
-        <h1 className="text-4xl font-bold text-gray-900">Electric Vehicle Rental List</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Electric Vehicle Rental List</h1>
         <p className="text-gray-600 mt-2">Find the best electric vehicle for your journey</p>
       </header>
       {loading ? (
