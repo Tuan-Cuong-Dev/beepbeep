@@ -1,26 +1,30 @@
-// lib/ebikeModels/ebikeModelTypes.ts
-import { Timestamp, FieldValue } from "firebase/firestore";
+import { Timestamp, FieldValue } from 'firebase/firestore';
+
+export type VehicleType = 'scooter' | 'bike' | 'cargo' | 'other';
+
+export const VEHICLE_TYPES = ['All', 'Scooter', 'Bike', 'Cargo', 'Other'] as const;
 
 export interface EbikeModel {
   id: string;
-  companyId: string;          // 🔗 chủ sở hữu (company hoặc private)
-  name: string;               // Tên thương mại model
+  companyId: string;
+  name: string;
   description: string;
 
-  batteryCapacity: string;    // Định dạng ví dụ: "72V22Ah"
-  motorPower: number;         // W
-  topSpeed: number;           // Km/h
-  range: number;              // Km
-  weight: number;             // Kg
-  maxLoad?: number;           // Kg (nếu cần)
+  batteryCapacity: string;  // e.g. "72V22Ah"
+  motorPower: number;       // W
+  topSpeed: number;         // km/h
+  range: number;            // km
+  weight: number;           // kg
+  maxLoad?: number;         // kg
 
-  pricePerDay: number;        // giá mặc định cho model
-  pricePerHour?: number;      // tùy chọn nếu hỗ trợ thuê theo giờ
-  pricePerWeek?: number;      // ✅ mới: giá theo tuần
-  pricePerMonth?: number;     // ✅ mới: giá theo tháng
+  pricePerDay: number;
+  pricePerHour?: number;
+  pricePerWeek?: number;
+  pricePerMonth?: number;
 
-  imageUrl?: string;          // ảnh minh họa
-  available: boolean;         // model này có còn dùng không
+  imageUrl?: string;
+  available: boolean;
+  type?: VehicleType;
 
   createdAt?: Timestamp | FieldValue;
   updatedAt?: Timestamp | FieldValue;

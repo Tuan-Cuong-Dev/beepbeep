@@ -9,25 +9,12 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
-
-interface EbikeModel {
-  id: string;
-  name: string;
-  pricePerDay: number;
-  imageUrl: string;
-  motorPower?: number;
-  topSpeed?: number;
-  range?: number;
-  maxLoad?: number;
-  type?: string; // 'scooter' | 'bike' | 'cargo' | 'other'
-}
-
-const VEHICLE_TYPES = ['All', 'Scooter', 'Bike', 'Cargo', 'Other'];
+import { EbikeModel, VEHICLE_TYPES, VehicleType } from '@/src/lib/ebikemodels/ebikeModelTypes';
 
 export default function VehicleModelsPage() {
   const [models, setModels] = useState<EbikeModel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeType, setActiveType] = useState('All');
+  const [activeType, setActiveType] = useState<string>('All');
   const router = useRouter();
 
   useEffect(() => {
@@ -38,15 +25,25 @@ export default function VehicleModelsPage() {
           const d = doc.data();
           return {
             id: doc.id,
+            companyId: d.companyId || '',
             name: d.name || '',
-            pricePerDay: d.pricePerDay || 0,
-            imageUrl: d.imageUrl || '',
+            description: d.description || '',
+            batteryCapacity: d.batteryCapacity || '',
             motorPower: d.motorPower,
             topSpeed: d.topSpeed,
             range: d.range,
+            weight: d.weight,
             maxLoad: d.maxLoad,
-            type: d.type || 'Other',
-          };
+            pricePerDay: d.pricePerDay || 0,
+            pricePerHour: d.pricePerHour,
+            pricePerWeek: d.pricePerWeek,
+            pricePerMonth: d.pricePerMonth,
+            imageUrl: d.imageUrl || '',
+            available: d.available ?? true,
+            type: (d.type || 'other').toLowerCase() as VehicleType,
+            createdAt: d.createdAt,
+            updatedAt: d.updatedAt,
+          } as EbikeModel;
         });
         setModels(data);
       } catch (error) {
@@ -59,9 +56,9 @@ export default function VehicleModelsPage() {
   }, []);
 
   const filteredModels =
-    activeType === 'All'
+    activeType.toLowerCase() === 'all'
       ? models
-      : models.filter((model) => model.type?.toLowerCase() === activeType.toLowerCase());
+      : models.filter((model) => model.type === activeType.toLowerCase());
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -93,7 +90,7 @@ export default function VehicleModelsPage() {
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading...</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5">
             {filteredModels.map((model) => (
               <div
                 key={model.id}
@@ -142,6 +139,7 @@ export default function VehicleModelsPage() {
           </div>
         )}
       </main>
+
       <Footer />
     </div>
   );
