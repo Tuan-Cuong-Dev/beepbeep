@@ -1,11 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
+import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { Button } from '@/src/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
 
 export default function TechnicianPartnerSection() {
   const { partners, loading } = usePublicTechnicianPartners();
@@ -13,9 +13,9 @@ export default function TechnicianPartnerSection() {
   const router = useRouter();
 
   return (
-    <section className="font-sans pt-4 px-4 bg-gray-100">
+    <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 text-center">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">
           Need Help? Find a Technician
         </h2>
 
@@ -24,17 +24,22 @@ export default function TechnicianPartnerSection() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <div className="flex gap-6 pb-4 md:pb-6 w-max">
+              <div className="flex gap-4 w-max pb-2">
                 {partners.slice(0, 6).map((partner) => (
-                  <div key={partner.id} className="min-w-[260px] max-w-[260px] flex-shrink-0">
-                    <TechnicianPartnerCard partner={partner} onContact={() => setShowNotice(true)} />
+                  <div
+                    key={partner.id}
+                    className="min-w-[260px] max-w-[260px] flex-shrink-0"
+                  >
+                    <TechnicianPartnerCard
+                      partner={partner}
+                      onContact={() => setShowNotice(true)}
+                    />
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* 🔍 View All Button */}
-            <div className="mt-6 text-center">
+            <div className="mt-4 text-center">
               <Button
                 size="sm"
                 variant="default"
@@ -48,7 +53,6 @@ export default function TechnicianPartnerSection() {
         )}
       </div>
 
-      {/* 🔔 Contact Notice */}
       <NotificationDialog
         open={showNotice}
         onClose={() => setShowNotice(false)}
