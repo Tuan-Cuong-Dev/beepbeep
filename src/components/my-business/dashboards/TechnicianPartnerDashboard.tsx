@@ -125,7 +125,27 @@ export default function TechnicianPartnerDashboard() {
 
         <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">🚧 Assigned Issues</h2>
-          <div className="overflow-auto border rounded-xl">
+          <div className="md:hidden space-y-4">
+            {issues.map(issue => (
+              <div key={issue.id} className="border rounded-xl p-4 bg-white shadow">
+                <div className="text-sm font-semibold mb-2">{issue.issueType} – {renderStatusBadge(issue.status)}</div>
+                <p className="text-sm text-gray-600"><strong>VIN:</strong> {issue.vin}</p>
+                <p className="text-sm text-gray-600"><strong>Plate:</strong> {issue.plateNumber}</p>
+                <p className="text-sm text-gray-600"><strong>Description:</strong> {issue.description}</p>
+                <p className="text-sm text-gray-600"><strong>Reported:</strong> {issue.reportedAt?.toDate().toLocaleString()}</p>
+
+                <div className="mt-3 space-y-2">
+                  {issue.status === 'assigned' && <Button className="w-full" onClick={() => setProposingIssue(issue)}>Submit Proposal</Button>}
+                  {issue.status === 'confirmed' && <Button className="w-full" onClick={() => handleUpdateStatus(issue, 'in_progress')}>Mark In Progress</Button>}
+                  {issue.status === 'in_progress' && <Button className="w-full" onClick={() => setUpdatingActualIssue(issue)}>Complete & Submit Actual Result</Button>}
+                  {issue.status === 'proposed' && <p className="text-green-600 text-center">Waiting Approval</p>}
+                  {issue.status === 'rejected' && <p className="text-gray-400 italic text-center">No actions</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden md:block overflow-auto border rounded-xl">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-gray-100 text-left">
