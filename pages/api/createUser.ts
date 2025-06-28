@@ -3,6 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { adminAuth } from '@/src/lib/firebaseAdmin';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  console.log('🔵 Incoming request:', req.method, req.body);
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -26,3 +28,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: error.message });
   }
 }
+
