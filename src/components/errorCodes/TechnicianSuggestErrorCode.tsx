@@ -11,7 +11,7 @@ import TechnicianSuggestionList from './TechnicianSuggestionList';
 
 export default function TechnicianSuggestErrorCode() {
   const { user, role } = useUser();
-  const isTechnician = role === 'technician';
+  const isTechnician = role === 'technician'|| role === 'technician_partner';
 
   const [errorCodes, setErrorCodes] = useState<ErrorCode[]>([]);
   const [selectedId, setSelectedId] = useState<string>('');
