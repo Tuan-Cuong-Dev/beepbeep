@@ -25,7 +25,7 @@ function EbikeModelList({ ebikemodels }: { ebikemodels: EbikeModel[] }) {
   const router = useRouter();
 
   return (
-    <section className="font-sans py-10 px-4 bg-gray-100">
+    <section className="font-sans pt-6 pb-4 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
         <div className="overflow-x-auto">
           <div className="flex gap-6 pb-4 md:pb-6 w-max">

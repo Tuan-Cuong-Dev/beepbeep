@@ -13,7 +13,7 @@ export default function TechnicianPartnerSection() {
   const router = useRouter();
 
   return (
-    <section className="font-sans py-6 px-4 bg-gray-100">
+    <section className="font-sans pt-4 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 text-center">
           Need Help? Find a Technician
