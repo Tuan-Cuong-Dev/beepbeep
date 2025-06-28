@@ -15,6 +15,7 @@ import TechnicianDashboard from '@/src/components/my-business/dashboards/Technic
 import CompanyAdminDashboard from '@/src/components/my-business/dashboards/CompanyAdminDashboard';
 import StationManagerDashboard from '@/src/components/my-business/dashboards/StationManagerDashboard';
 import TechnicianAssistantDashboard from '@/src/components/my-business/dashboards/TechnicianAssistantDashboard'; // ✅ Mới thêm
+import TechnicianPartnerDashboard from '@/src/components/my-business/dashboards/TechnicianPartnerDashboard';
 
 interface StaffEntry {
   id: string;
@@ -29,6 +30,7 @@ export default function MyBusinessPage() {
   const [businessType, setBusinessType] = useState<
     'admin' |
     'technician_assistant' |
+    'technician_partner' |
     'rental_company_owner' |
     'private_provider' |
     'agent' |
@@ -44,9 +46,13 @@ export default function MyBusinessPage() {
   useEffect(() => {
     if (loading || !user) return;
 
-    // Ưu tiên nếu là Technician Assistant
     if (role === 'technician_assistant') {
       setBusinessType('technician_assistant');
+      return;
+    }
+
+    if (role === 'technician_partner') {
+      setBusinessType('technician_partner');
       return;
     }
 
@@ -130,7 +136,8 @@ export default function MyBusinessPage() {
   return (
     <main className="min-h-screen space-y-6 bg-gray-50">
       {businessType === 'admin' && <AdminDashboard />}
-      {businessType === 'technician_assistant' && <TechnicianAssistantDashboard />} {/* ✅ Mới thêm */}
+      {businessType === 'technician_assistant' && <TechnicianAssistantDashboard />} 
+      {businessType === 'technician_partner' && <TechnicianPartnerDashboard />}
       {businessType === 'rental_company_owner' && <RentalCompanyDashboard />}
       {businessType === 'private_provider' && <PrivateProviderDashboard />}
       {businessType === 'agent' && <AgentDashboard />}

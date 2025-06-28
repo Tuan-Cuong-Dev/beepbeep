@@ -89,7 +89,14 @@ export default function LoginPopup({ onClose }: LoginPopupProps) {
       </div>
 
       {/* Popup Signin xuất hiện khi bấm "Continue with Email" */}
-      {showSignin && <SigninPopup onClose={() => setShowSignin(false)} />}
+      {showSignin && (
+        <SigninPopup
+          onClose={() => {
+            setShowSignin(false); // ẩn popup con
+            onClose();            // ẩn luôn LoginPopup cha
+          }}
+        />
+      )}
     </div>
   );
 }
