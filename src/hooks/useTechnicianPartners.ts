@@ -83,6 +83,7 @@ export function useTechnicianPartners() {
         userId: '',
         createdBy: user.uid,
         isActive: partner.isActive ?? true,
+        avatarUrl: partner.avatarUrl || '/assets/images/technician.png', // ✅ avatar mặc định
         createdAt: now,
         updatedAt: now,
       });
@@ -144,6 +145,7 @@ export function useTechnicianPartners() {
       await updateDoc(partnerRef, {
         ...updates,
         ...(userId ? { userId } : {}),
+        avatarUrl: updates.avatarUrl || existingPartner?.avatarUrl || '/assets/images/technician.png', // ✅ avatar mặc định nếu không có
         updatedAt: Timestamp.now(),
       });
 

@@ -22,19 +22,13 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
           >
             <div className="flex items-center gap-4 mb-2">
               <div className="w-12 h-12 rounded-full overflow-hidden border">
-                {user.photoURL ? (
-                  <Image
-                    src={user.photoURL}
-                    alt="User"
-                    width={48}
-                    height={48}
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <div className="bg-gray-200 w-full h-full flex items-center justify-center text-xs text-gray-500">
-                    N/A
-                  </div>
-                )}
+                <Image
+                  src={user.photoURL || '/assets/images/technician.png'}
+                  alt="User"
+                  width={48}
+                  height={48}
+                  className="object-cover w-full h-full"
+                />
               </div>
               <div>
                 <div className="font-semibold">{user.name}</div>
@@ -81,17 +75,13 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
                 <td className="border px-3 py-2">{user.phone}</td>
                 <td className="border px-3 py-2">{user.role}</td>
                 <td className="border px-3 py-2">
-                  {user.photoURL ? (
-                    <Image
-                      src={user.photoURL}
-                      alt="User"
-                      width={32}
-                      height={32}
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-gray-400 italic">N/A</span>
-                  )}
+                  <Image
+                    src={user.photoURL || '/assets/images/technician.png'}
+                    alt="User"
+                    width={32}
+                    height={32}
+                    className="rounded-full object-cover"
+                  />
                 </td>
                 <td className="border px-3 py-2">{user.city}</td>
                 <td className="border px-3 py-2">{user.country}</td>
