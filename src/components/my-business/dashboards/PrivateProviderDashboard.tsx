@@ -125,7 +125,6 @@ export default function PrivateProviderDashboard() {
             <QuickAction label="Add New Vehicle" href="/ebikes" />
             <QuickAction label="Check Reviews" href="/reviews" />
             <QuickAction label="Form Builder" href="/my-business/form-builder" />
-            <QuickAction label="View Reports" href="/reports" />
             <QuickAction label="Manage Vehicle Issues" href="/vehicle-issues" />
             <QuickAction label="Manage Packages" href="/subscriptionPackages" />
             <QuickAction label="Rent a Ride" href="/rent" />

@@ -145,8 +145,6 @@ export default function RentalCompanyDashboard() {
             <QuickAction label="Create Vehicle Model" href="/vehicles" />
             <QuickAction label="Assign Staff" href="/my-business/staff" />
             <QuickAction label="Form Builder" href="/my-business/form-builder" />
-            <QuickAction label="Upload Invoice" href="/my-business/documents" />
-            <QuickAction label="View Reports" href="/reports" />
             <QuickAction label="Rent a Ride" href="/rent" />
             <QuickAction label="Return Vehicle" href="/return" />
             <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />

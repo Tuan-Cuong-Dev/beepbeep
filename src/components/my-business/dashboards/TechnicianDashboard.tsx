@@ -125,7 +125,6 @@ export default function TechnicianDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         <QuickAction label="View My Issues" href="/vehicle-issues" />
         <QuickAction label="Proposal History" href="/vehicle-issues/proposals" />
-        <QuickAction label="View Reports" href="/reports" />
         <QuickAction label="Error Codes" href="/assistant/error-codes" />
         <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
         <QuickAction label="Suggest Error Fix" href="/suggest-error" />

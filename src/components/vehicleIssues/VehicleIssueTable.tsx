@@ -24,6 +24,9 @@ interface Props {
   statusFilter: string;
   stationFilter: string;
   refetchIssues: () => Promise<void>; // 👈 thêm dòng này
+   // 👇 THÊM DÒNG NÀY
+  setViewingProposal: (issue: ExtendedVehicleIssue | null) => void;
+  setApprovingProposal: (issue: ExtendedVehicleIssue | null) => void;
 }
 
 export default function VehicleIssueTable({

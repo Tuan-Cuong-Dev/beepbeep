@@ -20,21 +20,21 @@ export default function VehicleIssueProposalsPage() {
   const [viewingProposal, setViewingProposal] = useState<ExtendedVehicleIssue | null>(null);
   const [approvingProposal, setApprovingProposal] = useState<ExtendedVehicleIssue | null>(null);
 
-  useEffect(() => {
+  const fetchIssues = async () => {
     if (!companyId) return;
+    setLoading(true);
+    const q = query(
+      collection(db, 'vehicleIssues'),
+      where('companyId', '==', companyId),
+      where('status', '==', 'proposed')
+    );
+    const snap = await getDocs(q);
+    const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ExtendedVehicleIssue[];
+    setIssues(data);
+    setLoading(false);
+  };
 
-    const fetchIssues = async () => {
-      const q = query(
-        collection(db, 'vehicleIssues'),
-        where('companyId', '==', companyId),
-        where('status', '==', 'proposed')
-      );
-      const snap = await getDocs(q);
-      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ExtendedVehicleIssue[];
-      setIssues(data);
-      setLoading(false);
-    };
-
+  useEffect(() => {
     fetchIssues();
   }, [companyId]);
 
@@ -53,27 +53,37 @@ export default function VehicleIssueProposalsPage() {
       <Header />
       <UserTopMenu />
       <main className="flex-1 p-6 space-y-6">
-          title="Vehicle Issue Proposals"
-          subtitle="Review and approve proposed solutions by technicians."
+        <div>
+          <h1 className="text-2xl font-semibold">Vehicle Issue Proposals</h1>
+          <p className="text-gray-600">Review and approve proposed solutions by technicians.</p>
+        </div>
+
         <div className="bg-white shadow rounded-lg border overflow-auto">
-          <VehicleIssueTable
-            issues={issues}
-            technicianMap={{}}
-            onEdit={() => {}}
-            updateIssue={updateIssue}
-            setClosingIssue={() => {}}
-            setCloseDialogOpen={() => {}}
-            setEditingIssue={() => {}}
-            setShowForm={() => {}}
-            normalizedRole={role}
-            isAdmin={true}
-            isTechnician={false}
-            searchTerm=""
-            statusFilter="proposed"
-            stationFilter=""
-            setProposingIssue={() => {}}
-            setUpdatingActualIssue={() => {}}
-          />
+          {issues.length === 0 ? (
+            <div className="text-center py-6 text-gray-500">No proposals found.</div>
+          ) : (
+            <VehicleIssueTable
+              issues={issues}
+              technicianMap={{}}
+              onEdit={() => {}}
+              updateIssue={updateIssue}
+              setClosingIssue={() => {}}
+              setCloseDialogOpen={() => {}}
+              setEditingIssue={() => {}}
+              setShowForm={() => {}}
+              normalizedRole={role}
+              isAdmin={true}
+              isTechnician={false}
+              searchTerm=""
+              statusFilter="proposed"
+              stationFilter=""
+              setProposingIssue={() => {}}
+              setUpdatingActualIssue={() => {}}
+              setViewingProposal={setViewingProposal}
+              setApprovingProposal={setApprovingProposal}
+              refetchIssues={fetchIssues}
+            />
+          )}
         </div>
       </main>
       <Footer />
