@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { TechnicianSuggestion } from '@/src/lib/errorCodes/errorCodeTypes';
 import { Button } from '@/src/components/ui/button';
 import { Textarea } from '@/src/components/ui/textarea';
 
 interface Props {
   onSubmit: (suggestion: string) => void;
   disabled?: boolean;
+  loading?: boolean;
 }
 
-export default function TechnicianSuggestionForm({ onSubmit, disabled }: Props) {
+export default function TechnicianSuggestionForm({ onSubmit, disabled = false, loading = false }: Props) {
   const [comment, setComment] = useState('');
 
   const handleSubmit = () => {
@@ -25,10 +25,10 @@ export default function TechnicianSuggestionForm({ onSubmit, disabled }: Props) 
         placeholder="Enter your suggestion to improve the solution..."
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        disabled={disabled}
+        disabled={disabled || loading}
       />
-      <Button onClick={handleSubmit} disabled={disabled || !comment.trim()}>
-        Submit Suggestion
+      <Button onClick={handleSubmit} disabled={disabled || loading || !comment.trim()}>
+        {loading ? 'Submitting...' : 'Submit Suggestion'}
       </Button>
     </div>
   );
