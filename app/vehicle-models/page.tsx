@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { formatCurrency } from '@/src/utils/formatCurrency';
+import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
 
 interface EbikeModel {
   id: string;
@@ -18,11 +19,15 @@ interface EbikeModel {
   topSpeed?: number;
   range?: number;
   maxLoad?: number;
+  type?: string; // 'scooter' | 'bike' | 'cargo' | 'other'
 }
+
+const VEHICLE_TYPES = ['All', 'Scooter', 'Bike', 'Cargo', 'Other'];
 
 export default function VehicleModelsPage() {
   const [models, setModels] = useState<EbikeModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeType, setActiveType] = useState('All');
   const router = useRouter();
 
   useEffect(() => {
@@ -40,6 +45,7 @@ export default function VehicleModelsPage() {
             topSpeed: d.topSpeed,
             range: d.range,
             maxLoad: d.maxLoad,
+            type: d.type || 'Other',
           };
         });
         setModels(data);
@@ -52,70 +58,82 @@ export default function VehicleModelsPage() {
     fetchModels();
   }, []);
 
+  const filteredModels =
+    activeType === 'All'
+      ? models
+      : models.filter((model) => model.type?.toLowerCase() === activeType.toLowerCase());
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-10">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-          Choose Your Electric Ride
+      <main className="flex-1 container mx-auto px-4 py-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-gray-800">
+          🛵 Choose Your Electric Ride
         </h1>
 
+        {/* Tabs */}
+        <div className="flex justify-center mb-6">
+          <Tabs value={activeType} onValueChange={setActiveType}>
+            <TabsList className="flex flex-wrap gap-2 bg-white rounded-full p-2 shadow">
+              {VEHICLE_TYPES.map((type) => (
+                <TabsTrigger
+                  key={type}
+                  value={type}
+                  className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 data-[state=active]:bg-[#00d289] data-[state=active]:text-white"
+                >
+                  {type}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {/* Content */}
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading...</p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {models.map((model) => (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+            {filteredModels.map((model) => (
               <div
                 key={model.id}
-                className="bg-white rounded-xl shadow hover:shadow-md transition cursor-pointer overflow-hidden"
+                className="bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
                 onClick={() => router.push(`/vehicle-models/${model.id}`)}
               >
-                <div className="relative w-full h-56 ">
+                <div className="bg-white h-[180px] w-full relative flex items-center justify-center p-4">
                   {model.imageUrl ? (
                     <Image
                       src={model.imageUrl}
                       alt={model.name}
-                      fill
-                      className="object-contain p-4"
+                      width={300}
+                      height={180}
+                      className="object-contain w-full h-full transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="h-full flex items-center justify-center text-gray-400">
+                    <div className="h-full w-full flex items-center justify-center text-gray-400">
                       No Image
                     </div>
                   )}
                 </div>
 
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-700 text-base">{model.name}</h3>
-                  <p className="text-sm text-[#00d289] font-medium mb-2">
+                <div className="px-4 pb-4 pt-2">
+                  <h3 className="font-semibold text-gray-800 text-base mb-1">{model.name}</h3>
+                  <p className="text-sm text-[#00d289] font-semibold mb-2">
                     {formatCurrency(model.pricePerDay)} / day
                   </p>
 
                   <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                    {model.motorPower !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-purple-500">⚙️</span>
-                        <span>{model.motorPower} W</span>
-                      </div>
+                    {model.motorPower && (
+                      <div className="flex items-center gap-1">⚙️ {model.motorPower}W</div>
                     )}
-                    {model.topSpeed !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-orange-500">⚡</span>
-                        <span>{model.topSpeed} km/h</span>
-                      </div>
+                    {model.topSpeed && (
+                      <div className="flex items-center gap-1">⚡ {model.topSpeed} km/h</div>
                     )}
-                    {model.range !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-blue-500">📏</span>
-                        <span>{model.range} km</span>
-                      </div>
+                    {model.range && (
+                      <div className="flex items-center gap-1">📏 {model.range} km</div>
                     )}
-                    {model.maxLoad !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-amber-600">🏋️</span>
-                        <span>{model.maxLoad} kg</span>
-                      </div>
+                    {model.maxLoad && (
+                      <div className="flex items-center gap-1">🏋️ {model.maxLoad} kg</div>
                     )}
                   </div>
                 </div>
@@ -124,7 +142,6 @@ export default function VehicleModelsPage() {
           </div>
         )}
       </main>
-
       <Footer />
     </div>
   );

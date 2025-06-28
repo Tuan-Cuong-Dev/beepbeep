@@ -44,7 +44,7 @@ export default function EbikeModelsSection() {
         });
         setModels(data);
       } catch (error) {
-        console.error('Error fetching ebike models:', error);
+        console.error('Error fetching vehicle models:', error);
       } finally {
         setLoading(false);
       }
@@ -56,7 +56,7 @@ export default function EbikeModelsSection() {
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">
-          Explore Our Vehicles Models
+          Choose Your Electric Ride
         </h2>
 
         {loading ? (
