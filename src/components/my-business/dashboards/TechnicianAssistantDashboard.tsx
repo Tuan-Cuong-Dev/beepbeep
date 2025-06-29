@@ -4,10 +4,7 @@ import { useEffect, useState } from 'react';
 import { db } from '@/src/firebaseConfig';
 import {
   collection,
-  getCountFromServer,
   getDocs,
-  query,
-  where,
 } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
 import Header from '@/src/components/landingpage/Header';
@@ -23,7 +20,7 @@ export default function TechnicianAssistantDashboard() {
   const { user } = useUser();
   const [stats, setStats] = useState({
     unassignedIssues: 0,
-    technicianPartners: 0,
+    technicianPartners: '0/0',
     assignedToday: 0,
   });
 
@@ -35,16 +32,14 @@ export default function TechnicianAssistantDashboard() {
 
     const fetchStats = async () => {
       try {
-        // 🔍 Tải toàn bộ vehicleIssues
+        // 🔍 Vehicle issues
         const allIssuesSnap = await getDocs(collection(db, 'vehicleIssues'));
 
-        // Đếm các sự cố chưa được gán
         const unassignedIssuesCount = allIssuesSnap.docs.filter((doc) => {
           const data = doc.data();
           return data.status === 'pending' && !data.assignedTo;
         }).length;
 
-        // Đếm số sự cố được gán bởi technician_assistant hôm nay
         const assignedTodayCount = allIssuesSnap.docs.filter((doc) => {
           const data = doc.data();
           return (
@@ -53,14 +48,16 @@ export default function TechnicianAssistantDashboard() {
           );
         }).length;
 
-        // Đếm số technician_partner đang hoạt động
-        const partnerSnap = await getCountFromServer(
-          query(collection(db, 'technicianPartners'), where('isActive', '==', true))
-        );
+        // 🔍 Technician Partners
+        const partnersSnap = await getDocs(collection(db, 'technicianPartners'));
+        const total = partnersSnap.size;
+        const active = partnersSnap.docs.filter(
+          (doc) => doc.data().isActive === true
+        ).length;
 
         setStats({
           unassignedIssues: unassignedIssuesCount,
-          technicianPartners: partnerSnap.data().count,
+          technicianPartners: `${active}/${total}`,
           assignedToday: assignedTodayCount,
         });
       } catch (err) {
@@ -79,7 +76,7 @@ export default function TechnicianAssistantDashboard() {
           🛠️ Technician Assistant Dashboard
         </h1>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-6">
           <DashboardCard
             icon={<ClipboardList />}
             title="Unassigned Issues"
@@ -90,7 +87,7 @@ export default function TechnicianAssistantDashboard() {
             icon={<Wrench />}
             title="Technician Partners"
             value={stats.technicianPartners}
-            href="/assistant/technician-partners"
+            href="/assistant/add-technician-partner"
           />
           <DashboardCard
             icon={<FileText />}

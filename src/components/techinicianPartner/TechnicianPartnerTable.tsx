@@ -129,7 +129,19 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
             <div><strong>Working Days:</strong> {(partner.workingHours || []).filter((d) => d.isWorking).map((d) => d.day.slice(0, 3)).join(', ')}</div>
             <div><strong>Service Categories:</strong> {(partner.serviceCategories || []).join(', ') || '-'}</div>
             <div><strong>Rating:</strong> {partner.averageRating ? `${partner.averageRating.toFixed(1)}★` : 'N/A'}</div>
-            <div><strong>Active:</strong> {partner.isActive ? 'Yes' : 'No'}</div>
+            <div>
+              <strong>Active:</strong>{' '}
+              <span
+                className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  partner.isActive
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}
+              >
+                {partner.isActive ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+
             <div className="flex gap-2 justify-end pt-2">
               <Button size="sm" onClick={() => onEdit(partner)}>Edit</Button>
               {onDelete && partner.id && (
@@ -174,7 +186,18 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
                 <td className="p-2">{(partner.workingHours || []).filter((d) => d.isWorking).map((d) => d.day.slice(0, 3)).join(', ')}</td>
                 <td className="p-2">{(partner.serviceCategories || []).join(', ') || '-'}</td>
                 <td className="p-2">{partner.averageRating ? `${partner.averageRating.toFixed(1)}★` : 'N/A'}</td>
-                <td className="p-2">{partner.isActive ? 'Yes' : 'No'}</td>
+                <td className="p-2">
+                  <span
+                    className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                      partner.isActive
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {partner.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+
                 <td className="p-2">
                   <div className="flex items-center justify-end gap-2">
                     <Button size="sm" onClick={() => onEdit(partner)}>Edit</Button>

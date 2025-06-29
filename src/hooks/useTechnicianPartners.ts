@@ -57,19 +57,15 @@ export function useTechnicianPartners() {
     if (!res.ok) {
       const errorMessage = isJson
         ? (await res.json()).error
-        : await res.text(); // dùng .text() để xem lỗi HTML nếu có
-
+        : await res.text();
       console.error('❌ API /createUser error:', errorMessage);
       throw new Error(errorMessage || 'Unknown error');
     }
 
     const data = isJson ? await res.json() : null;
-
     if (!data?.uid) throw new Error('Missing uid from response');
     return data.uid;
   };
-
-
 
   const addPartner = async (
     partner: Partial<TechnicianPartner> & { email?: string; password?: string }
@@ -83,7 +79,7 @@ export function useTechnicianPartners() {
         userId: '',
         createdBy: user.uid,
         isActive: partner.isActive ?? true,
-        avatarUrl: partner.avatarUrl || '/assets/images/technician.png', // ✅ avatar mặc định
+        avatarUrl: partner.avatarUrl || '/assets/images/technician.png',
         createdAt: now,
         updatedAt: now,
       });
@@ -108,7 +104,7 @@ export function useTechnicianPartners() {
     try {
       const partnerRef = doc(db, 'technicianPartners', id);
       const partnerSnap = await getDoc(partnerRef);
-      const existingPartner = partnerSnap.exists() ? partnerSnap.data() as TechnicianPartner : null;
+      const existingPartner = partnerSnap.exists() ? (partnerSnap.data() as TechnicianPartner) : null;
 
       let userId = updates.userId || existingPartner?.userId;
 
@@ -124,14 +120,17 @@ export function useTechnicianPartners() {
             throw new Error('Missing userId when writing to Firestore');
           }
 
-          await setDoc(doc(db, 'users', userId), {
-            email: updates.email,
-            name: updates.name ?? existingPartner?.name ?? '',
-            role: 'technician_partner',
-            createdAt: existingPartner?.createdAt || Timestamp.now(),
-            updatedAt: Timestamp.now(),
-          }, { merge: true });
-
+          await setDoc(
+            doc(db, 'users', userId),
+            {
+              email: updates.email,
+              name: updates.name ?? existingPartner?.name ?? '',
+              role: 'technician_partner',
+              createdAt: existingPartner?.createdAt || Timestamp.now(),
+              updatedAt: Timestamp.now(),
+            },
+            { merge: true }
+          );
         } catch (err: any) {
           if (err.message.includes('email-already-in-use')) {
             alert('❌ Email đã được sử dụng cho tài khoản khác.');
@@ -145,13 +144,13 @@ export function useTechnicianPartners() {
       await updateDoc(partnerRef, {
         ...updates,
         ...(userId ? { userId } : {}),
-        avatarUrl: updates.avatarUrl || existingPartner?.avatarUrl || '/assets/images/technician.png', // ✅ avatar mặc định nếu không có
+        isActive: updates.isActive ?? existingPartner?.isActive ?? true,
+        avatarUrl: updates.avatarUrl || existingPartner?.avatarUrl || '/assets/images/technician.png',
         updatedAt: Timestamp.now(),
       });
 
       console.log('✅ Partner updated successfully:', id);
       await fetchPartners();
-
     } catch (error) {
       console.error('❌ Failed to update technician partner:', error);
       throw error;
@@ -161,10 +160,14 @@ export function useTechnicianPartners() {
   const deletePartner = async (id: string, userId?: string) => {
     try {
       if (userId) {
-        await setDoc(doc(db, 'users', userId), {
-          role: 'customer',
-          updatedAt: Timestamp.now(),
-        }, { merge: true });
+        await setDoc(
+          doc(db, 'users', userId),
+          {
+            role: 'customer',
+            updatedAt: Timestamp.now(),
+          },
+          { merge: true }
+        );
       }
 
       await deleteDoc(doc(db, 'technicianPartners', id));

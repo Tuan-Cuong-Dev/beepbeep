@@ -55,6 +55,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       type: initialData?.type ?? 'mobile',
       mapAddress: initialData?.mapAddress ?? '',
       coordinates: initialData?.coordinates ?? undefined,
+      isActive: initialData?.isActive ?? true,
     });
   }, [initialData]);
 
@@ -97,6 +98,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       serviceCategories: [],
       shopName: '',
       shopAddress: '',
+      isActive: true,
     });
   };
 
@@ -198,7 +200,6 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         </>
       )}
 
-
       <div>
         <label className="font-medium">Assigned Regions (one per line)</label>
         <Textarea
@@ -270,6 +271,14 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Checkbox
+          checked={formData.isActive ?? true}
+          onCheckedChange={(val) => updateField('isActive', !!val)}
+        />
+        <label className="text-sm font-medium">Is Active</label>
       </div>
 
       <Button type="submit">
