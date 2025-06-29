@@ -91,7 +91,7 @@ const Header = () => {
 
           {user ? (
             <img
-              src={user.photoURL || "/assets/images/usericon.png"}
+              src={user.photoURL || "/assets/images/technician.png"}
               alt="avatar"
               className="w-8 h-8 rounded-full object-cover cursor-pointer"
               onClick={toggleUserSidebar}
