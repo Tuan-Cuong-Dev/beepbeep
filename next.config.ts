@@ -12,11 +12,11 @@ const nextConfig = {
       },
     ],
   },
- eslint: {
-    ignoreDuringBuilds: true, // ⚠️ Bỏ qua lỗi eslint khi build
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,  // ⚠️ Bỏ qua lỗi TypeScript khi build
+    ignoreBuildErrors: true,
   },
 };
 

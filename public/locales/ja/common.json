@@ -1,0 +1,20 @@
+{
+  "preferences": "設定",
+  "region_language": "地域と言語",
+  "currency": "通貨",
+  "select_region_language": "地域と言語を選択",
+  "select_currency": "通貨を選択",
+  "vietnam": "ベトナム",
+  "englishUK": "英語（UK）",
+  "japan": "日本",
+  "china": "中国",
+  "southKorea": "韓国",
+  "russia": "ロシア",
+  "france": "フランス",
+  "germany": "ドイツ",
+  "italy": "イタリア",
+  "spain": "スペイン",
+  "portugal": "ポルトガル",
+  "saudiArabia": "サウジアラビア",
+  "saved_notice": "すべての設定変更はアカウントに保存されます。"
+}

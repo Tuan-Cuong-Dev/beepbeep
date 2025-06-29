@@ -1,0 +1,20 @@
+{
+  "preferences": "환경 설정",
+  "region_language": "지역 및 언어",
+  "currency": "통화",
+  "select_region_language": "지역 | 언어 선택",
+  "select_currency": "통화 선택",
+  "vietnam": "베트남",
+  "englishUK": "영어 (UK)",
+  "japan": "일본",
+  "china": "중국",
+  "southKorea": "대한민국",
+  "russia": "러시아",
+  "france": "프랑스",
+  "germany": "독일",
+  "italy": "이탈리아",
+  "spain": "스페인",
+  "portugal": "포르투갈",
+  "saudiArabia": "사우디아라비아",
+  "saved_notice": "모든 환경 설정 변경 사항은 계정에 저장됩니다."
+}

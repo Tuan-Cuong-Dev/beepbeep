@@ -4,12 +4,20 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth, db } from '@/src/firebaseConfig';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import i18n from '@/src/i18n'; // ✅ Import từ nơi đã init, KHÔNG import từ 'i18next'
+
+interface UserPreferences {
+  language: string;
+  region: string;
+  currency?: string;
+}
 
 interface AuthContextType {
   user: User | null;
   companyId: string;
   stationId: string;
   role: string;
+  preferences: UserPreferences;
   loading: boolean;
 }
 
@@ -18,6 +26,11 @@ const AuthContext = createContext<AuthContextType>({
   companyId: '',
   stationId: '',
   role: '',
+  preferences: {
+    language: 'en',
+    region: 'US',
+    currency: 'USD',
+  },
   loading: true,
 });
 
@@ -26,6 +39,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [companyId, setCompanyId] = useState<string>('');
   const [stationId, setStationId] = useState<string>('');
   const [role, setRole] = useState<string>('');
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    language: 'en',
+    region: 'US',
+    currency: 'USD',
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,6 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const userData = userDoc.exists() ? userDoc.data() : null;
 
         if (userData) {
+          // 👉 Gán thông tin staff nếu có
           const staffSnap = await getDocs(
             query(collection(db, 'staffs'), where('userId', '==', currentUser.uid))
           );
@@ -51,16 +70,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setCompanyId(userData.companyId || '');
             setStationId(userData.stationId || '');
           }
+
+          // 👉 Gán preferences
+          const prefs = userData.preferences || {};
+          const loadedPrefs: UserPreferences = {
+            language: prefs.language || 'en',
+            region: prefs.region || 'US',
+            currency: prefs.currency || 'USD',
+          };
+          setPreferences(loadedPrefs);
+
+          // 👉 Chỉ đổi ngôn ngữ nếu khác hiện tại
+          if (i18n.isInitialized && i18n.language !== loadedPrefs.language) {
+            i18n.changeLanguage(loadedPrefs.language);
+          } else {
+            // Delay một chút để tránh lỗi chưa init
+            setTimeout(() => {
+              i18n.changeLanguage(loadedPrefs.language);
+            }, 100);
+          }
         } else {
+          // Nếu user không tồn tại trong Firestore
           setCompanyId('');
           setStationId('');
           setRole('');
         }
       } else {
+        // Khi người dùng đăng xuất
         setUser(null);
         setCompanyId('');
         setStationId('');
         setRole('');
+        setPreferences({
+          language: 'en',
+          region: 'US',
+          currency: 'USD',
+        });
       }
 
       setLoading(false);
@@ -70,7 +115,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, companyId, stationId, role, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        companyId,
+        stationId,
+        role,
+        preferences,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

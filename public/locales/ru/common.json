@@ -1,0 +1,20 @@
+{
+  "preferences": "Настройки",
+  "region_language": "Регион и язык",
+  "currency": "Валюта",
+  "select_region_language": "Выберите регион | язык",
+  "select_currency": "Выберите валюту",
+  "vietnam": "Вьетнам",
+  "englishUK": "Английский (UK)",
+  "japan": "Япония",
+  "china": "Китай",
+  "southKorea": "Южная Корея",
+  "russia": "Россия",
+  "france": "Франция",
+  "germany": "Германия",
+  "italy": "Италия",
+  "spain": "Испания",
+  "portugal": "Португалия",
+  "saudiArabia": "Саудовская Аравия",
+  "saved_notice": "Все изменения настроек будут сохранены в вашей учетной записи."
+}

@@ -1,0 +1,20 @@
+{
+  "preferences": "Preferences",
+  "region_language": "Region & Language",
+  "currency": "Currency",
+  "select_region_language": "Select Region | Language",
+  "select_currency": "Select Currency",
+  "vietnam": "Vietnam",
+  "englishUK": "English (UK)",
+  "japan": "Japan",
+  "china": "China",
+  "southKorea": "South Korea",
+  "russia": "Russia",
+  "france": "France",
+  "germany": "Germany",
+  "italy": "Italy",
+  "spain": "Spain",
+  "portugal": "Portugal",
+  "saudiArabia": "Saudi Arabia",
+  "saved_notice": "All preference changes will be saved to your account."
+}
