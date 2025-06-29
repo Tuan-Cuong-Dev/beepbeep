@@ -45,6 +45,13 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginatedData = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  const renderReferences = (refs: { name?: string; phone?: string }[]) => {
+    if (!refs || refs.length === 0) return '—';
+    return refs
+      .map((r) => `${r.name || 'N/A'} – ${r.phone || 'N/A'}`)
+      .join(', ');
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-4">
@@ -87,53 +94,6 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         />
       </div>
 
-      <div className="grid gap-4 sm:hidden">
-        {paginatedData.map((item) => (
-          <div key={item.id} className="border rounded-lg p-4 bg-white shadow">
-            <div className="font-semibold text-base mb-1 text-[#00d289]">{item.code}</div>
-            <div className="text-sm text-gray-700">{item.description}</div>
-            <div className="text-sm text-gray-600">Solution: {item.recommendedSolution}</div>
-            <div className="text-sm text-gray-600">Brand: {item.brand || '-'}</div>
-            <div className="text-sm text-gray-600">Model: {item.modelName || '-'}</div>
-            <div className="text-sm text-gray-600">
-              Video: {item.tutorialVideoUrl ? (
-                <a
-                  href={item.tutorialVideoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#00d289] underline"
-                >
-                  YouTube <ExternalLink className="inline w-4 h-4" />
-                </a>
-              ) : 'No link'}
-            </div>
-            <div className="text-sm text-gray-600">
-              Suggestions: {(item.technicianSuggestions?.length ?? 0) > 0 ? (
-                <button
-                  onClick={() => setSelectedForSuggestion(item)}
-                  className="text-[#00d289] underline hover:text-[#00d289]"
-                >
-                  {item.technicianSuggestions?.length ?? 0} suggestion(s)
-                </button>
-              ) : '0'}
-            </div>
-            <div className="text-xs text-gray-400">
-              {item.createdAt?.toDate().toLocaleString()}
-            </div>
-            {!(isTechnician || isTechnicianPartner) && (
-              <div className="mt-3 flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
-                  Edit
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => onDelete(item)}>
-                  Delete
-                </Button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
       <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full text-sm border">
           <thead className="bg-gray-100">
@@ -145,6 +105,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
               <th className="p-2 text-left">Model</th>
               <th className="p-2 text-left">Video</th>
               <th className="p-2 text-left">Suggestions</th>
+              <th className="p-2 text-left">Reference</th>
               <th className="p-2 text-left">Created At</th>
               {!(isTechnician || isTechnicianPartner) && <th className="p-2 text-left">Actions</th>}
             </tr>
@@ -159,39 +120,25 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                 <td className="p-2">{item.modelName || '-'}</td>
                 <td className="p-2">
                   {item.tutorialVideoUrl ? (
-                    <a
-                      href={item.tutorialVideoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#00d289] underline inline-flex items-center gap-1"
-                    >
+                    <a href={item.tutorialVideoUrl} target="_blank" rel="noopener noreferrer" className="text-[#00d289] underline inline-flex items-center gap-1">
                       YouTube <ExternalLink className="w-4 h-4 inline" />
                     </a>
-                  ) : (
-                    <span className="text-gray-400 italic">No link</span>
-                  )}
+                  ) : <span className="text-gray-400 italic">No link</span>}
                 </td>
                 <td className="p-2 text-center">
                   {(item.technicianSuggestions?.length ?? 0) > 0 ? (
-                    <button
-                      onClick={() => setSelectedForSuggestion(item)}
-                      className="text-[#00d289] underline hover:text-[#00d289]"
-                    >
-                      {item.technicianSuggestions?.length ?? 0}
+                    <button onClick={() => setSelectedForSuggestion(item)} className="text-[#00d289] underline hover:text-[#00d289]">
+                      {item.technicianSuggestions?.length}
                     </button>
-                  ) : (
-                    <span className="text-gray-500">0</span>
-                  )}
+                  ) : <span className="text-gray-500">0</span>}
                 </td>
+
+                <td className="p-2 text-sm">{renderReferences(item.technicianReferences || [])}</td>
                 <td className="p-2">{item.createdAt?.toDate().toLocaleString()}</td>
                 {!(isTechnician || isTechnicianPartner) && (
                   <td className="p-2 flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => onEdit(item)}>
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={() => onDelete(item)}>
-                      <Trash className="w-4 h-4" />
-                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => onEdit(item)}><Pencil className="w-4 h-4" /></Button>
+                    <Button size="sm" variant="destructive" onClick={() => onDelete(item)}><Trash className="w-4 h-4" /></Button>
                   </td>
                 )}
               </tr>
@@ -201,35 +148,14 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
       </div>
 
       <div className="flex justify-center items-center gap-6 mt-6 text-gray-700 text-sm">
-        <button
-          className={`px-4 py-1 rounded border ${
-            currentPage === 1
-              ? 'text-gray-400 border-gray-200 cursor-not-allowed bg-gray-50'
-              : 'hover:bg-gray-100 border-gray-300'
-          }`}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
+        <button className={`px-4 py-1 rounded border ${currentPage === 1 ? 'text-gray-400 border-gray-200 cursor-not-allowed bg-gray-50' : 'hover:bg-gray-100 border-gray-300'}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
           Previous
         </button>
-
-        <span>
-          Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
-        </span>
-
-        <button
-          className={`px-4 py-1 rounded border ${
-            currentPage === totalPages
-              ? 'text-gray-400 border-gray-200 cursor-not-allowed bg-gray-50'
-              : 'hover:bg-gray-100 border-gray-300'
-          }`}
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
+        <span>Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong></span>
+        <button className={`px-4 py-1 rounded border ${currentPage === totalPages ? 'text-gray-400 border-gray-200 cursor-not-allowed bg-gray-50' : 'hover:bg-gray-100 border-gray-300'}`} onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
           Next
         </button>
       </div>
-
 
       {selectedForSuggestion && (
         <Dialog open={!!selectedForSuggestion} onOpenChange={() => setSelectedForSuggestion(null)}>

@@ -3,13 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ErrorCode, TechnicianSuggestion } from '@/src/lib/errorCodes/errorCodeTypes';
 import { db } from '@/src/firebaseConfig';
-import {
-  collection,
-  addDoc,
-  updateDoc,
-  doc,
-  Timestamp,
-} from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, Timestamp } from 'firebase/firestore';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
@@ -34,6 +28,8 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
   const [modelName, setModelName] = useState('');
   const [tutorialVideoUrl, setTutorialVideoUrl] = useState('');
   const [technicianSuggestions, setTechnicianSuggestions] = useState<TechnicianSuggestion[]>([]);
+  const [supportTechnicians, setSupportTechnicians] = useState<string[]>([]);
+  const [technicianReferences, setTechnicianReferences] = useState<{ name?: string; phone?: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,6 +41,7 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
       setModelName(existing.modelName || '');
       setTutorialVideoUrl(existing.tutorialVideoUrl || '');
       setTechnicianSuggestions(existing.technicianSuggestions || []);
+      setTechnicianReferences(existing.technicianReferences || []);
     } else {
       setCode('');
       setDescription('');
@@ -53,6 +50,7 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
       setModelName('');
       setTutorialVideoUrl('');
       setTechnicianSuggestions([]);
+      setTechnicianReferences([]);
     }
   }, [existing]);
 
@@ -71,8 +69,7 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
 
   const handleSubmit = async () => {
     const isReadonlyRole = isTechnician || isTechnicianPartner;
-
-  if (!code || !description || !recommendedSolution || !user?.uid || isReadonlyRole) return;
+    if (!code || !description || !recommendedSolution || !user?.uid || isReadonlyRole) return;
 
     setLoading(true);
 
@@ -85,6 +82,8 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
         modelName,
         tutorialVideoUrl,
         technicianSuggestions,
+        supportTechnicians,
+        technicianReferences,
         updatedAt: Timestamp.now(),
       };
 
@@ -107,7 +106,22 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
     }
   };
 
-  // 🔒 Ẩn toàn bộ form nếu là technician
+  const updateReference = (index: number, field: 'name' | 'phone', value: string) => {
+    const updated = [...technicianReferences];
+    updated[index][field] = value;
+    setTechnicianReferences(updated);
+  };
+
+  const addReference = () => {
+    setTechnicianReferences([...technicianReferences, { name: '', phone: '' }]);
+  };
+
+  const removeReference = (index: number) => {
+    const updated = [...technicianReferences];
+    updated.splice(index, 1);
+    setTechnicianReferences(updated);
+  };
+
   if (isTechnician || isTechnicianPartner) return null;
 
   return (
@@ -116,47 +130,43 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
         {existing ? '✏️ Edit Error Code' : '➕ Add New Error Code'}
       </h2>
 
-      <Input
-        className="w-full"
-        placeholder="Error Code (e.g. E01)"
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-      />
-      <Textarea
-        className="w-full"
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <Textarea
-        className="w-full"
-        placeholder="Recommended Solution"
-        value={recommendedSolution}
-        onChange={(e) => setRecommendedSolution(e.target.value)}
-      />
-      <Input
-        className="w-full"
-        placeholder="Brand (e.g. Selex)"
-        value={brand}
-        onChange={(e) => setBrand(e.target.value)}
-      />
-      <Input
-        className="w-full"
-        placeholder="Model Name (e.g. Camel 2)"
-        value={modelName}
-        onChange={(e) => setModelName(e.target.value)}
-      />
-      <Input
-        className="w-full"
-        placeholder="Tutorial Video URL (YouTube)"
-        value={tutorialVideoUrl}
-        onChange={(e) => setTutorialVideoUrl(e.target.value)}
-      />
+      <Input className="w-full" placeholder="Error Code (e.g. E01)" value={code} onChange={(e) => setCode(e.target.value)} />
+      <Textarea className="w-full" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+      <Textarea className="w-full" placeholder="Recommended Solution" value={recommendedSolution} onChange={(e) => setRecommendedSolution(e.target.value)} />
+      <Input className="w-full" placeholder="Brand (e.g. Selex)" value={brand} onChange={(e) => setBrand(e.target.value)} />
+      <Input className="w-full" placeholder="Model Name (e.g. Camel 2)" value={modelName} onChange={(e) => setModelName(e.target.value)} />
+      <Input className="w-full" placeholder="Tutorial Video URL (YouTube)" value={tutorialVideoUrl} onChange={(e) => setTutorialVideoUrl(e.target.value)} />
 
       <div className="space-y-2">
         <h3 className="font-semibold">💡 Technician Suggestions</h3>
         <TechnicianSuggestionForm onSubmit={handleAddSuggestion} />
         <TechnicianSuggestionList suggestions={technicianSuggestions} />
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="font-semibold">🔧 Technician References</h3>
+        {technicianReferences.map((ref, idx) => (
+          <div key={idx} className="flex gap-2 items-center">
+            <Input
+              placeholder="Name"
+              value={ref.name || ''}
+              onChange={(e) => updateReference(idx, 'name', e.target.value)}
+              className="w-1/2"
+            />
+            <Input
+              placeholder="Phone"
+              value={ref.phone || ''}
+              onChange={(e) => updateReference(idx, 'phone', e.target.value)}
+              className="w-1/2"
+            />
+            <Button type="button" variant="ghost" size="sm" onClick={() => removeReference(idx)} className="text-red-500">
+              ✕
+            </Button>
+          </div>
+        ))}
+        <Button type="button" variant="outline" onClick={addReference} className="text-[#00d289]">
+          ➕ Add Reference
+        </Button>
       </div>
 
       <div className="pt-2">
