@@ -25,6 +25,7 @@ interface Props {
 export default function ErrorCodeForm({ onSaved, existing }: Props) {
   const { user, role } = useUser();
   const isTechnician = role === 'technician';
+  const isTechnicianPartner = role === 'technician_partner';
 
   const [code, setCode] = useState('');
   const [description, setDescription] = useState('');
@@ -69,7 +70,7 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!code || !description || !recommendedSolution || !user?.uid || isTechnician) return;
+    if (!code || !description || !recommendedSolution || !user?.uid || isTechnician || isTechnicianPartner) return;
     setLoading(true);
 
     try {
@@ -104,7 +105,7 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
   };
 
   // 🔒 Ẩn toàn bộ form nếu là technician
-  if (isTechnician) return null;
+  if (isTechnician || isTechnicianPartner) return null;
 
   return (
     <div className="space-y-4 w-full sm:max-w-xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow">

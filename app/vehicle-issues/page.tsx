@@ -25,6 +25,7 @@ export default function VehicleIssuesManagementPage() {
   const normalizedRole = role?.toLowerCase();
   const isAdmin = normalizedRole === "admin";
   const isTechnician = normalizedRole === 'technician';
+  const isTechnicianPartner = normalizedRole === 'technician_partner';
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -44,7 +45,8 @@ export default function VehicleIssuesManagementPage() {
   const { issues, loading: issuesLoading, updateIssue } = useVehicleIssues({
     role: role ?? undefined,
     companyId: companyId ?? undefined,
-    technicianUserId: isTechnician ? user?.uid : undefined,
+    technicianUserId:
+    isTechnician || isTechnicianPartner ? user?.uid : undefined,
   });
 
   const loading = userLoading || technicianMapLoading || issuesLoading;
@@ -112,7 +114,8 @@ export default function VehicleIssuesManagementPage() {
     setUpdatingActualIssue(null);
   };
 
-  const canViewIssues = isAdmin || (!!companyId && ["company_owner", "company_admin", "technician", "station_manager"].includes(normalizedRole || ""));
+  const canViewIssues = isAdmin || (!!companyId && ["company_owner", "company_admin", "technician", "station_manager"].includes(normalizedRole || ""))||
+  isTechnicianPartner;
 
   const filteredIssues = issues.filter((issue) => {
     const matchSearch = `${issue.vin} ${issue.plateNumber} ${issue.description}`.toLowerCase().includes(searchTerm.toLowerCase());
@@ -176,6 +179,9 @@ export default function VehicleIssuesManagementPage() {
             searchTerm={searchTerm}
             statusFilter={statusFilter}
             stationFilter={stationFilter}
+            refetchIssues={async () => {}}
+            setViewingProposal={async () => {}}
+            setApprovingProposal={async () => {}}
           />
         </div>
 

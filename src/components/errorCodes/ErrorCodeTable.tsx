@@ -18,6 +18,7 @@ interface Props {
 export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) {
   const { role } = useUser();
   const isTechnician = role === 'technician';
+  const isTechnicianPartner = role === 'technician_partner';
 
   const [brandFilter, setBrandFilter] = useState('');
   const [modelFilter, setModelFilter] = useState('');
@@ -119,7 +120,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
             <div className="text-xs text-gray-400">
               {item.createdAt?.toDate().toLocaleString()}
             </div>
-            {!isTechnician && (
+            {!isTechnician && !isTechnicianPartner && (
               <div className="mt-3 flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
                   Edit
@@ -145,7 +146,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
               <th className="p-2 text-left">Video</th>
               <th className="p-2 text-left">Suggestions</th>
               <th className="p-2 text-left">Created At</th>
-              {!isTechnician && <th className="p-2 text-left">Actions</th>}
+              {!isTechnician || !isTechnicianPartner && <th className="p-2 text-left">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -183,7 +184,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                   )}
                 </td>
                 <td className="p-2">{item.createdAt?.toDate().toLocaleString()}</td>
-                {!isTechnician && (
+                {!isTechnician || isTechnicianPartner && (
                   <td className="p-2 flex gap-2">
                     <Button size="sm" variant="outline" onClick={() => onEdit(item)}>
                       <Pencil className="w-4 h-4" />
