@@ -134,9 +134,9 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
           </button>
 
           <img
-            src={user?.photoURL || "/default-avatar.png"}
+            src={user?.photoURL || "/assets/images/technician.png"}
             alt="Avatar"
-            className="w-16 h-16 rounded-full"
+            className="w-16 h-16 rounded-full object-cover"
           />
           <p className="mt-2 text-gray-600 text-sm">Welcome</p>
           <p className="font-semibold text-gray-800 mt-1 text-center">{user?.displayName || "User"}</p>
