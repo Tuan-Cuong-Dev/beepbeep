@@ -87,7 +87,7 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
           <option value="inactive">Inactive Only</option>
         </select>
 
-        {!isTechnician || !isTechnicianPartner && (
+        {!(isTechnician || isTechnicianPartner) && (
           <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto">
             Export to Excel
           </Button>
@@ -117,7 +117,7 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
             <div className="text-sm text-gray-600 mt-2">
               Features: {item.features?.join(', ') || '-'}
             </div>
-            {!isTechnician || !isTechnicianPartner && (
+            {!(isTechnician || isTechnicianPartner) && (
               <div className="mt-3 flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
                   Edit
@@ -142,7 +142,7 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
               <th className="p-2 text-left">Price</th>
               <th className="p-2 text-left">Active</th>
               <th className="p-2 text-left">Features</th>
-              {!isTechnician || !isTechnicianPartner && <th className="p-2 text-right">Actions</th>}
+              {!(isTechnician || isTechnicianPartner) && <th className="p-2 text-right">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -162,7 +162,7 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
                   </span>
                 </td>
                 <td className="p-2">{item.features?.join(', ') || '-'}</td>
-                {!isTechnician || !isTechnicianPartner && (
+                {!(isTechnician || isTechnicianPartner) && (
                   <td className="p-2 text-right space-x-2 whitespace-nowrap">
                     <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
                       Edit

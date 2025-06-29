@@ -70,7 +70,10 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!code || !description || !recommendedSolution || !user?.uid || isTechnician || isTechnicianPartner) return;
+    const isReadonlyRole = isTechnician || isTechnicianPartner;
+
+  if (!code || !description || !recommendedSolution || !user?.uid || isReadonlyRole) return;
+
     setLoading(true);
 
     try {

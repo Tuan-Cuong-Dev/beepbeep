@@ -16,7 +16,7 @@ interface Props {
   onRefresh?: () => void;
 }
 
-const categories = ['Sửa chữa', 'Bảo trì', 'Vệ sinh', 'Thay thế linh kiện', 'Bảo hiểm'];
+const categories = ['Repair', 'Maintenance', 'Cleaning', 'Parts Replacement', 'Insurance'];
 
 export default function ServicePricingForm({ existing, onSaved, onRefresh }: Props) {
   const { user } = useUser();
@@ -93,27 +93,31 @@ export default function ServicePricingForm({ existing, onSaved, onRefresh }: Pro
       <h2 className="text-xl font-semibold">
         {existing ? 'Edit Service Package' : 'Add Service Package'}
       </h2>
-      <Input placeholder="Tên gói dịch vụ (VD: Bảo trì cơ bản)" value={title} onChange={(e) => setTitle(e.target.value)} />
+      <Input
+        placeholder="Service title (e.g. Basic Maintenance)"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
       <Textarea
-        placeholder="Mô tả ngắn gọn về gói dịch vụ, mục đích sử dụng và lợi ích dành cho khách hàng."
+        placeholder="Brief description of the service package, its purpose, and customer benefits."
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
       <Textarea
-        placeholder="Các bước công việc hoặc hạng mục thực hiện, mỗi dòng là 1 tính năng.\nVD:\n- Kiểm tra hệ thống điện\n- Tra dầu phanh"
+        placeholder="Work steps or service items, one per line.\nE.g.:\n- Check electrical system\n- Apply brake oil"
         value={featuresText}
         onChange={(e) => setFeaturesText(e.target.value)}
       />
       <Input
         type="number"
-        placeholder="Giá dịch vụ (VND)"
+        placeholder="Service price (VND)"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
       />
       <div className="space-y-1">
         <label className="text-sm font-medium">Category</label>
         <SimpleSelect
-          placeholder="Chọn loại dịch vụ"
+          placeholder="Select category"
           value={category}
           onChange={(val) => setCategory(val)}
           options={categories.map((cat) => ({ label: cat, value: cat }))}
@@ -121,21 +125,25 @@ export default function ServicePricingForm({ existing, onSaved, onRefresh }: Pro
       </div>
 
       <Input
-        placeholder="Thời gian ước tính (VD: 30 phút, 1 giờ)"
+        placeholder="Estimated time (e.g. 30 mins, 1 hour)"
         value={durationEstimate}
         onChange={(e) => setDurationEstimate(e.target.value)}
       />
       <Input
-        placeholder="URL hình ảnh đại diện (tùy chọn)"
+        placeholder="Image URL (optional)"
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
       />
       <div className="flex items-center gap-2">
-        <label className="text-sm">Hiển thị dịch vụ</label>
-        <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+        <label className="text-sm">Show service</label>
+        <input
+          type="checkbox"
+          checked={isActive}
+          onChange={(e) => setIsActive(e.target.checked)}
+        />
       </div>
       <Button onClick={handleSave} disabled={loading} className="w-full sm:w-auto">
-        {loading ? 'Saving...' : existing ? 'Update Package' : 'Save Package'}
+        {loading ? 'Saving...' : existing ? 'Update Package' : 'Add Package'}
       </Button>
     </div>
   );
