@@ -10,13 +10,15 @@ import { Button } from '@/src/components/ui/button';
 import { useUser } from '@/src/context/AuthContext';
 import TechnicianSuggestionList from './TechnicianSuggestionList';
 import TechnicianSuggestionForm from './TechnicianSuggestionForm';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
-interface Props {
+export default function ErrorCodeForm({
+  onSaved,
+  existing,
+}: {
   onSaved?: () => void;
   existing?: ErrorCode | null;
-}
-
-export default function ErrorCodeForm({ onSaved, existing }: Props) {
+}) {
   const { user, role } = useUser();
   const isTechnician = role === 'technician';
   const isTechnicianPartner = role === 'technician_partner';
@@ -31,6 +33,18 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
   const [supportTechnicians, setSupportTechnicians] = useState<string[]>([]);
   const [technicianReferences, setTechnicianReferences] = useState<{ name?: string; phone?: string }[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const [notification, setNotification] = useState<{
+    open: boolean;
+    type: 'success' | 'error';
+    title: string;
+    description?: string;
+  }>({
+    open: false,
+    type: 'success',
+    title: '',
+    description: '',
+  });
 
   useEffect(() => {
     if (existing) {
@@ -56,14 +70,12 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
 
   const handleAddSuggestion = (comment: string) => {
     if (!user?.uid) return;
-
     const suggestion: TechnicianSuggestion = {
       userId: user.uid,
       name: user.displayName || 'Unknown',
       comment,
       timestamp: Timestamp.now(),
     };
-
     setTechnicianSuggestions((prev) => [...prev, suggestion]);
   };
 
@@ -90,17 +102,45 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
       if (existing?.id) {
         const ref = doc(db, 'errorCodes', existing.id);
         await updateDoc(ref, data);
+        setNotification({
+          open: true,
+          type: 'success',
+          title: 'Updated Successfully',
+          description: `Error code "${code}" has been updated.`,
+        });
       } else {
         await addDoc(collection(db, 'errorCodes'), {
           ...data,
           createdBy: user.uid,
           createdAt: Timestamp.now(),
         });
+        setNotification({
+          open: true,
+          type: 'success',
+          title: 'Saved Successfully',
+          description: `New error code "${code}" has been added.`,
+        });
+
+        // Reset form
+        setCode('');
+        setDescription('');
+        setRecommendedSolution('');
+        setBrand('');
+        setModelName('');
+        setTutorialVideoUrl('');
+        setTechnicianSuggestions([]);
+        setTechnicianReferences([]);
       }
 
       if (onSaved) onSaved();
     } catch (error) {
       console.error('Error saving error code:', error);
+      setNotification({
+        open: true,
+        type: 'error',
+        title: 'Save Failed',
+        description: 'An error occurred while saving the error code.',
+      });
     } finally {
       setLoading(false);
     }
@@ -125,55 +165,73 @@ export default function ErrorCodeForm({ onSaved, existing }: Props) {
   if (isTechnician || isTechnicianPartner) return null;
 
   return (
-    <div className="space-y-4 w-full sm:max-w-xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow">
-      <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
-        {existing ? '✏️ Edit Error Code' : '➕ Add New Error Code'}
-      </h2>
+    <>
+      <div className="space-y-4 w-full sm:max-w-xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
+          {existing ? '✏️ Edit Error Code' : '➕ Add New Error Code'}
+        </h2>
 
-      <Input className="w-full" placeholder="Error Code (e.g. E01)" value={code} onChange={(e) => setCode(e.target.value)} />
-      <Textarea className="w-full" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-      <Textarea className="w-full" placeholder="Recommended Solution" value={recommendedSolution} onChange={(e) => setRecommendedSolution(e.target.value)} />
-      <Input className="w-full" placeholder="Brand (e.g. Selex)" value={brand} onChange={(e) => setBrand(e.target.value)} />
-      <Input className="w-full" placeholder="Model Name (e.g. Camel 2)" value={modelName} onChange={(e) => setModelName(e.target.value)} />
-      <Input className="w-full" placeholder="Tutorial Video URL (YouTube)" value={tutorialVideoUrl} onChange={(e) => setTutorialVideoUrl(e.target.value)} />
+        <Input placeholder="Error Code (e.g. E01)" value={code} onChange={(e) => setCode(e.target.value)} />
+        <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+        <Textarea
+          placeholder="Recommended Solution"
+          value={recommendedSolution}
+          onChange={(e) => setRecommendedSolution(e.target.value)}
+        />
+        <Input placeholder="Brand (e.g. Selex)" value={brand} onChange={(e) => setBrand(e.target.value)} />
+        <Input placeholder="Model Name (e.g. Camel 2)" value={modelName} onChange={(e) => setModelName(e.target.value)} />
+        <Input
+          placeholder="Tutorial Video URL (YouTube)"
+          value={tutorialVideoUrl}
+          onChange={(e) => setTutorialVideoUrl(e.target.value)}
+        />
 
-      <div className="space-y-2">
-        <h3 className="font-semibold">💡 Technician Suggestions</h3>
-        <TechnicianSuggestionForm onSubmit={handleAddSuggestion} />
-        <TechnicianSuggestionList suggestions={technicianSuggestions} />
+        <div className="space-y-2">
+          <h3 className="font-semibold">💡 Technician Suggestions</h3>
+          <TechnicianSuggestionForm onSubmit={handleAddSuggestion} />
+          <TechnicianSuggestionList suggestions={technicianSuggestions} />
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="font-semibold">🔧 Technician References</h3>
+          {technicianReferences.map((ref, idx) => (
+            <div key={idx} className="flex gap-2 items-center">
+              <Input
+                placeholder="Name"
+                value={ref.name || ''}
+                onChange={(e) => updateReference(idx, 'name', e.target.value)}
+                className="w-1/2"
+              />
+              <Input
+                placeholder="Phone"
+                value={ref.phone || ''}
+                onChange={(e) => updateReference(idx, 'phone', e.target.value)}
+                className="w-1/2"
+              />
+              <Button type="button" variant="ghost" size="sm" onClick={() => removeReference(idx)} className="text-red-500">
+                ✕
+              </Button>
+            </div>
+          ))}
+          <Button type="button" variant="outline" onClick={addReference} className="text-[#00d289]">
+            ➕ Add Reference
+          </Button>
+        </div>
+
+        <div className="pt-2">
+          <Button className="w-full sm:w-auto" onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Saving...' : existing ? 'Update Code' : 'Save Error Code'}
+          </Button>
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <h3 className="font-semibold">🔧 Technician References</h3>
-        {technicianReferences.map((ref, idx) => (
-          <div key={idx} className="flex gap-2 items-center">
-            <Input
-              placeholder="Name"
-              value={ref.name || ''}
-              onChange={(e) => updateReference(idx, 'name', e.target.value)}
-              className="w-1/2"
-            />
-            <Input
-              placeholder="Phone"
-              value={ref.phone || ''}
-              onChange={(e) => updateReference(idx, 'phone', e.target.value)}
-              className="w-1/2"
-            />
-            <Button type="button" variant="ghost" size="sm" onClick={() => removeReference(idx)} className="text-red-500">
-              ✕
-            </Button>
-          </div>
-        ))}
-        <Button type="button" variant="outline" onClick={addReference} className="text-[#00d289]">
-          ➕ Add Reference
-        </Button>
-      </div>
-
-      <div className="pt-2">
-        <Button className="w-full sm:w-auto" onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Saving...' : existing ? 'Update Code' : 'Save Error Code'}
-        </Button>
-      </div>
-    </div>
+      <NotificationDialog
+        open={notification.open}
+        type={notification.type}
+        title={notification.title}
+        description={notification.description}
+        onClose={() => setNotification((prev) => ({ ...prev, open: false }))}
+      />
+    </>
   );
 }
