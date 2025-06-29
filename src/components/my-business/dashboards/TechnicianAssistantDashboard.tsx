@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/src/firebaseConfig';
-import { collection, getCountFromServer, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  getCountFromServer,
+  getDocs,
+  query,
+  where,
+} from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
@@ -17,7 +23,7 @@ export default function TechnicianAssistantDashboard() {
   const { user } = useUser();
   const [stats, setStats] = useState({
     unassignedIssues: 0,
-    technicians: 0,
+    technicianPartners: 0,
     assignedToday: 0,
   });
 
@@ -29,36 +35,36 @@ export default function TechnicianAssistantDashboard() {
 
     const fetchStats = async () => {
       try {
-        // ✅ Lấy toàn bộ vehicleIssues để lọc assignedTo == null client-side
+        // 🔍 Tải toàn bộ vehicleIssues
         const allIssuesSnap = await getDocs(collection(db, 'vehicleIssues'));
+
+        // Đếm các sự cố chưa được gán
         const unassignedIssuesCount = allIssuesSnap.docs.filter((doc) => {
           const data = doc.data();
-          return data.status === 'pending' && (data.assignedTo === null || data.assignedTo === undefined);
+          return data.status === 'pending' && !data.assignedTo;
         }).length;
 
-        const q2 = query(
-          collection(db, 'staffs'),
-          where('role', '==', 'technician')
-        );
+        // Đếm số sự cố được gán bởi technician_assistant hôm nay
+        const assignedTodayCount = allIssuesSnap.docs.filter((doc) => {
+          const data = doc.data();
+          return (
+            data.assignedBy === user.uid &&
+            data.assignedAt?.toDate?.() >= todayStart
+          );
+        }).length;
 
-        const q3 = query(
-          collection(db, 'vehicleIssues'),
-          where('assignedBy', '==', user.uid),
-          where('assignedAt', '>=', todayStart)
+        // Đếm số technician_partner đang hoạt động
+        const partnerSnap = await getCountFromServer(
+          query(collection(db, 'technicianPartners'), where('isActive', '==', true))
         );
-
-        const [snap2, snap3] = await Promise.all([
-          getCountFromServer(q2),
-          getCountFromServer(q3),
-        ]);
 
         setStats({
           unassignedIssues: unassignedIssuesCount,
-          technicians: snap2.data().count,
-          assignedToday: snap3.data().count,
+          technicianPartners: partnerSnap.data().count,
+          assignedToday: assignedTodayCount,
         });
       } catch (err) {
-        console.error('Error fetching Technician Assistant stats:', err);
+        console.error('Error fetching stats for technician assistant:', err);
       }
     };
 
@@ -82,9 +88,9 @@ export default function TechnicianAssistantDashboard() {
           />
           <DashboardCard
             icon={<Wrench />}
-            title="Technicians"
-            value={stats.technicians}
-            href="/my-business/staff"
+            title="Technician Partners"
+            value={stats.technicianPartners}
+            href="/assistant/technician-partners"
           />
           <DashboardCard
             icon={<FileText />}
@@ -95,15 +101,15 @@ export default function TechnicianAssistantDashboard() {
         </section>
 
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <QuickAction label="Dispatch Issues" href="/assistant/dispatch" />
-          <QuickAction label="Manage Error Codes" href="/assistant/error-codes" />
-          <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
-          <QuickAction label="Add Technician Partner" href="/assistant/add-technician-partner" />
-          <QuickAction label="Report Issue" href="vehicle-issues/report" />
-        </div>
-      </section>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <QuickAction label="Dispatch Issues" href="/assistant/dispatch" />
+            <QuickAction label="Manage Error Codes" href="/assistant/error-codes" />
+            <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
+            <QuickAction label="Add Technician Partner" href="/assistant/add-technician-partner" />
+            <QuickAction label="Report Issue" href="/vehicle-issues/report" />
+          </div>
+        </section>
       </main>
       <Footer />
     </div>
