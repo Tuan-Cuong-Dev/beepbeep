@@ -9,6 +9,8 @@ import { useUser } from '@/src/context/AuthContext';
 
 interface UseEbikeDataOptions {
   companyId?: string;
+  stationId?: string;
+  isAdmin?: boolean;
 }
 
 export function useEbikeData({ companyId = '' }: UseEbikeDataOptions = {}) {
