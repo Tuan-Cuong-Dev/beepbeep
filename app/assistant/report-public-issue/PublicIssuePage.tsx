@@ -1,5 +1,5 @@
 // 📁 assistant/report-public-issue/PublicIssuePage.tsx
-import PublicIssueForm from '@/src/components/report-public-issue/PublicIssueForm';
+import PublicIssueForm from '@/src/components/report-public-issue/ReportPublicIssueForm';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 
@@ -14,3 +14,4 @@ export default function PublicIssuePage() {
     </>
   );
 }
+

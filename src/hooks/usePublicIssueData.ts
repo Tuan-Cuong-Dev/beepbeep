@@ -1,8 +1,9 @@
 // 📁 assistant/report-public-issue/usePublicIssueForm.ts (optional hook)
+// Xữ lý báo cáo của Techinician_assistant
 import { useState } from 'react';
 import { PublicIssue } from '@/src/lib/publicIssue/publicIssueTypes';
 
-export function usePublicIssueForm(initial: Partial<PublicIssue> = {}) {
+export function usePublicIssueData(initial: Partial<PublicIssue> = {}) {
   const [form, setForm] = useState<Partial<PublicIssue>>(initial);
 
   const handleChange = (field: keyof PublicIssue, value: any) => {

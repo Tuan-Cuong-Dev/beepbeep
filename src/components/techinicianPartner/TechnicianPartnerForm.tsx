@@ -274,11 +274,10 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Checkbox
-          checked={formData.isActive ?? true}
-          onCheckedChange={(val) => updateField('isActive', !!val)}
-        />
-        <label className="text-sm font-medium">Is Active</label>
+        <input type="checkbox" className="form-checkbox" />
+        <label className="text-sm font-medium">
+          Agree to become a Bíp Bíp technician partner.
+        </label>
       </div>
 
       <Button type="submit">

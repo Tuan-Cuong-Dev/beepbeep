@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import lineClamp from '@tailwindcss/line-clamp'; // ✅ import plugin
 
 export default {
   content: [
@@ -13,14 +14,9 @@ export default {
         foreground: "var(--foreground)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"], // Đặt font mặc định là Inter
+        sans: ["var(--font-inter)", "sans-serif"],
       },
-      darkMode: false, // hoặc 'class' nếu bạn chủ động xử lý
     },
   },
-  plugins: [],
+  plugins: [lineClamp], // ✅ bật plugin ở đây
 } satisfies Config;
-
-
-
-
