@@ -123,24 +123,9 @@ export default function RentalCompanyDashboard() {
           <DashboardCard title="Subscription Packages" value="Manage" href="/subscriptionPackages" icon={<ClipboardList className="w-6 h-6" />} />
         </DashboardGrid1>
 
-        <DashboardGrid2>
-          <InfoCard title="📈 Revenue Overview">
-            <p className="text-2xl font-bold">
-              {formatCurrency(stats.revenue)} from {stats.bookings} bookings this month
-            </p>
-          </InfoCard>
-
-          <InfoCard title="📝 Recent Activity">
-            <RecentActivityItem text="New booking received from John Doe" />
-            <RecentActivityItem text='Station "My Khe Beach" updated' />
-            <RecentActivityItem text='Vehicle "VIN DE0183" marked as under maintenance' />
-            <RecentActivityItem text='New model "EMOVE Flex" added' />
-          </InfoCard>
-        </DashboardGrid2>
-
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             <QuickAction label="Add New Station" href="/my-business/stations" />
             <QuickAction label="Create Vehicle Model" href="/vehicles" />
             <QuickAction label="Assign Staff" href="/my-business/staff" />
@@ -157,7 +142,7 @@ export default function RentalCompanyDashboard() {
 }
 
 function DashboardGrid1({ children }: { children: React.ReactNode }) {
-  return <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">{children}</section>;
+  return <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">{children}</section>;
 }
 
 function DashboardGrid2({ children }: { children: React.ReactNode }) {
