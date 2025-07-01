@@ -92,20 +92,20 @@ export default function ServicesPage() {
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading services...</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredServices.map((service) => (
               <div
                 key={service.id}
-                className="bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-300 overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
               >
-                <div className="bg-white h-[180px] w-full relative flex items-center justify-center p-4">
+                {/* Image Section */}
+                <div className="relative w-full h-[220px] overflow-hidden">
                   {service.imageUrl ? (
                     <Image
                       src={service.imageUrl}
                       alt={service.title}
-                      width={300}
-                      height={180}
-                      className="object-contain w-full h-full transition-transform duration-300 hover:scale-105"
+                      fill
+                      className="object-contain p-6 transition-transform duration-300 hover:scale-105"
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center text-gray-400">
@@ -114,20 +114,24 @@ export default function ServicesPage() {
                   )}
                 </div>
 
-                <div className="px-4 pb-4 pt-2">
-                  <h3 className="font-semibold text-gray-800 text-base mb-1">{service.title}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">{service.description}</p>
+                {/* Content */}
+                <div className="flex flex-col justify-between flex-grow p-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">{service.title}</h3>
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{service.description}</p>
 
-                  <ul className="text-xs text-gray-500 list-disc pl-5 mt-2 mb-3">
-                    {service.features?.slice(0, 4).map((f, i) => (
-                      <li key={i}>{f}</li>
-                    ))}
-                  </ul>
+                    <ul className="text-xs text-gray-500 list-disc pl-4 mt-2 space-y-1">
+                      {service.features?.slice(0, 4).map((f, i) => (
+                        <li key={i}>{f}</li>
+                      ))}
+                    </ul>
+                  </div>
 
-                  <div className="flex justify-between items-center text-sm font-semibold text-[#00d289]">
-                    <span>{formatCurrency(service.price)} VND</span>
+                  {/* Bottom Info */}
+                  <div className="flex justify-between items-center mt-4 text-sm font-medium">
+                    <span className="text-[#00d289]">{formatCurrency(service.price)} VND</span>
                     {service.durationEstimate && (
-                      <span className="text-gray-400">⏱️ {service.durationEstimate}</span>
+                      <span className="text-gray-400">⏱ {service.durationEstimate}</span>
                     )}
                   </div>
                 </div>
@@ -135,6 +139,7 @@ export default function ServicesPage() {
             ))}
           </div>
         )}
+
       </main>
 
       <Footer />
