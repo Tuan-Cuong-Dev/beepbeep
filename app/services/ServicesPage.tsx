@@ -70,14 +70,14 @@ export default function ServicesPage() {
         </h1>
 
         {/* Tabs by Category */}
-        <div className="flex gap-2 bg-white rounded-full p-2 shadow overflow-x-auto whitespace-nowrap no-scrollbar">
+        <div className="w-full overflow-x-auto px-4 mb-6">
           <Tabs value={activeCategory} onValueChange={setActiveCategory}>
-            <TabsList className="flex flex-wrap gap-2 bg-white rounded-full p-2 shadow">
+            <TabsList className="flex gap-2 bg-white rounded-full p-2 shadow overflow-x-auto whitespace-nowrap no-scrollbar min-w-max">
               {categories.map((cat) => (
                 <TabsTrigger
                   key={cat}
                   value={cat}
-                  className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 data-[state=active]:bg-[#00d289] data-[state=active]:text-white"
+                  className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 data-[state=active]:bg-[#00d289] data-[state=active]:text-white whitespace-nowrap"
                 >
                   {cat}
                 </TabsTrigger>
@@ -85,6 +85,8 @@ export default function ServicesPage() {
             </TabsList>
           </Tabs>
         </div>
+
+
 
         {/* Services Grid */}
         {loading ? (

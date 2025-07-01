@@ -126,3 +126,13 @@ body {
   z-index: 1000 !important;
   position: relative;
 }
+
+/* ✅ Ẩn thanh cuộn ngang trên Tabs nếu cần */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE và Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+  
