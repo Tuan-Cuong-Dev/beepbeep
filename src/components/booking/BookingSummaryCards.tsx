@@ -26,7 +26,7 @@ export default function BookingSummaryCards({ bookings }: Props) {
   const cancelledBookings = bookings.filter((b) => b.bookingStatus === 'cancelled').length;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <Card>
         <CardContent className="p-6">
           <h3 className="text-sm font-medium text-gray-500 mb-1">Total Bookings</h3>
