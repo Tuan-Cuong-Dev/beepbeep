@@ -21,7 +21,7 @@ export default function ServiceCard({ service, onContact }: Props) {
       <h3 className="text-lg font-semibold text-gray-800 mb-2">{service.title}</h3>
       <p className="text-sm text-gray-600 mb-2 line-clamp-2">{service.description}</p>
       <ul className="text-sm text-gray-500 mb-3 list-disc pl-5 space-y-1">
-        {service.features.slice(0, 2).map((feature, i) => (
+        {service.features.slice(0, 4).map((feature, i) => (
           <li key={i}>{feature}</li>
         ))}
       </ul>
