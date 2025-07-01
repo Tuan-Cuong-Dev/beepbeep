@@ -72,12 +72,12 @@ export default function VehicleModelsPage() {
         {/* Tabs */}
         <div className="flex justify-center mb-6">
           <Tabs value={activeType} onValueChange={setActiveType}>
-            <TabsList className="flex flex-wrap gap-2 bg-white rounded-full p-2 shadow">
+            <TabsList className="flex gap-2 overflow-x-auto whitespace-nowrap no-scrollbar bg-white rounded-full p-2 shadow min-w-full max-w-full">
               {VEHICLE_TYPES.map((type) => (
                 <TabsTrigger
                   key={type}
                   value={type}
-                  className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 data-[state=active]:bg-[#00d289] data-[state=active]:text-white"
+                  className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 whitespace-nowrap data-[state=active]:bg-[#00d289] data-[state=active]:text-white"
                 >
                   {type}
                 </TabsTrigger>
