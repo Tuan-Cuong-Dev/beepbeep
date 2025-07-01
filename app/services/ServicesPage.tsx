@@ -70,7 +70,7 @@ export default function ServicesPage() {
         </h1>
 
         {/* Tabs by Category */}
-        <div className="flex justify-center mb-6">
+        <div className="flex gap-2 bg-white rounded-full p-2 shadow overflow-x-auto whitespace-nowrap no-scrollbar">
           <Tabs value={activeCategory} onValueChange={setActiveCategory}>
             <TabsList className="flex flex-wrap gap-2 bg-white rounded-full p-2 shadow">
               {categories.map((cat) => (
