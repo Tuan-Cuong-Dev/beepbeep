@@ -188,7 +188,7 @@ export default function EbikeManagementPage() {
       <main className="p-6 mt-1 flex-grow">
         <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">Vehicle Management</h1>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-6">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 mb-6">
           <EbikeSummaryCard status="Total" count={totalEbikeCount} total={totalEbikeCount} />
           {Object.entries(ebikeStatusCount).map(([status, count]) => (
             <EbikeSummaryCard key={status} status={status} count={count} total={totalEbikeCount} />
