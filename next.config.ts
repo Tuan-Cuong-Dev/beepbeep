@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "drive.google.com",
       },
+      {
+        protocol: "https",
+        hostname: "drive.usercontent.google.com", // 👈 thêm dòng này
+      },
     ],
   },
   eslint: {
