@@ -50,7 +50,7 @@ export default function BatterySummaryCard({ batteries }: Props) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+    <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
       {items.map((item, idx) => (
         <Card key={idx} className="shadow-sm">
           <CardContent className="p-4 flex items-center justify-between">

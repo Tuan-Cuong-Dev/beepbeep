@@ -7,7 +7,7 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import BatteryForm from '@/src/components/batteries/BatteryForm';
-import BatteryTable from '@/src/components/batteries/BatteryTable';
+import ResponsiveBatteryTable from '@/src/components/batteries/ResponsiveBatteryTable';
 import BatterySearchImportExport from '@/src/components/batteries/BatterySearchImportExport';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import Pagination from '@/src/components/ui/pagination';
@@ -167,7 +167,7 @@ export default function BatteryManagementPage() {
           </select>
         </div>
 
-        <BatteryTable
+        <ResponsiveBatteryTable
           batteries={paginatedBatteries}
           setBatteries={!isTechnician ? setBatteries : undefined}
           onEdit={!isTechnician ? (battery) => {
