@@ -71,7 +71,7 @@ export default function VehicleIssueTable({
             <div className="text-sm text-gray-600">Plate: {issue.plateNumber}</div>
             <div className="text-sm text-gray-600">Station: {issue.stationName}</div>
             <div className="text-sm text-gray-600">Type: {issue.issueType}</div>
-            <td className="text-sm text-gray-600">Descriptions:{issue.description || '-'}</td>
+            <td className="text-sm text-gray-600 text-blue-600 ">Descriptions: {issue.description || '-'}</td>
             <div className="text-sm text-gray-600">Status: {renderStatusBadge(issue.status)}</div>
             <div className="text-sm text-gray-600">Assigned To: {issue.assignedToName || '-'}</div>
             <div className="text-sm text-gray-600">Proposal: {issue.proposedSolution || '-'}</div>
