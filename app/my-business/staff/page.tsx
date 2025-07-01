@@ -5,7 +5,6 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import StaffForm from '@/src/components/staff/StaffForm';
-import StaffTable from '@/src/components/staff/StaffTable';
 import StaffSummaryCard from '@/src/components/staff/StaffSummaryCard';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
@@ -15,6 +14,8 @@ import { Button } from '@/src/components/ui/button';
 import { db } from '@/src/firebaseConfig';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { deleteInvitationMessage } from '@/src/lib/invitations/invitationService';
+import ResponsiveStaffTable from '@/src/components/staff/ResponsiveStaffTable';
+
 
 interface Invitation {
   id: string;
@@ -157,7 +158,7 @@ export default function StaffManagementPage() {
 
         <StaffSummaryCard staffs={staffs} />
 
-          <StaffTable
+          <ResponsiveStaffTable
             staffs={staffs}
             onEdit={(staff) => {
               setEditingStaff(staff);
@@ -174,6 +175,7 @@ export default function StaffManagementPage() {
             stationMap={stationMap}
             companyNames={companyNames}
           />
+
 
           {showForm && (
             <StaffForm
