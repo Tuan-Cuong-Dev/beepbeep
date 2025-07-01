@@ -10,7 +10,7 @@ import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import BookingForm from '@/src/components/booking/BookingForm';
-import BookingTable from '@/src/components/booking/BookingTable';
+import ResponsiveBookingTable from '@/src/components/booking/ResponsiveBookingTable';
 import BookingSummaryCards from '@/src/components/booking/BookingSummaryCards';
 import BookingSearchFilter from '@/src/components/booking/BookingSearchFilter';
 import Pagination from '@/src/components/ui/pagination';
@@ -190,7 +190,7 @@ export default function BookingManagementPage() {
             {loading ? (
               <p>Loading bookings...</p>
             ) : bookings.length > 0 ? (
-              <BookingTable
+              <ResponsiveBookingTable
                 bookings={paginatedBookings}
                 stationNames={stationNames}
                 companyNames={companyNames}
