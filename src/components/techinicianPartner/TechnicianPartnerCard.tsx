@@ -30,14 +30,14 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
   const avatar = partner.avatarUrl || '/assets/images/technician.png';
   const roleLabel = partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician';
 
-  // ✅ Tính khoảng cách nếu có vị trí người dùng và geo
+  // ✅ Tính khoảng cách nếu có vị trí người dùng và coordinates
   let distanceText = '';
-  if (partner.geo && userLocation) {
+  if (partner.coordinates && userLocation) {
     const dist = haversineDistance(
       userLocation[0],
       userLocation[1],
-      partner.geo.lat,
-      partner.geo.lng
+      partner.coordinates.lat,
+      partner.coordinates.lng
     );
     distanceText = `📍 ${Math.round(dist * 10) / 10} km away`;
   }

@@ -1,5 +1,4 @@
-// hooks/usePublicTechnicianPartners.ts
-// Tạo Hook chỉ fetch các TechnicianPartner đang hoạt động (isActive = true)
+'use client';
 
 import { useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -17,10 +16,16 @@ export function usePublicTechnicianPartners() {
         where('isActive', '==', true)
       );
       const snap = await getDocs(q);
-      const data = snap.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })) as TechnicianPartner[];
+
+      const data: TechnicianPartner[] = snap.docs.map((doc) => {
+        const raw = doc.data();
+        return {
+          ...(raw as TechnicianPartner),
+          id: doc.id,
+          geo: raw.coordinates ?? undefined, // Hỗ trợ backward compatibility
+        };
+      });
+
       setPartners(data);
       setLoading(false);
     };
@@ -30,4 +35,3 @@ export function usePublicTechnicianPartners() {
 
   return { partners, loading };
 }
-

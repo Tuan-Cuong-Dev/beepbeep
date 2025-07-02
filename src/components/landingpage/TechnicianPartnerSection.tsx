@@ -11,7 +11,7 @@ import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // ✅ impo
 export default function TechnicianPartnerSection() {
   const { partners, loading } = usePublicTechnicianPartners();
   const [showNotice, setShowNotice] = useState(false);
-  const { location: userLocation } = useCurrentLocation(); // ✅ lấy tọa độ
+  const { location: userLocation } = useCurrentLocation();
   const router = useRouter();
 
   return (
