@@ -1,16 +1,9 @@
-// useRentalData.ts
+// hooks/useRentalData.ts
 
 import { useState, useEffect } from 'react';
 import {
   collection,
   getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  query,
-  where,
-  Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 
@@ -32,6 +25,7 @@ export interface RentalStation {
   location: string;
   totalEbikes: number;
   companyId: string;
+  contactPhone?: string; // ✅ Bổ sung trường này
 }
 
 export function useRentalData() {
@@ -67,6 +61,7 @@ export function useRentalData() {
         location: typeof data.location === 'string' ? data.location : '',
         totalEbikes: data.totalEbikes || 0,
         companyId: data.companyId || '',
+        contactPhone: data.contactPhone || '', // ✅ Lấy dữ liệu từ Firestore
       };
     });
     setRentalStations(stations);

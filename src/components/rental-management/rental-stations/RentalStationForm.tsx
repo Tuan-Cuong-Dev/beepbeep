@@ -1,9 +1,9 @@
-// RentalStationForm.tsx
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
-import { RentalStation } from './rental-companies/useCompanyData';
+import { RentalStation } from '@/src/hooks/useRentalData';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 
 interface Props {
@@ -21,20 +21,24 @@ export default function RentalStationForm({ companies, editingStation, onSave, o
     location: '',
     totalEbikes: 0,
     companyId: '',
+    contactPhone: '', // ✅ Thêm trường liên hệ
   });
 
   const { coords, geocode, loading, error } = useGeocodeAddress();
 
   useEffect(() => {
     if (coords) {
-      setForm((prev) => ({ ...prev, location: `${coords.lat}° N, ${coords.lng}° E` }));
+      setForm((prev) => ({
+        ...prev,
+        location: `${coords.lat}° N, ${coords.lng}° E`,
+      }));
     }
   }, [coords]);
 
   useEffect(() => {
     if (editingStation) {
       const { id, ...rest } = editingStation;
-      setForm(rest);
+      setForm({ ...rest, contactPhone: rest.contactPhone || '' });
     }
   }, [editingStation]);
 
@@ -74,11 +78,11 @@ export default function RentalStationForm({ companies, editingStation, onSave, o
       {loading && <p className="text-sm text-gray-500">Detecting coordinates...</p>}
       {error && <p className="text-sm text-red-500">{error}</p>}
       <Input
-        placeholder="Total eBikes"
-        type="number"
-        value={form.totalEbikes}
-        onChange={(e) => handleChange('totalEbikes', +e.target.value)}
+        placeholder="Contact Phone"
+        value={form.contactPhone}
+        onChange={(e) => handleChange('contactPhone', e.target.value)}
       />
+
       <select
         className="border rounded px-3 py-2 w-full"
         value={form.companyId}
@@ -91,8 +95,14 @@ export default function RentalStationForm({ companies, editingStation, onSave, o
       </select>
 
       <div className="flex gap-2">
-        <Button onClick={() => onSave(form)}>{editingStation ? 'Update' : 'Add'} Station</Button>
-        {editingStation && <Button variant="outline" onClick={onCancel}>Cancel</Button>}
+        <Button onClick={() => onSave(form)}>
+          {editingStation ? 'Update' : 'Add'} Station
+        </Button>
+        {editingStation && (
+          <Button variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
       </div>
     </div>
   );

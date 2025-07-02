@@ -7,7 +7,7 @@ import { useState } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
-import { useRentalData, RentalCompany, RentalStation } from '@/src/hooks/useCompanyData';
+import { useRentalData, RentalCompany, RentalStation } from '@/src/hooks/useRentalData';
 import RentalCompanyForm from '@/src/components/rental-management/rental-companies/CompanyForm';
 import RentalStationForm from '@/src/components/rental-management/rental-stations/RentalStationForm';
 import RentalSearchImportExport from '@/src/components/rental-management/rental-companies/RentalSearchImportExport';

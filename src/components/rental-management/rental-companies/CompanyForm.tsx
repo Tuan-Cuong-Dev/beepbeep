@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
-import { RentalCompany } from '../../../hooks/useCompanyData';
+import { RentalCompany } from '../../../hooks/useRentalData';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 
 interface Props {

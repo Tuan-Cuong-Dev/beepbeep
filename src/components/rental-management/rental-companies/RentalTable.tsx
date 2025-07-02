@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { RentalCompany, RentalStation } from '../../../hooks/useCompanyData';
+import { RentalCompany, RentalStation } from '../../../hooks/useRentalData';
 import { Button } from '@/src/components/ui/button';
 
 interface Props {
@@ -132,7 +132,7 @@ export default function RentalTable({
                 <th className="px-3 py-2 border">Station Name</th>
                 <th className="px-3 py-2 border">Address</th>
                 <th className="px-3 py-2 border">Location</th>
-                <th className="px-3 py-2 border text-center">eBikes</th>
+                <th className="px-3 py-2 border text-center">Contact Phone</th>
                 <th className="px-3 py-2 border">Actions</th>
               </tr>
             </thead>
@@ -152,7 +152,7 @@ export default function RentalTable({
                       <td className="px-3 py-2 border">{s.name}</td>
                       <td className="px-3 py-2 border">{s.displayAddress}</td>
                       <td className="px-3 py-2 border">{s.location}</td>
-                      <td className="px-3 py-2 border text-center">{s.totalEbikes}</td>
+                      <td className="px-3 py-2 border text-center">{s.contactPhone}</td>
                       <td className="px-3 py-2 border whitespace-nowrap">
                         <div className="flex gap-2">
                           <Button size="sm" variant="default" onClick={() => onEditStation(s)}>Edit</Button>

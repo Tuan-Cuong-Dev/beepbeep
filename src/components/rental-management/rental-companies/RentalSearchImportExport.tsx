@@ -1,7 +1,7 @@
 // RentalSearchImportExport.tsx
 
 import { useState } from 'react';
-import { RentalCompany } from '../../../hooks/useCompanyData';
+import { RentalCompany } from '../../../hooks/useRentalData';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import * as XLSX from 'xlsx';
