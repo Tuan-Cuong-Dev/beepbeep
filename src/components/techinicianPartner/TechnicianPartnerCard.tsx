@@ -3,18 +3,48 @@
 import Image from 'next/image';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { Button } from '@/src/components/ui/button';
-import { PhoneCall, Star } from 'lucide-react';
+import { PhoneCall, Star, MapPin } from 'lucide-react';
 
 interface Props {
   partner: TechnicianPartner;
   onContact?: () => void;
+  userLocation?: [number, number]; // ⬅️ thêm tọa độ người dùng
 }
 
-export default function TechnicianPartnerCard({ partner, onContact }: Props) {
+function haversineDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const toRad = (x: number) => (x * Math.PI) / 180;
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) ** 2;
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+export default function TechnicianPartnerCard({ partner, onContact, userLocation }: Props) {
   const services = partner.serviceCategories ?? [];
   const fullAddress = partner.shopAddress || 'N/A';
   const avatar = partner.avatarUrl || '/assets/images/technician.png';
   const roleLabel = partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician';
+
+  let distanceText = '';
+  if (partner.geo && userLocation) {
+    const dist = haversineDistance(
+      userLocation[0],
+      userLocation[1],
+      partner.geo.lat,
+      partner.geo.lng
+    );
+    distanceText = `${dist.toFixed(1)} km away`;
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-5 flex flex-col items-center text-center h-full hover:shadow-xl transition-all">
@@ -38,8 +68,12 @@ export default function TechnicianPartnerCard({ partner, onContact }: Props) {
         {partner.assignedRegions?.join(', ') || 'N/A'}
       </p>
 
-      {/* Address */}
-      <p className="text-xs text-gray-500 italic mt-1">{fullAddress}</p>
+      {/* Address & Distance */}
+      <p className="text-xs text-gray-500 italic mt-1 flex items-center justify-center gap-1">
+        <MapPin className="w-4 h-4" />
+        {fullAddress}
+        {distanceText && <span className="text-gray-600 font-medium ml-2">📍 {distanceText}</span>}
+      </p>
 
       {/* Services */}
       {services.length > 0 && (
