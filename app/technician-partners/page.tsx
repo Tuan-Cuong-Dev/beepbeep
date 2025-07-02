@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
+import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // ✅ mới
 import { useState, useMemo } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
@@ -9,12 +10,14 @@ import { Input } from '@/src/components/ui/input';
 import { SimpleSelect } from '@/src/components/ui/select';
 import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
 
-const TechnicianPartnerMap = dynamic(() => import('@/src/components/techinicianPartner/TechnicianPartnerMap'), {
-  ssr: false,
-});
+const TechnicianPartnerMap = dynamic(
+  () => import('@/src/components/techinicianPartner/TechnicianPartnerMap'),
+  { ssr: false }
+);
 
 export default function TechnicianPartnerPage() {
   const { partners, loading } = usePublicTechnicianPartners();
+  const { location: userLocation } = useCurrentLocation(); // ✅ dùng vị trí người dùng
   const [showNotice, setShowNotice] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [regionFilter, setRegionFilter] = useState('');
@@ -74,14 +77,14 @@ export default function TechnicianPartnerPage() {
             value={regionFilter}
             onChange={setRegionFilter}
             placeholder="🌍 Filter by region"
-            options={[{ label: 'All regions', value: '' }, ...regions.map(r => ({ label: r, value: r }))]}
+            options={[{ label: 'All regions', value: '' }, ...regions.map((r) => ({ label: r, value: r }))]}
             className="w-full md:w-1/4"
           />
           <SimpleSelect
             value={serviceFilter}
             onChange={setServiceFilter}
             placeholder="🛠️ Filter by service"
-            options={[{ label: 'All services', value: '' }, ...services.map(s => ({ label: s, value: s }))]}
+            options={[{ label: 'All services', value: '' }, ...services.map((s) => ({ label: s, value: s }))]}
             className="w-full md:w-1/4"
           />
         </div>
@@ -101,6 +104,7 @@ export default function TechnicianPartnerPage() {
                 key={partner.id}
                 partner={partner}
                 onContact={() => setShowNotice(true)}
+                userLocation={userLocation} // ✅ truyền userLocation vào đây
               />
             ))}
           </div>
