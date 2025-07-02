@@ -8,7 +8,8 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Input } from '@/src/components/ui/input';
 import { SimpleSelect } from '@/src/components/ui/select';
-import StationCard from '@/src/components/stations/StationCard'; // bạn cần tạo nếu chưa có
+import StationCard from '@/src/components/stations/StationCard';
+import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // 🆕 import
 
 const StationMap = dynamic(() => import('@/src/components/stations/StationMap'), {
   ssr: false,
@@ -16,7 +17,8 @@ const StationMap = dynamic(() => import('@/src/components/stations/StationMap'),
 
 export default function StationPage() {
   const { user } = useUser();
-  const { stations, loading } = useStations(); // ← KHÔNG truyền companyId
+  const { stations, loading } = useStations();
+  const { location: userLocation } = useCurrentLocation(); // 🆕 lấy vị trí người dùng
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -79,7 +81,7 @@ export default function StationPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
             {filteredStations.map((station) => (
-              <StationCard key={station.id} station={station} />
+              <StationCard key={station.id} station={station} userLocation={userLocation} />
             ))}
           </div>
         )}
