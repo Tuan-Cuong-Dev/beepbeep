@@ -9,6 +9,7 @@ import Footer from '../src/components/landingpage/Footer';
 import FAQ  from "@/src/components/landingpage/FAQ";
 import TechnicianPartnerSection from '../src/components/landingpage/TechnicianPartnerSection';
 import ServicePricingSection from "@/src/components/landingpage/ServicePricingSection";
+import StationSection from "@/src/components/landingpage/StationSection";
 
 const Home: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const Home: React.FC = () => {
       <Header />
       <Hero />
       <ServiceSection />
+      <StationSection/>
       <EbikeModels />
       <TechnicianPartnerSection />
       <ServicePricingSection/>

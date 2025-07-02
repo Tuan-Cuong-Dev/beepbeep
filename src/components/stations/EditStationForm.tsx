@@ -26,6 +26,8 @@ export default function EditStationForm({
     displayAddress: editingStation.displayAddress,
     mapAddress: editingStation.mapAddress,
     location: editingStation.location,
+    geo: editingStation.geo,
+    contactPhone: editingStation.contactPhone ?? '',
   });
 
   const [status, setStatus] = useState<'active' | 'inactive'>(
@@ -38,6 +40,7 @@ export default function EditStationForm({
     if (coords) {
       setForm((prev) => ({
         ...prev,
+        geo: coords,
         location: `${coords.lat}° N, ${coords.lng}° E`,
       }));
     }
@@ -93,6 +96,11 @@ export default function EditStationForm({
         value={form.mapAddress}
         onChange={(e) => handleChange('mapAddress', e.target.value)}
         onBlur={handleMapAddressBlur}
+      />
+      <Input
+        placeholder="Contact Phone (e.g. 090-xxx-xxxx)"
+        value={form.contactPhone}
+        onChange={(e) => handleChange('contactPhone', e.target.value)}
       />
       <Input
         placeholder="Location (auto-filled)"

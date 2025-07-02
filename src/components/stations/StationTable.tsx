@@ -16,6 +16,17 @@ export default function StationTable({ stations, onEdit, onDelete }: Props) {
     return { lat: match[1], lng: match[3] };
   };
 
+  const renderStatus = (status?: string) => {
+    switch (status) {
+      case 'inactive':
+        return <span className="text-red-600">🚫 Inactive</span>;
+      case 'maintenance':
+        return <span className="text-yellow-600">🛠️ Maintenance</span>;
+      default:
+        return <span className="text-green-600">✅ Active</span>;
+    }
+  };
+
   return (
     <div className="overflow-x-auto border rounded-lg">
       <table className="min-w-full text-sm">
@@ -23,6 +34,7 @@ export default function StationTable({ stations, onEdit, onDelete }: Props) {
           <tr>
             <th className="p-2 text-left">Name</th>
             <th className="p-2 text-left">Address</th>
+            <th className="p-2 text-left">Phone</th>
             <th className="p-2 text-left">Status</th>
             <th className="p-2 text-left">Map</th>
             <th className="p-2 text-right">Actions</th>
@@ -33,15 +45,12 @@ export default function StationTable({ stations, onEdit, onDelete }: Props) {
             const coords = extractLatLng(station.location);
             return (
               <tr key={station.id} className="border-t align-top">
-                <td className="p-2 font-medium">{station.name}</td>
-                <td className="p-2 text-gray-700">{station.displayAddress}</td>
-                <td className="p-2">
-                  {station.status === 'inactive' ? (
-                    <span className="text-red-600">🚫 Inactive</span>
-                  ) : (
-                    <span className="text-green-600">✅ Active</span>
-                  )}
+                <td className="p-2 font-medium text-gray-800">{station.name}</td>
+                <td className="p-2 text-gray-600">{station.displayAddress}</td>
+                <td className="p-2 text-gray-600">
+                  {station.contactPhone || <span className="text-gray-400 italic">N/A</span>}
                 </td>
+                <td className="p-2">{renderStatus(station.status)}</td>
                 <td className="p-2">
                   {coords ? (
                     <iframe

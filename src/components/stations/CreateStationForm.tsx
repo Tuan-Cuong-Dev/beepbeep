@@ -31,6 +31,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
     displayAddress: '',
     mapAddress: '',
     location: '',
+    contactPhone: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -92,7 +93,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
   };
 
   const handleCreate = async () => {
-    const { name, displayAddress, mapAddress, location } = formValues;
+    const { name, displayAddress, mapAddress, location, contactPhone } = formValues;
 
     if (!name.trim() || !displayAddress.trim() || !mapAddress.trim() || !location.trim()) {
       return showDialog('error', 'Missing Data', 'Please fill in all required fields.');
@@ -115,13 +116,21 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
         name,
         displayAddress,
         mapAddress,
+        contactPhone,
         location: formattedLocation,
-        status: 'active', // ✅ Mặc định là active
+        geo: { lat, lng },
+        status: 'active',
         createdAt: serverTimestamp(),
       });
 
       showDialog('success', 'Station Created', '✅ The station was added successfully.');
-      setFormValues({ name: '', displayAddress: '', mapAddress: '', location: '' });
+      setFormValues({
+        name: '',
+        displayAddress: '',
+        mapAddress: '',
+        location: '',
+        contactPhone: '',
+      });
       if (onCreated) onCreated();
     } catch (err) {
       console.error('❌ Error creating station:', err);
@@ -170,6 +179,14 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
             setFormValues((prev) => ({ ...prev, mapAddress: e.target.value }))
           }
           onBlur={handleGeocode}
+        />
+
+        <Input
+          placeholder="Contact Phone (e.g. 090-xxx-xxxx)"
+          value={formValues.contactPhone}
+          onChange={(e) =>
+            setFormValues((prev) => ({ ...prev, contactPhone: e.target.value }))
+          }
         />
 
         <Input

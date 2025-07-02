@@ -1,6 +1,7 @@
 // 📁 lib/stations/stationTypes.ts
-
 import { Timestamp } from 'firebase/firestore';
+
+export type StationStatus = 'active' | 'inactive';
 
 export interface Station {
   id: string;
@@ -8,17 +9,25 @@ export interface Station {
   name: string;
   displayAddress: string;
   mapAddress: string;
-  location: string; // "16.07° N, 108.22° E"
-  status?: 'active' | 'inactive';
-  createdAt?: any;
-  updatedAt?: any;
+  location: string; // Ví dụ: "16.07° N, 108.22° E"
+  geo?: {
+    lat: number;
+    lng: number;
+  };
+  contactPhone?: string; // ✅ Mới thêm
+  status?: StationStatus;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
-
-export type StationStatus = 'active' | 'inactive' | 'maintenance'; // Có thể dùng để mở rộng về sau
 
 export interface StationFormValues {
   name: string;
   displayAddress: string;
   mapAddress: string;
   location: string;
+  geo?: {
+    lat: number;
+    lng: number;
+  };
+  contactPhone?: string; // ✅ Mới thêm
 }
