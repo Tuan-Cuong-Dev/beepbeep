@@ -15,7 +15,7 @@ const stationIcon = new L.Icon({
 
 // Biểu tượng marker cho vị trí người dùng
 const userIcon = new L.Icon({
-  iconUrl: '/assets/images/user-location.png', // bạn có thể đổi sang icon màu xanh hoặc định vị
+  iconUrl: '/assets/images/usericon.png', // bạn có thể đổi sang icon màu xanh hoặc định vị
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -28],
