@@ -65,11 +65,16 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       </p>
 
       {/* Address & Distance */}
-      <div className="flex items-center justify-center text-xs text-gray-500 mt-1 gap-1 flex-wrap">
-        <MapPin className="w-4 h-4" />
-        <span className="truncate">{fullAddress}</span>
-        {distanceText && <span className="ml-2 text-gray-600 font-medium">{distanceText}</span>}
+      <div className="text-xs text-gray-500 mt-2 text-center">
+        <div className="flex justify-center items-center gap-1">
+          <MapPin className="w-4 h-4" />
+          <span className="font-medium">{distanceText}</span>
+        </div>
+        <p className="mt-1 leading-snug whitespace-pre-line break-words">
+          {fullAddress}
+        </p>
       </div>
+
 
       {/* Services */}
       {services.length > 0 && (
