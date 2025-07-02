@@ -9,31 +9,63 @@ import Footer from '@/src/components/landingpage/Footer';
 import { Input } from '@/src/components/ui/input';
 import { SimpleSelect } from '@/src/components/ui/select';
 import StationCard from '@/src/components/stations/StationCard';
-import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // 🆕 import
+import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 
 const StationMap = dynamic(() => import('@/src/components/stations/StationMap'), {
   ssr: false,
 });
 
+// ✅ Hàm tính khoảng cách giữa hai tọa độ
+function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+// ✅ Hàm trích xuất lat/lng từ location string
+function parseCoords(location: string): [number, number] {
+  const match = location.match(/([-]?\d+(\.\d+)?)°\s*N?,?\s*([-]?\d+(\.\d+)?)°\s*E?/i);
+  if (!match) return [0, 0];
+  return [parseFloat(match[1]), parseFloat(match[3])];
+}
+
 export default function StationPage() {
   const { user } = useUser();
   const { stations, loading } = useStations();
-  const { location: userLocation } = useCurrentLocation(); // 🆕 lấy vị trí người dùng
+  const { location: userLocation } = useCurrentLocation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  const filteredStations = useMemo(() => {
-    return stations.filter((station) => {
+  // ✅ Bộ lọc & sắp xếp theo khoảng cách
+  const sortedStations = useMemo(() => {
+    const filtered = stations.filter((station) => {
       const matchSearch =
         station.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         station.displayAddress.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchStatus = statusFilter ? station.status === statusFilter : true;
-
       return matchSearch && matchStatus;
     });
-  }, [stations, searchTerm, statusFilter]);
+
+    if (!userLocation || !Array.isArray(userLocation)) return filtered;
+
+    const [userLat, userLng] = userLocation;
+
+    return [...filtered].sort((a, b) => {
+      const [latA, lngA] = parseCoords(a.location);
+      const [latB, lngB] = parseCoords(b.location);
+      const distA = getDistanceFromLatLng(userLat, userLng, latA, lngA);
+      const distB = getDistanceFromLatLng(userLat, userLng, latB, lngB);
+      return distA - distB;
+    });
+  }, [stations, searchTerm, statusFilter, userLocation]);
 
   const statusOptions = [
     { label: 'All statuses', value: '' },
@@ -70,17 +102,15 @@ export default function StationPage() {
           />
         </div>
 
-        <StationMap stations={filteredStations} />
+        <StationMap stations={sortedStations} />
 
         {loading ? (
           <p className="text-center text-gray-500 text-lg mt-10">⏳ Loading stations...</p>
-        ) : filteredStations.length === 0 ? (
-          <p className="text-center text-gray-500 text-lg mt-10">
-            No matching stations found.
-          </p>
+        ) : sortedStations.length === 0 ? (
+          <p className="text-center text-gray-500 text-lg mt-10">No matching stations found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
-            {filteredStations.map((station) => (
+            {sortedStations.map((station) => (
               <StationCard key={station.id} station={station} userLocation={userLocation} />
             ))}
           </div>
