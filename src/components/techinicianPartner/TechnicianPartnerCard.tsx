@@ -8,19 +8,20 @@ import { PhoneCall, Star, MapPin } from 'lucide-react';
 interface Props {
   partner: TechnicianPartner;
   onContact?: () => void;
-  userLocation?: [number, number]; // ⬅️ Tọa độ người dùng [lat, lng]
+  userLocation?: [number, number]; // ⬅️ Vị trí người dùng [lat, lng]
 }
 
-// 🎯 Hàm tính khoảng cách Haversine
+// 🎯 Tính khoảng cách giữa hai tọa độ
 function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const toRad = (x: number) => (x * Math.PI) / 180;
-  const R = 6371; // Earth radius in km
+  const R = 6371; // Bán kính trái đất (km)
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
 
 export default function TechnicianPartnerCard({ partner, onContact, userLocation }: Props) {
@@ -29,7 +30,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
   const avatar = partner.avatarUrl || '/assets/images/technician.png';
   const roleLabel = partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician';
 
-  // 📍 Tính khoảng cách nếu có tọa độ
+  // ✅ Tính khoảng cách nếu có vị trí người dùng và geo
   let distanceText = '';
   if (partner.geo && userLocation) {
     const dist = haversineDistance(
@@ -38,7 +39,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       partner.geo.lat,
       partner.geo.lng
     );
-    distanceText = `📍 ${dist.toFixed(1)} km away`;
+    distanceText = `📍 ${Math.round(dist * 10) / 10} km away`;
   }
 
   return (
@@ -64,7 +65,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       </p>
 
       {/* Address & Distance */}
-      <div className="flex items-center justify-center text-xs text-gray-500 mt-1 gap-1">
+      <div className="flex items-center justify-center text-xs text-gray-500 mt-1 gap-1 flex-wrap">
         <MapPin className="w-4 h-4" />
         <span className="truncate">{fullAddress}</span>
         {distanceText && <span className="ml-2 text-gray-600 font-medium">{distanceText}</span>}

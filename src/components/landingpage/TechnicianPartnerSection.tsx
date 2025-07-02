@@ -6,10 +6,12 @@ import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPart
 import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { Button } from '@/src/components/ui/button';
+import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // ✅ import hook
 
 export default function TechnicianPartnerSection() {
   const { partners, loading } = usePublicTechnicianPartners();
   const [showNotice, setShowNotice] = useState(false);
+  const { location: userLocation } = useCurrentLocation(); // ✅ lấy tọa độ
   const router = useRouter();
 
   return (
@@ -33,6 +35,7 @@ export default function TechnicianPartnerSection() {
                     <TechnicianPartnerCard
                       partner={partner}
                       onContact={() => setShowNotice(true)}
+                      userLocation={userLocation} // ✅ truyền vị trí người dùng
                     />
                   </div>
                 ))}
