@@ -8,24 +8,18 @@ import { PhoneCall, Star, MapPin } from 'lucide-react';
 interface Props {
   partner: TechnicianPartner;
   onContact?: () => void;
-  userLocation?: [number, number]; // ⬅️ thêm tọa độ người dùng
+  userLocation?: [number, number]; // ⬅️ Tọa độ người dùng [lat, lng]
 }
 
-function haversineDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
+// 🎯 Hàm tính khoảng cách Haversine
+function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const toRad = (x: number) => (x * Math.PI) / 180;
-  const R = 6371; // km
+  const R = 6371; // Earth radius in km
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
   return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
@@ -35,6 +29,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
   const avatar = partner.avatarUrl || '/assets/images/technician.png';
   const roleLabel = partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician';
 
+  // 📍 Tính khoảng cách nếu có tọa độ
   let distanceText = '';
   if (partner.geo && userLocation) {
     const dist = haversineDistance(
@@ -43,7 +38,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       partner.geo.lat,
       partner.geo.lng
     );
-    distanceText = `${dist.toFixed(1)} km away`;
+    distanceText = `📍 ${dist.toFixed(1)} km away`;
   }
 
   return (
@@ -69,11 +64,11 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       </p>
 
       {/* Address & Distance */}
-      <p className="text-xs text-gray-500 italic mt-1 flex items-center justify-center gap-1">
+      <div className="flex items-center justify-center text-xs text-gray-500 mt-1 gap-1">
         <MapPin className="w-4 h-4" />
-        {fullAddress}
-        {distanceText && <span className="text-gray-600 font-medium ml-2">📍 {distanceText}</span>}
-      </p>
+        <span className="truncate">{fullAddress}</span>
+        {distanceText && <span className="ml-2 text-gray-600 font-medium">{distanceText}</span>}
+      </div>
 
       {/* Services */}
       {services.length > 0 && (
@@ -93,7 +88,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
         {partner.averageRating?.toFixed(1) || 'N/A'} ({partner.ratingCount || 0})
       </p>
 
-      {/* 📞 Contact button */}
+      {/* 📞 Contact */}
       <div className="mt-auto w-full pt-4 flex justify-center">
         {partner.phone ? (
           <a href={`tel:${partner.phone}`} className="w-full">

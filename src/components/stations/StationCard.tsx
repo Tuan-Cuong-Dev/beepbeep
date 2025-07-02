@@ -1,35 +1,17 @@
 'use client';
 
-import { Station } from '@/src/lib/stations/stationTypes';
 import Image from 'next/image';
+import { Station } from '@/src/lib/stations/stationTypes';
 import { MapPin, Phone } from 'lucide-react';
 import { Badge } from '@/src/components/ui/badge';
 
 interface Props {
   station: Station;
-  userLocation?: [number, number]; // 🆕 thêm prop vị trí người dùng
-}
-
-function haversineDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
-  const toRad = (x: number) => (x * Math.PI) / 180;
-  const R = 6371; // Earth radius in km
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+  userLocation?: [number, number]; // [latitude, longitude]
 }
 
 export default function StationCard({ station, userLocation }: Props) {
-  const { name, displayAddress, status, mapAddress, contactPhone, location } = station;
+  const { name, displayAddress, status, mapAddress, contactPhone } = station;
 
   const statusColor = {
     active: 'bg-green-100 text-green-800',
@@ -37,16 +19,31 @@ export default function StationCard({ station, userLocation }: Props) {
     maintenance: 'bg-yellow-100 text-yellow-800',
   }[status || 'inactive'];
 
-  let distanceText = '';
-  if (userLocation && location) {
-    const match = location.match(/([-]?\d+(\.\d+)?)°\s*N?,?\s*([-]?\d+(\.\d+)?)°\s*E?/i);
-    if (match) {
-      const lat = parseFloat(match[1]);
-      const lng = parseFloat(match[3]);
-      const dist = haversineDistance(userLocation[0], userLocation[1], lat, lng);
-      distanceText = `${dist.toFixed(1)} km away`;
-    }
+  // 🔎 Parse tọa độ từ station.location
+  const match = station.location?.match(
+    /([-]?\d+(\.\d+)?)°\s*N?,?\s*([-]?\d+(\.\d+)?)°\s*E?/i
+  );
+  const stationCoords = match ? [parseFloat(match[1]), parseFloat(match[3])] : null;
+
+  // 📍 Hàm tính khoảng cách Haversine
+  function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const toRad = (x: number) => (x * Math.PI) / 180;
+    const R = 6371; // Earth radius in km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   }
+
+  const distance =
+    userLocation && stationCoords
+      ? haversineDistance(userLocation[0], userLocation[1], stationCoords[0], stationCoords[1])
+      : null;
 
   return (
     <div className="bg-white rounded-xl shadow hover:shadow-md transition duration-200 overflow-hidden border">
@@ -77,6 +74,12 @@ export default function StationCard({ station, userLocation }: Props) {
           </div>
         )}
 
+        {distance !== null && (
+          <p className="text-xs text-gray-500 italic">
+            📍 {distance.toFixed(2)} km from you
+          </p>
+        )}
+
         {mapAddress && (
           <a
             href={mapAddress}
@@ -86,10 +89,6 @@ export default function StationCard({ station, userLocation }: Props) {
           >
             View on Google Maps
           </a>
-        )}
-
-        {distanceText && (
-          <p className="text-xs text-gray-500 italic mt-1">📍 {distanceText}</p>
         )}
       </div>
     </div>
