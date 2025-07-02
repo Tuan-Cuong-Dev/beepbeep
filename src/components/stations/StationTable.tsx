@@ -70,12 +70,18 @@ export default function StationTable({ stations, onEdit, onDelete, userLocation 
             <th className="p-2 text-left">Phone</th>
             <th className="p-2 text-left">Status</th>
             <th className="p-2 text-left">Map</th>
+            {userLocation && <th className="p-2 text-left">Distance</th>}
             <th className="p-2 text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
           {sortedStations.map((station) => {
             const coords = extractLatLng(station.location);
+            const distanceKm =
+              coords && userLocation
+                ? getDistanceFromLatLng(userLocation[0], userLocation[1], coords[0], coords[1])
+                : null;
+
             return (
               <tr key={station.id} className="border-t align-top">
                 <td className="p-2 font-medium text-gray-800">{station.name}</td>
@@ -99,6 +105,11 @@ export default function StationTable({ stations, onEdit, onDelete, userLocation 
                     <p className="text-gray-400 italic">No map</p>
                   )}
                 </td>
+                {userLocation && (
+                  <td className="p-2 text-gray-600">
+                    {distanceKm !== null ? `${distanceKm.toFixed(2)} km` : '—'}
+                  </td>
+                )}
                 <td className="p-2 text-right space-x-2 whitespace-nowrap">
                   <Button variant="outline" onClick={() => onEdit(station)}>
                     Edit
