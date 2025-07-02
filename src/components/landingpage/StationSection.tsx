@@ -1,17 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStations } from '@/src/hooks/useStations';
-import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // ✅ Import hook
+import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 import StationCard from '@/src/components/stations/StationCard';
 import { Button } from '@/src/components/ui/button';
 
+function getDistanceFromLatLng(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number {
+  const toRad = (value: number) => (value * Math.PI) / 180;
+
+  const R = 6371; // Earth radius in km
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
+
 export default function StationSection() {
-  const { stations, loading } = useStations(); // Lấy toàn bộ station
-  const { location: userLocation } = useCurrentLocation(); // ✅ Lấy vị trí người dùng
+  const { stations, loading } = useStations();
+  const { location: userLocation } = useCurrentLocation();
   const [showNotice, setShowNotice] = useState(false);
   const router = useRouter();
+
+  const sortedStations = useMemo(() => {
+    if (!userLocation || !Array.isArray(userLocation)) return stations;
+
+    const [userLat, userLng] = userLocation;
+
+    return [...stations].sort((a, b) => {
+      const [latA, lngA] = parseCoords(a.location);
+      const [latB, lngB] = parseCoords(b.location);
+
+      const distA = getDistanceFromLatLng(userLat, userLng, latA, lngA);
+      const distB = getDistanceFromLatLng(userLat, userLng, latB, lngB);
+
+      return distA - distB;
+    });
+  }, [stations, userLocation]);
+
+  const parseCoords = (location: string): [number, number] => {
+    const match = location.match(/([\d.]+)[°] N, ([\d.]+)[°] E/);
+    if (!match) return [0, 0];
+    return [parseFloat(match[1]), parseFloat(match[2])];
+  };
 
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
@@ -26,12 +69,12 @@ export default function StationSection() {
           <>
             <div className="overflow-x-auto">
               <div className="flex gap-4 w-max pb-2">
-                {stations.slice(0, 6).map((station) => (
+                {sortedStations.slice(0, 6).map((station) => (
                   <div
                     key={station.id}
                     className="min-w-[260px] max-w-[260px] flex-shrink-0"
                   >
-                    <StationCard station={station} userLocation={userLocation} /> {/* ✅ Truyền vị trí */}
+                    <StationCard station={station} userLocation={userLocation} />
                   </div>
                 ))}
               </div>
