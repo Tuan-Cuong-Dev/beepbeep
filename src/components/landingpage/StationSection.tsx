@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStations } from '@/src/hooks/useStations';
+import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // ✅ Import hook
 import StationCard from '@/src/components/stations/StationCard';
 import { Button } from '@/src/components/ui/button';
 
 export default function StationSection() {
   const { stations, loading } = useStations(); // Lấy toàn bộ station
+  const { location: userLocation } = useCurrentLocation(); // ✅ Lấy vị trí người dùng
   const [showNotice, setShowNotice] = useState(false);
   const router = useRouter();
 
@@ -29,7 +31,7 @@ export default function StationSection() {
                     key={station.id}
                     className="min-w-[260px] max-w-[260px] flex-shrink-0"
                   >
-                    <StationCard station={station} />
+                    <StationCard station={station} userLocation={userLocation} /> {/* ✅ Truyền vị trí */}
                   </div>
                 ))}
               </div>
