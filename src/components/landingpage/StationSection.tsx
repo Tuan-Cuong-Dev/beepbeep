@@ -14,7 +14,6 @@ function getDistanceFromLatLng(
   lng2: number
 ): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
-
   const R = 6371; // Earth radius in km
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
@@ -25,8 +24,15 @@ function getDistanceFromLatLng(
       Math.sin(dLng / 2) *
       Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in km
+  return R * c;
 }
+
+// ✅ Cập nhật lại hàm parseCoords để hỗ trợ định dạng 16.123456° N, 108.123456° E
+const parseCoords = (location: string): [number, number] => {
+  const match = location.match(/([-]?\d+(\.\d+)?)°\s*N?,?\s*([-]?\d+(\.\d+)?)°\s*E?/i);
+  if (!match) return [0, 0];
+  return [parseFloat(match[1]), parseFloat(match[3])];
+};
 
 export default function StationSection() {
   const { stations, loading } = useStations();
@@ -50,12 +56,6 @@ export default function StationSection() {
     });
   }, [stations, userLocation]);
 
-  const parseCoords = (location: string): [number, number] => {
-    const match = location.match(/([\d.]+)[°] N, ([\d.]+)[°] E/);
-    if (!match) return [0, 0];
-    return [parseFloat(match[1]), parseFloat(match[2])];
-  };
-
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
@@ -74,7 +74,10 @@ export default function StationSection() {
                     key={station.id}
                     className="min-w-[260px] max-w-[260px] flex-shrink-0"
                   >
-                    <StationCard station={station} userLocation={userLocation} />
+                    <StationCard
+                      station={station}
+                      userLocation={userLocation}
+                    />
                   </div>
                 ))}
               </div>
