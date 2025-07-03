@@ -32,15 +32,13 @@ export default function StationMarkers() {
         return (
           <Marker key={station.id} position={coords} icon={stationIcon}>
             <Popup>
-              <strong>{station.name}</strong>
-              <br />
-              {station.displayAddress}
-              {station.contactPhone && (
-                <>
-                  <br />
-                  📞 {station.contactPhone}
-                </>
-              )}
+              <div className="text-sm leading-snug max-w-[220px]">
+                <p className="font-semibold text-black">{station.name}</p>
+                <p className="text-gray-600 text-xs">{station.displayAddress}</p>
+                {station.contactPhone && (
+                  <p className="text-gray-600 text-xs mt-1">📞 {station.contactPhone}</p>
+                )}
+              </div>
             </Popup>
           </Marker>
         );

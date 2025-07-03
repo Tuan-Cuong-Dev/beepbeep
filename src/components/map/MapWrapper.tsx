@@ -1,6 +1,6 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup, LayersControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { useEffect, useState, ReactNode } from 'react';
 
@@ -40,10 +40,7 @@ export default function MapWrapper({ children }: MapWrapperProps) {
           </Marker>
         )}
 
-        <LayersControl position="topright">
-          {/* 👇 Allow toggling technician & station marker groups */}
-          <LayersControl.Overlay checked name="Markers">{children}</LayersControl.Overlay>
-        </LayersControl>
+        {children}
       </MapContainer>
     </div>
   );
