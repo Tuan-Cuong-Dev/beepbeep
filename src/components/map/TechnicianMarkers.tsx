@@ -20,39 +20,53 @@ export default function TechnicianMarkers() {
     setIsClient(true);
   }, []);
 
-  if (!isClient) return null; // 🚫 Tránh lỗi khi SSR
+  useEffect(() => {
+    if (isClient) {
+      console.log('✅ Technician partners:', partners);
+    }
+  }, [isClient, partners]);
+
+  if (!isClient) return null;
 
   return (
     <>
       {partners
-        .filter((p) => p.coordinates)
-        .map((p) => (
-          <Marker
-            key={p.id}
-            position={[p.coordinates!.lat, p.coordinates!.lng]}
-            icon={technicianIcon}
-          >
-            <Popup>
-              <div className="text-sm leading-snug max-w-[220px]">
-                <p className="font-semibold text-black">{p.name}</p>
-                <p className="text-gray-700 text-xs mb-1">
-                  {p.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
-                </p>
-                <p className="text-gray-600 text-xs">📍 {p.shopAddress || 'No address'}</p>
-                <p className="text-gray-600 text-xs mb-1">📞 {p.phone || 'No phone'}</p>
+        .filter((p) => p.coordinates && !isNaN(p.coordinates.lat) && !isNaN(p.coordinates.lng))
+        .map((p) => {
+          const lat = Number(p.coordinates!.lat);
+          const lng = Number(p.coordinates!.lng);
 
-                {p.phone && (
-                  <a
-                    href={`tel:${p.phone}`}
-                    className="inline-block text-xs text-white bg-green-500 px-3 py-1 rounded mt-1 hover:bg-green-600"
-                  >
-                    📞 Call Now
-                  </a>
-                )}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+          return (
+            <Marker
+              key={p.id}
+              position={[lat, lng]}
+              icon={technicianIcon}
+              eventHandlers={{
+                add: () => console.log(`📍 Marker added: ${p.name} (${lat}, ${lng})`),
+              }}
+            >
+              <Popup>
+                <div className="text-sm leading-snug max-w-[220px]">
+                  <p className="font-semibold text-black">{p.name}</p>
+                  <p className="text-gray-700 text-xs mb-1">
+                    {p.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
+                  </p>
+                  <p className="text-gray-600 text-xs">📍 {p.shopAddress || 'No address'}</p>
+                  <p className="text-gray-600 text-xs mb-1">📞 {p.phone || 'No phone'}</p>
+
+                  {p.phone && (
+                    <a
+                      href={`tel:${p.phone}`}
+                      className="inline-block text-xs text-white bg-green-500 px-3 py-1 rounded mt-1 hover:bg-green-600"
+                    >
+                      📞 Call Now
+                    </a>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
     </>
   );
 }
