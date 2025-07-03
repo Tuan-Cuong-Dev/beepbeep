@@ -19,10 +19,22 @@ export function usePublicTechnicianPartners() {
 
       const data: TechnicianPartner[] = snap.docs.map((doc) => {
         const raw = doc.data();
+
+        // ✅ Parse lại coordinates nếu là string "lat,lng"
+        let coordinates = raw.coordinates;
+        if (typeof coordinates === 'string') {
+          const [lat, lng] = coordinates.split(',').map(parseFloat);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            coordinates = { lat, lng };
+          } else {
+            coordinates = undefined;
+          }
+        }
+
         return {
           ...(raw as TechnicianPartner),
           id: doc.id,
-          geo: raw.coordinates ?? undefined, // Hỗ trợ backward compatibility
+          coordinates, // ✅ Đảm bảo luôn có coordinates nếu hợp lệ
         };
       });
 
