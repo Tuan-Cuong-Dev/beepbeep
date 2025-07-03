@@ -12,11 +12,7 @@ const technicianIcon = L.icon({
   popupAnchor: [0, -32],
 });
 
-interface Props {
-  visible: boolean;
-}
-
-export default function TechnicianMarkers({ visible }: Props) {
+export default function TechnicianMarkers() {
   const { partners } = usePublicTechnicianPartners();
   const [isClient, setIsClient] = useState(false);
 
@@ -24,7 +20,7 @@ export default function TechnicianMarkers({ visible }: Props) {
     setIsClient(true);
   }, []);
 
-  if (!isClient || !visible) return null;
+  if (!isClient) return null;
 
   return (
     <LayerGroup>
@@ -44,7 +40,6 @@ export default function TechnicianMarkers({ visible }: Props) {
                 </p>
                 <p className="text-gray-600 text-xs">📍 {p.shopAddress || 'No address'}</p>
                 <p className="text-gray-600 text-xs mb-1">📞 {p.phone || 'No phone'}</p>
-
                 {p.phone && (
                   <a
                     href={`tel:${p.phone}`}

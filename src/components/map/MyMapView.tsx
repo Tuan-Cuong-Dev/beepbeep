@@ -15,7 +15,7 @@ interface MyMapViewProps {
 }
 
 export default function MyMapView({ onClose }: MyMapViewProps) {
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'station' | 'maintenance'>('all');
 
   return (
     <div className="h-full w-full relative flex flex-col">
@@ -30,16 +30,16 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
       <Header />
       <div className="flex-1 relative">
         <MapWrapper key={activeTab}>
-          <StationMarkers visible={activeTab === 'all' || activeTab === 'station'} />
-          <TechnicianMarkers visible={activeTab === 'all' || activeTab === 'maintenance'} />
+          {(activeTab === 'all' || activeTab === 'station') && <StationMarkers />}
+          {(activeTab === 'all' || activeTab === 'maintenance') && <TechnicianMarkers />}
         </MapWrapper>
       </div>
 
       <div className="bg-white border-t py-2">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <TabsList className="w-full flex justify-around">
             <TabsTrigger value="all">🗺️ All</TabsTrigger>
-            <TabsTrigger value="station">🏪 GoStation</TabsTrigger>
+            <TabsTrigger value="station">🏪 BípBíp-Stations</TabsTrigger>
             <TabsTrigger value="maintenance">🔧 Maintenance</TabsTrigger>
           </TabsList>
         </Tabs>
