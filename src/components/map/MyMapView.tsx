@@ -32,7 +32,6 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
 
       <div className="flex-1 relative">
         <MapWrapper>
-          {activeTab === 'rent' && null}
           {activeTab === 'station' && <StationMarkers />}
           {activeTab === 'maintenance' && <TechnicianMarkers />}
         </MapWrapper>

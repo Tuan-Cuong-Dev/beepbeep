@@ -135,4 +135,7 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }
-  
+
+#__next {
+  height: 100%;
+}

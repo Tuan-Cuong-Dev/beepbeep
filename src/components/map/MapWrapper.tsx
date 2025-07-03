@@ -27,14 +27,13 @@ export default function MapWrapper({ children }: MapWrapperProps) {
     }
   }, []);
 
-  const center: [number, number] = userLocation ?? [16.0471, 108.2062]; // fallback Đà Nẵng
+  const center: [number, number] = userLocation ?? [16.0471, 108.2062];
 
   return (
     <div className="h-full w-full z-0">
       <MapContainer center={center} zoom={13} scrollWheelZoom className="h-full w-full z-0">
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {/* Vị trí người dùng */}
         {userLocation && (
           <Marker position={userLocation} icon={userIcon}>
             <Popup>You are here</Popup>

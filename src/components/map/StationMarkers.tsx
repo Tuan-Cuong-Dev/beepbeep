@@ -14,7 +14,6 @@ const stationIcon = new L.Icon({
 export default function StationMarkers() {
   const { rentalStations } = useRentalData();
 
-  // Convert từ "location" string (VD: "16.0471,108.2062") sang [lat, lng]
   const parseLatLng = (location: string): [number, number] | null => {
     const parts = location.split(',');
     if (parts.length !== 2) return null;
