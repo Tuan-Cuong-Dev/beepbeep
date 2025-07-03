@@ -11,8 +11,11 @@ const stationIcon = new L.Icon({
   popupAnchor: [0, -32],
 });
 
-export default function StationMarkers() {
+export default function StationMarkers({ visible = true }: { visible?: boolean }) {
   const { rentalStations } = useRentalData();
+  console.log('📍 StationMarkers render', rentalStations.length);
+
+  if (!visible) return null;
 
   const parseLatLng = (location: string): [number, number] | null => {
     const parts = location?.split(',');

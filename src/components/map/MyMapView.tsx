@@ -27,15 +27,11 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
           <X className="w-6 h-6 text-gray-800" />
         </button>
       )}
-
       <Header />
-
-      <div className="text-center py-3 text-lg font-semibold">Explore Bíp Bíp</div>
-
       <div className="flex-1 relative">
         <MapWrapper>
-          {(activeTab === 'all' || activeTab === 'station') && <StationMarkers />}
-          {(activeTab === 'all' || activeTab === 'maintenance') && <TechnicianMarkers />}
+          <StationMarkers visible={activeTab === 'all' || activeTab === 'station'} />
+          <TechnicianMarkers visible={activeTab === 'all' || activeTab === 'maintenance'} />
         </MapWrapper>
       </div>
 
@@ -43,7 +39,7 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full flex justify-around">
             <TabsTrigger value="all">🗺️ All</TabsTrigger>
-            <TabsTrigger value="station">🏪 GoStation</TabsTrigger>
+            <TabsTrigger value="station">🏪 BípBíp-Stations</TabsTrigger>
             <TabsTrigger value="maintenance">🔧 Maintenance</TabsTrigger>
           </TabsList>
         </Tabs>
