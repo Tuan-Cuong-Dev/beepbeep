@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
-import { Marker, Popup } from 'react-leaflet';
+import { Marker, Popup, LayerGroup } from 'react-leaflet';
 import L from 'leaflet';
 
 const technicianIcon = L.icon({
@@ -12,7 +12,11 @@ const technicianIcon = L.icon({
   popupAnchor: [0, -32],
 });
 
-export default function TechnicianMarkers({ visible = true }: { visible?: boolean }) {
+interface Props {
+  visible: boolean;
+}
+
+export default function TechnicianMarkers({ visible }: Props) {
   const { partners } = usePublicTechnicianPartners();
   const [isClient, setIsClient] = useState(false);
 
@@ -22,16 +26,14 @@ export default function TechnicianMarkers({ visible = true }: { visible?: boolea
 
   if (!isClient || !visible) return null;
 
-  console.log('🔧 TechnicianMarkers render', partners.length);
-
   return (
-    <>
+    <LayerGroup>
       {partners
         .filter((p) => p.coordinates && !isNaN(p.coordinates.lat) && !isNaN(p.coordinates.lng))
         .map((p) => (
           <Marker
             key={p.id}
-            position={[p.coordinates?.lat ?? 0, p.coordinates?.lng ?? 0]}
+            position={[p.coordinates?.lat??0, p.coordinates?.lng??0]}
             icon={technicianIcon}
           >
             <Popup>
@@ -55,6 +57,6 @@ export default function TechnicianMarkers({ visible = true }: { visible?: boolea
             </Popup>
           </Marker>
         ))}
-    </>
+    </LayerGroup>
   );
 }

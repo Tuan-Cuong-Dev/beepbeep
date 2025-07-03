@@ -1,6 +1,6 @@
 'use client';
 
-import { Marker, Popup } from 'react-leaflet';
+import { Marker, Popup, LayerGroup } from 'react-leaflet';
 import L from 'leaflet';
 import { useRentalData } from '@/src/hooks/useRentalData';
 
@@ -11,10 +11,12 @@ const stationIcon = new L.Icon({
   popupAnchor: [0, -32],
 });
 
-export default function StationMarkers({ visible = true }: { visible?: boolean }) {
-  const { rentalStations } = useRentalData();
-  console.log('📍 StationMarkers render', rentalStations.length);
+interface Props {
+  visible: boolean;
+}
 
+export default function StationMarkers({ visible }: Props) {
+  const { rentalStations } = useRentalData();
   if (!visible) return null;
 
   const parseLatLng = (location: string): [number, number] | null => {
@@ -23,34 +25,31 @@ export default function StationMarkers({ visible = true }: { visible?: boolean }
 
     const lat = parseFloat(parts[0].trim());
     const lng = parseFloat(parts[1].trim());
-
     return isNaN(lat) || isNaN(lng) ? null : [lat, lng];
   };
 
   return (
-    <>
-      {rentalStations
-        .map((station) => {
-          const coords = parseLatLng(station.location);
-          if (!coords) return null;
+    <LayerGroup>
+      {rentalStations.map((station) => {
+        const coords = parseLatLng(station.location);
+        if (!coords) return null;
 
-          return (
-            <Marker key={station.id} position={coords} icon={stationIcon}>
-              <Popup>
-                <strong>{station.name}</strong>
-                <br />
-                {station.displayAddress}
-                {station.contactPhone && (
-                  <>
-                    <br />
-                    📞 {station.contactPhone}
-                  </>
-                )}
-              </Popup>
-            </Marker>
-          );
-        })
-        .filter(Boolean)}
-    </>
+        return (
+          <Marker key={station.id} position={coords} icon={stationIcon}>
+            <Popup>
+              <strong>{station.name}</strong>
+              <br />
+              {station.displayAddress}
+              {station.contactPhone && (
+                <>
+                  <br />
+                  📞 {station.contactPhone}
+                </>
+              )}
+            </Popup>
+          </Marker>
+        );
+      })}
+    </LayerGroup>
   );
 }

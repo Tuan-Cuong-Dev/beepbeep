@@ -29,7 +29,7 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
       )}
       <Header />
       <div className="flex-1 relative">
-        <MapWrapper>
+        <MapWrapper key={activeTab}>
           <StationMarkers visible={activeTab === 'all' || activeTab === 'station'} />
           <TechnicianMarkers visible={activeTab === 'all' || activeTab === 'maintenance'} />
         </MapWrapper>
@@ -39,7 +39,7 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full flex justify-around">
             <TabsTrigger value="all">🗺️ All</TabsTrigger>
-            <TabsTrigger value="station">🏪 BípBíp-Stations</TabsTrigger>
+            <TabsTrigger value="station">🏪 GoStation</TabsTrigger>
             <TabsTrigger value="maintenance">🔧 Maintenance</TabsTrigger>
           </TabsList>
         </Tabs>
