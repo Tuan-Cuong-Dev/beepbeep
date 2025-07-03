@@ -15,35 +15,39 @@ export default function StationMarkers() {
   const { rentalStations } = useRentalData();
 
   const parseLatLng = (location: string): [number, number] | null => {
-    const parts = location.split(',');
+    const parts = location?.split(',');
     if (parts.length !== 2) return null;
-    const lat = parseFloat(parts[0]);
-    const lng = parseFloat(parts[1]);
+
+    const lat = parseFloat(parts[0].trim());
+    const lng = parseFloat(parts[1].trim());
+
     return isNaN(lat) || isNaN(lng) ? null : [lat, lng];
   };
 
   return (
     <>
-      {rentalStations.map((station) => {
-        const coords = parseLatLng(station.location);
-        if (!coords) return null;
+      {rentalStations
+        .map((station) => {
+          const coords = parseLatLng(station.location);
+          if (!coords) return null;
 
-        return (
-          <Marker key={station.id} position={coords} icon={stationIcon}>
-            <Popup>
-              <strong>{station.name}</strong>
-              <br />
-              {station.displayAddress}
-              {station.contactPhone && (
-                <>
-                  <br />
-                  📞 {station.contactPhone}
-                </>
-              )}
-            </Popup>
-          </Marker>
-        );
-      })}
+          return (
+            <Marker key={station.id} position={coords} icon={stationIcon}>
+              <Popup>
+                <strong>{station.name}</strong>
+                <br />
+                {station.displayAddress}
+                {station.contactPhone && (
+                  <>
+                    <br />
+                    📞 {station.contactPhone}
+                  </>
+                )}
+              </Popup>
+            </Marker>
+          );
+        })
+        .filter(Boolean)}
     </>
   );
 }

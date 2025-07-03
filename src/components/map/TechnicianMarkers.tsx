@@ -5,7 +5,7 @@ import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPart
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-const technicianIcon = L.icon({
+const technicianIcon = new L.Icon({
   iconUrl: '/assets/images/technician.png',
   iconSize: [32, 38],
   iconAnchor: [16, 32],
@@ -25,7 +25,14 @@ export default function TechnicianMarkers() {
   return (
     <>
       {partners
-        .filter((p) => p.coordinates && !isNaN(p.coordinates.lat) && !isNaN(p.coordinates.lng))
+        .filter(
+          (p) =>
+            p.coordinates &&
+            typeof p.coordinates.lat === 'number' &&
+            typeof p.coordinates.lng === 'number' &&
+            !isNaN(p.coordinates.lat) &&
+            !isNaN(p.coordinates.lng)
+        )
         .map((p) => (
           <Marker
             key={p.id}
