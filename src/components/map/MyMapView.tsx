@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
 import { X } from 'lucide-react';
+import Header from '@/src/components/landingpage/Header';
 
 const MapWrapper = dynamic(() => import('./MapWrapper'), { ssr: false });
 const TechnicianMarkers = dynamic(() => import('./TechnicianMarkers'), { ssr: false });
@@ -27,7 +28,7 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
         </button>
       )}
 
-      <div className="text-center py-3 text-lg font-semibold">Explore Bíp Bíp</div>
+      <Header />
 
       <div className="flex-1 relative">
         <MapWrapper>
