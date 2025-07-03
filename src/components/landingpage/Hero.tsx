@@ -58,7 +58,7 @@ export default function Hero() {
           onClick={() => setShowNotice(true)}
           className="mt-2 text-lg px-6 py-3 rounded-sm shadow-lg"
         >
-          🛵 RENT A RIDE
+          🛵 Explore Bíp Bíp
         </Button>
       </div>
 
