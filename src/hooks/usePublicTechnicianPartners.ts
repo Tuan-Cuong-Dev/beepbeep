@@ -20,8 +20,7 @@ export function usePublicTechnicianPartners() {
       const data: TechnicianPartner[] = snap.docs.map((doc) => {
         const raw = doc.data();
 
-        // ✅ Parse lại coordinates nếu là string "lat,lng"
-        let coordinates = raw.coordinates;
+        let coordinates = raw.coordinates ?? raw.geo; // ✅ fallback
         if (typeof coordinates === 'string') {
           const [lat, lng] = coordinates.split(',').map(parseFloat);
           if (!isNaN(lat) && !isNaN(lng)) {
@@ -34,7 +33,7 @@ export function usePublicTechnicianPartners() {
         return {
           ...(raw as TechnicianPartner),
           id: doc.id,
-          coordinates, // ✅ Đảm bảo luôn có coordinates nếu hợp lệ
+          coordinates, // ✅ key used in Marker
         };
       });
 
