@@ -5,12 +5,12 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/src/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/button';
-import NotificationDialog from '@/src/components/ui/NotificationDialog';
+import { useRouter } from 'next/navigation';
 
 export default function Hero() {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showNotice, setShowNotice] = useState(false); // ✅ trạng thái thông báo
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -52,24 +52,15 @@ export default function Hero() {
           <span className="block text-[#00d289]"> in a beep!</span>
         </h1>
 
-        {/* Button triggers NotificationDialog */}
+        {/* Button điều hướng sang trang Explore */}
         <Button
           variant="greenOutline"
-          onClick={() => setShowNotice(true)}
+          onClick={() => router.push('/map')}
           className="mt-2 text-lg px-6 py-3 rounded-sm shadow-lg"
         >
           🛵 Explore Bíp Bíp
         </Button>
       </div>
-
-      {/* Dialog */}
-      <NotificationDialog
-        open={showNotice}
-        onClose={() => setShowNotice(false)}
-        type="info"
-        title="🚧 Coming Soon"
-        description="We are currently setting up our rental stations. The rent feature is not yet available."
-      />
     </section>
   );
 }
