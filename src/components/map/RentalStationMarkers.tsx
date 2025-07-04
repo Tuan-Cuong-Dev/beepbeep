@@ -3,29 +3,32 @@
 import { useEffect, useState } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+import { Station } from '@/src/lib/stations/stationTypes';
 
 interface Props {
-  vehicleType: 'car' | 'motorbike' | 'bike';
+  vehicleType?: 'car' | 'motorbike' | 'bike'; // ✅ optional for 'all'
 }
 
 export default function RentalStationMarkers({ vehicleType }: Props) {
-  const [stations, setStations] = useState<any[]>([]);
+  const [stations, setStations] = useState<Station[]>([]);
 
   useEffect(() => {
     const fetch = async () => {
-      const q = query(collection(db, 'rentalStations'), where('isActive', '==', true));
-      const snap = await getDocs(q);
-      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const snap = await getDocs(collection(db, 'rentalStations'));
+      const data = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Station, 'id'>),
+      }));
       setStations(data);
     };
     fetch();
   }, []);
 
-  const filtered = stations.filter((s) =>
-  !s.vehicleType || s.vehicleType === vehicleType
-  );
+  const filtered = vehicleType
+    ? stations.filter((s) => !s.vehicleType || s.vehicleType === vehicleType)
+    : stations;
 
   const icon = L.icon({
     iconUrl: '/assets/images/stationmarker.png',
@@ -37,15 +40,22 @@ export default function RentalStationMarkers({ vehicleType }: Props) {
   return (
     <>
       {filtered.map((station) =>
-        station.coordinates ? (
+        station.geo?.lat != null && station.geo?.lng != null ? (
           <Marker
             key={station.id}
-            position={[station.coordinates.lat, station.coordinates.lng]}
+            position={[station.geo.lat, station.geo.lng]}
             icon={icon}
           >
             <Popup>
-              <strong>{station.name}</strong><br />
+              <strong>{station.name}</strong>
+              <br />
               {station.displayAddress}
+              {station.contactPhone && (
+                <>
+                  <br />
+                  📞 {station.contactPhone}
+                </>
+              )}
             </Popup>
           </Marker>
         ) : null

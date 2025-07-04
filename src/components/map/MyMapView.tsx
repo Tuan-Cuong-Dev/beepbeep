@@ -20,6 +20,11 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'rental' | 'battery' | 'maintenance'>('all');
   const [vehicleType, setVehicleType] = useState<'car' | 'motorbike' | 'bike'>('motorbike');
 
+  const showAll = activeTab === 'all';
+
+  const shouldShowBatteryStations =
+    (showAll || activeTab === 'battery') && vehicleType !== 'bike'; // ✅ KHÔNG hiển thị BatteryStations nếu là 'bike'
+
   return (
     <div className="h-full w-full relative flex flex-col">
       {onClose && (
@@ -39,14 +44,14 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
       {/* Map display */}
       <div className="flex-1 relative">
         <MapWrapper key={activeTab + '-' + vehicleType}>
-          {(activeTab === 'all' || activeTab === 'rental') && (
-            <RentalStationMarkers vehicleType={vehicleType} />
+          {(showAll || activeTab === 'rental') && (
+            <RentalStationMarkers vehicleType={showAll ? undefined : vehicleType} />
           )}
-          {(activeTab === 'all' || activeTab === 'battery') && (
-            <BatteryStationMarkers vehicleType={vehicleType} />
+          {shouldShowBatteryStations && (
+            <BatteryStationMarkers vehicleType={showAll ? undefined : vehicleType} />
           )}
-          {(activeTab === 'all' || activeTab === 'maintenance') && (
-            <TechnicianMarkers vehicleType={vehicleType} />
+          {(showAll || activeTab === 'maintenance') && (
+            <TechnicianMarkers vehicleType={showAll ? undefined : vehicleType} />
           )}
         </MapWrapper>
       </div>
@@ -55,9 +60,7 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
       <div className="bg-white border-t py-2">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <div className="w-full overflow-x-auto">
-            <TabsList
-              className="flex gap-2 bg-white rounded-full px-4 py-2 min-w-max whitespace-nowrap"
-            >
+            <TabsList className="flex gap-2 bg-white rounded-full px-4 py-2 min-w-max whitespace-nowrap">
               <TabsTrigger value="all">🗺️ All</TabsTrigger>
               <TabsTrigger value="rental">🏪 Rental Stations</TabsTrigger>
               <TabsTrigger value="battery">🔄 Battery Swap</TabsTrigger>

@@ -1,7 +1,7 @@
-// 📁 lib/stations/stationTypes.ts
 import { Timestamp } from 'firebase/firestore';
 
 export type StationStatus = 'active' | 'inactive';
+export type VehicleType = 'car' | 'motorbike' | 'bike'; // ✅ Loại phương tiện
 
 export interface Station {
   id: string;
@@ -14,7 +14,8 @@ export interface Station {
     lat: number;
     lng: number;
   };
-  contactPhone?: string; // ✅ Mới thêm
+  contactPhone?: string;
+  vehicleType?: VehicleType; // ✅ Thêm trường này
   status?: StationStatus;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
@@ -29,5 +30,6 @@ export interface StationFormValues {
     lat: number;
     lng: number;
   };
-  contactPhone?: string; // ✅ Mới thêm
+  contactPhone?: string;
+  vehicleType?: VehicleType; // ✅ Thêm vào form nếu cần
 }

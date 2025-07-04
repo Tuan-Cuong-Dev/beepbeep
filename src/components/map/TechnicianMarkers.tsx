@@ -5,28 +5,26 @@ import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 
 interface Props {
-  vehicleType: 'car' | 'motorbike' | 'bike';
+  vehicleType?: 'car' | 'motorbike' | 'bike';
 }
 
 export default function TechnicianMarkers({ vehicleType }: Props) {
-  const [technicians, setTechnicians] = useState<any[]>([]);
+  const [technicians, setTechnicians] = useState<TechnicianPartner[]>([]);
 
   useEffect(() => {
     const fetch = async () => {
       const q = query(collection(db, 'technicianPartners'), where('isActive', '==', true));
       const snap = await getDocs(q);
-      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as TechnicianPartner));
       setTechnicians(data);
     };
     fetch();
   }, []);
 
-  const filtered = technicians.filter(
-    (t) =>
-      !t.supportedVehicleTypes || t.supportedVehicleTypes.includes(vehicleType)
-  );
+  const filtered = technicians.filter((t) => t.vehicleType === vehicleType);
 
   const icon = L.icon({
     iconUrl: '/assets/images/technician.png',
@@ -45,7 +43,8 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
             icon={icon}
           >
             <Popup>
-              <strong>{tech.name}</strong><br />
+              <strong>{tech.name}</strong>
+              <br />
               {tech.phone || ''}
             </Popup>
           </Marker>

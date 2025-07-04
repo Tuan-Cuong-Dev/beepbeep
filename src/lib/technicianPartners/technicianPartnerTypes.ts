@@ -1,5 +1,7 @@
 import { Timestamp,FieldValue } from 'firebase/firestore';
 import { WorkingHours } from './workingHoursTypes';
+export type VehicleType = 'car' | 'motorbike' | 'bike'; // ✅ Thêm type nếu chưa có
+
 
 export interface TechnicianPartner {
   id?: string; // Firebase auto-generated ID
@@ -43,6 +45,9 @@ export interface TechnicianPartner {
 
   // Types of services the partner can handle
   serviceCategories?: string[];
+  
+  // ✅ Thêm loại phương tiện phục vụ
+  vehicleType?: VehicleType;
 
   // Weekly availability
   workingHours: WorkingHours[];
