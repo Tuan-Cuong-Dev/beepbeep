@@ -93,13 +93,6 @@ export default function StationPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full md:w-1/3"
           />
-          <SimpleSelect
-            value={statusFilter}
-            onChange={setStatusFilter}
-            placeholder="⚙️ Filter by status"
-            options={statusOptions}
-            className="w-full md:w-1/4"
-          />
         </div>
 
         <StationMap stations={sortedStations} />

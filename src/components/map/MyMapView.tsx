@@ -41,7 +41,7 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
       <div className="bg-white border-t py-2">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
         <TabsList
-          className="flex w-full overflow-x-auto whitespace-nowrap gap-2 px-4 no-scrollbar"
+          className="flex gap-2 bg-white rounded-full p-2 shadow overflow-x-auto whitespace-nowrap no-scrollbar min-w-max"
         >
           <TabsTrigger value="all">🗺️ All</TabsTrigger>
           <TabsTrigger value="rental">🏪 Rental Stations</TabsTrigger>
