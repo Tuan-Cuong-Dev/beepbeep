@@ -1,48 +1,53 @@
 'use client';
 
-import { Marker, Popup, LayerGroup } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { useRentalData } from '@/src/hooks/useRentalData';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
 
-const stationIcon = new L.Icon({
-  iconUrl: '/assets/images/station-marker.png',
-  iconSize: [24, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
+interface Props {
+  vehicleType: 'car' | 'motorbike' | 'bike';
+}
 
-export default function RentalStationMarkers() {
-  const { rentalStations } = useRentalData();
+export default function RentalStationMarkers({ vehicleType }: Props) {
+  const [stations, setStations] = useState<any[]>([]);
 
-  const parseLatLng = (location: string): [number, number] | null => {
-    const parts = location?.split(',');
-    if (parts.length !== 2) return null;
+  useEffect(() => {
+    const fetch = async () => {
+      const q = query(collection(db, 'rentalStations'), where('isActive', '==', true));
+      const snap = await getDocs(q);
+      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setStations(data);
+    };
+    fetch();
+  }, []);
 
-    const lat = parseFloat(parts[0].trim());
-    const lng = parseFloat(parts[1].trim());
-    return isNaN(lat) || isNaN(lng) ? null : [lat, lng];
-  };
+  const filtered = stations.filter((s) => s.vehicleType === vehicleType);
+
+  const icon = L.icon({
+    iconUrl: '/assets/icons/rental-station.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
 
   return (
-    <LayerGroup>
-      {rentalStations.map((station) => {
-        const coords = parseLatLng(station.location);
-        if (!coords) return null;
-
-        return (
-          <Marker key={station.id} position={coords} icon={stationIcon}>
+    <>
+      {filtered.map((station) =>
+        station.coordinates ? (
+          <Marker
+            key={station.id}
+            position={[station.coordinates.lat, station.coordinates.lng]}
+            icon={icon}
+          >
             <Popup>
-              <div className="text-sm leading-snug max-w-[220px]">
-                <p className="font-semibold text-black">{station.name}</p>
-                <p className="text-gray-600 text-xs">{station.displayAddress}</p>
-                {station.contactPhone && (
-                  <p className="text-gray-600 text-xs mt-1">📞 {station.contactPhone}</p>
-                )}
-              </div>
+              <strong>{station.name}</strong><br />
+              {station.displayAddress}
             </Popup>
           </Marker>
-        );
-      })}
-    </LayerGroup>
+        ) : null
+      )}
+    </>
   );
 }

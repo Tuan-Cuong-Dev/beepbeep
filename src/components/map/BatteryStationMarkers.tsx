@@ -6,14 +6,11 @@ import L from 'leaflet';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 
-const batteryIcon = L.icon({
-  iconUrl: '/assets/icons/battery-station.png',
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
+interface Props {
+  vehicleType: 'car' | 'motorbike' | 'bike';
+}
 
-export default function BatteryStationMarkers() {
+export default function BatteryStationMarkers({ vehicleType }: Props) {
   const [stations, setStations] = useState<any[]>([]);
 
   useEffect(() => {
@@ -26,14 +23,23 @@ export default function BatteryStationMarkers() {
     fetch();
   }, []);
 
+  const filtered = stations.filter((s) => s.vehicleType === vehicleType);
+
+  const icon = L.icon({
+    iconUrl: '/assets/icons/battery-station.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
+
   return (
     <>
-      {stations.map((station) =>
+      {filtered.map((station) =>
         station.coordinates ? (
           <Marker
             key={station.id}
             position={[station.coordinates.lat, station.coordinates.lng]}
-            icon={batteryIcon}
+            icon={icon}
           >
             <Popup>
               <strong>{station.name}</strong><br />

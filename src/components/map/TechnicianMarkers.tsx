@@ -1,57 +1,56 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
-import { Marker, Popup, LayerGroup } from 'react-leaflet';
+import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
 
-const technicianIcon = L.icon({
-  iconUrl: '/assets/images/technician.png',
-  iconSize: [32, 38],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
+interface Props {
+  vehicleType: 'car' | 'motorbike' | 'bike';
+}
 
-export default function TechnicianMarkers() {
-  const { partners } = usePublicTechnicianPartners();
-  const [isClient, setIsClient] = useState(false);
+export default function TechnicianMarkers({ vehicleType }: Props) {
+  const [technicians, setTechnicians] = useState<any[]>([]);
 
   useEffect(() => {
-    setIsClient(true);
+    const fetch = async () => {
+      const q = query(collection(db, 'technicianPartners'), where('isActive', '==', true));
+      const snap = await getDocs(q);
+      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setTechnicians(data);
+    };
+    fetch();
   }, []);
 
-  if (!isClient) return null;
+  const filtered = technicians.filter(
+    (t) =>
+      !t.supportedVehicleTypes || t.supportedVehicleTypes.includes(vehicleType)
+  );
+
+  const icon = L.icon({
+    iconUrl: '/assets/icons/technician.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
 
   return (
-    <LayerGroup>
-      {partners
-        .filter((p) => p.coordinates && !isNaN(p.coordinates.lat) && !isNaN(p.coordinates.lng))
-        .map((p) => (
+    <>
+      {filtered.map((tech) =>
+        tech.coordinates ? (
           <Marker
-            key={p.id}
-            position={[p.coordinates?.lat??0, p.coordinates?.lng??0]}
-            icon={technicianIcon}
+            key={tech.id}
+            position={[tech.coordinates.lat, tech.coordinates.lng]}
+            icon={icon}
           >
             <Popup>
-              <div className="text-sm leading-snug max-w-[220px]">
-                <p className="font-semibold text-black">{p.name}</p>
-                <p className="text-gray-700 text-xs mb-1">
-                  {p.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
-                </p>
-                <p className="text-gray-600 text-xs">📍 {p.shopAddress || 'No address'}</p>
-                <p className="text-gray-600 text-xs mb-1">📞 {p.phone || 'No phone'}</p>
-                {p.phone && (
-                  <a
-                    href={`tel:${p.phone}`}
-                    className="inline-block text-xs text-white bg-green-500 px-3 py-1 rounded mt-1 hover:bg-green-600"
-                  >
-                    📞 Call Now
-                  </a>
-                )}
-              </div>
+              <strong>{tech.name}</strong><br />
+              {tech.phone || ''}
             </Popup>
           </Marker>
-        ))}
-    </LayerGroup>
+        ) : null
+      )}
+    </>
   );
 }

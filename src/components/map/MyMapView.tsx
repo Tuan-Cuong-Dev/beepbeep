@@ -5,12 +5,12 @@ import dynamic from 'next/dynamic';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
 import { X } from 'lucide-react';
 import Header from '@/src/components/landingpage/Header';
+import VehicleSwitcher from './VehicleSwitcher';
 
 const MapWrapper = dynamic(() => import('./MapWrapper'), { ssr: false });
 const TechnicianMarkers = dynamic(() => import('./TechnicianMarkers'), { ssr: false });
 const RentalStationMarkers = dynamic(() => import('./RentalStationMarkers'), { ssr: false });
 const BatteryStationMarkers = dynamic(() => import('./BatteryStationMarkers'), { ssr: false });
-
 
 interface MyMapViewProps {
   onClose?: () => void;
@@ -18,6 +18,7 @@ interface MyMapViewProps {
 
 export default function MyMapView({ onClose }: MyMapViewProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'rental' | 'battery' | 'maintenance'>('all');
+  const [vehicleType, setVehicleType] = useState<'car' | 'motorbike' | 'bike'>('motorbike');
 
   return (
     <div className="h-full w-full relative flex flex-col">
@@ -29,18 +30,30 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
           <X className="w-6 h-6 text-gray-800" />
         </button>
       )}
+
       <Header />
+
+      {/* Vehicle switcher */}
+      <VehicleSwitcher vehicleType={vehicleType} onChange={setVehicleType} />
+
+      {/* Map display */}
       <div className="flex-1 relative">
-        <MapWrapper key={activeTab}>
-          {(activeTab === 'all' || activeTab === 'rental') && <RentalStationMarkers />}
-          {(activeTab === 'all' || activeTab === 'battery') && <BatteryStationMarkers />}
-          {(activeTab === 'all' || activeTab === 'maintenance') && <TechnicianMarkers />}
+        <MapWrapper key={activeTab + '-' + vehicleType}>
+          {(activeTab === 'all' || activeTab === 'rental') && (
+            <RentalStationMarkers vehicleType={vehicleType} />
+          )}
+          {(activeTab === 'all' || activeTab === 'battery') && (
+            <BatteryStationMarkers vehicleType={vehicleType} />
+          )}
+          {(activeTab === 'all' || activeTab === 'maintenance') && (
+            <TechnicianMarkers vehicleType={vehicleType} />
+          )}
         </MapWrapper>
       </div>
 
+      {/* Bottom tabs */}
       <div className="bg-white border-t py-2">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-          {/* Wrapper đảm bảo scroll hoạt động */}
           <div className="w-full overflow-x-auto">
             <TabsList
               className="flex gap-2 bg-white rounded-full px-4 py-2 min-w-max whitespace-nowrap"
@@ -53,7 +66,6 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
           </div>
         </Tabs>
       </div>
-
     </div>
   );
 }
