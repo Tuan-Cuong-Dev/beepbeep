@@ -10,49 +10,27 @@ export function usePublicTechnicianPartners() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPartners = async () => {
-      try {
-        const q = query(
-          collection(db, 'technicianPartners'),
-          where('isActive', '==', true)
-        );
+    const fetch = async () => {
+      const q = query(
+        collection(db, 'technicianPartners'),
+        where('isActive', '==', true)
+      );
+      const snap = await getDocs(q);
 
-        const snap = await getDocs(q);
-        const data: TechnicianPartner[] = snap.docs.map((doc) => {
-          const raw = doc.data();
+      const data: TechnicianPartner[] = snap.docs.map((doc) => {
+        const raw = doc.data();
+        return {
+          ...(raw as TechnicianPartner),
+          id: doc.id,
+          geo: raw.coordinates ?? undefined, // Hỗ trợ backward compatibility
+        };
+      });
 
-          // Fallback: coordinates hoặc geo string
-          let coordinates = raw.coordinates ?? raw.geo;
-
-          if (typeof coordinates === 'string') {
-            const [latStr, lngStr] = coordinates.split(',').map((s) => s.trim());
-            const lat = parseFloat(latStr);
-            const lng = parseFloat(lngStr);
-
-            if (!isNaN(lat) && !isNaN(lng)) {
-              coordinates = { lat, lng };
-            } else {
-              console.warn(`⚠️ Invalid coordinates string in technician ${doc.id}:`, coordinates);
-              coordinates = undefined;
-            }
-          }
-
-          return {
-            ...(raw as TechnicianPartner),
-            id: doc.id,
-            coordinates,
-          };
-        });
-
-        setPartners(data);
-      } catch (error) {
-        console.error('❌ Failed to fetch technician partners:', error);
-      } finally {
-        setLoading(false);
-      }
+      setPartners(data);
+      setLoading(false);
     };
 
-    fetchPartners();
+    fetch();
   }, []);
 
   return { partners, loading };
