@@ -40,16 +40,20 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
 
       <div className="bg-white border-t py-2">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-        <TabsList
-          className="flex gap-2 bg-white rounded-full p-2 shadow overflow-x-auto whitespace-nowrap no-scrollbar min-w-max"
-        >
-          <TabsTrigger value="all">🗺️ All</TabsTrigger>
-          <TabsTrigger value="rental">🏪 Rental Stations</TabsTrigger>
-          <TabsTrigger value="battery">🔋 Battery Stations</TabsTrigger>
-          <TabsTrigger value="maintenance">🔧 Maintenance</TabsTrigger>
-        </TabsList>
+          {/* Wrapper đảm bảo scroll hoạt động */}
+          <div className="w-full overflow-x-auto">
+            <TabsList
+              className="flex gap-2 bg-white rounded-full px-4 py-2 min-w-max whitespace-nowrap"
+            >
+              <TabsTrigger value="all">🗺️ All</TabsTrigger>
+              <TabsTrigger value="rental">🏪 Rental Stations</TabsTrigger>
+              <TabsTrigger value="battery">🔄 Battery Swap</TabsTrigger>
+              <TabsTrigger value="maintenance">🔧 Maintenance</TabsTrigger>
+            </TabsList>
+          </div>
         </Tabs>
       </div>
+
     </div>
   );
 }
