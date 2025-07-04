@@ -26,7 +26,7 @@ export default function BatteryStationMarkers({ vehicleType }: Props) {
   const filtered = stations.filter((s) => s.vehicleType === vehicleType);
 
   const icon = L.icon({
-    iconUrl: '/assets/icons/battery-station.png',
+    iconUrl: '/assets/images/icon-battery-station.png',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],

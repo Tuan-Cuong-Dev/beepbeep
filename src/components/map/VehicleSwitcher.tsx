@@ -14,7 +14,7 @@ export default function VehicleSwitcher({ vehicleType, onChange }: VehicleSwitch
         <button
           onClick={() => onChange('car')}
           className={`w-12 h-12 flex items-center justify-center rounded-full ${
-            vehicleType === 'car' ? 'bg-red-500 text-white' : 'bg-gray-100'
+            vehicleType === 'car' ? 'bg-[#00d289] text-white' : 'bg-gray-100'
           }`}
           aria-label="Car"
         >
@@ -23,7 +23,7 @@ export default function VehicleSwitcher({ vehicleType, onChange }: VehicleSwitch
         <button
           onClick={() => onChange('motorbike')}
           className={`w-12 h-12 flex items-center justify-center rounded-full ${
-            vehicleType === 'motorbike' ? 'bg-red-500 text-white' : 'bg-gray-100'
+            vehicleType === 'motorbike' ? 'bg-[#00d289] text-white' : 'bg-gray-100'
           }`}
           aria-label="Motorbike"
         >
@@ -32,7 +32,7 @@ export default function VehicleSwitcher({ vehicleType, onChange }: VehicleSwitch
         <button
           onClick={() => onChange('bike')}
           className={`w-12 h-12 flex items-center justify-center rounded-full ${
-            vehicleType === 'bike' ? 'bg-red-500 text-white' : 'bg-gray-100'
+            vehicleType === 'bike' ? 'bg-[#00d289] text-white' : 'bg-gray-100'
           }`}
           aria-label="Bike"
         >
