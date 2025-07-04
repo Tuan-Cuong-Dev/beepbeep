@@ -23,7 +23,9 @@ export default function RentalStationMarkers({ vehicleType }: Props) {
     fetch();
   }, []);
 
-  const filtered = stations.filter((s) => s.vehicleType === vehicleType);
+  const filtered = stations.filter((s) =>
+  !s.vehicleType || s.vehicleType === vehicleType
+  );
 
   const icon = L.icon({
     iconUrl: '/assets/images/stationmarker.png',
