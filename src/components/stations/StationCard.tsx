@@ -47,7 +47,7 @@ export default function StationCard({ station, userLocation }: Props) {
     <div className="bg-white rounded-xl shadow hover:shadow-md transition duration-200 overflow-hidden border">
       <div className="relative h-32 w-full">
         <Image
-          src="/assets/images/station-marker.png"
+          src="/assets/images/stationmarker.png"
           alt="Station"
           fill
           className="object-contain p-6"
