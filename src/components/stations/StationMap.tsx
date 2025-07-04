@@ -7,7 +7,7 @@ import { Station } from '@/src/lib/stations/stationTypes';
 
 // Biểu tượng marker cho station
 const stationIcon = new L.Icon({
-  iconUrl: '/assets/images/station-marker.png',
+  iconUrl: '/assets/images/stationmarker.png',
   iconSize: [24, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],

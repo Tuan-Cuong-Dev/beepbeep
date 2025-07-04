@@ -30,7 +30,7 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
 
   const icon = L.icon({
     iconUrl: '/assets/images/technician.png',
-    iconSize: [25, 32],
+    iconSize: [28, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
   });
