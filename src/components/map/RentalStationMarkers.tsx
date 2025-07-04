@@ -11,7 +11,7 @@ const stationIcon = new L.Icon({
   popupAnchor: [0, -32],
 });
 
-export default function StationMarkers() {
+export default function RentalStationMarkers() {
   const { rentalStations } = useRentalData();
 
   const parseLatLng = (location: string): [number, number] | null => {

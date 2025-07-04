@@ -8,14 +8,16 @@ import Header from '@/src/components/landingpage/Header';
 
 const MapWrapper = dynamic(() => import('./MapWrapper'), { ssr: false });
 const TechnicianMarkers = dynamic(() => import('./TechnicianMarkers'), { ssr: false });
-const StationMarkers = dynamic(() => import('./StationMarkers'), { ssr: false });
+const RentalStationMarkers = dynamic(() => import('./RentalStationMarkers'), { ssr: false });
+const BatteryStationMarkers = dynamic(() => import('./BatteryStationMarkers'), { ssr: false });
+
 
 interface MyMapViewProps {
   onClose?: () => void;
 }
 
 export default function MyMapView({ onClose }: MyMapViewProps) {
-  const [activeTab, setActiveTab] = useState<'all' | 'station' | 'maintenance'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'rental' | 'battery' | 'maintenance'>('all');
 
   return (
     <div className="h-full w-full relative flex flex-col">
@@ -30,18 +32,20 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
       <Header />
       <div className="flex-1 relative">
         <MapWrapper key={activeTab}>
-          {(activeTab === 'all' || activeTab === 'station') && <StationMarkers />}
+          {(activeTab === 'all' || activeTab === 'rental') && <RentalStationMarkers />}
+          {(activeTab === 'all' || activeTab === 'battery') && <BatteryStationMarkers />}
           {(activeTab === 'all' || activeTab === 'maintenance') && <TechnicianMarkers />}
         </MapWrapper>
       </div>
 
       <div className="bg-white border-t py-2">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-          <TabsList className="w-full flex justify-around">
-            <TabsTrigger value="all">🗺️ All</TabsTrigger>
-            <TabsTrigger value="station">🏪 BípBíp-Stations</TabsTrigger>
-            <TabsTrigger value="maintenance">🔧 Maintenance</TabsTrigger>
-          </TabsList>
+        <TabsList className="w-full flex justify-around">
+          <TabsTrigger value="all">🗺️ All</TabsTrigger>
+          <TabsTrigger value="rental">🏪 Rental Stations</TabsTrigger>
+          <TabsTrigger value="battery">🔋 Battery Stations</TabsTrigger>
+          <TabsTrigger value="maintenance">🔧 Maintenance</TabsTrigger>
+        </TabsList>
         </Tabs>
       </div>
     </div>
