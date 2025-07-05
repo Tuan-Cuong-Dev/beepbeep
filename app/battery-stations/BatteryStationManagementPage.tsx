@@ -1,4 +1,5 @@
 // 📁 pages/admin/battery-stations/BatteryStationManagementPage.tsx
+// 📁 pages/admin/battery-stations/BatteryStationManagementPage.tsx
 'use client';
 
 import { useState } from 'react';
@@ -7,6 +8,8 @@ import BatteryStationTable from '@/src/components/battery-stations/BatteryStatio
 import BatteryStationForm from '@/src/components/battery-stations/BatteryStationForm';
 import BatteryStationSearchBar from '@/src/components/battery-stations/BatteryStationSearchBar';
 import { BatteryStation } from '@/src/lib/batteryStations/batteryStationTypes';
+import Header from '@/src/components/landingpage/Header';
+import Footer from '@/src/components/landingpage/Footer';
 
 export default function BatteryStationManagementPage() {
   const {
@@ -43,36 +46,40 @@ export default function BatteryStationManagementPage() {
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-xl font-bold">Battery Stations Management</h1>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <Header />
+      <main className="flex-grow p-4 space-y-4">
+        <h1 className="text-xl font-bold">Battery Stations Management</h1>
 
-      <BatteryStationForm
-        station={editing || undefined}
-        onSave={handleSave}
-        onCancel={() => setEditing(null)}
-      />
-
-      <BatteryStationSearchBar
-        searchTerm={searchTerm}
-        vehicleFilter={vehicleFilter}
-        statusFilter={statusFilter}
-        setSearchTerm={setSearchTerm}
-        setVehicleFilter={setVehicleFilter}
-        setStatusFilter={setStatusFilter}
-      />
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <BatteryStationTable
-          stations={filtered}
-          onEdit={setEditing}
-          onDelete={async (id) => {
-            await remove(id);
-            await reload();
-          }}
+        <BatteryStationForm
+          station={editing || undefined}
+          onSave={handleSave}
+          onCancel={() => setEditing(null)}
         />
-      )}
+
+        <BatteryStationSearchBar
+          searchTerm={searchTerm}
+          vehicleFilter={vehicleFilter}
+          statusFilter={statusFilter}
+          setSearchTerm={setSearchTerm}
+          setVehicleFilter={setVehicleFilter}
+          setStatusFilter={setStatusFilter}
+        />
+
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <BatteryStationTable
+            stations={filtered}
+            onEdit={setEditing}
+            onDelete={async (id) => {
+              await remove(id);
+              await reload();
+            }}
+          />
+        )}
+      </main>
+      <Footer />
     </div>
   );
 }
