@@ -11,6 +11,20 @@ interface Props {
   vehicleType?: 'car' | 'motorbike' | 'bike'; // ✅ optional for 'all'
 }
 
+// ✅ Hàm parse từ chuỗi "15.8785655° N, 108.3258334° E" → [15.8785655, 108.3258334]
+function parseLocationString(locationStr: string): [number, number] | null {
+  try {
+    const [latPart, lngPart] = locationStr.split(',');
+    const lat = parseFloat(latPart);
+    const lng = parseFloat(lngPart);
+    if (isNaN(lat) || isNaN(lng)) return null;
+    return [lat, lng];
+  } catch (e) {
+    console.warn('❌ Error parsing location string:', locationStr);
+    return null;
+  }
+}
+
 export default function RentalStationMarkers({ vehicleType }: Props) {
   const [stations, setStations] = useState<Station[]>([]);
 
@@ -21,6 +35,10 @@ export default function RentalStationMarkers({ vehicleType }: Props) {
         id: doc.id,
         ...(doc.data() as Omit<Station, 'id'>),
       }));
+      console.log(
+        '📍 Rental Stations:',
+        data.map((d) => ({ name: d.name, location: d.location }))
+      );
       setStations(data);
     };
     fetch();
@@ -32,20 +50,21 @@ export default function RentalStationMarkers({ vehicleType }: Props) {
 
   const icon = L.icon({
     iconUrl: '/assets/images/stationmarker.png',
-    iconSize: [28, 32],
+    iconSize: [25, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
   });
 
   return (
     <>
-      {filtered.map((station) =>
-        station.geo?.lat != null && station.geo?.lng != null ? (
-          <Marker
-            key={station.id}
-            position={[station.geo.lat, station.geo.lng]}
-            icon={icon}
-          >
+      {filtered.map((station) => {
+        const parsed = typeof station.location === 'string' ? parseLocationString(station.location) : null;
+        if (!parsed) return null;
+
+        const [lat, lng] = parsed;
+
+        return (
+          <Marker key={station.id} position={[lat, lng]} icon={icon}>
             <Popup>
               <strong>{station.name}</strong>
               <br />
@@ -58,8 +77,8 @@ export default function RentalStationMarkers({ vehicleType }: Props) {
               )}
             </Popup>
           </Marker>
-        ) : null
-      )}
+        );
+      })}
     </>
   );
 }
