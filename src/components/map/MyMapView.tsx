@@ -22,8 +22,10 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
 
   const showAll = activeTab === 'all';
 
+  // Sửa đoạn này:
   const shouldShowBatteryStations =
-    (showAll || activeTab === 'battery') && vehicleType !== 'bike'; // ✅ KHÔNG hiển thị BatteryStations nếu là 'bike'
+    showAll || (activeTab === 'battery' && vehicleType !== 'bike');
+  // ✅ KHÔNG hiển thị BatteryStations nếu là 'bike'
 
   return (
     <div className="h-full w-full relative flex flex-col">
