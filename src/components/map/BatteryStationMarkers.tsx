@@ -35,7 +35,7 @@ export default function BatteryStationMarkers({ vehicleType }: Props) {
 
   const icon = L.icon({
     iconUrl: '/assets/images/batterystation.png',
-    iconSize: [28, 32],
+    iconSize: [25, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
   });
