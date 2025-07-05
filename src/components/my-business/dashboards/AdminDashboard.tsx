@@ -43,6 +43,12 @@ export default function AdminDashboard() {
       route: '/vehicle-issues',
     },
     {
+    icon: <FaWrench className="w-6 h-6 text-[#00d289]" />,
+    title: 'Technician Partners',
+    description: 'Manage external repair partners',
+    route: '/technician-partners',
+    },
+    {
       icon: <FaUser className="w-6 h-6 text-[#00d289]" />,
       title: 'Users Management',
       description: 'Control user accounts and access',

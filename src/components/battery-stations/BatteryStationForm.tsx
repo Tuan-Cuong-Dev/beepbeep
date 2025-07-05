@@ -1,4 +1,3 @@
-// 📁 components/battery-stations/BatteryStationForm.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,11 +8,12 @@ import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 
 interface Props {
   station?: BatteryStation;
-  onSave: (data: Omit<BatteryStation, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSave: (data: Omit<BatteryStation, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   onCancel?: () => void;
+  onSaveComplete?: () => void;
 }
 
-export default function BatteryStationForm({ station, onSave, onCancel }: Props) {
+export default function BatteryStationForm({ station, onSave, onCancel, onSaveComplete }: Props) {
   const [form, setForm] = useState<Omit<BatteryStation, 'id' | 'createdAt' | 'updatedAt'>>({
     name: '',
     displayAddress: '',
@@ -51,8 +51,13 @@ export default function BatteryStationForm({ station, onSave, onCancel }: Props)
 
   const coordsForMap = form.coordinates?.lat && form.coordinates?.lng ? form.coordinates : null;
 
-  const handleSubmit = () => {
-    onSave(form);
+  const handleSubmit = async () => {
+    try {
+      await onSave(form);
+      if (onSaveComplete) onSaveComplete();
+    } catch (err) {
+      console.error('Failed to save station:', err);
+    }
   };
 
   return (
