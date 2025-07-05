@@ -39,7 +39,6 @@ export default function MapWrapper({ children }: MapWrapperProps) {
             <Popup>You are here</Popup>
           </Marker>
         )}
-
         {children}
       </MapContainer>
     </div>

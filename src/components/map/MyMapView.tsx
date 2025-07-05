@@ -61,10 +61,10 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <div className="w-full overflow-x-auto">
             <TabsList className="flex gap-2 bg-white rounded-full px-4 py-2 min-w-max whitespace-nowrap">
-              <TabsTrigger value="all">🗺️ All</TabsTrigger>
-              <TabsTrigger value="rental">🏪 Rental Stations</TabsTrigger>
-              <TabsTrigger value="battery">🔄 Battery Swap</TabsTrigger>
-              <TabsTrigger value="maintenance">🔧 Maintenance</TabsTrigger>
+              <TabsTrigger value="all" onClick={() => setActiveTab('all')}>🗺️ All</TabsTrigger>
+              <TabsTrigger value="rental" onClick={() => setActiveTab('rental')}>🏪 Rental Stations</TabsTrigger>
+              <TabsTrigger value="maintenance" onClick={() => setActiveTab('maintenance')}>🔧 Maintenance</TabsTrigger>
+              <TabsTrigger value="battery" onClick={() => setActiveTab('battery')}>🔄 Battery Swap</TabsTrigger>
             </TabsList>
           </div>
         </Tabs>
