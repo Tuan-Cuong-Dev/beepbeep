@@ -35,10 +35,6 @@ export default function RentalStationMarkers({ vehicleType }: Props) {
         id: doc.id,
         ...(doc.data() as Omit<Station, 'id'>),
       }));
-      console.log(
-        '📍 Rental Stations:',
-        data.map((d) => ({ name: d.name, location: d.location }))
-      );
       setStations(data);
     };
     fetch();
