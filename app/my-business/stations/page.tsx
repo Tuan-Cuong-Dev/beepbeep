@@ -12,8 +12,8 @@ import {
 import { db } from '@/src/firebaseConfig';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-import CreateStationForm from '@/src/components/stations/CreateStationForm';
-import EditStationForm from '@/src/components/stations/EditStationForm';
+import CreateStationForm from '@/src/components/rental-stations/CreateStationForm';
+import EditStationForm from '@/src/components/rental-stations/EditStationForm';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useCurrentCompanyId } from '@/src/hooks/useCurrentCompanyId';
 import { Station } from '@/src/lib/stations/stationTypes';

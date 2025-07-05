@@ -7,11 +7,10 @@ import { useState, useMemo } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Input } from '@/src/components/ui/input';
-import { SimpleSelect } from '@/src/components/ui/select';
-import StationCard from '@/src/components/stations/StationCard';
+import StationCard from '@/src/components/rental-stations/StationCard';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 
-const StationMap = dynamic(() => import('@/src/components/stations/StationMap'), {
+const StationMap = dynamic(() => import('@/src/components/rental-stations/StationMap'), {
   ssr: false,
 });
 

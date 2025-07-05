@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStations } from '@/src/hooks/useStations';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
-import StationCard from '@/src/components/stations/StationCard';
+import StationCard from '@/src/components/rental-stations/StationCard';
 import { Button } from '@/src/components/ui/button';
 
 function getDistanceFromLatLng(
