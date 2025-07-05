@@ -49,7 +49,9 @@ export default function BatteryStationManagementPage() {
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       <main className="flex-grow p-4 space-y-4">
-        <h1 className="text-xl font-bold">Battery Stations Management</h1>
+        <h1 className="text-2xl font-bold border-b-2 border-[#00d289] pb-2">
+          Battery Stations Management
+        </h1>
 
         <BatteryStationForm
           station={editing || undefined}

@@ -21,12 +21,12 @@ export default function BatteryStationSearchBar({
   setStatusFilter,
 }: Props) {
   return (
-    <div className="flex flex-wrap gap-2 mb-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-4 w-full">
       <Input
         placeholder="Search by name or address..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-60"
+        className="w-full"
       />
 
       <SimpleSelect
@@ -38,7 +38,7 @@ export default function BatteryStationSearchBar({
           { label: 'Motorbike', value: 'motorbike' },
           { label: 'Car', value: 'car' },
         ]}
-        className="w-40"
+        className="w-full"
       />
 
       <SimpleSelect
@@ -50,7 +50,7 @@ export default function BatteryStationSearchBar({
           { label: 'Active', value: 'true' },
           { label: 'Inactive', value: 'false' },
         ]}
-        className="w-40"
+        className="w-full"
       />
     </div>
   );
