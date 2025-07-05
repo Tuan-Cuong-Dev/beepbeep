@@ -1,9 +1,9 @@
+// 📁 pages/admin/AdminDashboard.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-
 import { Card, CardContent } from '@/src/components/ui/card';
 import {
   FaStore,
@@ -65,6 +65,12 @@ export default function AdminDashboard() {
       title: 'Battery Management',
       description: 'Track battery inventory and status',
       route: '/battery',
+    },
+    {
+      icon: <FaBatteryFull className="w-6 h-6 text-[#00d289]" />,
+      title: 'Battery Stations',
+      description: 'Manage battery swapping station locations',
+      route: '/admin/battery-stations',
     },
     {
       icon: <FaToolbox className="w-6 h-6 text-[#00d289]" />,
