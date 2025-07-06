@@ -87,7 +87,7 @@ export default function StationSection() {
               <Button
                 size="sm"
                 variant="default"
-                onClick={() => router.push('/stations')}
+                onClick={() => router.push('/rental-stations')}
                 className="text-white bg-[#00d289] hover:bg-[#00b47a] rounded-full px-6 py-2 text-sm shadow"
               >
                 📍 View All Stations
