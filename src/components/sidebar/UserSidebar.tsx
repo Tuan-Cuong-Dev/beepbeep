@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileContract } from '@fortawesome/free-solid-svg-icons';
 import {
   FaTimes, FaPencilAlt, FaUser, FaCalendarAlt, FaEnvelope, FaBuilding,
-  FaCog, FaUsers, FaDollarSign,FaWrench,FaStore,FaBatteryFull
+  FaCog, FaUsers, FaDollarSign,FaMapMarkerAlt
 } from 'react-icons/fa';
 import { useUser } from '@/src/context/AuthContext';
 import { IconType } from 'react-icons';
@@ -99,21 +99,10 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
       },
       { divider: true },
       {
-        icon: FaWrench,
-        label: 'Add Repair Shop',
-        path: '/contribute/add-repair-shop',
+        icon: FaMapMarkerAlt, // hoặc FaPlusCircle
+        label: 'Add to the Map',
+        path: '/contribute/add-to-the-map',
       },
-      {
-        icon: FaStore,
-        label: 'Add Rental Shop',
-        path: '/contribute/add-rental-shop',
-      },
-      {
-        icon: FaBatteryFull,
-        label: 'Add Battery Station',
-        path: '/contribute/add-battery-station',
-      },
-
       { divider: true },
       { icon: FaUser, label: 'Profile', path: '/profile' },
     ];
