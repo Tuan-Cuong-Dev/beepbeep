@@ -114,6 +114,12 @@ export default function AdminDashboard() {
       description: 'Customize rental forms for providers',
       route: '/my-business/form-builder',
     },
+    {
+      icon: <FaClipboardList className="w-6 h-6 text-[#00d289]" />,
+      title: 'Pending Contributions',
+      description: 'Review user-submitted data before approval',
+      route: '/admin/pending-contributions', // ✅ Route mới
+    },
   ];
 
   return (
@@ -143,7 +149,6 @@ export default function AdminDashboard() {
           ))}
         </div>
       </main>
-      
       <Footer />
     </div>
   );

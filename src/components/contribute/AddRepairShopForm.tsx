@@ -1,16 +1,14 @@
-// 📁 components/contribute/AddRepairShopForm.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Timestamp } from 'firebase/firestore';
-import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
+import { Timestamp, addDoc, collection } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
-import { addDoc, collection } from 'firebase/firestore';
+import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import { db } from '@/src/firebaseConfig';
-import { Button } from '@/src/components/ui/button';
+import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
-import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
+import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 export default function AddRepairShopForm() {
@@ -29,7 +27,7 @@ export default function AddRepairShopForm() {
     isActive: false,
   });
 
-  const { coords, geocode, loading } = useGeocodeAddress();
+  const { coords, geocode } = useGeocodeAddress();
   const [submitting, setSubmitting] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -53,28 +51,27 @@ export default function AddRepairShopForm() {
     if (!user?.uid || !form.name || !form.phone || !form.shopAddress) return;
     setSubmitting(true);
     try {
-      const { name, phone, shopAddress, type } = form;
-      if (!name || !phone || !shopAddress || !type) return;
-
       const data: TechnicianPartner = {
         ...form,
-        name,
-        phone,
-        shopAddress,
-        type,
+        name: form.name!,
+        phone: form.phone!,
+        shopAddress: form.shopAddress!,
+        type: 'shop',
         assignedRegions: form.assignedRegions || [],
         workingHours: form.workingHours || [],
         coordinates: form.coordinates || undefined,
-        vehicleType: form.vehicleType,
+        vehicleType: form.vehicleType || 'motorbike',
         createdBy: user.uid,
         isActive: false,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         role: 'technician_partner',
-        userId: '',
+        userId: '', // sẽ gán sau khi admin duyệt
       };
 
       await addDoc(collection(db, 'technicianPartners'), data);
+
+      // Reset và thông báo
       setForm({
         type: 'shop',
         name: '',
@@ -90,7 +87,7 @@ export default function AddRepairShopForm() {
       });
       setShowDialog(true);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('❌ Error submitting technician:', error);
     } finally {
       setSubmitting(false);
     }
