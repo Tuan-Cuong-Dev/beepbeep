@@ -101,7 +101,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
       {
         icon: FaMapMarkerAlt, // hoặc FaPlusCircle
         label: 'Add to the Map',
-        path: '/contribute/add-to-the-map',
+        path: '/contribute',
       },
       { divider: true },
       { icon: FaUser, label: 'Profile', path: '/profile' },
