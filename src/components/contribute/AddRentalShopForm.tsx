@@ -85,6 +85,16 @@ export default function AddRentalShopForm() {
         value={form.contactPhone}
         onChange={(e) => handleChange('contactPhone', e.target.value)}
       />
+      <select
+        className="w-full border rounded px-3 py-2"
+        value={form.vehicleType || ''}
+        onChange={(e) => handleChange('vehicleType', e.target.value as any)}
+      >
+        <option value="">Select vehicle type</option>
+        <option value="bike">Bike</option>
+        <option value="motorbike">Motorbike</option>
+        <option value="car">Car</option>
+      </select>
       <Button onClick={handleSubmit} disabled={submitting}>
         {submitting ? 'Submitting...' : 'Submit Rental Shop'}
       </Button>

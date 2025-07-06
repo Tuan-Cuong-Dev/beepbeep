@@ -20,9 +20,10 @@ export default function AddRepairShopForm() {
     shopName: '',
     shopAddress: '',
     mapAddress: '',
-    coordinates: undefined,
+    coordinates: { lat: 0, lng: 0 },
     assignedRegions: [],
     workingHours: [],
+    vehicleType: 'motorbike',
     isActive: false,
   });
 
@@ -38,25 +39,25 @@ export default function AddRepairShopForm() {
     setSubmitting(true);
     try {
       const { name, phone, shopAddress, type } = form;
-        if (!name || !phone || !shopAddress || !type) return;
+      if (!name || !phone || !shopAddress || !type) return;
 
-        const data: TechnicianPartner = {
+      const data: TechnicianPartner = {
         ...form,
         name,
         phone,
         shopAddress,
         type,
-        assignedRegions: form.assignedRegions || [], // ✅ sửa lỗi
-        workingHours: form.workingHours || [],        // nếu cần
+        assignedRegions: form.assignedRegions || [],
+        workingHours: form.workingHours || [],
         coordinates: form.coordinates || undefined,
+        vehicleType: form.vehicleType,
         createdBy: user.uid,
         isActive: false,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         role: 'technician_partner',
         userId: '',
-        };
-
+      };
 
       await addDoc(collection(db, 'technicianPartners'), data);
       setSuccess(true);
@@ -67,9 +68,10 @@ export default function AddRepairShopForm() {
         shopName: '',
         shopAddress: '',
         mapAddress: '',
-        coordinates: undefined,
+        coordinates: { lat: 0, lng: 0 },
         assignedRegions: [],
         workingHours: [],
+        vehicleType: 'motorbike',
         isActive: false,
       });
     } catch (error) {
@@ -106,6 +108,36 @@ export default function AddRepairShopForm() {
         value={form.mapAddress || ''}
         onChange={(e) => handleChange('mapAddress', e.target.value)}
       />
+      <Input
+        placeholder="Latitude"
+        value={form.coordinates?.lat ?? ''}
+        onChange={(e) =>
+          handleChange('coordinates', {
+            ...form.coordinates,
+            lat: parseFloat(e.target.value),
+          })
+        }
+      />
+      <Input
+        placeholder="Longitude"
+        value={form.coordinates?.lng ?? ''}
+        onChange={(e) =>
+          handleChange('coordinates', {
+            ...form.coordinates,
+            lng: parseFloat(e.target.value),
+          })
+        }
+      />
+      <select
+        className="w-full border rounded px-3 py-2"
+        value={form.vehicleType || ''}
+        onChange={(e) => handleChange('vehicleType', e.target.value as any)}
+      >
+        <option value="">Select vehicle type</option>
+        <option value="bike">Bike</option>
+        <option value="motorbike">Motorbike</option>
+        <option value="car">Car</option>
+      </select>
 
       <Button onClick={handleSubmit} disabled={submitting}>
         {submitting ? 'Submitting...' : 'Submit Repair Shop'}

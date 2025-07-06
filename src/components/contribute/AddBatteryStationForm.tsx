@@ -78,6 +78,16 @@ export default function AddBatteryStationForm() {
         value={form.location}
         onChange={(e) => handleChange('location', e.target.value)}
       />
+      <select
+        className="w-full border rounded px-3 py-2"
+        value={form.vehicleType || ''}
+        onChange={(e) => handleChange('vehicleType', e.target.value as 'motorbike' | 'car')}
+      >
+        <option value="">Select vehicle type</option>
+        <option value="motorbike">Motorbike</option>
+        <option value="car">Car</option>
+      </select>
+
       <Button onClick={handleSubmit} disabled={submitting}>
         {submitting ? 'Submitting...' : 'Submit Battery Station'}
       </Button>

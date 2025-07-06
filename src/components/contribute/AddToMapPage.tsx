@@ -6,25 +6,35 @@ import AddRepairShopForm from './AddRepairShopForm';
 import AddRentalShopForm from './AddRentalShopForm';
 import AddBatteryStationForm from './AddBatteryStationForm';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
+import Header from '@/src/components/landingpage/Header';
+import Footer from '@/src/components/landingpage/Footer';
 
 export default function AddToMapPage() {
-  const [tab, setTab] = useState<'repair' | 'rental' | 'battery'>('repair');
+  const [activeTab, setActiveTab] = useState<'repair' | 'rental' | 'battery'>('repair');
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4 text-center">Add to the Map</h1>
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-1 px-4 sm:px-6 py-4 max-w-3xl mx-auto w-full">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center">Add to the Map</h1>
 
-      <Tabs value={tab} onValueChange={(value) => setTab(value as any)} className="mb-4">
-        <TabsList className="grid grid-cols-3">
-          <TabsTrigger value="repair">Repair Shop</TabsTrigger>
-          <TabsTrigger value="rental">Rental Shop</TabsTrigger>
-          <TabsTrigger value="battery">Battery Station</TabsTrigger>
-        </TabsList>
-      </Tabs>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+          <div className="w-full overflow-x-auto mb-4">
+            <TabsList className="flex gap-2 bg-white rounded-lg px-2 py-2 min-w-max whitespace-nowrap justify-start sm:justify-center">
+              <TabsTrigger value="repair" onClick={() => setActiveTab('repair')} className="text-sm sm:text-base">🔧 Repair</TabsTrigger>
+              <TabsTrigger value="rental" onClick={() => setActiveTab('rental')} className="text-sm sm:text-base">🏪 Rental</TabsTrigger>
+              <TabsTrigger value="battery" onClick={() => setActiveTab('battery')} className="text-sm sm:text-base">🔋 Battery</TabsTrigger>
+            </TabsList>
+          </div>
+        </Tabs>
 
-      {tab === 'repair' && <AddRepairShopForm />}
-      {tab === 'rental' && <AddRentalShopForm />}
-      {tab === 'battery' && <AddBatteryStationForm />}
+        <div className="space-y-6">
+          {activeTab === 'repair' && <AddRepairShopForm />}
+          {activeTab === 'rental' && <AddRentalShopForm />}
+          {activeTab === 'battery' && <AddBatteryStationForm />}
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 }
