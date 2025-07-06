@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileContract } from '@fortawesome/free-solid-svg-icons';
 import {
   FaTimes, FaPencilAlt, FaUser, FaCalendarAlt, FaEnvelope, FaBuilding,
-  FaCog, FaUsers, FaDollarSign
+  FaCog, FaUsers, FaDollarSign,FaWrench,FaStore,FaBatteryFull
 } from 'react-icons/fa';
 import { useUser } from '@/src/context/AuthContext';
 import { IconType } from 'react-icons';
@@ -97,6 +97,23 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
         label: 'Write a review',
         onClick: () => setShowComingSoon(true), // ✅ phản hồi tức thì
       },
+      { divider: true },
+      {
+        icon: FaWrench,
+        label: 'Add Repair Shop',
+        path: '/contribute/add-repair-shop',
+      },
+      {
+        icon: FaStore,
+        label: 'Add Rental Shop',
+        path: '/contribute/add-rental-shop',
+      },
+      {
+        icon: FaBatteryFull,
+        label: 'Add Battery Station',
+        path: '/contribute/add-battery-station',
+      },
+
       { divider: true },
       { icon: FaUser, label: 'Profile', path: '/profile' },
     ];
