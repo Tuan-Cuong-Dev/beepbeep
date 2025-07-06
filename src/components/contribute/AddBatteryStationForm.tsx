@@ -1,7 +1,7 @@
 // 📁 components/contribute/AddBatteryStationForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
@@ -9,6 +9,8 @@ import { useUser } from '@/src/context/AuthContext';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
+import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 export default function AddBatteryStationForm() {
   const { user } = useUser();
@@ -17,10 +19,29 @@ export default function AddBatteryStationForm() {
     displayAddress: '',
     mapAddress: '',
     location: '',
+    coordinates: undefined as { lat: number; lng: number } | undefined,
     vehicleType: 'motorbike' as 'motorbike' | 'car',
   });
+
+  const { coords, geocode, loading } = useGeocodeAddress();
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+
+  useEffect(() => {
+    if (form.mapAddress) {
+      geocode(form.mapAddress);
+    }
+  }, [form.mapAddress]);
+
+  useEffect(() => {
+    if (coords) {
+      setForm((prev) => ({
+        ...prev,
+        coordinates: coords,
+        location: `${coords.lat.toFixed(5)}° N, ${coords.lng.toFixed(5)}° E`,
+      }));
+    }
+  }, [coords]);
 
   const handleChange = (field: keyof typeof form, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -34,21 +55,23 @@ export default function AddBatteryStationForm() {
         name: form.name,
         displayAddress: form.displayAddress,
         mapAddress: form.mapAddress,
-        coordinates: undefined,
+        location: form.location,
+        coordinates: form.coordinates,
         vehicleType: form.vehicleType,
         isActive: false,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       };
       await addDoc(collection(db, 'batteryStations'), data);
-      setSuccess(true);
       setForm({
         name: '',
         displayAddress: '',
         mapAddress: '',
         location: '',
+        coordinates: undefined,
         vehicleType: 'motorbike',
       });
+      setShowDialog(true);
     } catch (err) {
       console.error('❌ Error adding battery station:', err);
     } finally {
@@ -80,7 +103,7 @@ export default function AddBatteryStationForm() {
       />
       <select
         className="w-full border rounded px-3 py-2"
-        value={form.vehicleType || ''}
+        value={form.vehicleType}
         onChange={(e) => handleChange('vehicleType', e.target.value as 'motorbike' | 'car')}
       >
         <option value="">Select vehicle type</option>
@@ -92,7 +115,13 @@ export default function AddBatteryStationForm() {
         {submitting ? 'Submitting...' : 'Submit Battery Station'}
       </Button>
 
-      {success && <p className="text-green-600">Battery station submitted for review!</p>}
+      <NotificationDialog
+        open={showDialog}
+        type="success"
+        title="Thank you for your contribution!"
+        description="We’ve received your submission and will review it shortly."
+        onClose={() => setShowDialog(false)}
+      />
     </div>
   );
 }

@@ -20,7 +20,7 @@ export default function AddToMapPage() {
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <div className="w-full overflow-x-auto mb-4">
-            <TabsList className="flex gap-2 bg-white rounded-lg px-2 py-2 min-w-max whitespace-nowrap justify-start sm:justify-center">
+            <TabsList className="flex gap-2 bg-white rounded-lg px-2 py-2 min-w-max whitespace-nowrap justify-center sm:justify-center">
               <TabsTrigger value="repair" onClick={() => setActiveTab('repair')} className="text-sm sm:text-base">🔧 Repair</TabsTrigger>
               <TabsTrigger value="rental" onClick={() => setActiveTab('rental')} className="text-sm sm:text-base">🏪 Rental</TabsTrigger>
               <TabsTrigger value="battery" onClick={() => setActiveTab('battery')} className="text-sm sm:text-base">🔋 Battery</TabsTrigger>

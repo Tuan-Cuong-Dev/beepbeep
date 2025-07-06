@@ -1,7 +1,7 @@
 // 📁 components/contribute/AddRepairShopForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { useUser } from '@/src/context/AuthContext';
@@ -10,6 +10,8 @@ import { db } from '@/src/firebaseConfig';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
+import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 export default function AddRepairShopForm() {
   const { user } = useUser();
@@ -27,8 +29,21 @@ export default function AddRepairShopForm() {
     isActive: false,
   });
 
+  const { coords, geocode, loading } = useGeocodeAddress();
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+
+  useEffect(() => {
+    if (form.mapAddress) {
+      geocode(form.mapAddress);
+    }
+  }, [form.mapAddress]);
+
+  useEffect(() => {
+    if (coords) {
+      setForm((prev) => ({ ...prev, coordinates: coords }));
+    }
+  }, [coords]);
 
   const handleChange = (field: keyof TechnicianPartner, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -60,7 +75,6 @@ export default function AddRepairShopForm() {
       };
 
       await addDoc(collection(db, 'technicianPartners'), data);
-      setSuccess(true);
       setForm({
         type: 'shop',
         name: '',
@@ -74,6 +88,7 @@ export default function AddRepairShopForm() {
         vehicleType: 'motorbike',
         isActive: false,
       });
+      setShowDialog(true);
     } catch (error) {
       console.error('Error submitting form:', error);
     } finally {
@@ -143,7 +158,13 @@ export default function AddRepairShopForm() {
         {submitting ? 'Submitting...' : 'Submit Repair Shop'}
       </Button>
 
-      {success && <p className="text-green-600">Repair shop submitted for review!</p>}
+      <NotificationDialog
+        open={showDialog}
+        type="success"
+        title="Thank you for your contribution!"
+        description="We’ve received your submission and will review it shortly."
+        onClose={() => setShowDialog(false)}
+      />
     </div>
   );
 }

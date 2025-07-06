@@ -1,7 +1,7 @@
 // 📁 components/contribute/AddRentalShopForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { StationFormValues } from '@/src/lib/stations/stationTypes';
 import { db } from '@/src/firebaseConfig';
@@ -10,6 +10,8 @@ import { useUser } from '@/src/context/AuthContext';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
+import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 export default function AddRentalShopForm() {
   const { user } = useUser();
@@ -22,8 +24,21 @@ export default function AddRentalShopForm() {
     contactPhone: '',
     vehicleType: 'motorbike',
   });
+
+  const { coords, geocode } = useGeocodeAddress();
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+
+  useEffect(() => {
+    if (form.mapAddress) geocode(form.mapAddress);
+  }, [form.mapAddress]);
+
+  useEffect(() => {
+    if (coords) {
+      const newLocation = `${coords.lat.toFixed(6)}° N, ${coords.lng.toFixed(6)}° E`;
+      setForm((prev) => ({ ...prev, geo: coords, location: newLocation }));
+    }
+  }, [coords]);
 
   const handleChange = (field: keyof StationFormValues, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -35,13 +50,12 @@ export default function AddRentalShopForm() {
     try {
       const data = {
         ...form,
-        companyId: 'contributed', // gán cố định hoặc xử lý sau
+        companyId: 'contributed',
         status: 'inactive',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       };
       await addDoc(collection(db, 'rentalStations'), data);
-      setSuccess(true);
       setForm({
         name: '',
         displayAddress: '',
@@ -51,6 +65,7 @@ export default function AddRentalShopForm() {
         contactPhone: '',
         vehicleType: 'motorbike',
       });
+      setShowDialog(true);
     } catch (err) {
       console.error('❌ Error adding rental shop:', err);
     } finally {
@@ -99,7 +114,13 @@ export default function AddRentalShopForm() {
         {submitting ? 'Submitting...' : 'Submit Rental Shop'}
       </Button>
 
-      {success && <p className="text-green-600">Rental shop submitted for review!</p>}
+      <NotificationDialog
+        open={showDialog}
+        type="success"
+        title="Thank you for your contribution!"
+        description="We’ve received your submission and will review it shortly."
+        onClose={() => setShowDialog(false)}
+      />
     </div>
   );
 }
