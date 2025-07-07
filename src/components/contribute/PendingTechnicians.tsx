@@ -38,6 +38,16 @@ export default function PendingTechnicians() {
   const handleApprove = async (id: string) => {
     await updateDoc(doc(db, 'technicianPartners', id), {
       isActive: true,
+      rejected: false,
+      updatedAt: new Date(),
+    });
+    fetchTechnicians();
+  };
+
+  const handleReject = async (id: string) => {
+    await updateDoc(doc(db, 'technicianPartners', id), {
+      isActive: false,
+      rejected: true,
       updatedAt: new Date(),
     });
     fetchTechnicians();
@@ -63,9 +73,14 @@ export default function PendingTechnicians() {
                 Categories: {(tech.serviceCategories || []).join(', ') || '—'}
               </p>
             </div>
-            <Button onClick={() => handleApprove(tech.id)} className="mt-2 md:mt-0">
-              Approve
-            </Button>
+            <div className="flex gap-2 mt-2 md:mt-0">
+              <Button onClick={() => handleApprove(tech.id)} variant="default">
+                Approve
+              </Button>
+              <Button onClick={() => handleReject(tech.id)} variant="destructive">
+                Reject
+              </Button>
+            </div>
           </div>
         ))
       )}
