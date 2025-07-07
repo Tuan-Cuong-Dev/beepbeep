@@ -18,7 +18,7 @@ export default function PendingTechnicians() {
   const [loading, setLoading] = useState(true);
 
   const fetchTechnicians = async () => {
-    const q = query(collection(db, 'technicianPartners'), where('isActive', '==', false), where('rejected', '!=', true));
+    const q = query(collection(db, 'technicianPartners'), where('isActive', '==', false));
     const snap = await getDocs(q);
     const data: Technician[] = snap.docs.map((doc) => {
       const raw = doc.data() as Technician;
@@ -38,15 +38,6 @@ export default function PendingTechnicians() {
   const handleApprove = async (id: string) => {
     await updateDoc(doc(db, 'technicianPartners', id), {
       isActive: true,
-      rejected: false,
-      updatedAt: new Date(),
-    });
-    fetchTechnicians();
-  };
-
-  const handleReject = async (id: string) => {
-    await updateDoc(doc(db, 'technicianPartners', id), {
-      rejected: true,
       updatedAt: new Date(),
     });
     fetchTechnicians();
@@ -55,7 +46,6 @@ export default function PendingTechnicians() {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold">Pending Technicians</h2>
-
       {loading ? (
         <p>Loading...</p>
       ) : technicians.length === 0 ? (
@@ -66,21 +56,16 @@ export default function PendingTechnicians() {
             key={tech.id}
             className="border p-4 rounded shadow flex flex-col md:flex-row justify-between items-start md:items-center"
           >
-            <div className="mb-2 md:mb-0">
+            <div>
               <p className="font-semibold">{tech.name}</p>
               <p className="text-sm text-gray-500">{tech.contactPhone || '—'}</p>
               <p className="text-xs text-gray-400">
                 Categories: {(tech.serviceCategories || []).join(', ') || '—'}
               </p>
             </div>
-            <div className="flex gap-2 mt-2 md:mt-0">
-              <Button variant="default" onClick={() => handleApprove(tech.id)}>
-                Approve
-              </Button>
-              <Button variant="destructive" onClick={() => handleReject(tech.id)}>
-                Reject
-              </Button>
-            </div>
+            <Button onClick={() => handleApprove(tech.id)} className="mt-2 md:mt-0">
+              Approve
+            </Button>
           </div>
         ))
       )}

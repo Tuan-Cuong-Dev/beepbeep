@@ -1,3 +1,4 @@
+// 📁 components/contribute/PendingBatteryStations.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -21,14 +22,16 @@ export default function PendingBatteryStations() {
   const fetchStations = async () => {
     const q = query(
       collection(db, 'batteryStations'),
-      where('isActive', '==', false),
-      where('rejected', '!=', true)
+      where('isActive', '==', false)
     );
     const snap = await getDocs(q);
-    const data: BatteryStation[] = snap.docs.map((doc) => ({
-      ...(doc.data() as BatteryStation),
-      id: doc.id,
-    }));
+    const data: BatteryStation[] = snap.docs.map((doc) => {
+      const raw = doc.data() as BatteryStation;
+      return {
+        ...raw,
+        id: doc.id,
+      };
+    });
     setStations(data);
     setLoading(false);
   };
@@ -40,15 +43,6 @@ export default function PendingBatteryStations() {
   const handleApprove = async (id: string) => {
     await updateDoc(doc(db, 'batteryStations', id), {
       isActive: true,
-      rejected: false,
-      updatedAt: new Date(),
-    });
-    fetchStations();
-  };
-
-  const handleReject = async (id: string) => {
-    await updateDoc(doc(db, 'batteryStations', id), {
-      rejected: true,
       updatedAt: new Date(),
     });
     fetchStations();
@@ -67,18 +61,15 @@ export default function PendingBatteryStations() {
             key={s.id}
             className="border p-4 rounded shadow flex flex-col md:flex-row justify-between items-start md:items-center"
           >
-            <div className="mb-2 md:mb-0">
+            <div>
               <p className="font-semibold">{s.name}</p>
               <p className="text-sm text-gray-500">{s.displayAddress}</p>
               <p className="text-sm">Vehicle Type: {s.vehicleType}</p>
               <p className="text-xs text-gray-400">Location: {s.location}</p>
             </div>
-            <div className="flex gap-2 mt-2 md:mt-0">
-              <Button onClick={() => handleApprove(s.id)}>Approve</Button>
-              <Button onClick={() => handleReject(s.id)} variant="destructive">
-                Reject
-              </Button>
-            </div>
+            <Button onClick={() => handleApprove(s.id)} className="mt-2 md:mt-0">
+              Approve
+            </Button>
           </div>
         ))
       )}

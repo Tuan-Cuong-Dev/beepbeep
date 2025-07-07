@@ -22,14 +22,16 @@ export default function PendingRentalShops() {
     const q = query(
       collection(db, 'rentalStations'),
       where('companyId', '==', 'contributed'),
-      where('status', '==', 'inactive'),
-      where('rejected', '!=', true)
+      where('status', '==', 'inactive')
     );
     const snap = await getDocs(q);
-    const data: RentalStation[] = snap.docs.map((doc) => ({
-      ...(doc.data() as RentalStation),
-      id: doc.id,
-    }));
+    const data: RentalStation[] = snap.docs.map((doc) => {
+      const raw = doc.data() as RentalStation;
+      return {
+        ...raw,
+        id: doc.id,
+      };
+    });
     setStations(data);
     setLoading(false);
   };
@@ -41,15 +43,6 @@ export default function PendingRentalShops() {
   const handleApprove = async (id: string) => {
     await updateDoc(doc(db, 'rentalStations', id), {
       status: 'active',
-      rejected: false,
-      updatedAt: new Date(),
-    });
-    fetchStations();
-  };
-
-  const handleReject = async (id: string) => {
-    await updateDoc(doc(db, 'rentalStations', id), {
-      rejected: true,
       updatedAt: new Date(),
     });
     fetchStations();
@@ -58,7 +51,6 @@ export default function PendingRentalShops() {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold">Pending Rental Shops</h2>
-
       {loading ? (
         <p>Loading...</p>
       ) : stations.length === 0 ? (
@@ -69,20 +61,15 @@ export default function PendingRentalShops() {
             key={s.id}
             className="border p-4 rounded shadow flex flex-col md:flex-row justify-between items-start md:items-center"
           >
-            <div className="mb-2 md:mb-0">
+            <div>
               <p className="font-semibold">{s.name}</p>
               <p className="text-sm text-gray-500">{s.displayAddress}</p>
               <p className="text-sm">Vehicle Type: {s.vehicleType}</p>
               <p className="text-xs text-gray-400">Location: {s.location}</p>
             </div>
-            <div className="flex gap-2 mt-2 md:mt-0">
-              <Button onClick={() => handleApprove(s.id)} variant="default">
-                Approve
-              </Button>
-              <Button onClick={() => handleReject(s.id)} variant="destructive">
-                Reject
-              </Button>
-            </div>
+            <Button onClick={() => handleApprove(s.id)} className="mt-2 md:mt-0">
+              Approve
+            </Button>
           </div>
         ))
       )}
