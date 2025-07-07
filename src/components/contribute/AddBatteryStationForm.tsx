@@ -50,8 +50,6 @@ export default function AddBatteryStationForm() {
       await create({
         ...form,
         isActive: false,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
       });
       setForm({
         name: '',
