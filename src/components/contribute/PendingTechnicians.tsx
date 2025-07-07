@@ -10,6 +10,7 @@ interface Technician {
   name: string;
   contactPhone?: string;
   serviceCategories?: string[];
+  rejected?: boolean;
   [key: string]: any;
 }
 
@@ -18,15 +19,14 @@ export default function PendingTechnicians() {
   const [loading, setLoading] = useState(true);
 
   const fetchTechnicians = async () => {
-    const q = query(collection(db, 'technicianPartners'), where('isActive', '==', false));
+    const q = query(
+      collection(db, 'technicianPartners'),
+      where('isActive', '==', false)
+    );
     const snap = await getDocs(q);
-    const data: Technician[] = snap.docs.map((doc) => {
-      const raw = doc.data() as Technician;
-      return {
-        ...raw,
-        id: doc.id,
-      };
-    });
+    const data: Technician[] = snap.docs
+      .map((doc) => ({ ...doc.data(), id: doc.id } as Technician))
+      .filter((tech) => tech.rejected !== true);
     setTechnicians(data);
     setLoading(false);
   };
