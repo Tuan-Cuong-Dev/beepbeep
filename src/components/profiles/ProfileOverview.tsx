@@ -6,13 +6,11 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { FiSettings } from 'react-icons/fi';
-import ProfileTabs from '@/src/components/profiles/ProfileTabs';
-type TabType = 'profile' | 'vehicles' | 'insurance' | 'issues';
+
 
 export default function ProfileOverview() {
   const { currentUser } = useAuth();
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<TabType>('profile');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -31,7 +29,7 @@ export default function ProfileOverview() {
       {/* Cover Image */}
       <div className="relative w-full h-52 sm:h-64 md:h-72 lg:h-80">
         <Image
-          src={user.coverURL || '/assets/images/cover2.jpg'}
+          src={user.coverURL || '/assets/images/Cover2.jpg'}
           alt="Cover"
           fill
           className="object-cover"
