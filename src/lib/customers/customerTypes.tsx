@@ -1,30 +1,33 @@
-// customerType.ts
-
 import { Timestamp } from 'firebase/firestore';
 
 export interface Customer {
-  id: string;
-  userId: string;
+  id: string; // Firestore document ID
+  userId: string; // Liên kết tới users.uid
+
+  // Thông tin cơ bản
   name: string;
   email: string;
   phone: string;
   address: string;
-  dateOfBirth: Timestamp | null;
+
+  // Thông tin định danh
+  idNumber: string; // CCCD/CMND/Passport
   driverLicense: string;
-  idNumber: string;
   nationality?: string;         // Quốc tịch
-  sex?: string;                 // Giới tính
+  sex?: 'male' | 'female' | 'other'; // ✅ chuẩn hóa
+  dateOfBirth: Timestamp | null;
+
   placeOfOrigin?: string;       // Quê quán
   placeOfResidence?: string;    // Nơi thường trú
-  companyId: string; // ✅ thêm dòng này
+
+  // Liên kết công ty (nếu có)
+  companyId: string;
+
+  // Mở rộng
+  personalVehicleIds?: string[]; // Danh sách xe cá nhân (vehicleId)
+  rentalHistoryIds?: string[];   // Lịch sử booking
+  insuranceSubscriptions?: string[]; // Các gói bảo hiểm đã đăng ký
+
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface User {
-  uid: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
 }

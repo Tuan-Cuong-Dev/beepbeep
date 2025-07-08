@@ -14,6 +14,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "drive.usercontent.google.com", // 👈 thêm dòng này
       },
+      {
+        protocol: "https",
+        hostname: "i.pravatar.cc", // 👈 Thêm dòng này để ảnh avatar giả hoạt động
+      },
     ],
   },
   eslint: {

@@ -7,10 +7,12 @@ export interface Agent {
   name: string;
   email: string;
   phone: string;
+
   displayAddress: string;
   mapAddress: string;
-  location: string; // ví dụ: "16.0728986° N, 108.1620957° E" (chuỗi kinh độ, vĩ độ)
-  ownerId: string;
+  location: string; // ví dụ: "16.0728986° N, 108.1620957° E"
+
+  ownerId: string; // userId của người tạo agent
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

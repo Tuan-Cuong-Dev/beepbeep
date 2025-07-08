@@ -108,14 +108,20 @@ export default function CustomerForm({
         />
         <select
           value={newCustomer.sex ?? ''}
-          onChange={(e) => setNewCustomer({ ...newCustomer, sex: e.target.value })}
+          onChange={(e) =>
+            setNewCustomer({
+              ...newCustomer,
+              sex: e.target.value as 'male' | 'female' | 'other' | undefined,
+            })
+          }
           className="border p-2 rounded w-full"
         >
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
+          <option value="">Select gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
         </select>
+
         <input
           type="text"
           placeholder="Place of Origin"

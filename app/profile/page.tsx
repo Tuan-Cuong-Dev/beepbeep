@@ -9,10 +9,10 @@ import Header from "@/src/components/landingpage/Header";
 import Footer from "@/src/components/landingpage/Footer";
 import { Button } from "@/src/components/ui/button";
 import { FaImage, FaPen, FaCog } from "react-icons/fa";
-import ActivityFeed from "@/src/components/profile/ActivityFeed";
-import Photos from "@/src/components/profile/Photos";
-import Reviews from "@/src/components/profile/Reviews";
-import Forums from "@/src/components/profile/Forums";
+import ActivityFeed from "@/src/components/profiles/ActivityFeed";
+import Photos from "@/src/components/profiles/Photos";
+import Reviews from "@/src/components/profiles/Reviews";
+import Forums from "@/src/components/profiles/Forums";
 import SettingsMenu from "@/src/components/accounts/SettingsMenu";
 
 

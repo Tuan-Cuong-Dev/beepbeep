@@ -36,7 +36,7 @@ export default function CustomerTable({ customers, onEdit, onDelete, searchTerm,
               <th className="border px-3 py-1">Name</th>
               <th className="border px-3 py-1">Email</th>
               <th className="border px-3 py-1">Phone</th>
-              <th className="border px-3 py-1">Company</th> {/* ✅ Thêm cột */}
+              <th className="border px-3 py-1">Company</th>
               <th className="border px-3 py-1">Address</th>
               <th className="border px-3 py-1 whitespace-nowrap">Place of Residence</th>
               <th className="border px-3 py-1 whitespace-nowrap">Place of Origin</th>
@@ -53,9 +53,7 @@ export default function CustomerTable({ customers, onEdit, onDelete, searchTerm,
                 <td className="border px-3 py-1 whitespace-nowrap">{c.name}</td>
                 <td className="border px-3 py-1">{c.email}</td>
                 <td className="border px-3 py-1">{c.phone}</td>
-                <td className="border px-3 py-1 whitespace-nowrap">
-                  {companyMap[c.companyId] || 'Unknown'} {/* ✅ Hiển thị tên công ty */}
-                </td>
+                <td className="border px-3 py-1 whitespace-nowrap">{companyMap[c.companyId] || 'Unknown'}</td>
                 <td className="border px-3 py-1 whitespace-nowrap">{c.address}</td>
                 <td className="border px-3 py-1 whitespace-nowrap">{c.placeOfResidence || ''}</td>
                 <td className="border px-3 py-1 whitespace-nowrap">{c.placeOfOrigin || ''}</td>
@@ -65,13 +63,19 @@ export default function CustomerTable({ customers, onEdit, onDelete, searchTerm,
                   {c.dateOfBirth?.toDate().toLocaleDateString('vi-VN') || 'N/A'}
                 </td>
                 <td className="border px-3 py-1">{c.idNumber}</td>
-                <td className="border px-3 py-1 flex gap-2">
-                  <Button size="sm" onClick={() => onEdit(c)} className="bg-[#00d289] hover:bg-green-600 text-white">
-                    Edit
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => onDelete(c.id)}>
-                    Delete
-                  </Button>
+                <td className="border px-3 py-1">
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => onEdit(c)}
+                      className="bg-[#00d289] hover:bg-green-600 text-white"
+                    >
+                      Edit
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => onDelete(c.id)}>
+                      Delete
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}

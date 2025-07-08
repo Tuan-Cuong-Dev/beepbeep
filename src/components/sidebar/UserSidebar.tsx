@@ -104,7 +104,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
         path: '/contribute',
       },
       { divider: true },
-      { icon: FaUser, label: 'Profile', path: '/profile' },
+      { icon: FaUser, label: 'Profile', path: '/profiles' },
     ];
 
     if (!['support', 'technician','technician_assistant', 'technician_partner'].includes(normalizedRole)) {
