@@ -25,9 +25,11 @@ export function useUpdateUserPreferences(userId: string | null | undefined) {
     setError(null);
 
     try {
-      await updateUserPreferences(userId, {
-        preferences: prefs,
-      });
+     await updateUserPreferences(userId, {
+      preferences: {
+        ...prefs, // ✅ đảm bảo đúng shape mong muốn
+      },
+    });
       setSuccess(true);
     } catch (err: any) {
       console.error('❌ Failed to update preferences:', err);

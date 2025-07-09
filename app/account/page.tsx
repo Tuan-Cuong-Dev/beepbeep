@@ -1,125 +1,138 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { sendPasswordResetEmail } from "firebase/auth";
-import { useAuth } from "@/src/components/users/useAuth";
-import { db } from "@/src/firebaseConfig";
+import { useEffect, useState } from 'react';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { Timestamp } from 'firebase/firestore';
+import { auth } from '@/src/firebaseConfig';
 
-import Header from "@/src/components/landingpage/Header";
-import Footer from "@/src/components/landingpage/Footer";
-import { Label } from "@/src/components/ui/label";
-import { Input } from "@/src/components/ui/input";
-import { Button } from "@/src/components/ui/button";
-import { SimpleSelect } from "@/src/components/ui/select";
-import UserTopMenu from "@/src/components/landingpage/UserTopMenu";
-import { auth } from "@/src/firebaseConfig";
+import Header from '@/src/components/landingpage/Header';
+import Footer from '@/src/components/landingpage/Footer';
+import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
+import { Label } from '@/src/components/ui/label';
+import { Input } from '@/src/components/ui/input';
+import { Button } from '@/src/components/ui/button';
+import { SimpleSelect } from '@/src/components/ui/select';
 
-type UserData = {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  homeAirport?: string;
-  address?: string;
-  address2?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
-  phone?: string;
-};
+import { useUserProfile } from '@/src/hooks/useUserProfile';
+import { useUserPreferences } from '@/src/hooks/useUserPreferences';
+import { useUserLocation } from '@/src/hooks/useUserLocation';
 
 export default function AccountPage() {
-  const { currentUser } = useAuth();
-  const [userData, setUserData] = useState<UserData>({});
-  const [loading, setLoading] = useState(true);
+  const { user, loading, update } = useUserProfile();
+  const { preferences, updatePreferences } = useUserPreferences(user?.uid);
+  const { location, updateLocation } = useUserLocation(user?.uid);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!currentUser) return;
-      const ref = doc(db, "users", currentUser.uid);
-      const snapshot = await getDoc(ref);
-      if (snapshot.exists()) {
-        setUserData(snapshot.data() as UserData);
-      }
-      setLoading(false);
-    };
+  const [localPrefs, setLocalPrefs] = useState(() => preferences);
+  const [localLoc, setLocalLoc] = useState(() => location);
+  const [hasMounted, setHasMounted] = useState(false);
 
-    fetchUserData();
-  }, [currentUser]);
+  useEffect(() => setHasMounted(true), []);
+  useEffect(() => setLocalPrefs(preferences), [preferences]);
+  useEffect(() => setLocalLoc(location), [location]);
 
-  const handleChange = (field: keyof UserData, value: string) => {
-    setUserData((prev) => ({ ...prev, [field]: value }));
+  const handleFieldChange = (field: string, value: string) => {
+    if (user) update({ [field]: value });
   };
 
   const handleResetPassword = async () => {
-    if (currentUser?.email) {
-      try {
-        await sendPasswordResetEmail(auth, currentUser.email);
-        alert("A password reset email has been sent to your inbox.");
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          alert(`Failed to send reset email: ${err.message}`);
-        } else {
-          alert("An unknown error occurred.");
-        }
-      }
-    } else {
-      alert("No email found for current user.");
+    if (!user?.email) return;
+    try {
+      await sendPasswordResetEmail(auth, user.email);
+      alert('A password reset email has been sent.');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Unknown error');
     }
   };
 
+  const handleSaveAll = async () => {
+    if (!user?.uid) return;
 
-  if (loading) return <div className="p-6">Loading...</div>;
+    await updatePreferences({
+      language: localPrefs.language,
+      region: localPrefs.region,
+      currency: localPrefs.currency,
+    });
+
+    if (localLoc?.lat !== undefined && localLoc?.lng !== undefined) {
+      await updateLocation({
+        lat: localLoc.lat,
+        lng: localLoc.lng,
+        address: localLoc.address || '',
+        updatedAt: Timestamp.now(),
+      });
+    }
+
+    alert('Your profile has been updated.');
+  };
+
+  if (!hasMounted || loading || !user) return <div className="p-6">Loading...</div>;
 
   return (
     <>
       <Header />
       <UserTopMenu />
-      <div className="max-w-4xl mx-auto p-6">
+      <main className="max-w-4xl mx-auto p-6">
         <h2 className="text-2xl font-semibold mb-6 border-b-2 border-[#00d289] pb-2">Account Info</h2>
 
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 border border-gray-300 p-6 rounded shadow-lg bg-white">
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-6 rounded shadow-lg bg-white">
+          {/* Personal Info */}
           <div>
-            <Label htmlFor="firstName">First name</Label>
-            <Input
-              id="firstName"
-              value={userData.firstName || ""}
-              onChange={(e) => handleChange("firstName", e.target.value)}
-              className="border border-gray-300 rounded p-2"
-            />
+            <Label>First Name</Label>
+            <Input value={user.firstName || ''} onChange={(e) => handleFieldChange('firstName', e.target.value)} />
           </div>
 
           <div>
-            <Label htmlFor="lastName">Last name</Label>
-            <Input
-              id="lastName"
-              value={userData.lastName || ""}
-              onChange={(e) => handleChange("lastName", e.target.value)}
-              className="border border-gray-300 rounded p-2"
+            <Label>Last Name</Label>
+            <Input value={user.lastName || ''} onChange={(e) => handleFieldChange('lastName', e.target.value)} />
+          </div>
+
+          <div className="md:col-span-2">
+            <Label>Full Name</Label>
+            <Input value={user.name || ''} onChange={(e) => handleFieldChange('name', e.target.value)} />
+          </div>
+
+          <div>
+            <Label>Gender</Label>
+            <SimpleSelect
+              value={user.gender || ''}
+              onChange={(val) => handleFieldChange('gender', val)}
+              options={[
+                { label: 'Male', value: 'male' },
+                { label: 'Female', value: 'female' },
+                { label: 'Other', value: 'other' },
+              ]}
+              placeholder="Select gender"
             />
           </div>
 
-          <div className="md:col-span-2">
-            <Label htmlFor="homeAirport">Home airport</Label>
+          <div>
+            <Label>Date of Birth</Label>
             <Input
-              id="homeAirport"
-              value={userData.homeAirport || ""}
-              onChange={(e) => handleChange("homeAirport", e.target.value)}
-              className="border border-gray-300 rounded p-2"
+              type="date"
+              value={user.dateOfBirth || ''}
+              onChange={(e) => handleFieldChange('dateOfBirth', e.target.value)}
             />
           </div>
 
-          <div className="md:col-span-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" value={userData.email || ""} readOnly className="border border-gray-300 rounded p-2" />
-            <p className="text-sm text-gray-500 mt-1">* primary email</p>
+          <div>
+            <Label>ID Number</Label>
+            <Input value={user.idNumber || ''} onChange={(e) => handleFieldChange('idNumber', e.target.value)} />
           </div>
 
-          {/* 🔐 Password Section */}
+          <div>
+            <Label>Phone</Label>
+            <Input value={user.phone || ''} onChange={(e) => handleFieldChange('phone', e.target.value)} />
+          </div>
+
           <div className="md:col-span-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="********" disabled className="border border-gray-300 rounded p-2" />
+            <Label>Email</Label>
+            <Input value={user.email || ''} readOnly />
+            <p className="text-sm text-gray-500 mt-1">* This email is your login email.</p>
+          </div>
+
+          <div className="md:col-span-2">
+            <Label>Password</Label>
+            <Input type="password" value="********" disabled />
             <button
               type="button"
               onClick={handleResetPassword}
@@ -129,91 +142,132 @@ export default function AccountPage() {
             </button>
           </div>
 
-          <div className="md:col-span-2">
-            <Label htmlFor="address">Street address</Label>
-            <Input
-              id="address"
-              value={userData.address || ""}
-              onChange={(e) => handleChange("address", e.target.value)}
-              className="border border-gray-300 rounded p-2"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <Label htmlFor="address2">Street address (continued)</Label>
-            <Input
-              id="address2"
-              value={userData.address2 || ""}
-              onChange={(e) => handleChange("address2", e.target.value)}
-              className="border border-gray-300 rounded p-2"
-            />
-          </div>
-
+          {/* Preferences */}
           <div>
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              value={userData.city || ""}
-              onChange={(e) => handleChange("city", e.target.value)}
-              className="border border-gray-300 rounded p-2"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="state">State/Province/Region</Label>
+            <Label>Language</Label>
             <SimpleSelect
-              value={userData.state || ""}
-              onChange={(val) => handleChange("state", val)}
+              value={localPrefs.language}
+              onChange={(val) => setLocalPrefs((prev) => ({ ...prev, language: val }))}
               options={[
-                { label: "Da Nang", value: "danang" },
-                { label: "Ha Noi", value: "hanoi" },
-                { label: "Ho Chi Minh", value: "hochiminh" },
+                { label: 'English', value: 'en' },
+                { label: 'Vietnamese', value: 'vi' },
+                { label: 'Korean', value: 'ko' },
               ]}
-              placeholder="Select region"
             />
           </div>
 
           <div>
-            <Label htmlFor="zip">ZIP code</Label>
-            <Input
-              id="zip"
-              value={userData.zip || ""}
-              onChange={(e) => handleChange("zip", e.target.value)}
-              className="border border-gray-300 rounded p-2"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="country">Country</Label>
+            <Label>Region</Label>
             <SimpleSelect
-              value={userData.country || ""}
-              onChange={(val) => handleChange("country", val)}
+              value={localPrefs.region}
+              onChange={(val) => setLocalPrefs((prev) => ({ ...prev, region: val }))}
               options={[
-                { label: "Vietnam", value: "vn" },
-                { label: "United States", value: "us" },
-                { label: "Korea", value: "kr" },
+                { label: 'Vietnam', value: 'VN' },
+                { label: 'South Korea', value: 'KR' },
+                { label: 'United States', value: 'US' },
               ]}
-              placeholder="Select country"
             />
           </div>
 
           <div>
-            <Label htmlFor="phone">Phone number</Label>
-            <Input
-              id="phone"
-              value={userData.phone || ""}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              className="border border-gray-300 rounded p-2"
+            <Label>Currency</Label>
+            <SimpleSelect
+              value={localPrefs.currency || ''}
+              onChange={(val) => setLocalPrefs((prev) => ({ ...prev, currency: val }))}
+              options={[
+                { label: 'VND', value: 'VND' },
+                { label: 'USD', value: 'USD' },
+                { label: 'KRW', value: 'KRW' },
+              ]}
             />
-            <p className="text-sm text-gray-500 mt-1">Please enter numbers only</p>
           </div>
 
+          {/* Static Address */}
+          <div className="md:col-span-2">
+            <Label>Address</Label>
+            <Input value={user.address || ''} onChange={(e) => handleFieldChange('address', e.target.value)} />
+          </div>
+
+          <div>
+            <Label>City</Label>
+            <Input value={user.city || ''} onChange={(e) => handleFieldChange('city', e.target.value)} />
+          </div>
+
+          <div>
+            <Label>State</Label>
+            <Input value={user.state || ''} onChange={(e) => handleFieldChange('state', e.target.value)} />
+          </div>
+
+          <div>
+            <Label>ZIP</Label>
+            <Input value={user.zip || ''} onChange={(e) => handleFieldChange('zip', e.target.value)} />
+          </div>
+
+          <div>
+            <Label>Country</Label>
+            <Input value={user.country || ''} onChange={(e) => handleFieldChange('country', e.target.value)} />
+          </div>
+
+          {/* Last Known Location */}
+          <div className="md:col-span-2">
+            <Label>Last Known Address</Label>
+            <Input
+              value={localLoc?.address || ''}
+              onChange={(e) =>
+                setLocalLoc((prev) => ({
+                  address: e.target.value,
+                  lat: prev?.lat ?? 0,
+                  lng: prev?.lng ?? 0,
+                  updatedAt: prev?.updatedAt ?? Timestamp.fromDate(new Date(0)),
+                }))
+              }
+              placeholder="e.g. 123 Main St, Hanoi"
+            />
+          </div>
+
+          <div>
+            <Label>Latitude</Label>
+            <Input
+              value={localLoc?.lat?.toString() || ''}
+              onChange={(e) =>
+                setLocalLoc((prev) => ({
+                  address: prev?.address ?? '',
+                  lat: parseFloat(e.target.value) || 0,
+                  lng: prev?.lng ?? 0,
+                  updatedAt: prev?.updatedAt ?? Timestamp.fromDate(new Date(0)),
+                }))
+              }
+              placeholder="Latitude"
+            />
+          </div>
+
+          <div>
+            <Label>Longitude</Label>
+            <Input
+              value={localLoc?.lng?.toString() || ''}
+              onChange={(e) =>
+                setLocalLoc((prev) => ({
+                  address: prev?.address ?? '',
+                  lat: prev?.lat ?? 0,
+                  lng: parseFloat(e.target.value) || 0,
+                  updatedAt: prev?.updatedAt ?? Timestamp.fromDate(new Date(0)),
+                }))
+              }
+              placeholder="Longitude"
+            />
+          </div>
+
+          {/* Actions */}
           <div className="md:col-span-2 flex gap-4 mt-6">
-            <Button type="submit" className="border border-gray-300 rounded p-2">Save</Button>
-            <Button variant="ghost" type="button" className="border border-gray-300 rounded p-2">Cancel</Button>
+            <Button type="button" onClick={handleSaveAll}>
+              Save
+            </Button>
+            <Button type="button" variant="ghost">
+              Cancel
+            </Button>
           </div>
         </form>
-      </div>
+      </main>
       <Footer />
     </>
   );
