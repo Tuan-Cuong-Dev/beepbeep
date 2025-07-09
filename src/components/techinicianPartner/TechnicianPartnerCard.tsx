@@ -8,13 +8,12 @@ import { PhoneCall, Star, MapPin } from 'lucide-react';
 interface Props {
   partner: TechnicianPartner;
   onContact?: () => void;
-  userLocation?: [number, number]; // ⬅️ Vị trí người dùng [lat, lng]
+  userLocation?: [number, number];
 }
 
-// 🎯 Tính khoảng cách giữa hai tọa độ
 function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const toRad = (x: number) => (x * Math.PI) / 180;
-  const R = 6371; // Bán kính trái đất (km)
+  const R = 6371;
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
@@ -25,79 +24,69 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 export default function TechnicianPartnerCard({ partner, onContact, userLocation }: Props) {
-  const services = partner.serviceCategories ?? [];
-  const fullAddress = partner.shopAddress || 'N/A';
   const avatar = partner.avatarUrl || '/assets/images/technician.png';
   const roleLabel = partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician';
+  const fullAddress = partner.shopAddress || 'N/A';
 
-  // ✅ Tính khoảng cách nếu có vị trí người dùng và coordinates
-  let distanceText = '';
-  if (partner.coordinates && userLocation) {
-    const dist = haversineDistance(
-      userLocation[0],
-      userLocation[1],
-      partner.coordinates.lat,
-      partner.coordinates.lng
-    );
-    distanceText = `📍 ${Math.round(dist * 10) / 10} km away`;
-  }
+  const distanceText =
+    partner.coordinates && userLocation
+      ? `📍 ${Math.round(
+          haversineDistance(
+            userLocation[0],
+            userLocation[1],
+            partner.coordinates.lat,
+            partner.coordinates.lng
+          ) * 10
+        ) / 10} km`
+      : '';
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-5 flex flex-col items-center text-center h-full hover:shadow-xl transition-all">
-      {/* Avatar */}
-      <div className="w-20 h-20 rounded-full overflow-hidden border border-gray-300">
-        <Image
-          src={avatar}
-          alt={partner.name}
-          width={80}
-          height={80}
-          className="object-cover w-full h-full rounded-full"
-        />
+    <div className="bg-white rounded-2xl shadow-md p-5 flex flex-col h-full hover:shadow-xl transition-all">
+      {/* ✅ Hàng trên: Avatar 1/3 + Tên + Role 2/3 */}
+      <div className="flex items-start gap-3 mb-2 w-full">
+        {/* Avatar */}
+        <div className="w-1/3 flex justify-start">
+          <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-300">
+            <Image
+              src={avatar}
+              alt={partner.name}
+              width={64}
+              height={64}
+              className="object-cover w-full h-full rounded-full"
+            />
+          </div>
+        </div>
+
+        {/* Tên + loại */}
+        <div className="w-2/3">
+          <h3 className="text-base font-semibold text-gray-800 leading-tight">
+            {partner.name}
+          </h3>
+          <p className="text-sm text-gray-600 leading-tight">{roleLabel}</p>
+        </div>
       </div>
 
-      {/* Name & Role */}
-      <h3 className="text-lg font-semibold mt-3 text-gray-800">{partner.name}</h3>
-      <p className="text-sm text-gray-600 capitalize">{roleLabel}</p>
-
-      {/* Regions */}
-      <p className="text-sm text-green-700 mt-1">
-        {partner.assignedRegions?.join(', ') || 'N/A'}
-      </p>
-
-      {/* Address & Distance */}
-      <div className="text-xs text-gray-500 mt-2 text-center">
-        <div className="flex justify-center items-center gap-1">
-          <MapPin className="w-4 h-4" />
-          <span className="font-medium">{distanceText}</span>
-        </div>
-        <p className="mt-1 leading-snug whitespace-pre-line break-words">
-          {fullAddress}
-        </p>
+      {/* Địa chỉ */}
+      <div className="text-sm text-gray-600 mt-1 flex items-start gap-1 w-full">
+        <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+        <span>{fullAddress}</span>
       </div>
 
-
-      {/* Services */}
-      {services.length > 0 && (
-        <div className="text-xs text-gray-600 mt-3 w-full">
-          <p className="font-medium text-gray-700 mb-1">Services:</p>
-          <ul className="list-disc list-inside text-left">
-            {services.slice(0, 3).map((cat, i) => (
-              <li key={i}>{cat}</li>
-            ))}
-          </ul>
-        </div>
+      {/* Khoảng cách nếu có */}
+      {distanceText && (
+        <p className="text-xs text-green-700 mt-1">{distanceText}</p>
       )}
 
       {/* Rating */}
-      <p className="text-sm text-yellow-600 mt-2">
+      <p className="text-sm text-yellow-600 mt-2 w-full">
         <Star className="inline-block w-4 h-4 mr-1" />
         {partner.averageRating?.toFixed(1) || 'N/A'} ({partner.ratingCount || 0})
       </p>
 
-      {/* 📞 Contact */}
-      <div className="mt-auto w-full pt-4 flex justify-center">
+      {/* Nút gọi */}
+      <div className="mt-auto w-full pt-3">
         {partner.phone ? (
-          <a href={`tel:${partner.phone}`} className="w-full">
+          <a href={`tel:${partner.phone}`} className="w-full block">
             <Button
               size="sm"
               variant="greenOutline"

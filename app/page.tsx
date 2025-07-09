@@ -26,7 +26,6 @@ const Home: React.FC = () => {
       <ServicePricingSection/>
       <EbikeModels />
       <BatteryStationCounter />
-      <ServiceSection />
       <WhyChooseUs />
       <FAQ />
         <Footer />

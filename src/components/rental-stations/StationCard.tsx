@@ -10,22 +10,16 @@ interface Props {
   userLocation?: [number, number];
 }
 
-function haversineDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
+function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const toRad = (x: number) => (x * Math.PI) / 180;
   const R = 6371;
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
 
 export default function StationCard({ station, userLocation }: Props) {
@@ -43,36 +37,42 @@ export default function StationCard({ station, userLocation }: Props) {
       : '';
 
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 overflow-hidden flex flex-col">
-      {/* Image */}
-      <div className="relative w-full h-36 bg-gray-50">
-        <Image
-          src="/assets/images/stationmarker.png"
-          alt="Station"
-          fill
-          className="object-contain p-6"
-        />
-      </div>
+    <div className="bg-white rounded-2xl shadow-md p-4 flex flex-col h-full hover:shadow-xl transition-all">
+      {/* Top: Icon + Name + Status */}
+      <div className="flex items-start gap-3 mb-3">
+        {/* Icon */}
+        <div className="w-1/3 flex justify-start pt-1">
+          <div className="w-14 h-14 relative">
+            <Image
+              src="/assets/images/stationmarker.png"
+              alt="Station Icon"
+              width={56}
+              height={56}
+              className="object-contain"
+            />
+          </div>
+        </div>
 
-      {/* Info */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-        {/* Title & Status */}
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold text-gray-900 truncate">{name}</h3>
-          <Badge className={`text-xs rounded-full px-2 py-0.5 ${statusColor}`}>
+        {/* Name + Status */}
+        <div className="w-2/3">
+          <h3 className="text-base font-semibold text-gray-900 leading-tight">{name}</h3>
+          <Badge className={`text-xs rounded-full mt-1 px-2 py-0.5 ${statusColor}`}>
             {status}
           </Badge>
         </div>
+      </div>
 
+      {/* Info content */}
+      <div className="flex flex-col h-full">
         {/* Address */}
-        <div className="flex items-start text-sm text-gray-600 gap-2">
+        <div className="flex items-start text-sm text-gray-600 gap-2 w-full">
           <MapPin className="w-4 h-4 mt-0.5 text-gray-400" />
           <span className="leading-tight">{displayAddress}</span>
         </div>
 
         {/* Phone */}
         {contactPhone && (
-          <div className="flex items-center text-sm text-gray-600 gap-2">
+          <div className="flex items-center text-sm text-gray-600 gap-2 mt-1">
             <Phone className="w-4 h-4 text-gray-400" />
             <span>{contactPhone}</span>
           </div>
@@ -80,19 +80,21 @@ export default function StationCard({ station, userLocation }: Props) {
 
         {/* Distance */}
         {distanceText && (
-          <p className="text-xs text-gray-500">📍 {distanceText}</p>
+          <p className="text-xs text-gray-500 mt-1">📍 {distanceText}</p>
         )}
 
-        {/* Google Map */}
+        {/* Map link luôn nằm cuối cùng */}
         {mapAddress && (
-          <a
-            href={mapAddress}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-[#00d289] font-medium inline-flex items-center gap-1 hover:underline"
-          >
-            View on map <ArrowUpRight className="w-4 h-4" />
-          </a>
+          <div className="mt-auto pt-3">
+            <a
+              href={mapAddress}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-[#00d289] font-medium inline-flex items-center gap-1 hover:underline"
+            >
+              View on map <ArrowUpRight className="w-4 h-4" />
+            </a>
+          </div>
         )}
       </div>
     </div>
