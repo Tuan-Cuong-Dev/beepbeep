@@ -2,7 +2,7 @@
 
 import React from 'react';
 // Giả sử bạn đặt TabType vào file này
-export type TabType = 'profile' | 'vehicles' | 'insurance' | 'issues';
+export type TabType = 'activityFeed' | 'vehicles' | 'insurance' | 'issues';
 
 interface ProfileTabsProps {
   activeTab: TabType;
@@ -10,7 +10,7 @@ interface ProfileTabsProps {
 }
 
 const tabs: { key: TabType; label: string }[] = [
-  { key: 'profile', label: 'My Profile' },
+  { key: 'activityFeed', label: 'Activity feed' },
   { key: 'vehicles', label: 'My Vehicles' },
   { key: 'insurance', label: 'My Insurance Packages' },
   { key: 'issues', label: 'My Reported Issues' },
