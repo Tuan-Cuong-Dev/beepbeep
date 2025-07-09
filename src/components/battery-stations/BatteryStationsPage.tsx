@@ -1,12 +1,11 @@
-// 📁 components/battery-stations/BatteryStationsClientPage.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { BatteryStation } from '@/src/lib/batteryStations/batteryStationTypes';
-import BatteryStationMap from '@/src/components/battery-stations/BatteryStationMap';
-import BatteryStationCard from '@/src/components/battery-stations/BatteryStationCard';
+import BatteryStationMap from './BatteryStationMap';
+import BatteryStationCard from './BatteryStationCard';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 
@@ -42,9 +41,8 @@ export default function BatteryStationsClientPage() {
   return (
     <>
       <Header />
-
       <main className="min-h-screen bg-gray-50 pb-10">
-        <div className="max-w-6xl mx-auto px-4 pt-8">
+        <div className="max-w-7xl mx-auto px-4 pt-8">
           <div className="flex justify-center items-center gap-2 mb-6">
             <img
               src="/assets/images/batterystation_new.png"
@@ -63,7 +61,6 @@ export default function BatteryStationsClientPage() {
           ) : (
             <>
               <BatteryStationMap stations={stations} />
-
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
                 {stations.map((station) => (
                   <BatteryStationCard
@@ -77,7 +74,6 @@ export default function BatteryStationsClientPage() {
           )}
         </div>
       </main>
-
       <Footer />
     </>
   );
