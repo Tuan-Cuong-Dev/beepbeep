@@ -44,9 +44,12 @@ export default function EbikeTable({
     'Sold',
   ];
 
-  const sortedEbikes = [...ebikes].sort(
-    (a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
-  );
+  const sortedEbikes = [...ebikes].sort((a, b) => {
+    const dateA = a.createdAt?.toDate?.() || new Date(0);
+    const dateB = b.createdAt?.toDate?.() || new Date(0);
+    return dateB.getTime() - dateA.getTime(); // Mới nhất lên đầu
+  });
+
 
   useEffect(() => {
     const modelMap: Record<string, string> = {};
