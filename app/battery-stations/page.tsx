@@ -1,8 +1,13 @@
-// app/battery-stations/page.tsx
-'use client';
+// 📁 app/battery-stations/page.tsx
 
-import BatteryStationsPage from './BatteryStationsPage';
+import dynamic from 'next/dynamic';
 
-export default function ExplorePage() {
-  return <BatteryStationsPage />;
+// ⚠️ Quan trọng: import dynamic với ssr: false
+const BatteryStationsClientPage = dynamic(
+  () => import('./BatteryStationsPage'),
+  { ssr: false }
+);
+
+export default function BatteryStationsPage() {
+  return <BatteryStationsClientPage />;
 }
