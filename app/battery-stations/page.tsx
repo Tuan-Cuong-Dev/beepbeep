@@ -1,8 +1,8 @@
 // app/map/page.tsx
 'use client';
 
-import MyMapView from '@/src/components/map/MyMapView';
+import BatteryStations from '@/src/components/battery-stations/BatteryStationsClientPage';
 
 export default function ExplorePage() {
-  return <MyMapView />;
+  return <BatteryStations />;
 }
