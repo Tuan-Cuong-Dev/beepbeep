@@ -1,5 +1,5 @@
-import BatteryStationsPageWrapper from '@/src/components/battery-stations/BatteryStationsPage';
+import BatteryStationsClientWrapper from './BatteryStationsClientWrapper';
 
 export default function Page() {
-  return <BatteryStationsPageWrapper />;
+  return <BatteryStationsClientWrapper />;
 }
