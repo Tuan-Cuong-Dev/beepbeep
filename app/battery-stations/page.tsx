@@ -1,11 +1,8 @@
 // app/battery-stations/page.tsx
-import { Suspense } from 'react';
-import BatteryStationManagementPage from './BatteryStationManagementPage';
+'use client';
 
-export default function Page() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <BatteryStationManagementPage />
-    </Suspense>
-  );
+import BatteryStationsPage from './BatteryStationsPage';
+
+export default function ExplorePage() {
+  return <BatteryStationsPage />;
 }

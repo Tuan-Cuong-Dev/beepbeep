@@ -1,5 +1,4 @@
 // 📁 pages/admin/battery-stations/BatteryStationManagementPage.tsx
-// 📁 pages/admin/battery-stations/BatteryStationManagementPage.tsx
 'use client';
 
 import { useState } from 'react';

@@ -76,7 +76,7 @@ export default function AdminDashboard() {
       icon: <FaBatteryFull className="w-6 h-6 text-[#00d289]" />,
       title: 'Battery Stations',
       description: 'Manage battery swapping station locations',
-      route: '/battery-stations',
+      route: '/admin/battery-stations',
     },
     {
       icon: <FaToolbox className="w-6 h-6 text-[#00d289]" />,
