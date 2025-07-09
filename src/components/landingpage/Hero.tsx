@@ -37,7 +37,7 @@ export default function Hero() {
   if (loading) return <div className="text-center py-10">Loading...</div>;
 
   return (
-    <section className="relative min-h-[60vh] md:min-h-[80vh] lg:min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative  min-h-[60vh] md:min-h-[80vh] lg:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat brightness-75"
