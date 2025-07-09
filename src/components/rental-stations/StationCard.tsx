@@ -46,8 +46,8 @@ export default function StationCard({ station, userLocation }: Props) {
             <Image
               src="/assets/images/stationmarker.png"
               alt="Station Icon"
-              width={56}
-              height={56}
+              width={38}
+              height={40}
               className="object-contain"
             />
           </div>
