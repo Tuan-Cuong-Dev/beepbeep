@@ -21,12 +21,12 @@ const Home: React.FC = () => {
       </Head>
       <Header />
       <Hero />
-      <ServiceSection />
       <StationSection/>
-      <EbikeModels />
       <TechnicianPartnerSection />
       <ServicePricingSection/>
+      <EbikeModels />
       <BatteryStationCounter />
+      <ServiceSection />
       <WhyChooseUs />
       <FAQ />
         <Footer />
