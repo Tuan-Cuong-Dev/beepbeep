@@ -10,6 +10,7 @@ import FAQ  from "@/src/components/landingpage/FAQ";
 import TechnicianPartnerSection from '../src/components/landingpage/TechnicianPartnerSection';
 import ServicePricingSection from "@/src/components/landingpage/ServicePricingSection";
 import StationSection from "@/src/components/landingpage/StationSection";
+import BatteryStationCounter from '@/src/components/battery-stations/BatteryStationCounter';
 
 const Home: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const Home: React.FC = () => {
       <EbikeModels />
       <TechnicianPartnerSection />
       <ServicePricingSection/>
+      <BatteryStationCounter />
       <WhyChooseUs />
       <FAQ />
         <Footer />
