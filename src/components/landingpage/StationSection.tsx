@@ -62,7 +62,7 @@ export default function StationSection() {
         <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
           {loading
             ? '⏳ Loading stations...'
-            : `A total of ${stations.length} stations are ready to serve you!`}
+            : `${stations.length} stations are ready to serve you!`}
         </h2>
 
         {loading ? (
