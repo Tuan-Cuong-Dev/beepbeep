@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { VehicleModel } from '@/src/lib/vehicleModels/vehicleModelTypes_new';
+import { VEHICLE_SUBTYPE_LABELS } from '@/src/lib/vehicleModels/vehicleModelTypes_new';
 import {
   VEHICLE_TYPE_LABELS,
   FUEL_TYPE_LABELS,
@@ -71,6 +72,7 @@ export default function VehicleModelTable({
               <th className="px-3 py-2 border">Image</th>
               <th className="px-3 py-2 border">Name</th>
               <th className="px-3 py-2 border">Type</th>
+              <th className="px-3 py-2 border">Sub Type</th>
               <th className="px-3 py-2 border">Fuel</th>
               <th className="px-3 py-2 border">Battery</th>
               <th className="px-3 py-2 border">Motor</th>
@@ -108,6 +110,9 @@ export default function VehicleModelTable({
                 </td>
                 <td className="border px-2 py-1">
                   {VEHICLE_TYPE_LABELS[model.vehicleType]}
+                </td>
+                <td className="border px-2 py-1">
+                  {model.vehicleSubType ? VEHICLE_SUBTYPE_LABELS[model.vehicleSubType] || model.vehicleSubType : '-'}
                 </td>
                 <td className="border px-2 py-1">
                   {model.fuelType ? FUEL_TYPE_LABELS[model.fuelType] : '-'}
