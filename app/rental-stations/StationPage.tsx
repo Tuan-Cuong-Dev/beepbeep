@@ -2,12 +2,10 @@
 
 import dynamic from 'next/dynamic';
 import { useStations } from '@/src/hooks/useStations';
-import { useUser } from '@/src/context/AuthContext';
 import { useState, useMemo } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Input } from '@/src/components/ui/input';
-import StationCard from '@/src/components/rental-stations/StationCard';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 
 const StationMap = dynamic(() => import('@/src/components/rental-stations/StationMap'), {
@@ -33,41 +31,26 @@ function parseCoords(location: string): [number, number] {
 }
 
 export default function StationPage() {
-  const { user } = useUser();
   const { stations, loading } = useStations();
   const { location: userLocation } = useCurrentLocation();
-
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
 
-  const sortedStations = useMemo(() => {
-    const filtered = stations.filter((station) => {
+  const filteredStations = useMemo(() => {
+    return stations.filter((station) => {
       const matchSearch =
         station.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         station.displayAddress.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchStatus = statusFilter ? station.status === statusFilter : true;
-      return matchSearch && matchStatus;
+      return matchSearch;
     });
-
-    if (!userLocation || !Array.isArray(userLocation)) return filtered;
-
-    const [userLat, userLng] = userLocation;
-
-    return [...filtered].sort((a, b) => {
-      const [latA, lngA] = parseCoords(a.location);
-      const [latB, lngB] = parseCoords(b.location);
-      const distA = getDistanceFromLatLng(userLat, userLng, latA, lngA);
-      const distB = getDistanceFromLatLng(userLat, userLng, latB, lngB);
-      return distA - distB;
-    });
-  }, [stations, searchTerm, statusFilter, userLocation]);
+  }, [stations, searchTerm]);
 
   return (
     <div className="bg-gray-100 min-h-screen font-sans">
+      <Header />
+
       {/* Bộ lọc nổi trên bản đồ */}
-      <div className="relative h-[80vh] mb-12">
-        <div className="absolute px-6 top-4 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[90%] md:w-1/3">
+      <div className="relative h-[85vh]">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[90%] md:w-1/3">
           <Input
             placeholder="🔍 Search by name or address..."
             value={searchTerm}
@@ -75,21 +58,9 @@ export default function StationPage() {
             className="shadow-lg"
           />
         </div>
-        <StationMap stations={sortedStations} />
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4">
-        {loading ? (
-          <p className="text-center text-gray-500 text-lg mt-10">⏳ Loading stations...</p>
-        ) : sortedStations.length === 0 ? (
-          <p className="text-center text-gray-500 text-lg mt-10">No matching stations found.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-            {sortedStations.map((station) => (
-              <StationCard key={station.id} station={station} userLocation={userLocation} />
-            ))}
-          </div>
-        )}
+        {/* Bản đồ hiển thị toàn màn hình */}
+        <StationMap stations={filteredStations} userLocation={userLocation} />
       </div>
 
       <Footer />
