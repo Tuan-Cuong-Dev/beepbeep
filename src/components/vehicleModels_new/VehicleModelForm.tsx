@@ -120,6 +120,7 @@ export default function VehicleModelForm({
               handleChange('vehicleSubType', ''); // Reset subtype khi đổi loại
             }}
           />
+
           <SimpleSelect
             options={filteredSubTypeOptions}
             placeholder="Select Sub Type"
@@ -127,6 +128,7 @@ export default function VehicleModelForm({
             onChange={(val) => handleChange('vehicleSubType', val)}
             disabled={!newModel.vehicleType}
           />
+          
           <Input placeholder="Brand (e.g. VinFast)" value={newModel.brand || ''} onChange={(e) => handleChange('brand', e.target.value)} />
           <Input placeholder="Model Code" value={newModel.modelCode || ''} onChange={(e) => handleChange('modelCode', e.target.value)} />
           <Input placeholder="Battery Capacity (e.g. 72V22Ah)" value={newModel.batteryCapacity || ''} onChange={(e) => handleChange('batteryCapacity', e.target.value)} />

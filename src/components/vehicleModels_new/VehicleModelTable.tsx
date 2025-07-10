@@ -60,6 +60,15 @@ export default function VehicleModelTable({
     });
   };
 
+  // 🔧 Convert Google Drive link to direct image URL
+  const getDirectImageUrl = (url?: string): string | undefined => {
+    if (!url) return undefined;
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+    const id = match?.[1];
+    return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
+  };
+
+
   return (
     <div className="bg-white p-4 sm:p-6 rounded-xl shadow mt-6">
       <h2 className="text-xl font-bold mb-4">Vehicle Models</h2>
@@ -96,7 +105,7 @@ export default function VehicleModelTable({
                 <td className="border px-2 py-1">
                   {model.imageUrl ? (
                     <Image
-                      src={model.imageUrl}
+                      src={getDirectImageUrl(model.imageUrl) as string} // ✅ ép kiểu an toàn
                       alt={model.name}
                       width={60}
                       height={40}
@@ -106,6 +115,8 @@ export default function VehicleModelTable({
                     <span className="text-gray-400 italic">No image</span>
                   )}
                 </td>
+
+
                 <td className="border px-2 py-1 max-w-[160px] truncate">
                   {model.name}
                 </td>
