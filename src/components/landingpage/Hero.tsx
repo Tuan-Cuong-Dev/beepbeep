@@ -19,7 +19,6 @@ export default function Hero() {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           const data = userDoc.exists() ? userDoc.data() : {};
           const fetchedRole = data?.role || 'Customer';
-          console.log('✅ Role from Firestore:', fetchedRole);
           setRole(fetchedRole);
         } catch (err) {
           console.error('❌ Error fetching user role:', err);
@@ -37,26 +36,30 @@ export default function Hero() {
   if (loading) return <div className="text-center py-10">Loading...</div>;
 
   return (
-    <section className="relative  min-h-[60vh] md:min-h-[80vh] lg:min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
+    <section className="relative min-h-[60vh] md:min-h-[80vh] lg:min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background image - rõ nét, không blur */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat brightness-75"
-        style={{ backgroundImage: "url('/assets/images/Cover2.jpg')" }}
+        className="absolute inset-0 bg-center bg-cover"
+        style={{
+          backgroundImage: "url('/assets/images/Cover2.jpg')",
+          backgroundPosition: 'center top',
+        }}
       />
-      <div className="absolute inset-0 bg-black opacity-40" />
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl px-4 pt-16 pb-12 flex flex-col items-center gap-10 text-center">
-        <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] text-white">
+      {/* Overlay nhẹ để tăng độ tương phản chữ */}
+      <div className="absolute inset-0 bg-black opacity-30 md:opacity-40" />
+
+      {/* Nội dung */}
+      <div className="relative z-10 w-full max-w-5xl px-4 sm:px-6 pt-20 pb-12 flex flex-col items-center gap-8 text-center">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md">
           <span className="block">Rent your ride</span>
-          <span className="block text-[#00d289]"> in a beep!</span>
+          <span className="block text-[#00d289]">in a beep!</span>
         </h1>
 
-        {/* Button điều hướng sang trang Explore */}
         <Button
           variant="greenOutline"
           onClick={() => router.push('/map')}
-          className="mt-2 text-lg px-6 py-3 rounded-sm shadow-lg"
+          className="text-base sm:text-lg px-6 py-3 rounded shadow-lg"
         >
           🛵 Explore Bíp Bíp
         </Button>
