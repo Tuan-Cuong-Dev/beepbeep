@@ -60,10 +60,19 @@ export default function StationSection() {
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto ">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
-          {loading
-            ? '⏳ Loading stations...'
-            : `${stations.length} stations are ready to serve you!`}
+          {loading ? (
+            '⏳ Loading stations...'
+          ) : (
+            <>
+            <span className="text-3xl font-extrabold">
+              {stations.length} stations
+            </span>
+            <br />
+            <span className="text-2xl text-gray-700">are ready to serve you!</span>
+          </>
+          )}
         </h2>
+
 
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading stations...</p>

@@ -52,10 +52,15 @@ export default function TechnicianPartnerSection() {
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">
-          Broke down? Call a technician!
-        </h2>
-
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
+        <span className="text-3xl font-extrabold">
+          Vehicle trouble?
+        </span>
+        <br />
+        <span className="text-2xl text-gray-700">
+          We’ll connect you to a technician!
+        </span>
+      </h2>
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading technician partners...</p>
         ) : (
