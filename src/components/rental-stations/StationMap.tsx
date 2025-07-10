@@ -21,6 +21,7 @@ const userIcon = new L.Icon({
   popupAnchor: [0, -28],
 });
 
+// Component zoom đến vị trí user
 function ZoomToUser({ userPosition }: { userPosition: [number, number] }) {
   const map = useMap();
 
@@ -40,6 +41,22 @@ interface Props {
 
 export default function StationMap({ stations, userLocation }: Props) {
   const [userPosition, setUserPosition] = useState<[number, number] | null>(userLocation || null);
+
+  // Inject custom CSS to adjust zoom button position
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .leaflet-top.leaflet-left {
+        top: 80px !important; /* Dưới ô tìm kiếm */
+        left: 12px !important;
+        z-index: 1001 !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   // Nếu không truyền vào từ props, tự lấy từ navigator
   useEffect(() => {

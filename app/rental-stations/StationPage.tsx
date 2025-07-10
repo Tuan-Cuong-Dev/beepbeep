@@ -47,22 +47,22 @@ export default function StationPage() {
   return (
     <div className="bg-gray-100 min-h-screen font-sans">
       <Header />
+      <main className="flex-1 p-4">
+        {/* Bộ lọc nổi trên bản đồ */}
+        <div className="relative h-[85vh]">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[90%] md:w-1/3">
+            <Input
+              placeholder="🔍 Search by name or address..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="shadow-lg"
+            />
+          </div>
 
-      {/* Bộ lọc nổi trên bản đồ */}
-      <div className="relative h-[85vh]">
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[90%] md:w-1/3">
-          <Input
-            placeholder="🔍 Search by name or address..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="shadow-lg"
-          />
+          {/* Bản đồ hiển thị toàn màn hình */}
+          <StationMap stations={filteredStations} userLocation={userLocation} />
         </div>
-
-        {/* Bản đồ hiển thị toàn màn hình */}
-        <StationMap stations={filteredStations} userLocation={userLocation} />
-      </div>
-
+        </main>
       <Footer />
     </div>
   );
