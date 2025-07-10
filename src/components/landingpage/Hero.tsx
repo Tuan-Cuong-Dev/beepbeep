@@ -36,34 +36,43 @@ export default function Hero() {
   if (loading) return <div className="text-center py-10">Loading...</div>;
 
   return (
-    <section className="relative min-h-[60vh] md:min-h-[80vh] lg:min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background image - rõ nét, không blur */}
-      <div
-        className="absolute inset-0 bg-center bg-cover"
-        style={{
-          backgroundImage: "url('/assets/images/Cover2.jpg')",
-          backgroundPosition: 'center top',
-        }}
-      />
+  <section className="relative min-h-[60vh] md:min-h-[80vh] lg:min-h-screen flex items-center justify-center overflow-hidden">
 
-      {/* Overlay nhẹ để tăng độ tương phản chữ */}
-      <div className="absolute inset-0 bg-black opacity-30 md:opacity-40" />
+    {/* Mobile image */}
+    <div
+      className="absolute inset-0 bg-center bg-cover block md:hidden"
+      style={{
+        backgroundImage: "url('/assets/images/Cover-mobile.jpg')",
+      }}
+    />
 
-      {/* Nội dung */}
-      <div className="relative z-10 w-full max-w-5xl px-4 sm:px-6 pt-20 pb-12 flex flex-col items-center gap-8 text-center">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md">
-          <span className="block">Rent your ride</span>
-          <span className="block text-[#00d289]">in a beep!</span>
-        </h1>
+    {/* Desktop image */}
+    <div
+      className="absolute inset-0 bg-center bg-cover hidden md:block"
+      style={{
+        backgroundImage: "url('/assets/images/Cover-desktop.jpg')",
+      }}
+    />
 
-        <Button
-          variant="greenOutline"
-          onClick={() => router.push('/map')}
-          className="text-base sm:text-lg px-6 py-3 rounded shadow-lg"
-        >
-          🛵 Explore Bíp Bíp
-        </Button>
-      </div>
-    </section>
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black opacity-30 md:opacity-40" />
+
+    {/* Nội dung */}
+    <div className="relative z-10 w-full max-w-5xl px-4 sm:px-6 pt-20 pb-12 flex flex-col items-center gap-8 text-center">
+      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md">
+        <span className="block">Rent your ride</span>
+        <span className="block text-[#00d289]">in a beep!</span>
+      </h1>
+
+      <Button
+        variant="greenOutline"
+        onClick={() => router.push('/map')}
+        className="text-base sm:text-lg px-6 py-3 rounded shadow-lg"
+      >
+        🛵 Explore Bíp Bíp
+      </Button>
+    </div>
+  </section>
+
   );
 }

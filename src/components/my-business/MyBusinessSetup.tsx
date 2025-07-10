@@ -76,7 +76,7 @@ export default function CreateBusinessPage() {
   return (
     <div
       className="flex flex-col min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: "url('/assets/images/Cover2.jpg')" }}
+      style={{ backgroundImage: "url('/assets/images/Cover_desktop.jpg')" }}
     >
       <Header />
 

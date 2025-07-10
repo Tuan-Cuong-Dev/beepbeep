@@ -28,7 +28,7 @@ export default function ProfileOverview() {
       {/* Cover Image */}
       <div className="relative w-full h-52 sm:h-64 md:h-72 lg:h-80">
         <Image
-          src={user.coverURL || '/assets/images/Cover2.jpg'}
+          src={user.coverURL || '/assets/images/Cover_desktop.jpg'}
           alt="Cover"
           fill
           className="object-cover"

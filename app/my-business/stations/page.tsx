@@ -83,7 +83,7 @@ export default function StationManagementPage() {
   return (
     <div
       className="min-h-screen flex flex-col bg-cover bg-center"
-      style={{ backgroundImage: "url('/assets/images/Cover2.jpg')" }}
+      style={{ backgroundImage: "url('/assets/images/Cover_desktop.jpg')" }}
     >
       <Header />
 
