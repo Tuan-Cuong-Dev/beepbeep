@@ -5,12 +5,11 @@ import { useRouter } from 'next/navigation';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
 import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
-import { Button } from '@/src/components/ui/button';
-import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // ✅ import hook
+import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 
 function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
-  const R = 6371; // Earth radius in km
+  const R = 6371;
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
   const a =
@@ -37,7 +36,6 @@ export default function TechnicianPartnerSection() {
 
   const sortedPartners = useMemo(() => {
     if (!userLocation || !Array.isArray(userLocation)) return partners;
-
     const [userLat, userLng] = userLocation;
 
     return [...partners].sort((a, b) => {
@@ -52,15 +50,16 @@ export default function TechnicianPartnerSection() {
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
-        <span className="text-3xl font-extrabold">
-          Vehicle trouble?
-        </span>
-        <br />
-        <span className="text-2xl text-gray-700">
-          We’ll connect you to a technician!
-        </span>
-      </h2>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
+          <span className="text-3xl font-extrabold">
+            Vehicle trouble?
+          </span>
+          <br />
+          <span className="text-2xl text-gray-700">
+            We’ll connect you to a technician!
+          </span>
+        </h2>
+
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading technician partners...</p>
         ) : (
@@ -79,18 +78,20 @@ export default function TechnicianPartnerSection() {
                     />
                   </div>
                 ))}
-              </div>
-            </div>
 
-            <div className="mt-4 text-center">
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => router.push('/technician-partners')}
-                className="text-white bg-[#00d289] hover:bg-[#00b47a] rounded-full px-6 py-2 text-sm shadow"
-              >
-                🔍 View All Technicians
-              </Button>
+                {/* ✅ Card cuối: View All */}
+                <div
+                  onClick={() => router.push('/technician-partners')}
+                  className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
+                >
+                  <div className="border rounded-xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
+                    <h3 className="text-lg font-semibold text-gray-800">View All</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      See all technicians near you
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </>
         )}

@@ -27,7 +27,6 @@ function getDistanceFromLatLng(
   return R * c;
 }
 
-// ✅ Cập nhật lại hàm parseCoords để hỗ trợ định dạng 16.123456° N, 108.123456° E
 const parseCoords = (location: string): [number, number] => {
   const match = location.match(/([-]?\d+(\.\d+)?)°\s*N?,?\s*([-]?\d+(\.\d+)?)°\s*E?/i);
   if (!match) return [0, 0];
@@ -42,37 +41,35 @@ export default function StationSection() {
 
   const sortedStations = useMemo(() => {
     if (!userLocation || !Array.isArray(userLocation)) return stations;
-
     const [userLat, userLng] = userLocation;
 
     return [...stations].sort((a, b) => {
       const [latA, lngA] = parseCoords(a.location);
       const [latB, lngB] = parseCoords(b.location);
-
       const distA = getDistanceFromLatLng(userLat, userLng, latA, lngA);
       const distB = getDistanceFromLatLng(userLat, userLng, latB, lngB);
-
       return distA - distB;
     });
   }, [stations, userLocation]);
 
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
-      <div className="max-w-7xl mx-auto ">
+      <div className="max-w-7xl mx-auto">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
           {loading ? (
             '⏳ Loading stations...'
           ) : (
             <>
-            <span className="text-3xl font-extrabold">
-              {stations.length} stations
-            </span>
-            <br />
-            <span className="text-2xl text-gray-700">are ready to serve you!</span>
-          </>
+              <span className="text-3xl font-extrabold">
+                {stations.length} stations
+              </span>
+              <br />
+              <span className="text-2xl text-gray-700">
+                are ready to serve you!
+              </span>
+            </>
           )}
         </h2>
-
 
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading stations...</p>
@@ -91,18 +88,18 @@ export default function StationSection() {
                     />
                   </div>
                 ))}
-              </div>
-            </div>
 
-            <div className="mt-4 text-center">
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => router.push('/rental-stations')}
-                className="text-white bg-[#00d289] hover:bg-[#00b47a] rounded-full px-6 py-2 text-sm shadow"
-              >
-                📍 View All Stations
-              </Button>
+                {/* ✅ Card cuối cùng: View All */}
+                <div
+                  onClick={() => router.push('/rental-stations')}
+                  className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
+                >
+                  <div className="border rounded-xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
+                    <h3 className="text-lg font-semibold text-gray-800">View All</h3>
+                    <p className="text-sm text-gray-500 mt-1">See all rental stations</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </>
         )}

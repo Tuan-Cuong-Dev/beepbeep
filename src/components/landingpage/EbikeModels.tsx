@@ -89,7 +89,6 @@ export default function EbikeModelsSection() {
                           <span className="text-gray-500">No Image</span>
                         </div>
                       )}
-
                     </div>
 
                     <div className="p-4">
@@ -118,18 +117,20 @@ export default function EbikeModelsSection() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
 
-            <div className="mt-4 text-center">
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => router.push('/vehicle-models')}
-                className="text-white bg-[#00d289] hover:bg-[#00b47a] rounded-full px-6 py-2 text-sm shadow"
-              >
-                🔍 View All Models
-              </Button>
+                {/* ✅ Card cuối cùng: View All Models */}
+                <div
+                  onClick={() => router.push('/vehicle-models')}
+                  className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
+                >
+                  <div className="border rounded-2xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
+                    <h3 className="text-lg font-semibold text-gray-800">View All</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      See all electric vehicles
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </>
         )}
