@@ -203,15 +203,15 @@ export default function VehicleModelTable({
           >
             <div className="flex gap-3 items-start">
               {model.imageUrl ? (
-                <Image
-                  src={model.imageUrl}
-                  alt={model.name}
-                  width={80}
-                  height={60}
-                  className="rounded object-cover"
-                />
-              ) : (
-                <div className="w-20 h-14 bg-gray-200 rounded" />
+                    <Image
+                      src={getDirectImageUrl(model.imageUrl) as string} // ✅ ép kiểu an toàn
+                      alt={model.name}
+                      width={60}
+                      height={40}
+                      className="rounded object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-400 italic">No image</span>
               )}
               <div className="flex-1">
                 <h3 className="font-semibold">{model.name}</h3>
@@ -224,6 +224,12 @@ export default function VehicleModelTable({
                     ? formatCurrency(model.pricePerDay)
                     : '—'}{' '}
                   / day
+                </p>
+                <p className="text-sm mt-1">
+                  {model.pricePerMonth
+                    ? formatCurrency(model.pricePerMonth)
+                    : '—'}{' '}
+                  / month
                 </p>
               </div>
             </div>
