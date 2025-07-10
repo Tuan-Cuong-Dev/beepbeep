@@ -1,3 +1,4 @@
+// 📁 lib/vehicleModels/vehicleModelTypes_new.ts
 import { Timestamp, FieldValue } from 'firebase/firestore';
 
 /**
@@ -15,6 +16,17 @@ export const VEHICLE_TYPE_LABELS: Record<VehicleType, string> = {
 };
 
 /**
+ * Loại nhiên liệu sử dụng cho phương tiện
+ */
+export type FuelType = 'electric' | 'gasoline' | 'hybrid';
+
+export const FUEL_TYPE_LABELS: Record<FuelType, string> = {
+  electric: 'Electric',
+  gasoline: 'Gasoline',
+  hybrid: 'Hybrid',
+};
+
+/**
  * Mô tả một mẫu phương tiện (vehicle model) thuộc về công ty cho thuê.
  */
 export interface VehicleModel {
@@ -24,13 +36,14 @@ export interface VehicleModel {
   name: string;                   // Tên thương mại, ví dụ: "Klara S", "Ford Transit"
   description: string;           // Mô tả chi tiết
   vehicleType: VehicleType;      // Loại phương tiện
+  vehicleSubType?: string;       // Phân loại chi tiết hơn
 
   brand?: string;                // Hãng sản xuất (VinFast, Honda, etc.)
   modelCode?: string;            // Mã kỹ thuật của hãng (tuỳ chọn)
 
   batteryCapacity?: string;      // Dung lượng pin nếu là xe điện (VD: "72V22Ah")
   motorPower?: number;           // Công suất motor (W)
-  fuelType?: 'electric' | 'gasoline' | 'hybrid'; // Loại nhiên liệu
+  fuelType?: FuelType;           // Loại nhiên liệu
 
   topSpeed?: number;             // Tốc độ tối đa (km/h)
   range?: number;                // Quãng đường tối đa mỗi lần sạc/đổ xăng (km)

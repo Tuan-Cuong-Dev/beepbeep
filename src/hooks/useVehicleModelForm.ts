@@ -1,9 +1,15 @@
-// Tạo ngày 10/07/2025
 'use client';
 
 import { useState } from 'react';
-import { VehicleModel, VehicleType } from '@/src/lib/vehicleModels/vehicleModelTypes_new';
+import {
+  VehicleModel,
+  VehicleType,
+  FuelType,
+} from '@/src/lib/vehicleModels/vehicleModelTypes_new';
 
+/**
+ * Hook quản lý state và logic xử lý form VehicleModel
+ */
 export function useVehicleModelForm(initial?: Partial<VehicleModel>) {
   const [form, setForm] = useState<Partial<VehicleModel>>(initial || { available: true });
 
@@ -14,18 +20,31 @@ export function useVehicleModelForm(initial?: Partial<VehicleModel>) {
     }));
   };
 
-  const handleNumberChange = (key: keyof VehicleModel) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
-    setForm((prev) => ({
-      ...prev,
-      [key]: isNaN(value) ? undefined : value,
-    }));
-  };
-
-  const handleStringChange = (key: keyof VehicleModel) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleStringChange = (
+    key: keyof VehicleModel
+  ) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({
       ...prev,
       [key]: e.target.value,
+    }));
+  };
+
+  const handleNumberChange = (key: keyof VehicleModel) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseFloat(e.target.value);
+      setForm((prev) => ({
+        ...prev,
+        [key]: isNaN(value) ? undefined : value,
+      }));
+    };
+
+  const handleSelectChange = <T extends string>(
+    key: keyof VehicleModel,
+    value: T
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
     }));
   };
 
@@ -44,8 +63,9 @@ export function useVehicleModelForm(initial?: Partial<VehicleModel>) {
     form,
     setForm,
     handleChange,
-    handleNumberChange,
     handleStringChange,
+    handleNumberChange,
+    handleSelectChange,
     toggleAvailable,
     resetForm,
   };

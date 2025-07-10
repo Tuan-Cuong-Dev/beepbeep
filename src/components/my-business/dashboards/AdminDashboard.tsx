@@ -16,6 +16,7 @@ import {
   FaClipboardList,
   FaToolbox,
   FaFileExport,
+  FaCar,
 } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileContract } from '@fortawesome/free-solid-svg-icons';
@@ -29,6 +30,12 @@ export default function AdminDashboard() {
       title: 'Rental Companies',
       description: 'Manage all rental businesses',
       route: '/rental-companies',
+    },
+    {
+      icon: <FaCar className="w-6 h-6 text-[#00d289]" />,
+      title: 'Vehicle Models Management',
+      description: 'Manage all Vehicle Models in the system',
+      route: 'admin/vehicle_models',
     },
     {
       icon: <FaMotorcycle className="w-6 h-6 text-[#00d289]" />,

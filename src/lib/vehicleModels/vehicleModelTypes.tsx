@@ -1,8 +1,8 @@
 import { Timestamp, FieldValue } from 'firebase/firestore';
 
-export type VehicleType = 'scooter' | 'bike' | 'cargo' | 'other';
+export type VehicleType = 'scooter' | 'bicycle' | 'cargo' | 'other';
 
-export const VEHICLE_TYPES = ['All', 'Scooter', 'Bike', 'Cargo', 'Other'] as const;
+export const VEHICLE_TYPES = ['All', 'Scooter', 'Bicycle', 'Cargo', 'Other'] as const;
 
 export interface EbikeModel {
   id: string;

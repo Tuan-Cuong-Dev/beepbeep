@@ -13,17 +13,22 @@ export const SelectTrigger = ({
   value,
   placeholder,
   onClick,
+  disabled = false,
 }: {
   className?: string;
   value?: string;
   placeholder?: string;
   onClick?: () => void;
+  disabled?: boolean;
 }) => {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className={`w-full text-left px-3 py-2 border rounded text-base bg-white text-gray-900 appearance-none ${className}`}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      className={`w-full text-left px-3 py-2 border rounded text-base bg-white appearance-none
+        ${disabled ? 'text-gray-400 bg-gray-100 cursor-not-allowed' : 'text-gray-900 cursor-pointer'} 
+        ${className}`}
     >
       {value || placeholder || 'Select...'}
     </button>
@@ -41,9 +46,7 @@ export const SelectContent = ({
 }) => {
   if (!open) return null;
   return (
-    <div
-      className={`absolute z-10 mt-2 w-full bg-white rounded border shadow-sm ${className}`}
-    >
+    <div className={`absolute z-10 mt-2 w-full bg-white rounded border shadow-sm ${className}`}>
       {children}
     </div>
   );
@@ -67,12 +70,14 @@ export const SimpleSelect = ({
   value,
   onChange,
   className,
+  disabled = false,
 }: {
   options: { label: string; value: string }[];
   placeholder?: string;
   value?: string;
   onChange: (val: string) => void;
   className?: string;
+  disabled?: boolean; // ✅ THÊM prop mới
 }) => {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -82,16 +87,12 @@ export const SimpleSelect = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () =>
-      document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
@@ -100,6 +101,7 @@ export const SimpleSelect = ({
         value={selectedLabel}
         placeholder={placeholder}
         onClick={() => setOpen(!open)}
+        disabled={disabled} // ✅ TRUYỀN disabled vào
       />
       <SelectContent open={open}>
         {options.map((opt) => (
