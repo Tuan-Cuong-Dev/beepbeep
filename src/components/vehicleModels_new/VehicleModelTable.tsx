@@ -73,6 +73,7 @@ export default function VehicleModelTable({
               <th className="px-3 py-2 border">Name</th>
               <th className="px-3 py-2 border">Type</th>
               <th className="px-3 py-2 border">Sub Type</th>
+              <th className="px-3 py-2 border">Brand</th>
               <th className="px-3 py-2 border">Fuel</th>
               <th className="px-3 py-2 border">Battery</th>
               <th className="px-3 py-2 border">Motor</th>
@@ -113,6 +114,9 @@ export default function VehicleModelTable({
                 </td>
                 <td className="border px-2 py-1">
                   {model.vehicleSubType ? VEHICLE_SUBTYPE_LABELS[model.vehicleSubType] || model.vehicleSubType : '-'}
+                </td>
+                <td className="border px-2 py-1">
+                  {model.brand || '-'}
                 </td>
                 <td className="border px-2 py-1">
                   {model.fuelType ? FUEL_TYPE_LABELS[model.fuelType] : '-'}
@@ -161,7 +165,7 @@ export default function VehicleModelTable({
                     {model.available ? 'Yes' : 'No'}
                   </span>
                 </td>
-                <td className="border px-2 py-1 space-x-1">
+                <td className="flex items-center space-x-1">
                   <Button size="sm" onClick={() => onEdit(model)}>
                     Edit
                   </Button>
