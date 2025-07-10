@@ -79,7 +79,9 @@ export default function VehicleModelTable({
               <th className="px-3 py-2 border">Seats</th>
               <th className="px-3 py-2 border">Weight</th>
               <th className="px-3 py-2 border">Load</th>
+              <th className="px-3 py-2 border">Price (Hour)</th>
               <th className="px-3 py-2 border">Price (Day)</th>
+              <th className="px-3 py-2 border">Price (Week)</th>
               <th className="px-3 py-2 border">Price (Month)</th>
               <th className="px-3 py-2 border">Available</th>
               <th className="px-3 py-2 border">Actions</th>
