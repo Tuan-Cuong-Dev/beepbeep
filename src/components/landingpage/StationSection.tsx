@@ -64,7 +64,7 @@ export default function StationSection() {
                 {stations.length} stations
               </span>
               <br />
-              <span className="sm:text-xl md:text-2xl text-gray-700">
+              <span className="sm:text-lg md:text-xl text-gray-700">
                 are ready to serve you!
               </span>
             </>

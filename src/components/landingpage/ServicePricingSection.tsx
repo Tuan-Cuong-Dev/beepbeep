@@ -17,7 +17,7 @@ export default function ServicePricingSection() {
         <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
           <span className="sm:text-2xl md:text-3xl font-extrabold">🛠️ Bíp Bíp 365</span>
           <br />
-          <span className="sm:text-xl md:text-3xl text-gray-700">Your 24/7 Vehicles Lifesaver</span>
+          <span className="sm:text-lg md:text-xl text-gray-700">Your 24/7 Vehicles Lifesaver</span>
         </h2>
 
         {loading ? (

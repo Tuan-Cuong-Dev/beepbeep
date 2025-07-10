@@ -55,7 +55,7 @@ export default function TechnicianPartnerSection() {
             Vehicle trouble?
           </span>
           <br />
-          <span className="sm:text-xl md:text-3xl text-gray-700">
+          <span className="sm:text-lg md:text-xl text-gray-700">
             We’ll connect you to a technician!
           </span>
         </h2>
