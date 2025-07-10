@@ -1,4 +1,4 @@
-import { Ebike } from "@/src/lib/vehicles/ebikeTypes";
+import { Ebike } from "@/src/lib/vehicles/vehicleTypes";
 
 export const printSingleEbikeQR = (ebike: Ebike, modelName: string) => {
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(

@@ -20,8 +20,6 @@ export default function ServicePricingSection() {
         <br />
         <span className="text-2xl text-gray-700">Your 24/7 Vehicles Lifesaver</span>
       </h2>
-
-
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading services...</p>
         ) : (

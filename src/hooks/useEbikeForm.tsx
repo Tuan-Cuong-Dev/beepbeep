@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { addDoc, collection, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
+import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
 
 export function useEbikeForm(companyId: string, onSaveComplete?: () => void) {
   const [loading, setLoading] = useState(false);

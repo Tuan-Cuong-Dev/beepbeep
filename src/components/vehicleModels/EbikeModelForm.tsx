@@ -6,7 +6,7 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { Checkbox } from '@/src/components/ui/checkbox';
 import { Label } from '@/src/components/ui/label';
-import { EbikeModel } from '@/src/lib/vehicleModels/ebikeModelTypes';
+import { EbikeModel } from '@/src/lib/vehicleModels/vehicleModelTypes';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
 

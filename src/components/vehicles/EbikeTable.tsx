@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
-import { EbikeModel } from '@/src/lib/vehicleModels/ebikeModelTypes';
+import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { EbikeModel } from '@/src/lib/vehicleModels/vehicleModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { Button } from '@/src/components/ui/button';
 import { getDocs, collection } from 'firebase/firestore';

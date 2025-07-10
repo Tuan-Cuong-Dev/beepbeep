@@ -8,7 +8,7 @@ import { Input } from '@/src/components/ui/input';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useCompanyAndStation } from '@/src/hooks/useCompanyAndStation';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes'; // ✅ Sử dụng type gốc
+import { Ebike } from '@/src/lib/vehicles/vehicleTypes'; // ✅ Sử dụng type gốc
 
 interface SwitchBikeModalProps {
   open: boolean;

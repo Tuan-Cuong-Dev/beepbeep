@@ -5,8 +5,8 @@ import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { SimpleSelect } from '@/src/components/ui/select';
-import { EbikeStatus, Ebike } from '@/src/lib/vehicles/ebikeTypes';
-import { EbikeModel } from '@/src/lib/vehicleModels/ebikeModelTypes';
+import { EbikeStatus, Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { EbikeModel } from '@/src/lib/vehicleModels/vehicleModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { useUser } from '@/src/context/AuthContext';
 import { formatCurrency } from '@/src/utils/formatCurrency';
@@ -113,7 +113,7 @@ export default function EbikeForm({
     };
 
     try {
-      const { saveEbike } = await import('@/src/lib/vehicles/ebikeService');
+      const { saveEbike } = await import('@/src/lib/vehicles/vehicleService');
       const updatedList = await saveEbike(payload, isUpdateMode);
       setEbikes(updatedList);
       setIsUpdateMode(false);

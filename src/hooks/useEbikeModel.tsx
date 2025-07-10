@@ -12,7 +12,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { EbikeModel } from '@/src/lib/vehicleModels/ebikeModelTypes';
+import { EbikeModel } from '@/src/lib/vehicleModels/vehicleModelTypes';
 
 interface UseEbikeModelFormOptions {
   companyId?: string;
