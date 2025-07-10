@@ -17,7 +17,7 @@ import {
 import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
-import ApplyModelPricingButton from '@/src/components/ebikes/ApplyModelPricingButton';
+import ApplyModelPricingButton from '@/src/components/vehicles/ApplyModelPricingButton';
 
 interface Props {
   ebikes: Ebike[];
