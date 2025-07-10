@@ -88,24 +88,31 @@ export default function VehicleModelManagementPage() {
       <Header />
       <UserTopMenu />
 
-      <h1 className="text-2xl font-semibold mb-4 border-b-2 p-6 pb-2">Vehicle Model Management</h1>
+      <main className="flex-1 p-4">
+        <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">
+          Vehicle Model Management
+        </h1>
 
-      <VehicleModelForm
-        companyId="admin-global"
-        newModel={newModel}
-        handleChange={handleChange}
-        handleSave={handleSave}
-        isUpdateModeModel={isUpdateMode}
-        loading={loadingData}
-      />
+        <VehicleModelForm
+          companyId="admin-global"
+          newModel={newModel}
+          handleChange={handleChange}
+          handleSave={handleSave}
+          isUpdateModeModel={isUpdateMode}
+          loading={loadingData}
+        />
 
-      <VehicleModelTable
-        companyId="admin-global"
-        models={models}
-        onEdit={handleEdit}
-        onReload={fetchModels}
-      />
+        <VehicleModelTable
+          companyId="admin-global"
+          models={models}
+          onEdit={handleEdit}
+          onReload={fetchModels}
+        />
+      </main>
+
       <Footer />
     </div>
   );
+
+  <Footer />
 }
