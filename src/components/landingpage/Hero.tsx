@@ -50,7 +50,7 @@ export default function Hero() {
     <div
       className="absolute inset-0 bg-center bg-cover hidden md:block"
       style={{
-        backgroundImage: "url('/assets/images/Cover-desktop.jpg')",
+        backgroundImage: "url('/assets/images/Cover_desktop.jpg')",
       }}
     />
 
