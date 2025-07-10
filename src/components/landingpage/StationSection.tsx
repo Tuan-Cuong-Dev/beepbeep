@@ -60,11 +60,11 @@ export default function StationSection() {
             '⏳ Loading stations...'
           ) : (
             <>
-              <span className="text-3xl font-extrabold">
+              <span className="sm:text-2xl md:text-3xl font-extrabold">
                 {stations.length} stations
               </span>
               <br />
-              <span className="text-2xl text-gray-700">
+              <span className="sm:text-xl md:text-2xl text-gray-700">
                 are ready to serve you!
               </span>
             </>
