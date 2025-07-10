@@ -124,7 +124,7 @@ export default function EbikeForm({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow p-6 mt-6">
+    <div className="hidden md:block bg-white rounded-xl shadow p-6 mt-6">
       <h2 className="text-xl font-semibold mb-4">
         {isUpdateMode ? 'Edit Vehicle' : 'Add New Vehicle'}
       </h2>
