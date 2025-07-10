@@ -3,8 +3,8 @@
 "use client";
 
 import { useRef } from "react";
-import { Ebike } from '@/src/lib/ebikes/ebikeTypes';
-import { EbikeModel } from '@/src/lib/ebikemodels/ebikeModelTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
+import { EbikeModel } from '@/src/lib/vehicleModels/ebikeModelTypes';
 
 interface Props {
   open: boolean;

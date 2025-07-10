@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/src/components/ui/button';
-import { applyPricingFromModelsToVehicles } from '@/src/lib/ebikes/applyModelPricingService';
+import { applyPricingFromModelsToVehicles } from '@/src/lib/vehicles/applyModelPricingService';
 import { useState } from 'react';
 import { useUser } from '@/src/context/AuthContext';
 import { toast } from 'react-hot-toast'; // or use your NotificationDialog

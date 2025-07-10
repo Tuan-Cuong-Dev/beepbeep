@@ -2,7 +2,7 @@
 
 import * as XLSX from 'xlsx';
 import { Ebike } from './ebikeTypes';
-import { EbikeModel } from '../ebikemodels/ebikeModelTypes';
+import { EbikeModel } from '../vehicleModels/ebikeModelTypes';
 import { RentalStation } from '../rentalStations/rentalStationTypes';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';

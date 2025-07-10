@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Ebike } from '@/src/lib/ebikes/ebikeTypes';
-import { EbikeModel } from '@/src/lib/ebikemodels/ebikeModelTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
+import { EbikeModel } from '@/src/lib/vehicleModels/ebikeModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
-import { exportEbikesToExcel } from '@/src/lib/ebikes/exportEbikes';
-import { importEbikes } from '@/src/lib/ebikes/importEbikes';
-import { deleteAllEbikesByCompany, deleteAllEbikes } from '@/src/lib/ebikes/deleteEbikesByCompany';
+import { exportEbikesToExcel } from '@/src/lib/vehicles/exportEbikes';
+import { importEbikes } from '@/src/lib/vehicles/importEbikes';
+import { deleteAllEbikesByCompany, deleteAllEbikes } from '@/src/lib/vehicles/deleteEbikesByCompany';
 import {
   Dialog,
   DialogContent,

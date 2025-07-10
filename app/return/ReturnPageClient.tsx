@@ -19,7 +19,7 @@ import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import ExtendRentalModal from '@/src/components/return/ExtendRentalModal';
 import SwitchBikeModal from '@/src/components/return/SwitchBikeModal';
-import { Ebike } from '@/src/lib/ebikes/ebikeTypes'; // ✅ Sử dụng type gốc
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes'; // ✅ Sử dụng type gốc
 
 
 import {

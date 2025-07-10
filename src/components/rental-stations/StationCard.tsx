@@ -37,22 +37,21 @@ export default function StationCard({ station, userLocation }: Props) {
       : '';
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-4 flex flex-col h-full hover:shadow-xl transition-all">
+    <div className="bg-white rounded-2xl shadow-md p-5 flex flex-col h-full hover:shadow-xl transition-all">
       {/* Top: Icon + Name + Status */}
-      <div className="flex items-start gap-3 mb-3">
+      <div className="flex items-start gap-3 mb-2 w-full">
         {/* Icon */}
-        <div className="w-1/3 flex justify-start pt-1">
-          <div className="w-14 h-14 relative">
+        <div className="w-1/3 flex justify-center items-center">
+          <div className="w-16 h-16 flex items-center justify-center rounded-full overflow-hidden border border-gray-300">
             <Image
               src="/assets/images/stationmarker.png"
               alt="Station Icon"
-              width={38}
-              height={40}
+              width={32}
+              height={32}
               className="object-contain"
             />
           </div>
         </div>
-
         {/* Name + Status */}
         <div className="w-2/3">
           <h3 className="text-base font-semibold text-gray-900 leading-tight">{name}</h3>

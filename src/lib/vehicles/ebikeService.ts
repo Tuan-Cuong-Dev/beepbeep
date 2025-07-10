@@ -10,7 +10,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { Ebike } from '@/src/lib/ebikes/ebikeTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 
 export async function saveEbike(bike: Ebike, isUpdate: boolean): Promise<Ebike[]> {
   const dataToSave = {

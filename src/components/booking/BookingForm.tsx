@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useBookingForm } from '@/src/hooks/useBookingForm';
 import { useUser } from '@/src/context/AuthContext';
-import { Ebike } from '@/src/lib/ebikes/ebikeTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
