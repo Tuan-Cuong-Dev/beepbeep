@@ -49,8 +49,8 @@ export default function StationMap({ stations }: Props) {
       : defaultCenter;
 
   return (
-    <div className="h-[500px] w-full rounded-xl overflow-hidden">
-      <MapContainer center={center} zoom={13} style={{ height: '100%', width: '100%' }}>
+    <div className="fixed inset-0 z-0">
+      <MapContainer center={center} zoom={15} className="w-full h-full">
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {/* Hiển thị các trạm */}
