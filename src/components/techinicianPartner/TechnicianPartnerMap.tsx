@@ -14,14 +14,18 @@ const technicianIcon = new L.Icon({
   popupAnchor: [0, -32],
 });
 
-// Zoom đến user location
-function ZoomToUser({ userPosition }: { userPosition: [number, number] }) {
+// FlyToUser đến user location
+function FlyToUser({ userPosition }: { userPosition: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    if (userPosition) map.setView(userPosition, 13);
+    map.flyTo(userPosition, 15, {
+      animate: true,
+      duration: 1.5,
+    });
   }, [userPosition, map]);
   return null;
 }
+
 
 interface Props {
   partners: TechnicianPartner[];
@@ -83,7 +87,7 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
         />
 
         {/* Zoom đến vị trí người dùng */}
-        {userPosition && <ZoomToUser userPosition={userPosition} />}
+        {userPosition && <FlyToUser userPosition={userPosition} />}
 
         {/* Marker người dùng */}
         {userPosition && userIcon && (
