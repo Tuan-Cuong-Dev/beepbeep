@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
 import { BatteryStation } from '@/src/lib/batteryStations/batteryStationTypes';
 import { useAuth } from '@/src/hooks/useAuth';
-import L from 'leaflet';
 
 // Icon trạm đổi pin
 const stationIcon = L.icon({
@@ -14,7 +14,7 @@ const stationIcon = L.icon({
   popupAnchor: [0, -32],
 });
 
-// Icon người dùng mặc định
+// Icon mặc định cho người dùng
 const userIconDefault = L.icon({
   iconUrl: '/assets/images/usericon.png',
   iconSize: [32, 32],
@@ -26,10 +26,7 @@ const userIconDefault = L.icon({
 function FlyToUser({ userPosition }: { userPosition: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(userPosition, 15, {
-      animate: true,
-      duration: 1.5,
-    });
+    map.flyTo(userPosition, 15, { animate: true, duration: 1.5 });
   }, [userPosition, map]);
   return null;
 }
@@ -45,21 +42,21 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
   const [userIcon, setUserIcon] = useState<L.Icon>(userIconDefault);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  // Lấy vị trí người dùng nếu chưa có
+  // Lấy avatar nếu có
   useEffect(() => {
-    if (!userLocation && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserPosition([pos.coords.latitude, pos.coords.longitude]);
-        },
-        (err) => {
-          console.warn('📍 Could not get location:', err);
-        }
-      );
+    if (currentUser?.photoURL) {
+      const customUserIcon = L.icon({
+        iconUrl: currentUser.photoURL,
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -36],
+        className: 'rounded-full border border-white shadow',
+      });
+      setUserIcon(customUserIcon);
     }
-  }, [userLocation]);
+  }, [currentUser]);
 
-  // Lấy vị trí nếu chưa có
+  // Lấy vị trí người dùng nếu chưa có
   useEffect(() => {
     if (!userLocation && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -69,7 +66,7 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
     }
   }, [userLocation]);
 
-  // CSS tùy chỉnh
+  // CSS để điều chỉnh vị trí nút zoom
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -100,7 +97,6 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
           attribution="© OpenStreetMap contributors"
         />
 
-        {/* Zoom đến vị trí người dùng */}
         {userPosition && <FlyToUser userPosition={userPosition} />}
 
         {/* Marker người dùng */}
@@ -114,7 +110,7 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
           </Marker>
         )}
 
-        {/* Marker các trạm đổi pin */}
+        {/* Marker trạm đổi pin */}
         {stations
           .filter((s) => s.coordinates?.lat != null && s.coordinates?.lng != null)
           .map((station) => (
@@ -136,7 +132,6 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
           ))}
       </MapContainer>
 
-      {/* Lỗi khi lấy vị trí */}
       {locationError && (
         <p className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-sm text-red-500 bg-white px-3 py-1 rounded shadow">
           ⚠️ {locationError}
