@@ -7,13 +7,12 @@ import { db } from '@/src/firebaseConfig';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Input } from '@/src/components/ui/input';
-import BatteryStationCard from './BatteryStationCard';
 import { BatteryStation } from '@/src/lib/batteryStations/batteryStationTypes';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 
 const BatteryStationMap = dynamic(() => import('./BatteryStationMap'), { ssr: false });
 
-// ✅ Hàm tính khoảng cách giữa hai tọa độ
+// ✅ Tính khoảng cách
 function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
   const R = 6371;
@@ -30,9 +29,7 @@ export default function BatteryStationsClientPage() {
   const { location: userLocation } = useCurrentLocation();
   const [stations, setStations] = useState<BatteryStation[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
 
-  // 🔄 Fetch active battery stations từ Firestore
   useEffect(() => {
     const fetchStations = async () => {
       try {
@@ -45,15 +42,12 @@ export default function BatteryStationsClientPage() {
         setStations(data);
       } catch (err) {
         console.error('Error loading battery stations:', err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchStations();
   }, []);
 
-  // ✅ Bộ lọc và sắp xếp theo khoảng cách
   const sortedStations = useMemo(() => {
     const filtered = stations.filter((station) => {
       const searchMatch =
@@ -80,56 +74,24 @@ export default function BatteryStationsClientPage() {
   }, [stations, searchTerm, userLocation]);
 
   return (
-    <div className="bg-gray-100 min-h-screen font-sans">
+    <div className="bg-gray-100 min-h-screen font-sans overflow-x-hidden">
       <Header />
-
-      <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="flex justify-center items-center gap-2 mb-6">
-          <img
-            src="/assets/images/batterystation_new.png"
-            alt="Battery Station Icon"
-            className="w-8 h-8"
-          />
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-            Battery Swap Stations Near You
-          </h1>
-        </div>
-
-        <p className="text-center text-gray-600 mb-8">
-          Find available battery swap stations near your location.
-        </p>
-
-        {/* 🔍 Bộ lọc tìm kiếm */}
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-          <Input
-            placeholder="🔍 Search by name or address..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-1/3"
-          />
-        </div>
-
-        {/* 🗺️ Bản đồ */}
-        <BatteryStationMap stations={sortedStations} />
-
-        {/* 📋 Danh sách trạm */}
-        {loading ? (
-          <p className="text-center text-gray-500 text-lg mt-10">⏳ Loading stations...</p>
-        ) : sortedStations.length === 0 ? (
-          <p className="text-center text-gray-500 text-lg mt-10">No stations found.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
-            {sortedStations.map((station) => (
-              <BatteryStationCard
-                key={station.id}
-                station={station}
-                userLocation={userLocation}
-              />
-            ))}
+      <main className="flex-1 p-4">
+        <div className="relative h-[85vh] overflow-hidden rounded-lg">
+          {/* Thanh tìm kiếm nổi trên bản đồ */}
+          <div className="absolute px-10 top-20 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[95%] md:w-1/3">
+            <Input
+              placeholder="🔋 Search battery stations..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="shadow-lg"
+            />
           </div>
-        )}
-      </div>
 
+          {/* Bản đồ */}
+          <BatteryStationMap stations={sortedStations} />
+        </div>
+      </main>
       <Footer />
     </div>
   );
