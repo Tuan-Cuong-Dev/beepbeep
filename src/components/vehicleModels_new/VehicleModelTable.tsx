@@ -176,17 +176,19 @@ export default function VehicleModelTable({
                     {model.available ? 'Yes' : 'No'}
                   </span>
                 </td>
-                <td className="flex items-center space-x-1">
-                  <Button size="sm" onClick={() => onEdit(model)}>
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => confirmDelete(model.id)}
-                  >
-                    Delete
-                  </Button>
+                <td className="text-center">
+                  <div className="flex justify-center items-center gap-2">
+                    <Button size="sm" onClick={() => onEdit(model)}>
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => confirmDelete(model.id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
