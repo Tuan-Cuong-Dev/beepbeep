@@ -1,20 +1,25 @@
 'use client';
 
+import Image from 'next/image';
 import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
+import { Button } from '@/src/components/ui/button';
+import { Pencil, Trash2 } from 'lucide-react';
 
 interface Props {
   vehicle: PersonalVehicle_new;
+  onEdit?: (v: PersonalVehicle_new) => void;
+  onDelete?: (v: PersonalVehicle_new) => void;
 }
 
 // 🔧 Convert Google Drive link to direct image URL
-  const getDirectImageUrl = (url?: string): string | undefined => {
-    if (!url) return undefined;
-    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
-    const id = match?.[1];
-    return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
-  };
+const getDirectImageUrl = (url?: string): string | undefined => {
+  if (!url) return undefined;
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+  const id = match?.[1];
+  return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
+};
 
-export default function PersonalVehicleCard({ vehicle }: Props) {
+export default function PersonalVehicleCard({ vehicle, onEdit, onDelete }: Props) {
   const {
     name,
     brand,
@@ -27,13 +32,13 @@ export default function PersonalVehicleCard({ vehicle }: Props) {
     isPrimary,
     modelImageUrl,
   } = vehicle;
-  
+
   return (
     <div className="border rounded-lg p-4 shadow-sm bg-white text-sm">
-      <div className="flex gap-3 items-start">        
+      <div className="flex gap-3 items-start">
         {/* Image */}
         {modelImageUrl ? (
-          <img
+          <Image
             src={getDirectImageUrl(modelImageUrl) as string}
             alt={name}
             width={80}
@@ -65,11 +70,13 @@ export default function PersonalVehicleCard({ vehicle }: Props) {
         </div>
       </div>
 
-      {/* Status */}
+      {/* Status & Actions */}
       <div className="flex justify-between items-center mt-3 text-xs">
         <span
           className={`px-2 py-0.5 rounded ${
-            isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+            isActive
+              ? 'bg-green-100 text-green-700'
+              : 'bg-red-100 text-red-700'
           }`}
         >
           {isActive ? 'Active' : 'Inactive'}
@@ -79,6 +86,30 @@ export default function PersonalVehicleCard({ vehicle }: Props) {
           <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-medium">
             🌟 Primary
           </span>
+        )}
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex justify-end gap-2 mt-4">
+        {onEdit && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs"
+            onClick={() => onEdit(vehicle)}
+          >
+            <Pencil className="w-4 h-4 mr-1" /> Edit
+          </Button>
+        )}
+        {onDelete && (
+          <Button
+            size="sm"
+            variant="destructive"
+            className="text-xs"
+            onClick={() => onDelete(vehicle)}
+          >
+            <Trash2 className="w-4 h-4 mr-1" /> Delete
+          </Button>
         )}
       </div>
     </div>
