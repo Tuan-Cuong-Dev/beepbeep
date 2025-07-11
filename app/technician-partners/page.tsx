@@ -7,15 +7,13 @@ import { useState, useMemo } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Input } from '@/src/components/ui/input';
-import { SimpleSelect } from '@/src/components/ui/select';
-import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
 
 const TechnicianPartnerMap = dynamic(
   () => import('@/src/components/techinicianPartner/TechnicianPartnerMap'),
   { ssr: false }
 );
 
-// ✅ Hàm tính khoảng cách giữa hai vị trí
+// ✅ Hàm tính khoảng cách giữa 2 điểm
 function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
   const R = 6371;
@@ -28,64 +26,34 @@ function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: n
   return R * c;
 }
 
-// ✅ Tách lat/lng từ geo: "16.0226° N, 108.1207° E"
+// ✅ Parse geo string hoặc object
 function parseCoords(geo?: string | { lat: number; lng: number }): [number, number] {
   if (!geo) return [0, 0];
+  if (typeof geo === 'object') return [geo.lat, geo.lng];
 
-  // Trường hợp geo là object { lat, lng }
-  if (typeof geo === 'object' && 'lat' in geo && 'lng' in geo) {
-    return [geo.lat, geo.lng];
-  }
-
-  // Trường hợp geo là string: "16.0226° N, 108.1207° E"
   const match = geo.match(/([-]?\d+(\.\d+)?)°\s*N?,?\s*([-]?\d+(\.\d+)?)°\s*E?/i);
   if (!match) return [0, 0];
   return [parseFloat(match[1]), parseFloat(match[3])];
 }
 
-
 export default function TechnicianPartnerPage() {
   const { partners, loading } = usePublicTechnicianPartners();
   const { location: userLocation } = useCurrentLocation();
-  const [showNotice, setShowNotice] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [regionFilter, setRegionFilter] = useState('');
-  const [serviceFilter, setServiceFilter] = useState('');
 
-  const regions = useMemo(() => {
-    const allRegions = partners.flatMap((p) => p.assignedRegions || []);
-    return Array.from(new Set(allRegions)).sort();
-  }, [partners]);
-
-  const services = useMemo(() => {
-    const allServices = partners.flatMap((p) => p.serviceCategories || []);
-    return Array.from(new Set(allServices)).sort();
-  }, [partners]);
-
-  // ✅ Bộ lọc và sắp xếp theo khoảng cách
   const sortedPartners = useMemo(() => {
     const filtered = partners.filter((p) => {
-      const matchSearch =
+      return (
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.assignedRegions?.some((r) =>
           r.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-      const matchRegion = regionFilter
-        ? p.assignedRegions?.includes(regionFilter)
-        : true;
-
-      const matchService = serviceFilter
-        ? p.serviceCategories?.includes(serviceFilter)
-        : true;
-
-      return matchSearch && matchRegion && matchService;
+        )
+      );
     });
 
-    if (!userLocation || !Array.isArray(userLocation)) return filtered;
+    if (!userLocation) return filtered;
 
     const [userLat, userLng] = userLocation;
-
     return [...filtered].sort((a, b) => {
       const [latA, lngA] = parseCoords(a.geo);
       const [latB, lngB] = parseCoords(b.geo);
@@ -93,66 +61,27 @@ export default function TechnicianPartnerPage() {
       const distB = getDistanceFromLatLng(userLat, userLng, latB, lngB);
       return distA - distB;
     });
-  }, [partners, searchTerm, regionFilter, serviceFilter, userLocation]);
+  }, [partners, searchTerm, userLocation]);
 
   return (
-    <div className="bg-gray-100 min-h-screen font-sans">
+    <div className="bg-gray-100 min-h-screen font-sans ">
       <Header />
-
-      <div className="max-w-7xl mx-auto px-4 py-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-2">
-          Find a Technician Partner
-        </h1>
-        <p className="text-center text-gray-600 mb-8">
-          Our trusted technician partners are ready to assist you across regions.
-        </p>
-
-        {/* Bộ lọc */}
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-          <Input
-            placeholder="🔍 Search by name or region..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-1/3"
-          />
-          <SimpleSelect
-            value={regionFilter}
-            onChange={setRegionFilter}
-            placeholder="🌍 Filter by region"
-            options={[{ label: 'All regions', value: '' }, ...regions.map((r) => ({ label: r, value: r }))]}
-            className="w-full md:w-1/4"
-          />
-          <SimpleSelect
-            value={serviceFilter}
-            onChange={setServiceFilter}
-            placeholder="🛠️ Filter by service"
-            options={[{ label: 'All services', value: '' }, ...services.map((s) => ({ label: s, value: s }))]}
-            className="w-full md:w-1/4"
-          />
-        </div>
-
-        <TechnicianPartnerMap partners={sortedPartners} />
-
-        {loading ? (
-          <p className="text-center text-gray-500 text-lg mt-10">⏳ Loading technician partners...</p>
-        ) : sortedPartners.length === 0 ? (
-          <p className="text-center text-gray-500 text-lg mt-10">
-            No matching technicians found.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {sortedPartners.map((partner) => (
-              <TechnicianPartnerCard
-                key={partner.id}
-                partner={partner}
-                onContact={() => setShowNotice(true)}
-                userLocation={userLocation}
-              />
-            ))}
+      <main className="flex-1 p-4">
+        <div className="relative h-[85vh] overflow-hidden rounded-lg">
+          {/* Thanh tìm kiếm nổi trên bản đồ */}
+          <div className="absolute px-10 top-20 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[98%] md:w-1/3">
+            <Input
+              placeholder="🔍 Search by name or region..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="shadow-lg"
+            />
           </div>
-        )}
-      </div>
 
+          {/* Bản đồ kỹ thuật viên */}
+          <TechnicianPartnerMap partners={sortedPartners} userLocation={userLocation} />
+        </div>
+      </main>
       <Footer />
     </div>
   );

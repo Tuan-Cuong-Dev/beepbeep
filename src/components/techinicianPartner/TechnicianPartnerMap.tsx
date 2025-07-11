@@ -4,75 +4,99 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { useEffect, useState } from 'react';
 import L from 'leaflet';
+import { useAuth } from '@/src/hooks/useAuth'; // nếu bạn muốn dùng avatar làm icon
 
-// ✅ Tạo icon riêng cho người dùng và kỹ thuật viên
-const userIcon = L.icon({
-  iconUrl: '/assets/images/usericon.png',
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
-
-const technicianIcon = L.icon({
+// Icon kỹ thuật viên
+const technicianIcon = new L.Icon({
   iconUrl: '/assets/images/technician.png',
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
 });
 
-function FlyToUser({ location }: { location: [number, number] }) {
+// Zoom đến user location
+function ZoomToUser({ userPosition }: { userPosition: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(location, 13);
-  }, [location, map]);
+    if (userPosition) map.setView(userPosition, 13);
+  }, [userPosition, map]);
   return null;
 }
 
 interface Props {
   partners: TechnicianPartner[];
+  userLocation?: [number, number] | null;
 }
 
-export default function TechnicianMap({ partners }: Props) {
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+export default function TechnicianMap({ partners, userLocation }: Props) {
+  const { currentUser } = useAuth();
+  const [userPosition, setUserPosition] = useState<[number, number] | null>(userLocation || null);
+  const [userIcon, setUserIcon] = useState<L.Icon | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
 
+  // Custom style cho leaflet control
   useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation([pos.coords.latitude, pos.coords.longitude]);
-        },
-        (error) => {
-          setLocationError(error.message);
-          console.warn('Geolocation error:', error.message);
-        }
-      );
-    }
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .leaflet-top.leaflet-left {
+        top: 80px !important;
+        left: 12px !important;
+        z-index: 1001 !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
-  const defaultCenter: [number, number] = userLocation ?? [16.0471, 108.2062]; // Đà Nẵng fallback
+  // Lấy vị trí nếu chưa có
+  useEffect(() => {
+    if (!userLocation && typeof window !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserPosition([pos.coords.latitude, pos.coords.longitude]),
+        (err) => setLocationError(err.message)
+      );
+    }
+  }, [userLocation]);
 
-  if (typeof window === 'undefined') return null;
+  // Tạo icon user từ avatar hoặc fallback
+  useEffect(() => {
+    const icon = new L.Icon({
+      iconUrl: currentUser?.photoURL || '/assets/images/usericon.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -28],
+      className: 'rounded-full border border-white shadow-md',
+    });
+    setUserIcon(icon);
+  }, [currentUser?.photoURL]);
+
+  const defaultCenter: [number, number] = userPosition ?? [16.0471, 108.2062];
 
   return (
-    <div className="relative h-[500px] w-full rounded-xl overflow-hidden mb-8 z-0">
-      <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom className="h-full w-full z-0">
+    <div className="fixed inset-0 z-0">
+      <MapContainer center={defaultCenter} zoom={13} className="w-full h-full">
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="© OpenStreetMap contributors"
         />
 
-        {/* Vị trí người dùng */}
-        {userLocation && (
-          <>
-            <Marker position={userLocation} icon={userIcon}>
-              <Popup>You are here</Popup>
-            </Marker>
-            <FlyToUser location={userLocation} />
-          </>
+        {/* Zoom đến vị trí người dùng */}
+        {userPosition && <ZoomToUser userPosition={userPosition} />}
+
+        {/* Marker người dùng */}
+        {userPosition && userIcon && (
+          <Marker position={userPosition} icon={userIcon}>
+            <Popup>
+              🧍 You are here<br />
+              Lat: {userPosition[0].toFixed(5)}<br />
+              Lng: {userPosition[1].toFixed(5)}
+            </Popup>
+          </Marker>
         )}
 
-        {/* Vị trí Technician */}
+        {/* Marker kỹ thuật viên */}
         {partners
           .filter((p) => p.coordinates)
           .map((p) => (
@@ -100,12 +124,10 @@ export default function TechnicianMap({ partners }: Props) {
                   )}
                 </div>
               </Popup>
-
             </Marker>
           ))}
       </MapContainer>
 
-      {/* Thông báo lỗi vị trí nếu có */}
       {locationError && (
         <p className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-sm text-red-500 bg-white px-3 py-1 rounded shadow">
           ⚠️ {locationError}

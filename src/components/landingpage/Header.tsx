@@ -34,14 +34,17 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky flex items-center justify-between absolute top-0 left-0 w-full bg-white z-50 h-16">
+    <header className="absolute top-0 left-0 w-full bg-white z-50 h-16 flex items-center justify-between px-4 md:px-8">
       {/* Nút Menu Icon (hamburger) - chỉ hiện trên mobile */}
-      <button className="text-2xl text-gray-800 md:hidden lg:hidden px-6 py-2" onClick={toggleSidebar}>
+      <button
+        className="text-2xl text-gray-800 md:hidden px-2"
+        onClick={toggleSidebar}
+      >
         <FaBars />
       </button>
 
       {/* Logo */}
-      <div className="flex items-center px-8">
+      <div className="flex items-center">
         <Link href="/">
           <Image
             src="/assets/images/BipBip_logo1.png"
@@ -56,7 +59,7 @@ const Header = () => {
 
       {/* User Icon (mobile) */}
       <button
-        className="text-2xl md:hidden text-gray-800 lg:hidden px-6 py-2"
+        className="text-2xl md:hidden text-gray-800 px-2"
         onClick={user ? toggleUserSidebar : toggleLoginPopup}
       >
         {user ? (
@@ -77,7 +80,7 @@ const Header = () => {
       <SidebarMenu isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
       {/* Desktop Only */}
-      <div className="hidden sm:block px-8">
+      <div className="hidden sm:block">
         <div className="flex items-center space-x-4">
           <button
             onClick={togglePopup}
