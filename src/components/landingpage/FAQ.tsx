@@ -1,30 +1,32 @@
-"use client";
-import { useState } from "react";
+'use client';
+
+import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const faqs = [
   {
-    question: "How to Swap Battery at ATM Battery Station?",
+    question: 'How do I swap batteries at a station?',
     answer:
-      "With an extremely smart and convenient solution, when you rent a bike, we will guide you on how to swap the battery at the station. When you travel to tourist cities, you can swap the battery yourself using your existing account.",
+      'When you rent an electric vehicle from Bíp Bíp, we provide clear instructions on how to use our smart battery swapping stations. You can swap batteries yourself using your Bíp Bíp account at any supported location.',
   },
   {
-    question: "What equipment comes with the electric motorbike?",
+    question: 'What accessories come with the rental vehicle?',
     answer:
-      "Each bike is equipped with two helmets, two raincoats, and a charger. Additionally, all electric bikes have a phone holder, making it easy for you to explore the city and surrounding areas.",
+      'Each vehicle comes with two helmets, two raincoats, and a charger (if needed). Some vehicles may also include a phone holder, rear carrier, or extra storage depending on the model.',
   },
   {
-    question: "Which electric motorbike models are available?",
+    question: 'Which vehicle types are available on Bíp Bíp?',
     answer:
-      "We currently provide the most popular and reliable electric motorbike models in Vietnam - Selex Camel, Evgo C, Evgo D, Vinfast Evo Lite.",
+      'We offer a wide range of vehicles including electric motorbikes, bicycles, electric cars, vans, and more – all suited for both tourism and delivery needs.',
   },
   {
-    question: "What should I do in case of a traffic incident?",
+    question: 'What should I do if I encounter a problem on the road?',
     answer:
-      "If you encounter a traffic incident, please contact us immediately via our hotline for the fastest support. Also, comply with traffic regulations to ensure safety.",
+      'In case of accidents, breakdowns, or any issues, please contact our hotline or request roadside assistance directly through the app. Our technicians will assist you promptly.',
   },
 ];
 
-const FAQ = () => {
+export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {
@@ -32,27 +34,37 @@ const FAQ = () => {
   };
 
   return (
-    <div className="p-4 w-full mx-auto bg-gray-100">
-      <h2 className="text-2xl font-bold text-center text-gray-900 mb-4">What Would You Like to Ask?</h2>
-      <div className="bg-white shadow-lg p-4 rounded-lg">
-        {faqs.map((faq, index) => (
-          <div key={index} className="border-b border-gray-300 py-3">
+    <section className="px-4 py-12 bg-gray-50 w-full">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+          What Would You Like to Ask?
+        </h2>
+        <div className="bg-white shadow-xl rounded-xl divide-y">
+          {faqs.map((faq, index) => (
             <div
-              role="button"
-              tabIndex={0}
-              className="flex justify-between items-center w-full text-left text-md text-gray-800 font-semibold cursor-pointer"
-              onClick={() => toggleFAQ(index)}
-              onKeyDown={(e) => e.key === "Enter" && toggleFAQ(index)}
+              key={index}
+              className="px-6 py-4 hover:bg-gray-50 transition-colors"
             >
-              <span>{faq.question}</span>
-              <span>{openIndex === index ? "▲" : "▼"}</span>
+              <button
+                className="w-full flex justify-between items-center text-left text-lg font-semibold text-gray-800 focus:outline-none"
+                onClick={() => toggleFAQ(index)}
+              >
+                <span>{faq.question}</span>
+                {openIndex === index ? (
+                  <ChevronUp className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+              </button>
+              {openIndex === index && (
+                <p className="text-sm text-gray-700 mt-3 leading-relaxed">
+                  {faq.answer}
+                </p>
+              )}
             </div>
-            {openIndex === index && <p className="text-sm mt-2 text-gray-700">{faq.answer}</p>}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default FAQ;
+}
