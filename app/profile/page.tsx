@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useAuth } from "@/src/components/users/useAuth"; 
+import { useAuth } from "@/src/hooks/useAuth"; 
 import { db } from "@/src/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import Header from "@/src/components/landingpage/Header";

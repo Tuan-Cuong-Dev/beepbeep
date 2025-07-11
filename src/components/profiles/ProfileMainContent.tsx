@@ -1,6 +1,6 @@
 'use client';
 
-import MyVehiclesSection from './MyVehiclesSection';
+import MyVehiclesSection from '../personalVehicles/MyVehiclesSection';
 import MyInsuranceSection from './MyInsuranceSection';
 import MyIssuesSection from './MyIssuesSection';
 

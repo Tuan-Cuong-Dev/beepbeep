@@ -14,7 +14,8 @@ export interface PersonalVehicle_new {
   color?: string;
   yearOfManufacture?: number;
   odo?: number;                // Số km đã đi
-  photoUrl?: string;
+  photoUrl: string;          // ảnh thực tế người dùng upload
+  modelImageUrl: string;     // ảnh mẫu từ vehicleModels để hiển thị tạm
 
   isPrimary?: boolean;         // Xe chính
   isActive?: boolean;

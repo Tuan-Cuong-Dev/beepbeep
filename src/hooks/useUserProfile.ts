@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { useAuth } from '@/src/components/users/useAuth';
+import { useAuth } from '@/src/hooks/useAuth';
 import { User } from '@/src/lib/users/userTypes'; // đảm bảo đường dẫn đúng
 
 export function useUserProfile() {

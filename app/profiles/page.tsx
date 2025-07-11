@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { useAuth } from '@/src/components/users/useAuth';
+import { useAuth } from '@/src/hooks/useAuth';
 import ProfileOverview from '@/src/components/profiles/ProfileOverview';
 import ProfileTabs from '@/src/components/profiles/ProfileTabs';
 import ProfileSidebar from '@/src/components/profiles/ProfileSidebar';
 import ProfileMainContent from '@/src/components/profiles/ProfileMainContent';
-import MyVehiclesSection from '@/src/components/profiles/MyVehiclesSection';
+import MyVehiclesSection from '@/src/components/personalVehicles/MyVehiclesSection';
 import MyInsuranceSection from '@/src/components/profiles/MyInsuranceSection';
 import MyIssuesSection from '@/src/components/profiles/MyIssuesSection';
 

@@ -15,6 +15,10 @@ const nextConfig = {
         hostname: "drive.usercontent.google.com", // 👈 thêm dòng này
       },
       {
+      protocol: "https",
+      hostname: "lh3.googleusercontent.com", // ảnh từ Google Photos hoặc Avatar
+      },
+      {
         protocol: "https",
         hostname: "i.pravatar.cc", // 👈 Thêm dòng này để ảnh avatar giả hoạt động
       },

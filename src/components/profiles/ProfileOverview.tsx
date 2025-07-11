@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useAuth } from '@/src/components/users/useAuth';
+import { useAuth } from '@/src/hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
