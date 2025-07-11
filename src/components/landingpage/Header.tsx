@@ -34,7 +34,7 @@ const Header = () => {
   };
 
   return (
-    <header className="absolute top-0 left-0 w-full bg-white z-50 h-16 flex items-center justify-between px-4 md:px-8">
+    <header className="absolute top-0 left-0 right-0 bg-white z-50 h-16 flex items-center justify-between px-4 md:px-8 overflow-x-hidden">
       {/* Nút Menu Icon (hamburger) - chỉ hiện trên mobile */}
       <button
         className="text-2xl text-gray-800 md:hidden px-2"
