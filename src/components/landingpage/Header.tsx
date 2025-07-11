@@ -32,7 +32,7 @@ const Header = () => {
     if (!isUserSidebarOpen) setIsSidebarOpen(false);
     setIsUserSidebarOpen(!isUserSidebarOpen);
   };
-
+  
   return (
     <header className="absolute top-0 left-0 right-0 bg-white z-50 h-16 flex items-center justify-between px-4 md:px-8 overflow-x-hidden">
       {/* Nút Menu Icon (hamburger) - chỉ hiện trên mobile */}
