@@ -127,6 +127,12 @@ export default function AdminDashboard() {
       description: 'Review user-submitted data before approval',
       route: '/admin/pending-contributions', // ✅ Route mới
     },
+    {
+    icon: <FontAwesomeIcon icon={faFileContract} className="w-5 h-5 text-[#00d289]" />,
+    title: 'Insurance Products',
+    description: 'Create and manage user insurance products',
+    route: '/admin/insurance-products', // 📁 Route đến trang tạo & quản lý gói
+    },
   ];
 
   return (

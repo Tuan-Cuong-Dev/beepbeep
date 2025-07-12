@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { Slot } from '@radix-ui/react-slot';
 
 type ButtonVariant =
   | 'default'
@@ -10,7 +11,7 @@ type ButtonVariant =
   | 'danger'
   | 'greenOutline'
   | 'destructive'
-  | 'success'; // ✅ Thêm mới
+  | 'success';
 
 type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -22,6 +23,7 @@ interface ButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   disabled?: boolean;
+  asChild?: boolean;
 }
 
 export const Button = ({
@@ -32,6 +34,7 @@ export const Button = ({
   variant = 'default',
   size = 'md',
   disabled = false,
+  asChild = false,
 }: ButtonProps) => {
   const baseClass =
     'inline-flex items-center justify-center font-semibold rounded-md transition-all';
@@ -57,16 +60,18 @@ export const Button = ({
       'bg-transparent text-[#00d289] border border-[#00d289] hover:bg-[#00d289]/10',
     destructive:
       'bg-white text-red-600 border border-red-500 hover:bg-red-50',
-    success: 'bg-green-600 text-white border border-green-600 hover:bg-green-700', // ✅ Thêm class cho success
+    success: 'bg-green-600 text-white border border-green-600 hover:bg-green-700',
   };
 
   const disabledClass = disabled
     ? 'opacity-50 cursor-not-allowed pointer-events-none'
     : '';
 
+  const Comp = asChild ? Slot : 'button';
+
   return (
-    <button
-      type={type}
+    <Comp
+      type={asChild ? undefined : type}
       disabled={disabled}
       onClick={onClick}
       className={[
@@ -78,6 +83,6 @@ export const Button = ({
       ].join(' ')}
     >
       {children}
-    </button>
+    </Comp>
   );
 };
