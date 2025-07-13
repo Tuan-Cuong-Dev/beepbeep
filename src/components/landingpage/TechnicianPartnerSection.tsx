@@ -6,6 +6,7 @@ import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPart
 import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
+import SkeletonCard from '@/src/components/skeletons/SkeletonCard';
 
 function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
@@ -35,11 +36,10 @@ export default function TechnicianPartnerSection() {
   const [showNotice, setShowNotice] = useState(false);
   const router = useRouter();
 
-  // Chỉ sort và hiển thị 10 technician gần nhất
   useEffect(() => {
     if (!partners.length) return;
     if (!userLocation || !Array.isArray(userLocation)) {
-      setPreviewPartners(partners.slice(0, 10)); // fallback nếu chưa có vị trí người dùng
+      setPreviewPartners(partners.slice(0, 10));
       return;
     }
 
@@ -58,33 +58,34 @@ export default function TechnicianPartnerSection() {
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
-          <span className="sm:text-2xl md:text-3xl font-extrabold">Vehicle trouble?</span>
-          <br />
-          <span className="sm:text-lg md:text-xl text-gray-700">
-            Call to a technician!
-          </span>
-        </h2>
+        {!loading && (
+          <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
+            <span className="sm:text-2xl md:text-3xl font-extrabold">Vehicle trouble?</span>
+            <br />
+            <span className="sm:text-lg md:text-xl text-gray-700">
+              Call to a technician!
+            </span>
+          </h2>
+        )}
 
-        {loading ? (
-          <p className="text-center text-gray-500">⏳ Loading technician partners...</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <div className="flex gap-4 w-max pb-2">
-              {previewPartners.slice(0, 6).map((partner) => (
-                <div
-                  key={partner.id}
-                  className="min-w-[260px] max-w-[260px] flex-shrink-0"
-                >
-                  <TechnicianPartnerCard
-                    partner={partner}
-                    onContact={() => setShowNotice(true)}
-                    userLocation={userLocation}
-                  />
-                </div>
-              ))}
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 w-max pb-2">
+            {loading
+              ? [...Array(4)].map((_, i) => <SkeletonCard key={i} />)
+              : previewPartners.slice(0, 6).map((partner) => (
+                  <div
+                    key={partner.id}
+                    className="min-w-[260px] max-w-[260px] flex-shrink-0"
+                  >
+                    <TechnicianPartnerCard
+                      partner={partner}
+                      onContact={() => setShowNotice(true)}
+                      userLocation={userLocation}
+                    />
+                  </div>
+                ))}
 
-              {/* ✅ Card cuối: View All */}
+            {!loading && (
               <div
                 onClick={() => router.push('/technician-partners')}
                 className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
@@ -96,9 +97,9 @@ export default function TechnicianPartnerSection() {
                   </p>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       <NotificationDialog

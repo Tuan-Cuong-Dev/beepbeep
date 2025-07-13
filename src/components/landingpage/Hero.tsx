@@ -61,7 +61,7 @@ export default function Hero() {
     <div className="relative z-10 w-full max-w-5xl px-4 sm:px-6 pt-20 pb-12 flex flex-col items-center gap-8 text-center">
       <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md">
         <span className="block">Rent your ride</span>
-        <span className="block text-[#00d289]">in a beep!</span>
+        <span className="block text-[#00d289]">in a beep beep!</span>
       </h1>
 
       <Button
