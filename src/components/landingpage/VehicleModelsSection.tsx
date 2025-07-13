@@ -20,7 +20,7 @@ interface EbikeModel {
   maxLoad?: number;
 }
 
-export default function EbikeModelsSection() {
+export default function VehicleModelsSection() {
   const [models, setModels] = useState<EbikeModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNotice, setShowNotice] = useState(false);

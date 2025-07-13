@@ -16,7 +16,7 @@ const Home: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Bíp Bíp - Rent your ride in a beep beep !</title>
+        <title>Bíp Bíp - Rent your ride in a beep beep!</title>
         <meta name="description" content="Thuê xe dễ như bấm còi." />
       </Head>
       <Header />

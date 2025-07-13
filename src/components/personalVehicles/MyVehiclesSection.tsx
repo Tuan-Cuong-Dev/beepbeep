@@ -83,7 +83,7 @@ export default function MyVehiclesSection() {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">🚗 My Vehicles</h2>
         {!editingVehicle && (
-          <Button variant="outline" onClick={() => setShowForm(!showForm)}>
+          <Button size='sm' variant="outline" onClick={() => setShowForm(!showForm)}>
             {showForm ? 'Close' : '+ Add Vehicle'}
           </Button>
         )}

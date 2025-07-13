@@ -1,3 +1,4 @@
+// hooks/useInsurancePackages.ts
 import { useEffect, useState } from 'react';
 import {
   collection,
@@ -7,6 +8,8 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  getDoc,
+  updateDoc,
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
@@ -32,16 +35,42 @@ export function useInsurancePackages() {
     setLoading(false);
   };
 
-  // ➕ Create new package
-  const create = async (userId: string): Promise<InsurancePackage> => {
+  // ➕ Create new insurance package
+  const create = async ({
+    userId,
+    productId,
+    vehicleId,
+    frameNumber,
+    engineNumber,
+    plateNumber,
+    imageUrl,
+    note,
+  }: {
+    userId: string;
+    productId: string;
+    vehicleId: string;
+    frameNumber?: string;
+    engineNumber?: string;
+    plateNumber?: string;
+    imageUrl?: string;
+    note?: string;
+  }): Promise<InsurancePackage> => {
     const now = Timestamp.now();
+
     const newPackage: Omit<InsurancePackage, 'id'> = {
       userId,
+      productId,
+      vehicleId,
       packageCode: `BIP365-${generateRandomCode(4)}-${generateRandomCode(4)}-${generateRandomCode(4)}`,
-      isActive: false,
+      frameNumber,
+      engineNumber,
+      plateNumber,
+      imageUrl,
+      isActive: true,
       activationMethod: 'manual',
       createdAt: now,
       updatedAt: now,
+      note,
     };
 
     const docRef = await addDoc(ref, newPackage);
@@ -50,7 +79,28 @@ export function useInsurancePackages() {
     return created;
   };
 
-  // ❌ Delete a package
+  // 🧾 Extend by days
+  const extend = async (id: string, additionalDays: number) => {
+    const packageRef = doc(db, 'insurancePackages', id);
+    const snap = await getDoc(packageRef);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data() as InsurancePackage;
+    const oldDate = data.expiredAt?.toDate?.() || new Date();
+
+    const newDate = new Date(oldDate);
+    newDate.setDate(newDate.getDate() + additionalDays);
+
+    await updateDoc(packageRef, {
+      expiredAt: Timestamp.fromDate(newDate),
+      updatedAt: Timestamp.now(),
+    });
+
+    await fetchAll();
+  };
+
+  // ❌ Delete
   const remove = async (id: string) => {
     await deleteDoc(doc(ref, id));
     setPackages((prev) => prev.filter((p) => p.id !== id));
@@ -66,5 +116,6 @@ export function useInsurancePackages() {
     fetchAll,
     create,
     remove,
+    extend,
   };
 }
