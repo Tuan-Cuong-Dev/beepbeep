@@ -21,68 +21,50 @@ export default function RentalTable({
   onEditStation,
   onDeleteStation,
 }: Props) {
-  const COMPANIES_PER_PAGE = 10;
-  const STATIONS_PER_PAGE = 10;
-
   const [companyPage, setCompanyPage] = useState(1);
   const [stationPage, setStationPage] = useState(1);
 
-  const totalCompanyPages = Math.ceil(rentalCompanies.length / COMPANIES_PER_PAGE);
-  const totalStationPages = Math.ceil(rentalStations.length / STATIONS_PER_PAGE);
+  const perPage = 10;
+  const paginatedCompanies = rentalCompanies.slice((companyPage - 1) * perPage, companyPage * perPage);
+  const paginatedStations = rentalStations.slice((stationPage - 1) * perPage, stationPage * perPage);
 
-  const paginatedCompanies = rentalCompanies.slice(
-    (companyPage - 1) * COMPANIES_PER_PAGE,
-    companyPage * COMPANIES_PER_PAGE
-  );
-
-  const paginatedStations = rentalStations.slice(
-    (stationPage - 1) * STATIONS_PER_PAGE,
-    stationPage * STATIONS_PER_PAGE
-  );
-
-  const renderPagination = (
-    currentPage: number,
-    totalPages: number,
-    setPage: (page: number) => void
-  ) => (
+  const renderPagination = (currentPage: number, totalPages: number, setPage: (page: number) => void) => (
     <div className="flex justify-center items-center gap-4 mt-4">
-      <button
-        className={`px-4 py-2 rounded border text-sm transition 
-        ${currentPage === 1
-            ? 'text-gray-400 border-gray-200 bg-white cursor-not-allowed'
-            : 'text-gray-800 border-gray-300 hover:bg-gray-100'
-          }`}
-        disabled={currentPage === 1}
-        onClick={() => setPage(currentPage - 1)}
-      >
+      <Button variant="outline" size="sm" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1}>
         Previous
-      </button>
-
-      <span className="text-gray-600 text-sm">
-        Page {currentPage} of {totalPages}
-      </span>
-
-      <button
-        className={`px-4 py-2 rounded border text-sm transition 
-        ${currentPage === totalPages
-            ? 'text-gray-400 border-gray-200 bg-white cursor-not-allowed'
-            : 'text-gray-800 border-gray-300 hover:bg-gray-100'
-          }`}
-        disabled={currentPage === totalPages}
-        onClick={() => setPage(currentPage + 1)}
-      >
+      </Button>
+      <span className="text-gray-600 text-sm">Page {currentPage} of {totalPages}</span>
+      <Button variant="outline" size="sm" onClick={() => setPage(currentPage + 1)} disabled={currentPage === totalPages}>
         Next
-      </button>
+      </Button>
     </div>
   );
 
   return (
     <div className="bg-white shadow rounded-xl p-4 mt-4 space-y-10">
-      {/* Rental Companies Table */}
+      {/* Rental Companies */}
       <div>
         <h2 className="font-semibold text-lg text-gray-800 mb-2">🏢 Rental Companies</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 text-sm">
+
+        {/* Mobile view */}
+        <div className="md:hidden space-y-4">
+          {paginatedCompanies.map((c) => (
+            <div key={c.id} className="border p-4 rounded shadow-sm">
+              <p className="font-semibold text-gray-800">{c.name}</p>
+              <p className="text-sm text-gray-600">📧 {c.email}</p>
+              <p className="text-sm text-gray-600">📞 {c.phone}</p>
+              <p className="text-sm text-gray-600">📍 {c.displayAddress}</p>
+              <div className="mt-2 flex gap-2">
+                <Button size="sm" onClick={() => onEditCompany(c)}>Edit</Button>
+                <Button size="sm" variant="destructive" onClick={() => onDeleteCompany(c.id)}>Delete</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="min-w-full border text-sm">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-3 py-2 border">Name</th>
@@ -93,80 +75,88 @@ export default function RentalTable({
               </tr>
             </thead>
             <tbody>
-              {paginatedCompanies.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="text-center py-4 text-gray-500">
-                    No rental companies found.
+              {paginatedCompanies.map((c) => (
+                <tr key={c.id} className="hover:bg-gray-50">
+                  <td className="px-3 py-2 border">{c.name}</td>
+                  <td className="px-3 py-2 border">{c.email}</td>
+                  <td className="px-3 py-2 border">{c.phone}</td>
+                  <td className="px-3 py-2 border">{c.displayAddress}</td>
+                  <td className="px-3 py-2 border whitespace-nowrap">
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => onEditCompany(c)}>Edit</Button>
+                      <Button size="sm" variant="destructive" onClick={() => onDeleteCompany(c.id)}>Delete</Button>
+                    </div>
                   </td>
                 </tr>
-              ) : (
-                paginatedCompanies.map((c) => (
-                  <tr key={c.id} className="border-t hover:bg-gray-50">
-                    <td className="px-3 py-2 border">{c.name}</td>
-                    <td className="px-3 py-2 border">{c.email}</td>
-                    <td className="px-3 py-2 border">{c.phone}</td>
-                    <td className="px-3 py-2 border">{c.displayAddress}</td>
-                    <td className="px-3 py-2 border whitespace-nowrap">
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="default" onClick={() => onEditCompany(c)}>Edit</Button>
-                        <Button size="sm" variant="destructive" onClick={() => onDeleteCompany(c.id)}>Delete</Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
-        {renderPagination(companyPage, totalCompanyPages, setCompanyPage)}
+
+        {renderPagination(companyPage, Math.ceil(rentalCompanies.length / perPage), setCompanyPage)}
       </div>
 
-      {/* Rental Stations Table */}
+      {/* Rental Stations */}
       <div>
         <h2 className="font-semibold text-lg text-gray-800 mb-2">📍 Rental Stations</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 text-sm">
+
+        {/* Mobile view */}
+        <div className="md:hidden space-y-4">
+          {paginatedStations.map((s) => {
+            const company = rentalCompanies.find((c) => c.id === s.companyId);
+            return (
+              <div key={s.id} className="border p-4 rounded shadow-sm">
+                <p className="font-semibold text-gray-800">{s.name}</p>
+                <p className="text-sm text-gray-600">🏢 {company?.name || 'Unknown'}</p>
+                <p className="text-sm text-gray-600">📍 {s.displayAddress}</p>
+                <p className="text-sm text-gray-600">📌 {s.location}</p>
+                <p className="text-sm text-gray-600">📞 {s.contactPhone}</p>
+                <div className="mt-2 flex gap-2">
+                  <Button size="sm" onClick={() => onEditStation(s)}>Edit</Button>
+                  <Button size="sm" variant="destructive" onClick={() => onDeleteStation(s.id)}>Delete</Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="min-w-full border text-sm">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-3 py-2 border">Company</th>
                 <th className="px-3 py-2 border">Station Name</th>
                 <th className="px-3 py-2 border">Address</th>
                 <th className="px-3 py-2 border">Location</th>
-                <th className="px-3 py-2 border text-center">Contact Phone</th>
+                <th className="px-3 py-2 border">Contact Phone</th>
                 <th className="px-3 py-2 border">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {paginatedStations.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-4 text-gray-500">
-                    No rental stations found.
-                  </td>
-                </tr>
-              ) : (
-                paginatedStations.map((s) => {
-                  const company = rentalCompanies.find((c) => c.id === s.companyId);
-                  return (
-                    <tr key={s.id} className="border-t hover:bg-gray-50">
-                      <td className="px-3 py-2 border">{company?.name || 'Unknown'}</td>
-                      <td className="px-3 py-2 border">{s.name}</td>
-                      <td className="px-3 py-2 border">{s.displayAddress}</td>
-                      <td className="px-3 py-2 border">{s.location}</td>
-                      <td className="px-3 py-2 border text-center">{s.contactPhone}</td>
-                      <td className="px-3 py-2 border whitespace-nowrap">
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="default" onClick={() => onEditStation(s)}>Edit</Button>
-                          <Button size="sm" variant="destructive" onClick={() => onDeleteStation(s.id)}>Delete</Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
+              {paginatedStations.map((s) => {
+                const company = rentalCompanies.find((c) => c.id === s.companyId);
+                return (
+                  <tr key={s.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-2 border">{company?.name || 'Unknown'}</td>
+                    <td className="px-3 py-2 border">{s.name}</td>
+                    <td className="px-3 py-2 border">{s.displayAddress}</td>
+                    <td className="px-3 py-2 border">{s.location}</td>
+                    <td className="px-3 py-2 border">{s.contactPhone}</td>
+                    <td className="px-3 py-2 border whitespace-nowrap">
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={() => onEditStation(s)}>Edit</Button>
+                        <Button size="sm" variant="destructive" onClick={() => onDeleteStation(s.id)}>Delete</Button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-        {renderPagination(stationPage, totalStationPages, setStationPage)}
+
+        {renderPagination(stationPage, Math.ceil(rentalStations.length / perPage), setStationPage)}
       </div>
     </div>
   );

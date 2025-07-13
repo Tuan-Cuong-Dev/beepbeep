@@ -66,7 +66,7 @@ export default function RentalCompanyForm({ editingCompany, onSave, onCancel }: 
   };
 
   return (
-    <div className="space-y-5">
+    <div className="hidden md:space-y-5 md:block">
       <div className="grid gap-4">
         <div>
           <Label>Company Name</Label>

@@ -48,7 +48,7 @@ export default function RentalCompanyForm({ editingCompany, onSave, onCancel }: 
   };
 
   return (
-    <div className="space-y-3">
+    <div className="hidden md:space-y-3 md:block">
       <Input
         placeholder="Company Name"
         value={form.name}

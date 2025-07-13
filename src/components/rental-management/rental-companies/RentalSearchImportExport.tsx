@@ -30,8 +30,9 @@ export default function RentalSearchImportExport({ companies, searchTerm, onSear
           onChange={(e) => onSearch(e.target.value)}
         />
       </div>
-
-      <Button onClick={handleExport}>📤 Export to Excel</Button>
+      <Button onClick={handleExport} className="hidden md:inline-flex">
+        📤 Export to Excel
+      </Button>
     </div>
   );
 }

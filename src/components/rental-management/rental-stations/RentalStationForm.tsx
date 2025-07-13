@@ -53,7 +53,7 @@ export default function RentalStationForm({ companies, editingStation, onSave, o
   };
 
   return (
-    <div className="space-y-3">
+    <div className="hidden md:space-y-3 md:block">
       <Input
         placeholder="Station name"
         value={form.name}
