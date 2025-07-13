@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
 import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
@@ -30,30 +30,36 @@ function parseCoords(geo?: string | { lat: number; lng: number }): [number, numb
 
 export default function TechnicianPartnerSection() {
   const { partners, loading } = usePublicTechnicianPartners();
-  const [showNotice, setShowNotice] = useState(false);
   const { location: userLocation } = useCurrentLocation();
+  const [previewPartners, setPreviewPartners] = useState<typeof partners>([]);
+  const [showNotice, setShowNotice] = useState(false);
   const router = useRouter();
 
-  const sortedPartners = useMemo(() => {
-    if (!userLocation || !Array.isArray(userLocation)) return partners;
-    const [userLat, userLng] = userLocation;
+  // Chỉ sort và hiển thị 10 technician gần nhất
+  useEffect(() => {
+    if (!partners.length) return;
+    if (!userLocation || !Array.isArray(userLocation)) {
+      setPreviewPartners(partners.slice(0, 10)); // fallback nếu chưa có vị trí người dùng
+      return;
+    }
 
-    return [...partners].sort((a, b) => {
+    const [userLat, userLng] = userLocation;
+    const sorted = [...partners].sort((a, b) => {
       const [latA, lngA] = parseCoords(a.geo);
       const [latB, lngB] = parseCoords(b.geo);
       const distA = getDistanceFromLatLng(userLat, userLng, latA, lngA);
       const distB = getDistanceFromLatLng(userLat, userLng, latB, lngB);
       return distA - distB;
     });
+
+    setPreviewPartners(sorted.slice(0, 10));
   }, [partners, userLocation]);
 
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
-          <span className="sm:text-2xl md:text-3xl font-extrabold">
-            Vehicle trouble?
-          </span>
+          <span className="sm:text-2xl md:text-3xl font-extrabold">Vehicle trouble?</span>
           <br />
           <span className="sm:text-lg md:text-xl text-gray-700">
             Call to a technician!
@@ -63,37 +69,35 @@ export default function TechnicianPartnerSection() {
         {loading ? (
           <p className="text-center text-gray-500">⏳ Loading technician partners...</p>
         ) : (
-          <>
-            <div className="overflow-x-auto">
-              <div className="flex gap-4 w-max pb-2">
-                {sortedPartners.slice(0, 6).map((partner) => (
-                  <div
-                    key={partner.id}
-                    className="min-w-[260px] max-w-[260px] flex-shrink-0"
-                  >
-                    <TechnicianPartnerCard
-                      partner={partner}
-                      onContact={() => setShowNotice(true)}
-                      userLocation={userLocation}
-                    />
-                  </div>
-                ))}
-
-                {/* ✅ Card cuối: View All */}
+          <div className="overflow-x-auto">
+            <div className="flex gap-4 w-max pb-2">
+              {previewPartners.slice(0, 6).map((partner) => (
                 <div
-                  onClick={() => router.push('/technician-partners')}
-                  className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
+                  key={partner.id}
+                  className="min-w-[260px] max-w-[260px] flex-shrink-0"
                 >
-                  <div className="border rounded-xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
-                    <h3 className="text-lg font-semibold text-gray-800">View All</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      See all technicians near you
-                    </p>
-                  </div>
+                  <TechnicianPartnerCard
+                    partner={partner}
+                    onContact={() => setShowNotice(true)}
+                    userLocation={userLocation}
+                  />
+                </div>
+              ))}
+
+              {/* ✅ Card cuối: View All */}
+              <div
+                onClick={() => router.push('/technician-partners')}
+                className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
+              >
+                <div className="border rounded-xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
+                  <h3 className="text-lg font-semibold text-gray-800">View All</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    See all technicians near you
+                  </p>
                 </div>
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
 
