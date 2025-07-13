@@ -18,7 +18,7 @@ interface MapWrapperProps {
 
 export default function MapWrapper({ children }: MapWrapperProps) {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-  const { user } = useAuth(); // ✅ Lấy thông tin user, ví dụ từ Firebase
+  const { currentUser} = useAuth(); // ✅ Lấy thông tin user, ví dụ từ Firebase
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -31,7 +31,7 @@ export default function MapWrapper({ children }: MapWrapperProps) {
 
   // ✅ Tạo icon từ avatar nếu có
   const userIcon = L.icon({
-    iconUrl: user?.photoURL || '/assets/images/usericon.png',
+    iconUrl: currentUser?.photoURL || '/assets/images/usericon.png',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
