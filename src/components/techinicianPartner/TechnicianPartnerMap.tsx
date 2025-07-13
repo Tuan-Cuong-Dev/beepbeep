@@ -79,7 +79,7 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
   const defaultCenter: [number, number] = userPosition ?? [16.0471, 108.2062];
 
   return (
-    <div className="fixed inset-0 z-0">
+    <div className="h-full w-full relative flex flex-col">
       <MapContainer center={defaultCenter} zoom={13} className="w-full h-full">
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

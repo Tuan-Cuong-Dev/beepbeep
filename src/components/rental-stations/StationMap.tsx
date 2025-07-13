@@ -81,7 +81,7 @@ export default function StationMap({ stations, userLocation }: Props) {
       : defaultCenter);
 
   return (
-    <div className="fixed inset-0 z-0">
+    <div className="h-full w-full relative flex flex-col">
       <MapContainer center={center} zoom={13} className="w-full h-full">
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
