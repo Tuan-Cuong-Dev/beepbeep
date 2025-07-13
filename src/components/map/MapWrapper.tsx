@@ -1,57 +1,82 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { useEffect, useState, ReactNode } from 'react';
-import { useAuth } from '@/src/hooks/useAuth'; // ✅ giả định bạn có hook này
+import L from 'leaflet';
+import { useAuth } from '@/src/hooks/useAuth';
 
-const defaultUserIcon = L.icon({
-  iconUrl: '/assets/images/usericon.png',
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
+function FlyToUser({ userPosition }: { userPosition: [number, number] }) {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(userPosition, 15, {
+      animate: true,
+      duration: 1.5,
+    });
+  }, [userPosition, map]);
+  return null;
+}
 
 interface MapWrapperProps {
   children: ReactNode;
 }
 
 export default function MapWrapper({ children }: MapWrapperProps) {
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-  const { currentUser} = useAuth(); // ✅ Lấy thông tin user, ví dụ từ Firebase
+  const { currentUser } = useAuth();
+  const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
+  const [userIcon, setUserIcon] = useState<L.Icon | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
+  // Lấy vị trí người dùng
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
-        (err) => console.warn('⚠️ Location error:', err)
+        (pos) => setUserPosition([pos.coords.latitude, pos.coords.longitude]),
+        (err) => setLocationError(err.message)
       );
     }
   }, []);
 
-  // ✅ Tạo icon từ avatar nếu có
-  const userIcon = L.icon({
-    iconUrl: currentUser?.photoURL || '/assets/images/usericon.png',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
-  });
+  // Tạo icon avatar nếu có
+  useEffect(() => {
+    const icon = new L.Icon({
+      iconUrl: currentUser?.photoURL || '/assets/images/usericon.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -28],
+      className: 'rounded-full border border-white shadow-md',
+    });
+    setUserIcon(icon);
+  }, [currentUser?.photoURL]);
 
-  const center: [number, number] = userLocation ?? [16.0471, 108.2062];
+  const defaultCenter: [number, number] = userPosition ?? [16.0471, 108.2062];
 
   return (
     <div className="h-full w-full z-0">
-      <MapContainer center={center} zoom={13} scrollWheelZoom className="h-full w-full z-0">
+      <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom className="h-full w-full z-0">
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {userLocation && (
-          <Marker position={userLocation} icon={userIcon}>
-            <Popup>You are here</Popup>
-          </Marker>
+        {/* 👤 Marker vị trí người dùng */}
+        {userPosition && userIcon && (
+          <>
+            <FlyToUser userPosition={userPosition} />
+            <Marker position={userPosition} icon={userIcon}>
+              <Popup>
+                🧍 You are here<br />
+                Lat: {userPosition[0].toFixed(5)}<br />
+                Lng: {userPosition[1].toFixed(5)}
+              </Popup>
+            </Marker>
+          </>
         )}
 
         {children}
       </MapContainer>
+
+      {locationError && (
+        <p className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-sm text-red-500 bg-white px-3 py-1 rounded shadow">
+          ⚠️ {locationError}
+        </p>
+      )}
     </div>
   );
 }
