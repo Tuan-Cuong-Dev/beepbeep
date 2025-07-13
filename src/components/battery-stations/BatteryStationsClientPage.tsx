@@ -76,7 +76,7 @@ export default function BatteryStationsClientPage() {
   return (
     <div className="bg-gray-100 min-h-screen font-sans overflow-x-hidden">
       <Header />
-      <main className="flex-1 p-4">
+      <main className="flex-1">
         <div className="relative h-[85vh] overflow-hidden rounded-lg">
           {/* Thanh tìm kiếm nổi trên bản đồ */}
           <div className="absolute px-10 top-20 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[95%] md:w-1/3">
