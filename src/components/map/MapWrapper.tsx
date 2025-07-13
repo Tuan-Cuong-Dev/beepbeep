@@ -3,8 +3,9 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { useEffect, useState, ReactNode } from 'react';
+import { useAuth } from '@/src/hooks/useAuth'; // ✅ giả định bạn có hook này
 
-const userIcon = L.icon({
+const defaultUserIcon = L.icon({
   iconUrl: '/assets/images/usericon.png',
   iconSize: [32, 32],
   iconAnchor: [16, 32],
@@ -17,6 +18,7 @@ interface MapWrapperProps {
 
 export default function MapWrapper({ children }: MapWrapperProps) {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const { user } = useAuth(); // ✅ Lấy thông tin user, ví dụ từ Firebase
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -26,6 +28,14 @@ export default function MapWrapper({ children }: MapWrapperProps) {
       );
     }
   }, []);
+
+  // ✅ Tạo icon từ avatar nếu có
+  const userIcon = L.icon({
+    iconUrl: user?.photoURL || '/assets/images/usericon.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
 
   const center: [number, number] = userLocation ?? [16.0471, 108.2062];
 
@@ -39,6 +49,7 @@ export default function MapWrapper({ children }: MapWrapperProps) {
             <Popup>You are here</Popup>
           </Marker>
         )}
+
         {children}
       </MapContainer>
     </div>
