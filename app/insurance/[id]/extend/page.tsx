@@ -8,31 +8,44 @@ import NotificationDialog, { NotificationType } from '@/src/components/ui/Notifi
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
 import { useInsurancePackages } from '@/src/hooks/useInsurancePackages';
 import { useInsurancePackageById } from '@/src/hooks/useInsurancePackageById';
+import Header from '@/src/components/landingpage/Header';
+import Footer from '@/src/components/landingpage/Footer';
+
+// Helper to extract ID safely
+function getIdFromParams(param: any): string | undefined {
+  if (!param) return undefined;
+  if (typeof param === 'string') return param;
+  if (Array.isArray(param)) return param[0];
+  if (typeof param === 'object' && 'id' in param) {
+    const value = param.id;
+    return Array.isArray(value) ? value[0] : value;
+  }
+  return undefined;
+}
 
 export default function ExtendInsuranceForm() {
   const params = useParams();
-  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const id = getIdFromParams(params);
   const router = useRouter();
 
   const { currentPackage, loading } = useInsurancePackageById(id);
   const { extend } = useInsurancePackages();
 
-  const [extraDays, setExtraDays] = useState(30);
   const [submitting, setSubmitting] = useState(false);
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<NotificationType>('info');
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogDescription, setDialogDescription] = useState('');
 
+  const extraDays = 365;
+
   const handleExtend = async () => {
     if (!currentPackage) return;
 
-    // ⛔ Validate
     if (!currentPackage.isActive) {
       setDialogType('error');
-      setDialogTitle('Cannot Extend');
-      setDialogDescription('This insurance package is not yet activated.');
+      setDialogTitle('Extension Not Allowed');
+      setDialogDescription('Only active packages can be extended.');
       setDialogOpen(true);
       return;
     }
@@ -40,23 +53,22 @@ export default function ExtendInsuranceForm() {
     if (!currentPackage.expiredAt) {
       setDialogType('error');
       setDialogTitle('Missing Expiry Date');
-      setDialogDescription('This package has no expiry date. Cannot proceed.');
+      setDialogDescription('This package does not have an expiry date.');
       setDialogOpen(true);
       return;
     }
 
-    // ✅ Proceed
     setSubmitting(true);
     try {
       await extend(currentPackage.id, extraDays);
       setDialogType('success');
-      setDialogTitle('Successfully Extended');
-      setDialogDescription(`The package has been extended by ${extraDays} days.`);
+      setDialogTitle('Extension Successful');
+      setDialogDescription(`Package extended by ${extraDays} days.`);
     } catch (error) {
       console.error(error);
       setDialogType('error');
       setDialogTitle('Extension Failed');
-      setDialogDescription('Something went wrong. Please try again later.');
+      setDialogDescription('An error occurred. Please try again later.');
     } finally {
       setSubmitting(false);
       setDialogOpen(true);
@@ -70,15 +82,25 @@ export default function ExtendInsuranceForm() {
     }
   };
 
-  if (loading) return <p className="p-4 text-gray-500">⏳ Loading package...</p>;
-  if (!currentPackage) return <p className="p-4 text-red-500">❌ Insurance package not found.</p>;
+  if (!id) {
+    return <div className="p-6 text-center text-red-500">❌ Invalid or missing package ID.</div>;
+  }
+
+  if (loading) {
+    return <div className="p-6 text-center text-gray-500">⏳ Loading insurance package...</div>;
+  }
+
+  if (!currentPackage) {
+    return <div className="p-6 text-center text-red-500">❌ Insurance package not found.</div>;
+  }
 
   return (
-    <>
-      <main className="max-w-xl mx-auto p-6 bg-white shadow rounded space-y-4 mt-10">
-        <h1 className="text-xl font-semibold">🛡️ Extend Insurance Package</h1>
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="max-w-xl mx-auto p-6 flex-grow">
+        <h1 className="text-xl font-semibold mb-4">🛡️ Extend Insurance Package</h1>
 
-        <div className="text-sm text-gray-700 space-y-1">
+        <div className="text-sm text-gray-700 space-y-1 mb-4">
           <p>
             <strong>Package Code:</strong>{' '}
             <span className="font-mono">{currentPackage.packageCode}</span>
@@ -92,26 +114,28 @@ export default function ExtendInsuranceForm() {
           )}
 
           {!currentPackage.isActive && (
-            <p className="text-red-500">⚠️ This package is not active yet.</p>
+            <p className="text-red-500">⚠️ Only active packages can be extended.</p>
           )}
         </div>
 
-        <div>
+        <div className="mb-4">
           <label className="text-sm font-medium">Extend by (days)</label>
-          <Input
-            type="number"
-            value={extraDays}
-            onChange={(e) => setExtraDays(parseInt(e.target.value))}
-            min={1}
-            max={365}
-            className="mt-1"
-          />
+          <Input type="number" value={extraDays} disabled className="mt-1" />
+          <p className="text-xs text-gray-500 mt-1">
+            Currently only supports extension by 365 days.
+          </p>
         </div>
 
-        <Button onClick={handleExtend} disabled={submitting}>
+        <Button
+          onClick={handleExtend}
+          disabled={submitting || !currentPackage.isActive}
+          className="w-full"
+        >
           {submitting ? 'Processing...' : 'Extend Now'}
         </Button>
       </main>
+
+      <Footer />
 
       <NotificationDialog
         open={dialogOpen}
@@ -120,6 +144,6 @@ export default function ExtendInsuranceForm() {
         description={dialogDescription}
         onClose={handleDialogClose}
       />
-    </>
+    </div>
   );
 }
