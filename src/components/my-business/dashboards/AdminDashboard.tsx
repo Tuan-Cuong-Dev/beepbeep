@@ -133,6 +133,12 @@ export default function AdminDashboard() {
     description: 'Create and manage user insurance products',
     route: '/admin/insurance-products', // 📁 Route đến trang tạo & quản lý gói
     },
+    {
+    icon: <FaClipboardList className="w-6 h-6 text-[#00d289]" />,
+    title: 'Insurance Approvals',
+    description: 'Review and approve customer insurance requests',
+    route: '/admin/insurance-approvals',
+  },
   ];
 
   return (
