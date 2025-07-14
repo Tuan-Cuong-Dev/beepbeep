@@ -65,7 +65,7 @@ export default function InsuranceDetailPage() {
   return (
     <>
       <Header />
-      <main className="max-w-3xl mx-auto p-6 space-y-6 bg-white rounded shadow mt-6 mb-10 pt-24">
+      <main className="max-w-3xl mx-auto p-6 space-y-6 bg-white rounded shadow mt-6 mb-10">
         <div>
           <h1 className="text-2xl font-bold text-green-700">{product.name}</h1>
           <p className="text-gray-600 text-sm">{product.description}</p>
