@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useInsurancePackages } from '@/src/hooks/useInsurancePackages';
 import { useInsuranceProducts } from '@/src/hooks/useInsuranceProducts';
+import { useMyPersonalVehicles } from '@/src/hooks/useMyPersonalVehicles';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/src/components/ui/button';
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
@@ -11,9 +12,10 @@ import { cn } from '@/src/lib/utils';
 export default function MyInsurancePackagesSection() {
   const { packages, loading: loadingPackages } = useInsurancePackages();
   const { products, loading: loadingProducts } = useInsuranceProducts();
+  const { vehicles, loading: loadingVehicles } = useMyPersonalVehicles();
   const router = useRouter();
 
-  const isLoading = loadingPackages || loadingProducts;
+  const isLoading = loadingPackages || loadingProducts || loadingVehicles;
 
   if (isLoading) {
     return <p className="text-sm text-gray-500">Loading your insurance packages...</p>;
@@ -29,6 +31,7 @@ export default function MyInsurancePackagesSection() {
 
       {packages.map((pkg) => {
         const product = products.find((p) => p.id === pkg.productId);
+        const vehicle = vehicles.find((v) => v.id === pkg.vehicleId);
         const createdDate = pkg.createdAt?.toDate?.() || pkg.createdAt;
         const expiredDate = pkg.expiredAt?.toDate?.() || pkg.expiredAt;
 
@@ -48,7 +51,7 @@ export default function MyInsurancePackagesSection() {
           statusLabel = '❌ Rejected';
           statusColor = 'text-red-600';
         } else if (isExpired) {
-          statusLabel = '📅 Expired';
+          statusLabel = '🗕️ Expired';
           statusColor = 'text-gray-500';
         } else if (isActive) {
           statusLabel = '✅ Active';
@@ -88,26 +91,13 @@ export default function MyInsurancePackagesSection() {
               <div className="space-y-1 text-sm">
                 <p className="text-base font-semibold text-gray-800">{product?.name || 'Unnamed Product'}</p>
                 <p className="text-xs text-gray-600">Code: {pkg.packageCode}</p>
-                {pkg.frameNumber && (
-                  <p className="text-xs text-gray-600">Frame No.: {pkg.frameNumber}</p>
-                )}
-                {pkg.engineNumber && (
-                  <p className="text-xs text-gray-600">Engine No.: {pkg.engineNumber}</p>
-                )}
-                {pkg.plateNumber && (
-                  <p className="text-xs text-gray-600">Plate No.: {pkg.plateNumber}</p>
-                )}
-                {expiredDate && (
-                  <p className="text-xs text-gray-600">
-                    Expires: {safeFormatDate(expiredDate)}
-                  </p>
-                )}
+                {vehicle && <p className="text-xs text-gray-600">Vehicle: {vehicle.name}</p>}
+                {pkg.frameNumber && <p className="text-xs text-gray-600">Frame No.: {pkg.frameNumber}</p>}
+                {pkg.engineNumber && <p className="text-xs text-gray-600">Engine No.: {pkg.engineNumber}</p>}
+                {pkg.plateNumber && <p className="text-xs text-gray-600">Plate No.: {pkg.plateNumber}</p>}
+                {expiredDate && <p className="text-xs text-gray-600">Expires: {safeFormatDate(expiredDate)}</p>}
                 <p className={cn('text-sm font-semibold', statusColor)}>{statusLabel}</p>
-                {createdDate && (
-                  <p className="text-[11px] text-gray-400">
-                    Created: {safeFormatDate(createdDate)}
-                  </p>
-                )}
+                {createdDate && <p className="text-[11px] text-gray-400">Created: {safeFormatDate(createdDate)}</p>}
               </div>
 
               {/* Actions */}
@@ -122,6 +112,7 @@ export default function MyInsurancePackagesSection() {
                 <Button
                   size="sm"
                   onClick={() => router.push(`/insurance/${pkg.id}/extend`)}
+                  disabled={!isActive}
                 >
                   Extend Insurance
                 </Button>
