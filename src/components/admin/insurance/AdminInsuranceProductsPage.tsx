@@ -14,10 +14,10 @@ export default function AdminInsuranceProductsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
-      <main className="flex-grow px-4 pt-28 pb-10 md:px-8 space-y-8">
+      <main className="flex-grow p-6 max-w-5xl mx-auto">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800">🛡️ Insurance Product Management</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold mb-2 text-center text-gray-800">🛡️ Insurance Product Management</h1>
+          <p className="text-sm text-gray-500 mb-6">
             Create and manage standard insurance offerings for all users.
           </p>
         </div>

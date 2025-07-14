@@ -108,7 +108,7 @@ export default function CreateInsuranceProductForm({
 
   return (
     <>
-      <div className="hidden md:block border p-6 rounded-xl bg-white space-y-4 max-w-xl mx-auto shadow">
+      <div className="hidden md:block border p-6 mb-6 rounded-xl bg-white space-y-4 max-w-xl mx-auto shadow">
         <h2 className="text-lg font-bold text-gray-800">
           {initialProduct ? '✏️ Edit Insurance Product' : '➕ Create New Insurance Product'}
         </h2>
