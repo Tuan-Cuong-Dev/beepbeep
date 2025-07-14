@@ -50,7 +50,7 @@ export default function StationPage() {
       <main className="flex-1">
         {/* Bộ lọc nổi trên bản đồ */}
         <div className="relative h-[85vh]">
-          <div className="absolute px-10 top-20 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[98%] md:w-1/3">
+          <div className="absolute px-12 top-4 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[98%] md:w-1/3">
             <Input
               placeholder="🔍 Search by name or address..."
               value={searchTerm}

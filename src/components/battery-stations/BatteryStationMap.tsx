@@ -71,8 +71,8 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
     const style = document.createElement('style');
     style.innerHTML = `
       .leaflet-top.leaflet-left {
-        top: 80px !important;
-        left: 12px !important;
+        top: 4 !important;
+        left: 1/2 !important;
         z-index: 1001 !important;
       }
     `;
