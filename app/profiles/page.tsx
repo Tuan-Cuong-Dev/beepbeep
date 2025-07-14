@@ -15,16 +15,13 @@ import MyVehiclesSection from '@/src/components/personalVehicles/MyVehiclesSecti
 import MyInsuranceSection from '@/src/components/profiles/MyInsuranceSection';
 import MyIssuesSection from '@/src/components/profiles/MyIssuesSection';
 
-const mockVehicles = [
-  { model: 'Mocha S', plateNumber: '43C1-123.45', frameNumber: 'RL9Y9ENUMRBDE0182' },
-];
-
-const mockInsurances = [
-  { name: 'Bíp Bíp 365', validUntil: '2026-01-01' },
-];
-
 const mockIssues = [
-  { title: 'Xe không khởi động', status: 'pending', location: 'Gần Lotte Mart', reportedAt: '2025-07-01' },
+  {
+    title: 'Xe không khởi động',
+    status: 'pending',
+    location: 'Gần Lotte Mart',
+    reportedAt: '2025-07-01',
+  },
 ];
 
 const validTabs: TabType[] = ['activityFeed', 'vehicles', 'insurance', 'issues'];
@@ -36,23 +33,24 @@ export default function ProfilesPage() {
   const searchParams = useSearchParams()!;
   const router = useRouter();
   const urlTab = searchParams.get('tab') as TabType | null;
-  const isValidTab = (tab: string | null): tab is TabType => validTabs.includes(tab as TabType);
+  const isValidTab = (tab: string | null): tab is TabType =>
+    validTabs.includes(tab as TabType);
   const [activeTab, setActiveTab] = useState<TabType>('activityFeed');
 
-  // Sync tab from URL
+  // Đồng bộ tab từ URL
   useEffect(() => {
     if (isValidTab(urlTab)) {
       setActiveTab(urlTab);
     }
   }, [urlTab]);
 
-  // Update URL when tab changes
+  // Cập nhật URL khi tab thay đổi
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     router.push(`?tab=${tab}`);
   };
 
-  // Fetch user data
+  // Fetch user data từ Firestore
   useEffect(() => {
     const fetchUser = async () => {
       if (!currentUser) return;
@@ -71,12 +69,12 @@ export default function ProfilesPage() {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      {/* Overview Section */}
+      {/* Header */}
       <div className="bg-white shadow-sm">
         <ProfileOverview />
       </div>
 
-      {/* Tabs Section */}
+      {/* Tabs */}
       <div className="bg-white border-t border-b sticky top-0 z-10">
         <ProfileTabs activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
@@ -92,11 +90,13 @@ export default function ProfilesPage() {
           />
         </div>
 
-        {/* Content */}
+        {/* Tab nội dung */}
         <div className="w-full md:flex-[1_1_66.666%] md:max-w-[66.666%] space-y-6 mt-6 md:mt-0 min-w-0">
-          {activeTab === 'activityFeed' && <ProfileMainContent activeTab="profile" />}
+          {activeTab === 'activityFeed' && (
+            <ProfileMainContent activeTab="profile" />
+          )}
           {activeTab === 'vehicles' && <MyVehiclesSection />}
-          {activeTab === 'insurance' && <MyInsuranceSection/>} 
+          {activeTab === 'insurance' && <MyInsuranceSection />}
           {activeTab === 'issues' && <MyIssuesSection issues={mockIssues} />}
         </div>
       </div>
