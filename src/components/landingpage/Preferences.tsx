@@ -12,6 +12,7 @@ interface PreferencesProps {
 }
 
 const regions = [
+  { key: 'englishUS', value: 'en', code: 'US', flag: '🇺🇸' },
   { key: 'vietnam', value: 'vi', code: 'VN', flag: '🇻🇳' },
   { key: 'englishUK', value: 'en', code: 'GB', flag: '🇬🇧' },
   { key: 'japan', value: 'ja', code: 'JP', flag: '🇯🇵' },
@@ -27,25 +28,44 @@ const regions = [
 ];
 
 const currencies = [
-  { label: 'VND', name: 'Vietnamese Dong' },
-  { label: 'GBP', name: 'British Pound Sterling' },
-  { label: 'JPY', name: 'Japanese Yen' },
-  { label: 'CNY', name: 'Chinese Yuan' },
-  { label: 'KRW', name: 'South Korean Won' },
-  { label: 'RUB', name: 'Russian Ruble' },
-  { label: 'EUR', name: 'Euro' },
-  { label: 'SAR', name: 'Saudi Riyal' },
+  { label: 'USD', name: 'United States Dollar', region: 'US' },
+  { label: 'VND', name: 'Vietnamese Dong', region: 'VN' },
+  { label: 'GBP', name: 'British Pound Sterling', region: 'GB' },
+  { label: 'JPY', name: 'Japanese Yen', region: 'JP' },
+  { label: 'CNY', name: 'Chinese Yuan', region: 'CN' },
+  { label: 'KRW', name: 'South Korean Won', region: 'KR' },
+  { label: 'RUB', name: 'Russian Ruble', region: 'RU' },
+  { label: 'EUR', name: 'Euro', region: 'EU' }, // chung cho FR, DE, IT, ES, PT
+  { label: 'SAR', name: 'Saudi Riyal', region: 'SA' },
 ];
 
+// Region to default currency mapping
+const regionCurrencyMap: Record<string, string> = {
+  US: 'USD',
+  VN: 'VND',
+  GB: 'GBP',
+  JP: 'JPY',
+  CN: 'CNY',
+  KR: 'KRW',
+  RU: 'RUB',
+  FR: 'EUR',
+  DE: 'EUR',
+  IT: 'EUR',
+  ES: 'EUR',
+  PT: 'EUR',
+  SA: 'SAR',
+};
+
 export default function Preferences({ onClose }: PreferencesProps) {
-  const [activeTab, setActiveTab] = useState('region');
+  const [activeTab, setActiveTab] = useState<'region' | 'currency'>('region');
   const { user } = useUser();
   const { preferences, updatePreferences, loading, updating } = usePreferences(user?.uid);
   const { t } = useTranslation('common');
 
   const handleRegionChange = async (lang: string, region: string) => {
     i18n.changeLanguage(lang);
-    await updatePreferences({ language: lang, region });
+    const defaultCurrency = regionCurrencyMap[region];
+    await updatePreferences({ language: lang, region, currency: defaultCurrency });
   };
 
   const handleCurrencyChange = async (currency: string) => {
@@ -89,16 +109,26 @@ export default function Preferences({ onClose }: PreferencesProps) {
           <div>
             <h3 className="text-lg font-medium mb-2">{t('select_region_language')}</h3>
             <div className="text-sm grid grid-cols-4 gap-3">
-              {regions.map((region) => (
-                <button
-                  key={region.code}
-                  onClick={() => handleRegionChange(region.value, region.code)}
-                  className="p-2 rounded-lg border hover:bg-[#00d289] transition"
-                  disabled={updating}
-                >
-                  {t(region.key)} {region.flag}
-                </button>
-              ))}
+              {regions.map((region) => {
+                const isActive =
+                  preferences?.language === region.value &&
+                  preferences?.region === region.code;
+
+                return (
+                  <button
+                    key={region.code}
+                    onClick={() => handleRegionChange(region.value, region.code)}
+                    className={`p-2 rounded-lg border transition ${
+                      isActive
+                        ? 'bg-[#00d289] text-white font-semibold'
+                        : 'hover:bg-[#00d289]'
+                    }`}
+                    disabled={updating}
+                  >
+                    {t(region.key)} {region.flag}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ) : (
@@ -109,7 +139,11 @@ export default function Preferences({ onClose }: PreferencesProps) {
                 <button
                   key={currency.label}
                   onClick={() => handleCurrencyChange(currency.label)}
-                  className="p-2 rounded-lg border hover:bg-[#00d289] transition"
+                  className={`p-2 rounded-lg border transition ${
+                    preferences?.currency === currency.label
+                      ? 'bg-[#00d289] text-white font-semibold'
+                      : 'hover:bg-[#00d289]'
+                  }`}
                   disabled={updating}
                 >
                   {currency.label} ({currency.name})
