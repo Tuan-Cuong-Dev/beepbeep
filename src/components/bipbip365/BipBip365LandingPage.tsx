@@ -86,31 +86,35 @@ export default function BipBip365LandingPage() {
           </div>
         </section>
 
-        {/* HOW TO JOIN */}
+        {/* HOW TO JOIN + AFFILIATE */}
         <section className="bg-[#f9fafb] py-12 px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-xl sm:text-2xl font-semibold mb-6">Cách tham gia gói 365K</h2>
-            <ol className="text-left list-decimal list-inside space-y-3 text-gray-700 text-base">
-              <li>Chọn xe cá nhân cần bảo hiểm</li>
-              <li>Mua gói Bíp Bíp 365K trực tuyến</li>
-              <li>Nhận mã bảo hiểm/thẻ điện tử ngay sau thanh toán</li>
-              <li>Gọi cứu hộ/Bảo trì bất cứ khi nào cần</li>
-            </ol>
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+            
+            {/* HOW TO JOIN */}
+            <div className="text-center md:text-left">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-6">Cách tham gia gói 365K</h2>
+              <ol className="text-left list-decimal list-inside space-y-3 text-gray-700 text-base">
+                <li>Chọn xe cá nhân cần bảo hiểm</li>
+                <li>Mua gói Bíp Bíp 365K trực tuyến</li>
+                <li>Nhận mã bảo hiểm/thẻ điện tử ngay sau thanh toán</li>
+                <li>Gọi cứu hộ/Bảo trì bất cứ khi nào cần</li>
+              </ol>
+            </div>
+
+            {/* AFFILIATE */}
+            <div className="text-center md:text-left">
+              <h2 className="text-xl font-semibold mb-3">🎁 Dành cho Đối tác</h2>
+              <p className="text-gray-700 mb-5">
+                Giới thiệu khách hàng mua gói 365K, bạn nhận ngay <strong>30% hoa hồng/gói</strong>.
+              </p>
+              <Link href="/partners/register">
+                <Button size="lg">Đăng ký làm đối tác</Button>
+              </Link>
+            </div>
+            
           </div>
         </section>
 
-        {/* AFFILIATE */}
-        <section className="py-12 px-4 text-center">
-          <div className="max-w-xl mx-auto">
-            <h2 className="text-xl font-semibold mb-3">🎁 Dành cho Đối tác</h2>
-            <p className="text-gray-700 mb-5">
-              Giới thiệu khách hàng mua gói 365K, bạn nhận ngay <strong>30% hoa hồng/gói</strong>.
-            </p>
-            <Link href="/partners/register">
-              <Button size="lg">Đăng ký làm đối tác</Button>
-            </Link>
-          </div>
-        </section>
 
         {/* FAQ */}
         <section className="bg-[#f0fdf4] py-12 px-4">
