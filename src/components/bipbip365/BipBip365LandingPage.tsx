@@ -8,90 +8,124 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function BipBip365LandingPage() {
-  const { products, loading } = useInsuranceProducts();
-
+  const { products } = useInsuranceProducts();
   const bipbip365 = products.find(p => p.isActive && p.name.includes('365'));
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-white text-gray-900">
       <Header />
 
-      <main className="flex-grow bg-white">
-        {/* Hero Section */}
-        <section className="bg-[#f0fdf4] py-12 px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#00d289] mb-4">
-            {bipbip365?.name || 'Bíp Bíp 365K – Gói bảo hiểm xe điện'} 
-          </h1>
-          <p className="text-gray-600 mb-6 text-lg">
-            {bipbip365?.description || 'Chỉ 1.000đ/ngày, an tâm cả năm.'}
-          </p>
-          <div className="flex justify-center gap-4">
-            <Button size="lg">Mua ngay</Button>
-            <Button variant="outline" size="lg">Nhận mã giới thiệu</Button>
-          </div>
-        </section>
+      <main className="flex-grow">
+        {/* HERO */}
+        <section className="bg-[#f0fdf4] px-4 py-12 sm:py-16">
+          <div className="max-w-3xl mx-auto flex flex-col-reverse sm:flex-row items-center gap-6">
+            {/* Text */}
+            <div className="text-center sm:text-left space-y-4 flex-1">
+              <h1 className="text-3xl sm:text-4xl font-bold text-[#00d289]">
+                {bipbip365?.name || 'Gói Bíp Bíp 365K'}
+              </h1>
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
+                {bipbip365?.description || 'Chỉ 1.000đ/ngày, an tâm cả năm.'}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start mt-4">
+                <Button size="lg">Mua ngay</Button>
+                <Button variant="outline" size="lg">Nhận mã giới thiệu</Button>
+              </div>
+            </div>
 
-        {/* Benefits Section */}
-        <section className="py-12 px-6 max-w-5xl mx-auto">
-          <h2 className="text-2xl font-semibold mb-6 text-center">Quyền lợi gói 365K</h2>
-          <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-700">
-            <ul className="list-disc ml-6 space-y-2">
-              {bipbip365?.features?.length ? (
-                bipbip365.features.map((f, i) => (
-                  <li key={i}>✅ {f}</li>
-                ))
-              ) : (
-                <>
-                  <li>✅ Miễn phí 3 lần cứu hộ/năm</li>
-                  <li>✅ Sửa chữa tại chỗ hoặc kéo xe về trạm</li>
-                  <li>✅ Giảm giá phụ tùng & dịch vụ kỹ thuật</li>
-                  <li>✅ Theo dõi lịch sử bảo hiểm & cứu hộ</li>
-                </>
-              )}
-            </ul>
-
-            <div className="rounded border p-4 bg-gray-50 text-center">
+            {/* Image */}
+            <div className="relative w-full sm:w-[300px] aspect-[4/3] rounded-xl overflow-hidden shadow border">
               <Image
-                src={bipbip365?.imageUrl || '/insurance-card-sample.png'}
-                alt="Insurance Card"
-                width={300}
-                height={200}
-                className="mx-auto rounded shadow"
+                src="https://drive.google.com/uc?export=view&id=1knGrrixxRoCwYW8SU3ihhJuCqZm8fKqE"
+                alt="Bip Bip 365K Card"
+                fill
+                className="object-contain"
               />
-              <p className="text-xs text-gray-400 mt-2">*Hình ảnh minh họa</p>
             </div>
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="bg-[#f9fafb] py-12 px-6">
-          <h2 className="text-xl font-semibold text-center mb-6">Cách tham gia gói 365K</h2>
-          <ol className="list-decimal mx-auto max-w-2xl space-y-3 text-gray-700 text-sm ml-6">
-            <li>Chọn xe cá nhân cần bảo hiểm</li>
-            <li>Mua gói Bíp Bíp 365K trực tuyến</li>
-            <li>Nhận mã bảo hiểm/thẻ điện tử ngay sau thanh toán</li>
-            <li>Gọi cứu hộ/Bảo trì bất cứ khi nào cần</li>
-          </ol>
+        {/* BENEFITS */}
+        <section className="py-12 px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-xl sm:text-2xl font-semibold text-center mb-6">
+              Quyền lợi gói 365K
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+              {/* Left: List features */}
+              <ul className="space-y-3 text-gray-700 text-base list-inside">
+                {bipbip365?.features?.length ? (
+                  bipbip365.features.map((f, i) => <li key={i}>✅ {f}</li>)
+                ) : (
+                  <>
+                    <li>✅ Miễn phí 3 lần cứu hộ/năm</li>
+                    <li>✅ Sửa chữa tại chỗ hoặc kéo xe về trạm</li>
+                    <li>✅ Giảm giá phụ tùng & dịch vụ kỹ thuật</li>
+                    <li>✅ Theo dõi lịch sử bảo hiểm & cứu hộ</li>
+                  </>
+                )}
+              </ul>
+
+              {/* Right: Image */}
+              <div className="bg-gray-50 p-4 rounded-xl shadow text-center">
+                <Image
+                  src="https://drive.google.com/uc?export=view&id=1BEtR9tVBpU3rUeiw5GcA4tr1CkUq9NnG"
+                  alt="Insurance Card"
+                  width={320}
+                  height={220}
+                  className="mx-auto rounded"
+                />
+              </div>
+            </div>
+          </div>
         </section>
 
-        {/* Affiliate Section */}
-        <section className="py-12 px-6 max-w-4xl mx-auto text-center">
-          <h2 className="text-xl font-semibold mb-4">🎁 Dành cho Đối tác</h2>
-          <p className="text-gray-600 mb-4">
-            Giới thiệu khách hàng mua gói 365K, bạn nhận ngay hoa hồng 30%/gói.
-          </p>
-          <Link href="/partners/register">
-            <Button size="lg">Đăng ký làm đối tác</Button>
-          </Link>
+
+        {/* HOW TO JOIN */}
+        <section className="bg-[#f9fafb] py-12 px-4">
+          <div className="max-w-xl mx-auto text-center">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-6">Cách tham gia gói 365K</h2>
+            <ol className="text-left list-decimal list-inside space-y-3 text-gray-700 text-base">
+              <li>Chọn xe cá nhân cần bảo hiểm</li>
+              <li>Mua gói Bíp Bíp 365K trực tuyến</li>
+              <li>Nhận mã bảo hiểm/thẻ điện tử ngay sau thanh toán</li>
+              <li>Gọi cứu hộ/Bảo trì bất cứ khi nào cần</li>
+            </ol>
+          </div>
         </section>
 
-        {/* FAQ Section */}
-        <section className="bg-[#f0fdf4] py-12 px-6">
-          <h2 className="text-xl font-semibold text-center mb-6">Câu hỏi thường gặp</h2>
-          <div className="max-w-3xl mx-auto text-sm text-gray-700 space-y-4">
-            <p><strong>Gói bảo hiểm áp dụng cho xe nào?</strong> Xe máy điện cá nhân, xe đạp điện, xe xăng.</p>
-            <p><strong>Tôi có thể mua cho người thân không?</strong> Có, chỉ cần nhập thông tin xe và người sở hữu.</p>
-            <p><strong>Nếu xe tôi hỏng ở xa thì sao?</strong> Gọi cứu hộ qua app/web, kỹ thuật viên sẽ đến tận nơi hỗ trợ.</p>
+        {/* AFFILIATE */}
+        <section className="py-12 px-4 text-center">
+          <div className="max-w-xl mx-auto">
+            <h2 className="text-xl font-semibold mb-3">🎁 Dành cho Đối tác</h2>
+            <p className="text-gray-700 mb-5">
+              Giới thiệu khách hàng mua gói 365K, bạn nhận ngay <strong>30% hoa hồng/gói</strong>.
+            </p>
+            <Link href="/partners/register">
+              <Button size="lg">Đăng ký làm đối tác</Button>
+            </Link>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="bg-[#f0fdf4] py-12 px-4">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-xl sm:text-2xl font-semibold text-center mb-6">Câu hỏi thường gặp</h2>
+            <div className="space-y-6 text-base text-gray-700">
+              <div>
+                <p className="font-semibold">Gói bảo hiểm áp dụng cho xe nào?</p>
+                <p>Xe máy điện, xe đạp điện, xe xăng cá nhân.</p>
+              </div>
+              <div>
+                <p className="font-semibold">Tôi có thể mua cho người thân không?</p>
+                <p>Có, chỉ cần nhập thông tin xe và chủ xe.</p>
+              </div>
+              <div>
+                <p className="font-semibold">Nếu xe tôi hỏng ở xa thì sao?</p>
+                <p>Gọi cứu hộ qua app/web – kỹ thuật viên sẽ đến hỗ trợ tận nơi.</p>
+              </div>
+            </div>
           </div>
         </section>
       </main>
