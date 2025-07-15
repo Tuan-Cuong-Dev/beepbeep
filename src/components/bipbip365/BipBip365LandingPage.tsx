@@ -17,7 +17,7 @@ export default function BipBip365LandingPage() {
 
       <main className="flex-grow">
         {/* HERO */}
-        <section className="bg-[#f0fdf4] px-4 py-12 sm:py-16">
+        <section className="bg-[#f0fdf4] px-4 py-12 sm:py-24">
           <div className="max-w-3xl mx-auto flex flex-col-reverse sm:flex-row items-center gap-6">
             {/* Text */}
             <div className="text-center sm:text-left space-y-4 flex-1">
