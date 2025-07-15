@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
 import { auth } from '@/src/firebaseConfig';
+import { format } from 'date-fns';
 
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
@@ -78,20 +79,24 @@ export default function AccountPage() {
     if (!user?.uid || !localUser) return;
 
     try {
-      await update({
-        firstName: localUser.firstName,
-        lastName: localUser.lastName,
-        name: localUser.name,
-        gender: localUser.gender,
-        dateOfBirth: localUser.dateOfBirth,
-        idNumber: localUser.idNumber,
-        phone: localUser.phone,
-        address: localUser.address,
-        city: localUser.city,
-        state: localUser.state,
-        zip: localUser.zip,
-        country: localUser.country,
-      });
+      const cleanedUserData = Object.fromEntries(
+        Object.entries({
+          firstName: localUser.firstName,
+          lastName: localUser.lastName,
+          name: localUser.name,
+          gender: localUser.gender,
+          dateOfBirth: localUser.dateOfBirth,
+          idNumber: localUser.idNumber,
+          phone: localUser.phone,
+          address: localUser.address,
+          city: localUser.city,
+          state: localUser.state,
+          zip: localUser.zip,
+          country: localUser.country,
+        }).filter(([_, value]) => value !== undefined)
+      );
+
+      await update(cleanedUserData);
 
       await updatePreferences(localPrefs);
 
@@ -143,7 +148,7 @@ export default function AccountPage() {
           <div>
             <Label>Gender</Label>
             <SimpleSelect
-              value={localUser.gender ?? undefined}
+              value={localUser.gender ?? ''}
               onChange={(val) => handleFieldChange('gender', val)}
               options={[
                 { label: 'Male', value: 'male' },
@@ -158,7 +163,11 @@ export default function AccountPage() {
             <Label>Date of Birth</Label>
             <Input
               type="date"
-              value={localUser.dateOfBirth ?? ''}
+              value={
+                localUser.dateOfBirth
+                  ? format(new Date(localUser.dateOfBirth), 'yyyy-MM-dd')
+                  : ''
+              }
               onChange={(e) => handleFieldChange('dateOfBirth', e.target.value)}
             />
           </div>
@@ -195,7 +204,7 @@ export default function AccountPage() {
           <div>
             <Label>Language</Label>
             <SimpleSelect
-              value={localPrefs.language ?? undefined}
+              value={localPrefs.language ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, language: val }))}
               options={[
                 { label: 'English', value: 'en' },
@@ -208,7 +217,7 @@ export default function AccountPage() {
           <div>
             <Label>Region</Label>
             <SimpleSelect
-              value={localPrefs.region ?? undefined}
+              value={localPrefs.region ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, region: val }))}
               options={[
                 { label: 'Vietnam', value: 'VN' },
@@ -221,7 +230,7 @@ export default function AccountPage() {
           <div>
             <Label>Currency</Label>
             <SimpleSelect
-              value={localPrefs.currency ?? undefined}
+              value={localPrefs.currency ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, currency: val }))}
               options={[
                 { label: 'VND', value: 'VND' },
