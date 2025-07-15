@@ -11,6 +11,7 @@ import TechnicianPartnerSection from '../src/components/landingpage/TechnicianPa
 import ServicePricingSection from "@/src/components/landingpage/ServicePricingSection";
 import StationSection from "@/src/components/landingpage/StationSection";
 import BatteryStationCounter from '@/src/components/landingpage/BatteryStationCounter';
+import Bipbip365Section from "@/src/components/landingpage/Bipbip365Section";
 
 const Home: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const Home: React.FC = () => {
       <StationSection/>
       <TechnicianPartnerSection />
       <ServicePricingSection/>
+      <Bipbip365Section/>
       <VehicleModelsSection />
       <BatteryStationCounter />
       <WhyChooseUs />
