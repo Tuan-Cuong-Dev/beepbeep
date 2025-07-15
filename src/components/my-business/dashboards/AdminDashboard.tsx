@@ -53,7 +53,7 @@ export default function AdminDashboard() {
     icon: <FaWrench className="w-6 h-6 text-[#00d289]" />,
     title: 'Technician Partners',
     description: 'Manage external repair partners',
-    route: '/technician-partners',
+    route: "/assistant/add-technician-partner",
     },
     {
       icon: <FaUser className="w-6 h-6 text-[#00d289]" />,

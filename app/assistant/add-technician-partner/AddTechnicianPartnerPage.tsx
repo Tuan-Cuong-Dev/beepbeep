@@ -107,7 +107,7 @@ export default function AddTechnicianPartnerPage() {
           />
         </div>
 
-        <div>
+        <div className="hidden md:block">
           <h2 className="text-xl font-bold mb-4">
             {editingPartner ? 'Edit Technician Partner' : 'Add New Technician Partner'}
           </h2>
