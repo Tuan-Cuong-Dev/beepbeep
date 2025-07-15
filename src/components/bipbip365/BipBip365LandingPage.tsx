@@ -34,14 +34,18 @@ export default function BipBip365LandingPage() {
             </div>
 
             {/* Image */}
-            <div className="relative w-full sm:w-[300px] aspect-[4/3] rounded-xl overflow-hidden shadow border">
-              <Image
-                src="https://drive.google.com/uc?export=view&id=1knGrrixxRoCwYW8SU3ihhJuCqZm8fKqE"
-                alt="Bip Bip 365K Card"
-                fill
-                className="object-contain"
-              />
+            <div className="flex justify-center mt-6">
+              <div className="border-2 border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                <Image
+                  src="https://drive.google.com/uc?export=view&id=1knGrrixxRoCwYW8SU3ihhJuCqZm8fKqE"
+                  alt="Thẻ bảo hiểm Bíp Bíp 365K"
+                  width={320}
+                  height={240}
+                  className="object-cover"
+                />
+              </div>
             </div>
+
           </div>
         </section>
 
@@ -68,15 +72,17 @@ export default function BipBip365LandingPage() {
               </ul>
 
               {/* Right: Image */}
-              <div className="bg-gray-50 p-4 rounded-xl shadow text-center">
+              <div className="flex justify-center mt-6">
+              <div className="border-2 border-gray-300 rounded-xl overflow-hidden shadow-sm">
                 <Image
                   src="https://drive.google.com/uc?export=view&id=1BEtR9tVBpU3rUeiw5GcA4tr1CkUq9NnG"
-                  alt="Insurance Card"
+                  alt="Thẻ bảo hiểm Bíp Bíp 365K"
                   width={320}
-                  height={220}
-                  className="mx-auto rounded"
+                  height={240}
+                  className="object-cover"
                 />
               </div>
+            </div>
             </div>
           </div>
         </section>
