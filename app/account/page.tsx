@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '@/src/i18n';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
 import { auth } from '@/src/firebaseConfig';
@@ -21,13 +23,16 @@ import NotificationDialog, { NotificationType } from '@/src/components/ui/Notifi
 import { UserLocation } from '@/src/lib/users/userTypes';
 
 export default function AccountPage() {
+  const { t } = useTranslation();
   const { user, loading, update } = useUserProfile();
-  const { preferences, updatePreferences } = useUserPreferences(user?.uid);
-  const { location, updateLocation } = useUserLocation(user?.uid);
+  const { preferences, updatePreferences } = useUserPreferences(user?.uid ?? '');
+  const { location, updateLocation } = useUserLocation(user?.uid ?? '');
 
   const [localUser, setLocalUser] = useState(user);
   const [localPrefs, setLocalPrefs] = useState(preferences);
   const [localLoc, setLocalLoc] = useState<UserLocation | null>(null);
+
+  const [formattedDateOfBirth, setFormattedDateOfBirth] = useState('');
 
   const [notifyOpen, setNotifyOpen] = useState(false);
   const [notifyType, setNotifyType] = useState<NotificationType>('success');
@@ -45,6 +50,15 @@ export default function AccountPage() {
   useEffect(() => {
     setLocalLoc(location);
   }, [location]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && localUser?.dateOfBirth) {
+      const parsed = new Date(localUser.dateOfBirth);
+      if (!isNaN(parsed.getTime())) {
+        setFormattedDateOfBirth(format(parsed, 'yyyy-MM-dd'));
+      }
+    }
+  }, [localUser?.dateOfBirth]);
 
   const handleFieldChange = (field: string, value: string) => {
     setLocalUser((prev: any) => ({
@@ -68,10 +82,10 @@ export default function AccountPage() {
     if (!user?.email) return;
     try {
       await sendPasswordResetEmail(auth, user.email);
-      showNotification('info', 'Password Reset', 'A password reset email has been sent.');
+      showNotification('info', t('account.reset_success'), t('account.reset_notice'));
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
-      showNotification('error', 'Reset Failed', msg);
+      showNotification('error', t('account.reset_failed'), msg);
     }
   };
 
@@ -97,7 +111,6 @@ export default function AccountPage() {
       );
 
       await update(cleanedUserData);
-
       await updatePreferences(localPrefs);
 
       if (localLoc?.lat !== undefined && localLoc?.lng !== undefined) {
@@ -109,123 +122,126 @@ export default function AccountPage() {
         });
       }
 
-      showNotification('success', 'Profile Updated', 'Your profile was saved successfully.');
+      showNotification('success', t('account.update_success'), t('account.saved'));
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
-      showNotification('error', 'Update Failed', msg);
+      showNotification('error', t('account.update_failed'), msg);
     }
   };
 
-  if (loading || !user || !localUser) return <div className="p-6">Loading...</div>;
+  if (loading || !user || !localUser) return <div className="p-6">{t('landing.loading')}</div>;
 
   return (
     <>
       <Header />
       <UserTopMenu />
       <main className="max-w-4xl mx-auto p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b-2 border-[#00d289] pb-2">Account Info</h2>
+        <h2 className="text-2xl font-semibold mb-6 border-b-2 border-[#00d289] pb-2">{t('user_sidebar.menu.account_info')}</h2>
 
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-6 rounded shadow-lg bg-white"
-        >
-          {/* Personal Info */}
+        <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-6 rounded shadow-lg bg-white">
+          {/* First Name */}
           <div>
-            <Label>First Name</Label>
+            <Label>{t('account.first_name')}</Label>
             <Input value={localUser.firstName ?? ''} onChange={(e) => handleFieldChange('firstName', e.target.value)} />
           </div>
 
+          {/* Last Name */}
           <div>
-            <Label>Last Name</Label>
+            <Label>{t('account.last_name')}</Label>
             <Input value={localUser.lastName ?? ''} onChange={(e) => handleFieldChange('lastName', e.target.value)} />
           </div>
 
+          {/* Full Name */}
           <div className="md:col-span-2">
-            <Label>Full Name</Label>
+            <Label>{t('account.full_name')}</Label>
             <Input value={localUser.name ?? ''} onChange={(e) => handleFieldChange('name', e.target.value)} />
           </div>
 
+          {/* Gender */}
           <div>
-            <Label>Gender</Label>
+            <Label>{t('account.gender')}</Label>
             <SimpleSelect
               value={localUser.gender ?? ''}
               onChange={(val) => handleFieldChange('gender', val)}
               options={[
-                { label: 'Male', value: 'male' },
-                { label: 'Female', value: 'female' },
-                { label: 'Other', value: 'other' },
+                { label: t('account.male'), value: 'male' },
+                { label: t('account.female'), value: 'female' },
+                { label: t('account.other'), value: 'other' },
               ]}
-              placeholder="Select gender"
+              placeholder={t('account.select_gender')}
             />
           </div>
 
+          {/* Date of Birth */}
           <div>
-            <Label>Date of Birth</Label>
+            <Label>{t('account.date_of_birth')}</Label>
             <Input
               type="date"
-              value={
-                localUser.dateOfBirth
-                  ? format(new Date(localUser.dateOfBirth), 'yyyy-MM-dd')
-                  : ''
-              }
-              onChange={(e) => handleFieldChange('dateOfBirth', e.target.value)}
+              value={formattedDateOfBirth}
+              onChange={(e) => {
+                setFormattedDateOfBirth(e.target.value);
+                handleFieldChange('dateOfBirth', e.target.value);
+              }}
             />
           </div>
 
+          {/* ID Number */}
           <div>
-            <Label>ID Number</Label>
+            <Label>{t('account.id_number')}</Label>
             <Input value={localUser.idNumber ?? ''} onChange={(e) => handleFieldChange('idNumber', e.target.value)} />
           </div>
 
+          {/* Phone */}
           <div>
-            <Label>Phone</Label>
+            <Label>{t('account.phone')}</Label>
             <Input value={localUser.phone ?? ''} onChange={(e) => handleFieldChange('phone', e.target.value)} />
           </div>
 
+          {/* Email */}
           <div className="md:col-span-2">
-            <Label>Email</Label>
+            <Label>{t('account.email')}</Label>
             <Input value={localUser.email ?? ''} readOnly />
-            <p className="text-sm text-gray-500 mt-1">* This email is your login email.</p>
+            <p className="text-sm text-gray-500 mt-1">{t('account.login_email_note')}</p>
           </div>
 
+          {/* Password */}
           <div className="md:col-span-2">
-            <Label>Password</Label>
+            <Label>{t('account.password')}</Label>
             <Input type="password" value="********" disabled />
-            <button
-              type="button"
-              onClick={handleResetPassword}
-              className="text-sm text-[#00d289] mt-2 hover:underline"
-            >
-              Reset your password
+            <button type="button" onClick={handleResetPassword} className="text-sm text-[#00d289] mt-2 hover:underline">
+              {t('account.reset_password')}
             </button>
           </div>
 
           {/* Preferences */}
           <div>
-            <Label>Language</Label>
+            <Label>{t('header.language')}</Label>
             <SimpleSelect
               value={localPrefs.language ?? ''}
-              onChange={(val) => setLocalPrefs((prev) => ({ ...prev, language: val }))}
+              onChange={(val) => {
+                i18n.changeLanguage(val);
+                setLocalPrefs((prev) => ({ ...prev, language: val }));
+              }}
               options={[
-                  { label: 'English', value: 'en' },
-                  { label: 'Vietnamese', value: 'vi' },
-                  { label: 'Korean', value: 'ko' },
-                  { label: 'Chinese', value: 'zh' },
-                  { label: 'Japanese', value: 'ja' },
-                  { label: 'French', value: 'fr' },
-                  { label: 'German', value: 'de' },
-                  { label: 'Spanish', value: 'es' },
-                  { label: 'Portuguese', value: 'pt' },
-                  { label: 'Thai', value: 'th' },
-                  { label: 'Indonesian', value: 'id' },
-                  { label: 'Russian', value: 'ru' },
-                  { label: 'Hindi', value: 'hi' },
+                { label: 'English', value: 'en' },
+                { label: 'Vietnamese', value: 'vi' },
+                { label: 'Korean', value: 'ko' },
+                { label: 'Chinese', value: 'zh' },
+                { label: 'Japanese', value: 'ja' },
+                { label: 'French', value: 'fr' },
+                { label: 'German', value: 'de' },
+                { label: 'Spanish', value: 'es' },
+                { label: 'Portuguese', value: 'pt' },
+                { label: 'Thai', value: 'th' },
+                { label: 'Indonesian', value: 'id' },
+                { label: 'Russian', value: 'ru' },
+                { label: 'Hindi', value: 'hi' },
               ]}
             />
           </div>
 
           <div>
-            <Label>Region</Label>
+            <Label>{t('header.select_language')}</Label>
             <SimpleSelect
               value={localPrefs.region ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, region: val }))}
@@ -248,7 +264,7 @@ export default function AccountPage() {
           </div>
 
           <div>
-            <Label>Currency</Label>
+            <Label>{t('header.select_currency')}</Label>
             <SimpleSelect
               value={localPrefs.currency ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, currency: val }))}
@@ -270,35 +286,35 @@ export default function AccountPage() {
             />
           </div>
 
-          {/* Static Address */}
+          {/* Address Info */}
           <div className="md:col-span-2">
-            <Label>Address</Label>
+            <Label>{t('account.address')}</Label>
             <Input value={localUser.address ?? ''} onChange={(e) => handleFieldChange('address', e.target.value)} />
           </div>
 
           <div>
-            <Label>City</Label>
+            <Label>{t('account.city')}</Label>
             <Input value={localUser.city ?? ''} onChange={(e) => handleFieldChange('city', e.target.value)} />
           </div>
 
           <div>
-            <Label>State</Label>
+            <Label>{t('account.state')}</Label>
             <Input value={localUser.state ?? ''} onChange={(e) => handleFieldChange('state', e.target.value)} />
           </div>
 
           <div>
-            <Label>ZIP</Label>
+            <Label>{t('account.zip')}</Label>
             <Input value={localUser.zip ?? ''} onChange={(e) => handleFieldChange('zip', e.target.value)} />
           </div>
 
           <div>
-            <Label>Country</Label>
+            <Label>{t('account.country')}</Label>
             <Input value={localUser.country ?? ''} onChange={(e) => handleFieldChange('country', e.target.value)} />
           </div>
 
-          {/* Last Known Location */}
+          {/* Location */}
           <div className="md:col-span-2">
-            <Label>Last Known Address</Label>
+            <Label>{t('account.last_known_address')}</Label>
             <Input
               value={localLoc?.address ?? ''}
               onChange={(e) =>
@@ -307,12 +323,11 @@ export default function AccountPage() {
                   address: e.target.value,
                 }))
               }
-              placeholder="e.g. 123 Main St, Hanoi"
             />
           </div>
 
           <div>
-            <Label>Latitude</Label>
+            <Label>{t('account.latitude')}</Label>
             <Input
               value={localLoc?.lat?.toString() ?? ''}
               onChange={(e) =>
@@ -321,12 +336,11 @@ export default function AccountPage() {
                   lat: parseFloat(e.target.value) || 0,
                 }))
               }
-              placeholder="Latitude"
             />
           </div>
 
           <div>
-            <Label>Longitude</Label>
+            <Label>{t('account.longitude')}</Label>
             <Input
               value={localLoc?.lng?.toString() ?? ''}
               onChange={(e) =>
@@ -335,17 +349,15 @@ export default function AccountPage() {
                   lng: parseFloat(e.target.value) || 0,
                 }))
               }
-              placeholder="Longitude"
             />
           </div>
 
-          {/* Actions */}
           <div className="md:col-span-2 flex gap-4 mt-6">
             <Button type="button" onClick={handleSaveAll}>
-              Save
+              {t('account.save')}
             </Button>
             <Button type="button" variant="ghost">
-              Cancel
+              {t('account.cancel')}
             </Button>
           </div>
         </form>

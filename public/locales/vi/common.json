@@ -185,7 +185,50 @@
     "select_currency": "Chọn đơn vị tiền tệ",
     "select_language": "Chọn ngôn ngữ",
     "sign_in": "Đăng nhập"
+  },
+
+  "account": {
+    "title": "Thông tin tài khoản",
+    "first_name": "Tên",
+    "last_name": "Họ",
+    "full_name": "Họ và tên",
+    "gender": "Giới tính",
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác",
+    "date_of_birth": "Ngày sinh",
+    "id_number": "CMND/CCCD",
+    "phone": "Số điện thoại",
+    "email": "Email",
+    "email_note": "* Đây là email đăng nhập của bạn.",
+    "password": "Mật khẩu",
+    "reset_password": "Đặt lại mật khẩu",
+    "address": "Địa chỉ",
+    "city": "Thành phố",
+    "state": "Tỉnh/Thành",
+    "zip": "Mã ZIP",
+    "country": "Quốc gia",
+    "last_known_address": "Địa chỉ gần nhất",
+    "latitude": "Vĩ độ",
+    "longitude": "Kinh độ",
+
+    "language": "Ngôn ngữ",
+    "region": "Khu vực",
+    "currency": "Tiền tệ",
+
+    "save": "Lưu",
+    "cancel": "Hủy",
+
+    "saving_success": "Cập nhật thành công",
+    "saving_success_description": "Hồ sơ của bạn đã được lưu.",
+    "saving_error": "Cập nhật thất bại",
+
+    "reset_sent": "Đặt lại mật khẩu",
+    "reset_sent_description": "Email đặt lại mật khẩu đã được gửi.",
+    "reset_failed": "Lỗi đặt lại mật khẩu",
+    "login_email_note": "Đây là email bạn đã dùng để đăng nhập. Nếu bạn muốn thay đổi, vui lòng liên hệ hỗ trợ."
   }
+
 
 
 }

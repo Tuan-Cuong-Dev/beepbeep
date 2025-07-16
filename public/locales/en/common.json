@@ -171,6 +171,56 @@
     "select_currency": "Select currency",
     "select_language": "Select language",
     "sign_in": "Sign in"
+  },
+
+
+  "account": {
+    "title": "Account Info",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "full_name": "Full Name",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "date_of_birth": "Date of Birth",
+    "id_number": "ID Number",
+    "phone": "Phone",
+    "email": "Email",
+    "email_note": "* This email is your login email.",
+    "password": "Password",
+    "reset_password": "Reset your password",
+    "address": "Address",
+    "city": "City",
+    "state": "State",
+    "zip": "ZIP",
+    "country": "Country",
+    "last_known_address": "Last Known Address",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+
+    "language": "Language",
+    "region": "Region",
+    "currency": "Currency",
+
+    "save": "Save",
+    "cancel": "Cancel",
+
+    "saving_success": "Profile Updated",
+    "saving_success_description": "Your profile was saved successfully.",
+    "saving_error": "Update Failed",
+
+    "reset_sent": "Password Reset",
+    "reset_sent_description": "A password reset email has been sent.",
+    "reset_failed": "Reset Failed",
+    "login_email_note": "This is the email you used to sign in. If you want to change it, please contact support."
   }
+
+
+
+
+
+
+
   }
 }
