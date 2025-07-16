@@ -213,7 +213,7 @@ export default function AccountPage() {
             </button>
           </div>
 
-          {/* Preferences */}
+          {/* Preferences - Language */}
           <div>
             <Label>{t('header.language')}</Label>
             <SimpleSelect
@@ -223,68 +223,64 @@ export default function AccountPage() {
                 setLocalPrefs((prev) => ({ ...prev, language: val }));
               }}
               options={[
-                { label: 'English', value: 'en' },
                 { label: 'Vietnamese', value: 'vi' },
-                { label: 'Korean', value: 'ko' },
-                { label: 'Chinese', value: 'zh' },
+                { label: 'English (UK)', value: 'en' },
                 { label: 'Japanese', value: 'ja' },
+                { label: 'Chinese', value: 'zh' },
+                { label: 'Korean', value: 'ko' },
+                { label: 'Russian', value: 'ru' },
                 { label: 'French', value: 'fr' },
                 { label: 'German', value: 'de' },
+                { label: 'Italian', value: 'it' },
                 { label: 'Spanish', value: 'es' },
                 { label: 'Portuguese', value: 'pt' },
-                { label: 'Thai', value: 'th' },
-                { label: 'Indonesian', value: 'id' },
-                { label: 'Russian', value: 'ru' },
-                { label: 'Hindi', value: 'hi' },
+                { label: 'Arabic', value: 'ar' },
               ]}
             />
           </div>
 
+          {/* Preferences - Region */}
           <div>
-            <Label>{t('header.select_language')}</Label>
+            <Label>{t('header.region')}</Label>
             <SimpleSelect
               value={localPrefs.region ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, region: val }))}
               options={[
                 { label: 'Vietnam', value: 'VN' },
-                { label: 'South Korea', value: 'KR' },
-                { label: 'United States', value: 'US' },
-                { label: 'China', value: 'CN' },
+                { label: 'United Kingdom', value: 'GB' },
                 { label: 'Japan', value: 'JP' },
+                { label: 'China', value: 'CN' },
+                { label: 'South Korea', value: 'KR' },
+                { label: 'Russia', value: 'RU' },
                 { label: 'France', value: 'FR' },
                 { label: 'Germany', value: 'DE' },
+                { label: 'Italy', value: 'IT' },
                 { label: 'Spain', value: 'ES' },
                 { label: 'Portugal', value: 'PT' },
-                { label: 'Thailand', value: 'TH' },
-                { label: 'Indonesia', value: 'ID' },
-                { label: 'Russia', value: 'RU' },
-                { label: 'India', value: 'IN' },
+                { label: 'Saudi Arabia', value: 'SA' },
               ]}
             />
           </div>
 
+          {/* Preferences - Currency */}
           <div>
-            <Label>{t('header.select_currency')}</Label>
+            <Label>{t('header.currency')}</Label>
             <SimpleSelect
               value={localPrefs.currency ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, currency: val }))}
               options={[
                 { label: 'VND - Vietnamese Dong', value: 'VND' },
-                { label: 'USD - US Dollar', value: 'USD' },
-                { label: 'KRW - South Korean Won', value: 'KRW' },
-                { label: 'CNY - Chinese Yuan', value: 'CNY' },
+                { label: 'GBP - British Pound Sterling', value: 'GBP' },
                 { label: 'JPY - Japanese Yen', value: 'JPY' },
-                { label: 'EUR - Euro', value: 'EUR' },
-                { label: 'GBP - British Pound', value: 'GBP' },
-                { label: 'THB - Thai Baht', value: 'THB' },
-                { label: 'IDR - Indonesian Rupiah', value: 'IDR' },
+                { label: 'CNY - Chinese Yuan', value: 'CNY' },
+                { label: 'KRW - South Korean Won', value: 'KRW' },
                 { label: 'RUB - Russian Ruble', value: 'RUB' },
-                { label: 'INR - Indian Rupee', value: 'INR' },
-                { label: 'BRL - Brazilian Real', value: 'BRL' },
-                { label: 'AUD - Australian Dollar', value: 'AUD' },
+                { label: 'EUR - Euro', value: 'EUR' },
+                { label: 'SAR - Saudi Riyal', value: 'SAR' },
               ]}
             />
           </div>
+
 
           {/* Address Info */}
           <div className="md:col-span-2">

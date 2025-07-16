@@ -181,10 +181,9 @@
 
   "header": {
     "preferences": "Preferences",
-    "currency": "Currency",
     "language": "Language",
-    "select_currency": "Select currency",
-    "select_language": "Select language",
+    "region": "Region",
+    "currency": "Currency",
     "sign_in": "Sign in"
   },
 
