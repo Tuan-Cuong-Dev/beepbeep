@@ -140,7 +140,44 @@
     "about": "Về chúng tôi",
     "contact": "Liên hệ",
     "policy": "Chính sách"
+  },
+
+  "preferences_sidebar": {
+  "label": "Việt Nam, VI | VND"
+  },
+
+  "navigation": {
+    "home": "Trang chủ",
+    "about": "Về chúng tôi",
+    "contact": "Liên hệ",
+    "policy": "Chính sách"
+  },
+
+  "user_sidebar": {
+  "welcome": "Chào mừng",
+  "account_disabled": "Tài khoản đã bị vô hiệu hóa",
+  "total_earnings": "Tổng hoa hồng",
+  "pending_payment": "Chờ thanh toán",
+  "menu": {
+    "write_review": "Viết đánh giá",
+    "add_to_map": "Thêm vào bản đồ",
+    "profile": "Hồ sơ",
+    "bookings": "Đơn đặt xe",
+    "messages": "Tin nhắn",
+    "my_business": "Doanh nghiệp của tôi",
+    "account_info": "Thông tin tài khoản",
+    "agent_dashboard": "Bảng điều khiển Cộng tác viên",
+    "earnings": "Thu nhập",
+    "request_payment": "Yêu cầu thanh toán",
+    "sign_out": "Đăng xuất"
+  },
+    "coming_soon": {
+      "title": "🚧 Tính năng sắp ra mắt",
+      "description": "Chúng tôi đang thiết lập hệ thống trạm cho thuê. Tính năng viết đánh giá hiện chưa khả dụng."
+    }
   }
+
+
 
 }
 

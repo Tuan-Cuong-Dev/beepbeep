@@ -141,5 +141,44 @@
     "contact": "Contact",
     "policy": "Policy"
     }
+  },
+
+  "preferences_sidebar": {
+    "label": "United States, EN | USD"
+  },
+
+  "navigation": {
+    "home": "Home",
+    "about": "About Us",
+    "contact": "Contact",
+    "policy": "Policies"
+  },
+
+  "user_sidebar": {
+  "welcome": "Welcome",
+  "account_disabled": "Account Disabled",
+  "total_earnings": "Total Earnings",
+  "pending_payment": "Pending Payment",
+  "menu": {
+    "write_review": "Write a review",
+    "add_to_map": "Add to the Map",
+    "profile": "Profile",
+    "bookings": "Bookings",
+    "messages": "Messages",
+    "my_business": "My business",
+    "account_info": "Account Info",
+    "agent_dashboard": "Agent Dashboard",
+    "earnings": "Earnings",
+    "request_payment": "Request Payment",
+    "sign_out": "Sign out"
+  },
+
+  "coming_soon": {
+      "title": "🚧 Coming Soon",
+      "description": "We are currently setting up our rental stations. The Write a review feature is not yet available."
+    }
   }
+
+
+
 }
