@@ -37,11 +37,21 @@ const regionCurrencyMap: Record<string, string> = {
 export function useAutoDetectLanguage({
   preferences,
   updatePreferences,
+  user,
 }: {
   preferences: any;
   updatePreferences: (data: any) => Promise<void>;
+  user?: { uid: string } | null;
 }) {
   useEffect(() => {
+    if (!user) {
+      // 👤 Nếu chưa đăng nhập → mặc định là tiếng Việt
+      if (i18n.language !== 'vi') {
+        i18n.changeLanguage('vi');
+      }
+      return;
+    }
+
     if (!preferences?.language) {
       (async () => {
         try {
@@ -58,5 +68,5 @@ export function useAutoDetectLanguage({
         }
       })();
     }
-  }, [preferences, updatePreferences]);
+  }, [user, preferences, updatePreferences]);
 }
