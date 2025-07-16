@@ -23,7 +23,7 @@ import NotificationDialog, { NotificationType } from '@/src/components/ui/Notifi
 import { UserLocation } from '@/src/lib/users/userTypes';
 
 export default function AccountPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   const { user, loading, update } = useUserProfile();
   const { preferences, updatePreferences } = useUserPreferences(user?.uid ?? '');
   const { location, updateLocation } = useUserLocation(user?.uid ?? '');

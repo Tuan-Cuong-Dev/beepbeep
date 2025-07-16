@@ -164,7 +164,7 @@
       "description": "We are currently setting up our rental stations. The Write a review feature is not yet available."
     },
 
-    "header": {
+  "header": {
     "preferences": "Preferences",
     "currency": "Currency",
     "language": "Language",
@@ -215,9 +215,6 @@
     "reset_failed": "Reset Failed",
     "login_email_note": "This is the email you used to sign in. If you want to change it, please contact support."
   }
-
-
-
 
 
 
