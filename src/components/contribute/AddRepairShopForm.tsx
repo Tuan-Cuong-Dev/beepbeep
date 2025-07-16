@@ -10,8 +10,10 @@ import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
+import { useTranslation } from 'react-i18next';
 
 export default function AddRepairShopForm() {
+  const { t } = useTranslation('common');
   const { user } = useUser();
   const [form, setForm] = useState<Partial<TechnicianPartner>>({
     type: 'shop',
@@ -66,12 +68,11 @@ export default function AddRepairShopForm() {
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         role: 'technician_partner',
-        userId: '', // sẽ gán sau khi admin duyệt
+        userId: '',
       };
 
       await addDoc(collection(db, 'technicianPartners'), data);
 
-      // Reset và thông báo
       setForm({
         type: 'shop',
         name: '',
@@ -96,32 +97,32 @@ export default function AddRepairShopForm() {
   return (
     <div className="space-y-4">
       <Input
-        placeholder="Technician name"
+        placeholder={t('repair_shop_form.technician_name')}
         value={form.name || ''}
         onChange={(e) => handleChange('name', e.target.value)}
       />
       <Input
-        placeholder="Phone number"
+        placeholder={t('repair_shop_form.phone_number')}
         value={form.phone || ''}
         onChange={(e) => handleChange('phone', e.target.value)}
       />
       <Input
-        placeholder="Shop name (optional)"
+        placeholder={t('repair_shop_form.shop_name_optional')}
         value={form.shopName || ''}
         onChange={(e) => handleChange('shopName', e.target.value)}
       />
       <Textarea
-        placeholder="Shop address"
+        placeholder={t('repair_shop_form.shop_address')}
         value={form.shopAddress || ''}
         onChange={(e) => handleChange('shopAddress', e.target.value)}
       />
       <Textarea
-        placeholder="Google Maps formatted address (optional)"
+        placeholder={t('repair_shop_form.map_address')}
         value={form.mapAddress || ''}
         onChange={(e) => handleChange('mapAddress', e.target.value)}
       />
       <Input
-        placeholder="Latitude"
+        placeholder={t('repair_shop_form.latitude')}
         value={form.coordinates?.lat ?? ''}
         onChange={(e) =>
           handleChange('coordinates', {
@@ -131,7 +132,7 @@ export default function AddRepairShopForm() {
         }
       />
       <Input
-        placeholder="Longitude"
+        placeholder={t('repair_shop_form.longitude')}
         value={form.coordinates?.lng ?? ''}
         onChange={(e) =>
           handleChange('coordinates', {
@@ -140,26 +141,27 @@ export default function AddRepairShopForm() {
           })
         }
       />
+
       <select
         className="w-full border rounded px-3 py-2"
         value={form.vehicleType || ''}
         onChange={(e) => handleChange('vehicleType', e.target.value as any)}
       >
-        <option value="">Select vehicle type</option>
-        <option value="bike">Bike</option>
-        <option value="motorbike">Motorbike</option>
-        <option value="car">Car</option>
+        <option value="">{t('repair_shop_form.select_vehicle_type')}</option>
+        <option value="bike">{t('repair_shop_form.vehicle_bike')}</option>
+        <option value="motorbike">{t('repair_shop_form.vehicle_motorbike')}</option>
+        <option value="car">{t('repair_shop_form.vehicle_car')}</option>
       </select>
 
       <Button onClick={handleSubmit} disabled={submitting}>
-        {submitting ? 'Submitting...' : 'Submit Repair Shop'}
+        {submitting ? t('repair_shop_form.submitting') : t('repair_shop_form.submit_repair_shop')}
       </Button>
 
       <NotificationDialog
         open={showDialog}
         type="success"
-        title="Thank you for your contribution!"
-        description="We’ve received your submission and will review it shortly."
+        title={t('repair_shop_form.thank_you')}
+        description={t('repair_shop_form.submission_received')}
         onClose={() => setShowDialog(false)}
       />
     </div>

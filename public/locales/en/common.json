@@ -228,6 +228,64 @@
     "reset_sent_description": "A password reset email has been sent.",
     "reset_failed": "Reset Failed",
     "login_email_note": "This is the email you used to sign in. If you want to change it, please contact support."
+  },
+
+ "contribute": {
+    "add_to_map": "Add to the Map",
+    "repair": "Repair",
+    "rental": "Rental",
+    "battery": "Battery Station"
+  },
+
+  "repair_shop_form":{
+    "technician_name": "Technician Name",
+    "phone_number": "Phone Number",
+    "shop_name_optional": "Shop Name (optional)",
+    "shop_address": "Shop Address",
+    "map_address": "Google Maps Address (optional)",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "select_vehicle_type": "Select Vehicle Type",
+    "vehicle_bike": "Bicycle",
+    "vehicle_motorbike": "Motorbike",
+    "vehicle_car": "Car",
+    "submit_repair_shop": "Submit Repair Shop",
+    "submitting": "Submitting...",
+    "thank_you": "Thank you for your contribution!",
+    "submission_received": "We’ve received your submission and will review it shortly."
+  },
+
+  "rental_shop_form": {
+  "shop_name": "Shop name",
+  "display_address": "Display address",
+  "map_address": "Google Maps address (optional)",
+  "location": "Coordinates (e.g. 16.07° N, 108.22° E)",
+  "phone": "Phone number (optional)",
+  "select_vehicle_type": "Select vehicle type",
+  "vehicle_bike": "Bike",
+  "vehicle_motorbike": "Motorbike",
+  "vehicle_car": "Car",
+  "submit_rental_shop": "Submit Rental Shop",
+  "submitting": "Submitting...",
+  "thank_you": "Thank you for your contribution!",
+  "submission_received": "We’ve received your submission and will review it shortly."
+},
+
+"battery_station_form": {
+    "station_name": "Station name",
+    "display_address": "Display address",
+    "map_address": "Google Maps address (optional)",
+    "location": "Coordinates (e.g. 16.07° N, 108.22° E)",
+    "select_vehicle_type": "Select vehicle type",
+    "vehicle_motorbike": "Motorbike",
+    "vehicle_car": "Car",
+    "submit_battery_station": "Submit Battery Station",
+    "submitting": "Submitting...",
+    "thank_you": "Thank you for your contribution!",
+    "submission_received": "We’ve received your submission and will review it shortly."
   }
+
+
+
 
 }

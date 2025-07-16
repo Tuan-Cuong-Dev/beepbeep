@@ -226,7 +226,63 @@
     "reset_sent_description": "Email đặt lại mật khẩu đã được gửi.",
     "reset_failed": "Lỗi đặt lại mật khẩu",
     "login_email_note": "Đây là email bạn đã dùng để đăng nhập. Nếu bạn muốn thay đổi, vui lòng liên hệ hỗ trợ."
-  }
+  },
+
+"contribute": {
+  "add_to_map": "Thêm vào bản đồ",
+  "repair": "Sửa xe",
+  "rental": "Trạm cho thuê",
+  "battery": "Trạm đổi pin"
+  },
+
+"repair_shop_form": {
+  "technician_name": "Tên thợ sửa xe",
+  "phone_number": "Số điện thoại",
+  "shop_name_optional": "Tên cửa hàng (không bắt buộc)",
+  "shop_address": "Địa chỉ cửa hàng",
+  "map_address": "Địa chỉ Google Maps (không bắt buộc)",
+  "latitude": "Vĩ độ",
+  "longitude": "Kinh độ",
+  "select_vehicle_type": "Chọn loại xe",
+  "vehicle_bike": "Xe đạp",
+  "vehicle_motorbike": "Xe máy",
+  "vehicle_car": "Ô tô",
+  "submit_repair_shop": "Gửi thông tin cửa hàng",
+  "submitting": "Đang gửi...",
+  "thank_you": "Cảm ơn bạn đã đóng góp!",
+  "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
+},
+"rental_shop_form": {
+  "shop_name": "Tên cửa hàng",
+  "display_address": "Địa chỉ hiển thị",
+  "map_address": "Địa chỉ Google Maps (không bắt buộc)",
+  "location": "Tọa độ (vd: 16.07° N, 108.22° E)",
+  "phone": "Số điện thoại (không bắt buộc)",
+  "select_vehicle_type": "Chọn loại xe",
+  "vehicle_bike": "Xe đạp",
+  "vehicle_motorbike": "Xe máy",
+  "vehicle_car": "Ô tô",
+  "submit_rental_shop": "Gửi thông tin trạm cho thuê",
+  "submitting": "Đang gửi...",
+  "thank_you": "Cảm ơn bạn đã đóng góp!",
+  "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
+},
+
+"battery_station_form": {
+  "station_name": "Tên trạm",
+  "display_address": "Địa chỉ hiển thị",
+  "map_address": "Địa chỉ Google Maps (không bắt buộc)",
+  "location": "Tọa độ (vd: 16.07° N, 108.22° E)",
+  "select_vehicle_type": "Chọn loại xe",
+  "vehicle_motorbike": "Xe máy",
+  "vehicle_car": "Ô tô",
+  "submit_battery_station": "Gửi thông tin trạm pin",
+  "submitting": "Đang gửi...",
+  "thank_you": "Cảm ơn bạn đã đóng góp!",
+  "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
+}
+
+
 
 
 
