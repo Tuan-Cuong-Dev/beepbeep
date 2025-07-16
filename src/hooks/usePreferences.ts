@@ -6,9 +6,9 @@ import { updateUserPreferences } from '@/src/lib/users/updateUserPreferences';
 
 export function usePreferences(userId: string | null | undefined) {
   const [preferences, setPreferences] = useState<UserPreferences>({
-    language: 'vi',
-    region: 'VN',
-    currency: 'VND',
+    language: 'en',
+    region: 'US',
+    currency: 'USD',
   });
 
   const [loading, setLoading] = useState(true);
