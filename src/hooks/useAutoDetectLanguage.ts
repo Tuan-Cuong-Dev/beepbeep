@@ -1,5 +1,4 @@
-'use client';
-
+// hooks/useAutoDetectLanguage.ts
 import { useEffect } from 'react';
 import i18n from '@/src/i18n';
 
@@ -19,23 +18,45 @@ const countryToLanguageMap: Record<string, string> = {
   SA: 'ar',
 };
 
-export function useAutoDetectLanguage() {
+const regionCurrencyMap: Record<string, string> = {
+  US: 'USD',
+  VN: 'VND',
+  GB: 'GBP',
+  JP: 'JPY',
+  CN: 'CNY',
+  KR: 'KRW',
+  RU: 'RUB',
+  FR: 'EUR',
+  DE: 'EUR',
+  IT: 'EUR',
+  ES: 'EUR',
+  PT: 'EUR',
+  SA: 'SAR',
+};
+
+export function useAutoDetectLanguage({
+  preferences,
+  updatePreferences,
+}: {
+  preferences: any;
+  updatePreferences: (data: any) => Promise<void>;
+}) {
   useEffect(() => {
-    const detectAndSetLanguage = async () => {
-      try {
-        const res = await fetch('https://ipapi.co/json/');
-        const data = await res.json();
-        const countryCode = data?.country_code;
-        const lang = countryToLanguageMap[countryCode] || 'en';
+    if (!preferences?.language) {
+      (async () => {
+        try {
+          const res = await fetch('https://ipapi.co/json/');
+          const data = await res.json();
+          const region = data?.country_code || 'US';
+          const language = countryToLanguageMap[region] || 'en';
+          const currency = regionCurrencyMap[region] || 'USD';
 
-        if (i18n.language !== lang) {
-          i18n.changeLanguage(lang);
+          i18n.changeLanguage(language);
+          await updatePreferences({ language, region, currency });
+        } catch (err) {
+          console.warn('Failed to auto-detect language', err);
         }
-      } catch (error) {
-        console.error('Failed to detect country for language setting', error);
-      }
-    };
-
-    detectAndSetLanguage();
-  }, []);
+      })();
+    }
+  }, [preferences, updatePreferences]);
 }

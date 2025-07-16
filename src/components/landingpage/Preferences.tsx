@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import i18n from '@/src/i18n';
 import { useUser } from '@/src/context/AuthContext';
 import { usePreferences } from '@/src/hooks/usePreferences';
+import { useAutoDetectLanguage } from '@/src/hooks/useAutoDetectLanguage'; // 💡 Import hook
 import { useTranslation } from 'react-i18next';
+import i18n from '@/src/i18n';
 
 interface PreferencesProps {
   onClose: () => void;
@@ -61,30 +62,8 @@ export default function Preferences({ onClose }: PreferencesProps) {
   const { preferences, updatePreferences, loading, updating } = usePreferences(user?.uid);
   const { t } = useTranslation('common');
 
-  // ⏳ Auto-detect language/region if not yet set
-  useEffect(() => {
-    if (!preferences?.language && !loading && user) {
-      (async () => {
-        try {
-          const res = await fetch('https://ipapi.co/json/');
-          const data = await res.json();
-          const region = data?.country_code || 'US';
-          const language = getLanguageFromRegion(region);
-          const currency = regionCurrencyMap[region] || 'USD';
-
-          i18n.changeLanguage(language);
-          await updatePreferences({ language, region, currency });
-        } catch (err) {
-          console.warn('Could not auto-detect language', err);
-        }
-      })();
-    }
-  }, [preferences, loading, user]);
-
-  const getLanguageFromRegion = (region: string): string => {
-    const match = regions.find(r => r.code === region);
-    return match?.value || 'en';
-  };
+  // ✅ Gọi hook tự động xác định ngôn ngữ nếu chưa thiết lập
+  useAutoDetectLanguage({ preferences, updatePreferences });
 
   const handleRegionChange = async (lang: string, region: string) => {
     i18n.changeLanguage(lang);
@@ -99,7 +78,6 @@ export default function Preferences({ onClose }: PreferencesProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl p-6 w-full max-w-xl shadow-lg relative">
-        {/* Close */}
         <button
           className="absolute top-4 right-4 text-gray-500 hover:text-black"
           onClick={onClose}
@@ -107,10 +85,8 @@ export default function Preferences({ onClose }: PreferencesProps) {
           <X size={24} />
         </button>
 
-        {/* Title */}
         <h2 className="text-2xl font-bold mb-4">{t('preferences.preferences')}</h2>
 
-        {/* Tabs */}
         <div className="flex space-x-4 border-b mb-4">
           <button
             className={`pb-2 ${activeTab === 'region' ? 'border-b-2 border-black font-medium' : 'text-gray-500'}`}
@@ -126,14 +102,11 @@ export default function Preferences({ onClose }: PreferencesProps) {
           </button>
         </div>
 
-        {/* Region or Currency Select */}
         {loading ? (
           <p className="text-gray-500 text-sm">Loading preferences...</p>
         ) : activeTab === 'region' ? (
           <div>
-            <h3 className="text-lg font-medium mb-2">
-              {t('preferences.select_region_language')}
-            </h3>
+            <h3 className="text-lg font-medium mb-2">{t('preferences.select_region_language')}</h3>
             <div className="text-sm grid grid-cols-4 gap-3">
               {regions.map((region) => {
                 const isActive =
@@ -159,9 +132,7 @@ export default function Preferences({ onClose }: PreferencesProps) {
           </div>
         ) : (
           <div>
-            <h3 className="text-lg font-medium mb-2">
-              {t('preferences.select_currency')}
-            </h3>
+            <h3 className="text-lg font-medium mb-2">{t('preferences.select_currency')}</h3>
             <div className="text-sm grid grid-cols-4 gap-4">
               {currencies.map((currency) => {
                 const isActive = preferences?.currency === currency.label;
@@ -184,10 +155,7 @@ export default function Preferences({ onClose }: PreferencesProps) {
           </div>
         )}
 
-        {/* Notice */}
-        <p className="text-sm text-gray-500 mt-4">
-          {t('preferences.saved_notice')}
-        </p>
+        <p className="text-sm text-gray-500 mt-4">{t('preferences.saved_notice')}</p>
       </div>
     </div>
   );

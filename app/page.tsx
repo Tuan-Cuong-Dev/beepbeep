@@ -1,30 +1,36 @@
 'use client';
 
 import Head from 'next/head';
+import { usePreferences } from '@/src/hooks/usePreferences';
+import { useUser } from '@/src/context/AuthContext';
 import { useAutoDetectLanguage } from '@/src/hooks/useAutoDetectLanguage';
 
-import Header from '../src/components/landingpage/Header';
-import Hero from '../src/components/landingpage/Hero';
-import ServiceSection from '../src/components/landingpage/ServiceSection';
-import VehicleModelsSection from '../src/components/landingpage/VehicleModelsSection';
-import WhyChooseUs from '../src/components/landingpage/WhyChooseUs';
-import Footer from '../src/components/landingpage/Footer';
-import FAQ from '@/src/components/landingpage/FAQ';
-import TechnicianPartnerSection from '../src/components/landingpage/TechnicianPartnerSection';
-import ServicePricingSection from '@/src/components/landingpage/ServicePricingSection';
+import Header from '@/src/components/landingpage/Header';
+import Hero from '@/src/components/landingpage/Hero';
 import StationSection from '@/src/components/landingpage/StationSection';
-import BatteryStationCounter from '@/src/components/landingpage/BatteryStationCounter';
+import TechnicianPartnerSection from '@/src/components/landingpage/TechnicianPartnerSection';
+import ServicePricingSection from '@/src/components/landingpage/ServicePricingSection';
 import Bipbip365Section from '@/src/components/landingpage/Bipbip365Section';
+import VehicleModelsSection from '@/src/components/landingpage/VehicleModelsSection';
+import BatteryStationCounter from '@/src/components/landingpage/BatteryStationCounter';
+import WhyChooseUs from '@/src/components/landingpage/WhyChooseUs';
+import FAQ from '@/src/components/landingpage/FAQ';
+import Footer from '@/src/components/landingpage/Footer';
 
 const Home: React.FC = () => {
-  useAutoDetectLanguage(); // 🎯 tự động detect ngôn ngữ theo quốc gia
+  const { user } = useUser();
+  const { preferences, updatePreferences } = usePreferences(user?.uid);
+
+  // ✅ Gọi hook với đầy đủ đối số
+  useAutoDetectLanguage({ preferences, updatePreferences });
 
   return (
     <>
       <Head>
-        <title>Bíp Bíp - Rent your ride in a beep beep!</title>
-        <meta name="description" content="Thuê xe dễ như bấm còi." />
+        <title>Bíp Bíp - Thuê xe dễ như bấm còi!</title>
+        <meta name="description" content="Dịch vụ thuê xe tiện lợi chỉ với một tiếng bíp." />
       </Head>
+
       <Header />
       <Hero />
       <StationSection />
