@@ -1,22 +1,31 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function FAQ() {
   const { t } = useTranslation('common');
+
+  const [hasMounted, setHasMounted] = useState(false);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) return null;
+
   const faqs = t('faqSection.faqs', { returnObjects: true }) as {
     question: string;
     answer: string;
   }[];
 
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  if (!Array.isArray(faqs)) return null;
+
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
-
-  if (!Array.isArray(faqs)) return null;
 
   return (
     <section className="font-sans px-4 py-10 bg-gray-50 text-center">

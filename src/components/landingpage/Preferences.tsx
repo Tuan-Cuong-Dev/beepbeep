@@ -35,11 +35,10 @@ const currencies = [
   { label: 'CNY', name: 'Chinese Yuan', region: 'CN' },
   { label: 'KRW', name: 'South Korean Won', region: 'KR' },
   { label: 'RUB', name: 'Russian Ruble', region: 'RU' },
-  { label: 'EUR', name: 'Euro', region: 'EU' }, // chung cho FR, DE, IT, ES, PT
+  { label: 'EUR', name: 'Euro', region: 'EU' },
   { label: 'SAR', name: 'Saudi Riyal', region: 'SA' },
 ];
 
-// Region to default currency mapping
 const regionCurrencyMap: Record<string, string> = {
   US: 'USD',
   VN: 'VND',
@@ -75,7 +74,7 @@ export default function Preferences({ onClose }: PreferencesProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl p-6 w-full max-w-xl shadow-lg relative">
-        {/* Close Button */}
+        {/* Close */}
         <button
           className="absolute top-4 right-4 text-gray-500 hover:text-black"
           onClick={onClose}
@@ -83,31 +82,41 @@ export default function Preferences({ onClose }: PreferencesProps) {
           <X size={24} />
         </button>
 
-        {/* Header */}
-        <h2 className="text-2xl font-bold mb-4">{t('preferences')}</h2>
+        {/* Title */}
+        <h2 className="text-2xl font-bold mb-4">{t('preferences.preferences')}</h2>
 
         {/* Tabs */}
         <div className="flex space-x-4 border-b mb-4">
           <button
-            className={`pb-2 ${activeTab === 'region' ? 'border-b-2 border-black font-medium' : 'text-gray-500'}`}
+            className={`pb-2 ${
+              activeTab === 'region'
+                ? 'border-b-2 border-black font-medium'
+                : 'text-gray-500'
+            }`}
             onClick={() => setActiveTab('region')}
           >
-            {t('region_language')}
+            {t('preferences.region_language')}
           </button>
           <button
-            className={`pb-2 ${activeTab === 'currency' ? 'border-b-2 border-black font-medium' : 'text-gray-500'}`}
+            className={`pb-2 ${
+              activeTab === 'currency'
+                ? 'border-b-2 border-black font-medium'
+                : 'text-gray-500'
+            }`}
             onClick={() => setActiveTab('currency')}
           >
-            {t('currency')}
+            {t('preferences.currency')}
           </button>
         </div>
 
-        {/* Content */}
+        {/* Region or Currency Select */}
         {loading ? (
           <p className="text-gray-500 text-sm">Loading preferences...</p>
         ) : activeTab === 'region' ? (
           <div>
-            <h3 className="text-lg font-medium mb-2">{t('select_region_language')}</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {t('preferences.select_region_language')}
+            </h3>
             <div className="text-sm grid grid-cols-4 gap-3">
               {regions.map((region) => {
                 const isActive =
@@ -125,7 +134,7 @@ export default function Preferences({ onClose }: PreferencesProps) {
                     }`}
                     disabled={updating}
                   >
-                    {t(region.key)} {region.flag}
+                    {t(`preferences.${region.key}`)} {region.flag}
                   </button>
                 );
               })}
@@ -133,29 +142,34 @@ export default function Preferences({ onClose }: PreferencesProps) {
           </div>
         ) : (
           <div>
-            <h3 className="text-lg font-medium mb-2">{t('select_currency')}</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {t('preferences.select_currency')}
+            </h3>
             <div className="text-sm grid grid-cols-4 gap-4">
-              {currencies.map((currency) => (
-                <button
-                  key={currency.label}
-                  onClick={() => handleCurrencyChange(currency.label)}
-                  className={`p-2 rounded-lg border transition ${
-                    preferences?.currency === currency.label
-                      ? 'bg-[#00d289] text-white font-semibold'
-                      : 'hover:bg-[#00d289]'
-                  }`}
-                  disabled={updating}
-                >
-                  {currency.label} ({currency.name})
-                </button>
-              ))}
+              {currencies.map((currency) => {
+                const isActive = preferences?.currency === currency.label;
+                return (
+                  <button
+                    key={currency.label}
+                    onClick={() => handleCurrencyChange(currency.label)}
+                    className={`p-2 rounded-lg border transition ${
+                      isActive
+                        ? 'bg-[#00d289] text-white font-semibold'
+                        : 'hover:bg-[#00d289]'
+                    }`}
+                    disabled={updating}
+                  >
+                    {currency.label} ({currency.name})
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
 
-        {/* Footer */}
+        {/* Notice */}
         <p className="text-sm text-gray-500 mt-4">
-          {t('saved_notice')}
+          {t('preferences.saved_notice')}
         </p>
       </div>
     </div>

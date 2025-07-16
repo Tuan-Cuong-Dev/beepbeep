@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import useBatteryStationStats from '@/src/hooks/useBatteryStationStats';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,6 +9,15 @@ import { useTranslation } from 'react-i18next';
 export default function BatteryStationCounter() {
   const count = useBatteryStationStats();
   const { t } = useTranslation();
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) {
+    return null; // hoặc 1 skeleton loading nếu bạn muốn
+  }
 
   return (
     <Link href="/battery-stations" className="block group">

@@ -1,40 +1,39 @@
 {
-  "preferences": {
-    "preferences": "Preferences",
-    "region_language": "Region & Language",
-    "currency": "Currency",
-    "select_region_language": "Select Region | Language",
-    "select_currency": "Select Currency",
-    "vietnam": "Vietnam",
-    "englishUK": "English (UK)",
-    "japan": "Japan",
-    "china": "China",
-    "southKorea": "South Korea",
-    "russia": "Russia",
-    "france": "France",
-    "germany": "Germany",
-    "italy": "Italy",
-    "spain": "Spain",
-    "portugal": "Portugal",
-    "saudiArabia": "Saudi Arabia",
-    "saved_notice": "All preference changes will be saved to your account."
-  },
-
+"preferences": {
+  "preferences": "Preferences",
+  "region_language": "Region & Language",
+  "currency": "Currency",
+  "select_region_language": "Select Region & Language",
+  "select_currency": "Select Currency",
+  "englishUS": "English (US)",
+  "englishUK": "English (UK)",
+  "vietnam": "Vietnam",
+  "japan": "Japan",
+  "china": "China",
+  "southKorea": "South Korea",
+  "russia": "Russia",
+  "france": "France",
+  "germany": "Germany",
+  "italy": "Italy",
+  "spain": "Spain",
+  "portugal": "Portugal",
+  "saudiArabia": "Saudi Arabia",
+  "saved_notice": "All preference changes will be saved to your account."
+},
   "landing": {
     "loading": "Loading...",
     "hero": {
       "titleLine1": "Rent your ride",
       "titleLine2": "in a beep beep!",
       "cta": "Explore Bíp Bíp"
-    },
-
+    }
+  },
   "stationSection": {
-      "stations_title": "{{count}} stations",
-      "stations_subtitle": "are ready to serve you!",
-      "view_all": "View All",
-      "see_all_stations": "See all rental stations"
-    },
-
+    "stations_title": "{{count}} stations",
+    "stations_subtitle": "are ready to serve you!",
+    "view_all": "View All",
+    "see_all_stations": "See all rental stations"
+  },
   "technicianSection": {
     "vehicle_trouble": "Vehicle trouble?",
     "call_technician": "Call to a technician!",
@@ -42,15 +41,13 @@
     "see_all_technicians": "See all technicians near you",
     "notification_title": "📞 Contact Technician",
     "notification_description": "We are building a contact system so you can reach technicians directly. Coming soon!"
-    },
-
+  },
   "notificationTypes": {
     "info": "Info",
     "success": "Success",
     "warning": "Warning",
     "error": "Error"
-    },
-
+  },
   "serviceSection": {
     "title": "🛠️ Bíp Bíp 365",
     "subtitle": "Your 24/7 Vehicles Lifesaver",
@@ -59,22 +56,18 @@
     "notification_title": "📞 Book Service",
     "notification_description": "We're launching service booking soon! Stay tuned."
   },
-
   "vehicleModelSection": {
-  "title": "Choose your electric ride",
-  "rent_button": "🛵 Rent Now",
-  "view_all": "View All",
-  "see_all_vehicles": "See all electric vehicles",
-  "notification_title": "🚧 Coming Soon",
-  "notification_description": "We are currently setting up our rental stations. The rent feature is not yet available."
+    "title": "Choose your electric ride",
+    "rent_button": "🛵 Rent Now",
+    "view_all": "View All",
+    "see_all_vehicles": "See all electric vehicles",
+    "notification_title": "🚧 Coming Soon",
+    "notification_description": "We are currently setting up our rental stations. The rent feature is not yet available."
   },
-
   "batteryStationSection": {
-  "count_label": "Battery Swap Stations",
-  "subtitle": "Click to explore stations across the country"
+    "count_label": "Battery Swap Stations",
+    "subtitle": "Click to explore stations across the country"
   },
-
-
   "whyChooseUs": {
     "title": "Why Everyone Benefits from Our Platform",
     "roles": [
@@ -112,7 +105,6 @@
       }
     ]
   },
-
   "faqSection": {
     "title": "What Would You Like to Ask?",
     "faqs": [
@@ -134,51 +126,42 @@
       }
     ]
   },
-
   "footer": {
     "rights": "All rights reserved.",
     "about": "About Us",
     "contact": "Contact",
     "policy": "Policy"
-    }
   },
-
   "preferences_sidebar": {
     "label": "United States, EN | USD"
   },
-
   "navigation": {
     "home": "Home",
     "about": "About Us",
     "contact": "Contact",
     "policy": "Policies"
   },
-
   "user_sidebar": {
-  "welcome": "Welcome",
-  "account_disabled": "Account Disabled",
-  "total_earnings": "Total Earnings",
-  "pending_payment": "Pending Payment",
-  "menu": {
-    "write_review": "Write a review",
-    "add_to_map": "Add to the Map",
-    "profile": "Profile",
-    "bookings": "Bookings",
-    "messages": "Messages",
-    "my_business": "My business",
-    "account_info": "Account Info",
-    "agent_dashboard": "Agent Dashboard",
-    "earnings": "Earnings",
-    "request_payment": "Request Payment",
-    "sign_out": "Sign out"
-  },
-
-  "coming_soon": {
+    "welcome": "Welcome",
+    "account_disabled": "Account Disabled",
+    "total_earnings": "Total Earnings",
+    "pending_payment": "Pending Payment",
+    "menu": {
+      "write_review": "Write a review",
+      "add_to_map": "Add to the Map",
+      "profile": "Profile",
+      "bookings": "Bookings",
+      "messages": "Messages",
+      "my_business": "My business",
+      "account_info": "Account Info",
+      "agent_dashboard": "Agent Dashboard",
+      "earnings": "Earnings",
+      "request_payment": "Request Payment",
+      "sign_out": "Sign out"
+    },
+    "coming_soon": {
       "title": "🚧 Coming Soon",
       "description": "We are currently setting up our rental stations. The Write a review feature is not yet available."
     }
   }
-
-
-
 }

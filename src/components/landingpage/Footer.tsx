@@ -1,10 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
   const { t } = useTranslation('common');
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) return null;
 
   return (
     <footer className="bg-[#00d289] text-white text-sm py-4 text-center w-full">
