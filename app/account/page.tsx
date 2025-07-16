@@ -207,9 +207,19 @@ export default function AccountPage() {
               value={localPrefs.language ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, language: val }))}
               options={[
-                { label: 'English', value: 'en' },
-                { label: 'Vietnamese', value: 'vi' },
-                { label: 'Korean', value: 'ko' },
+                  { label: 'English', value: 'en' },
+                  { label: 'Vietnamese', value: 'vi' },
+                  { label: 'Korean', value: 'ko' },
+                  { label: 'Chinese', value: 'zh' },
+                  { label: 'Japanese', value: 'ja' },
+                  { label: 'French', value: 'fr' },
+                  { label: 'German', value: 'de' },
+                  { label: 'Spanish', value: 'es' },
+                  { label: 'Portuguese', value: 'pt' },
+                  { label: 'Thai', value: 'th' },
+                  { label: 'Indonesian', value: 'id' },
+                  { label: 'Russian', value: 'ru' },
+                  { label: 'Hindi', value: 'hi' },
               ]}
             />
           </div>
@@ -223,6 +233,16 @@ export default function AccountPage() {
                 { label: 'Vietnam', value: 'VN' },
                 { label: 'South Korea', value: 'KR' },
                 { label: 'United States', value: 'US' },
+                { label: 'China', value: 'CN' },
+                { label: 'Japan', value: 'JP' },
+                { label: 'France', value: 'FR' },
+                { label: 'Germany', value: 'DE' },
+                { label: 'Spain', value: 'ES' },
+                { label: 'Portugal', value: 'PT' },
+                { label: 'Thailand', value: 'TH' },
+                { label: 'Indonesia', value: 'ID' },
+                { label: 'Russia', value: 'RU' },
+                { label: 'India', value: 'IN' },
               ]}
             />
           </div>
@@ -233,9 +253,19 @@ export default function AccountPage() {
               value={localPrefs.currency ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, currency: val }))}
               options={[
-                { label: 'VND', value: 'VND' },
-                { label: 'USD', value: 'USD' },
-                { label: 'KRW', value: 'KRW' },
+                { label: 'VND - Vietnamese Dong', value: 'VND' },
+                { label: 'USD - US Dollar', value: 'USD' },
+                { label: 'KRW - South Korean Won', value: 'KRW' },
+                { label: 'CNY - Chinese Yuan', value: 'CNY' },
+                { label: 'JPY - Japanese Yen', value: 'JPY' },
+                { label: 'EUR - Euro', value: 'EUR' },
+                { label: 'GBP - British Pound', value: 'GBP' },
+                { label: 'THB - Thai Baht', value: 'THB' },
+                { label: 'IDR - Indonesian Rupiah', value: 'IDR' },
+                { label: 'RUB - Russian Ruble', value: 'RUB' },
+                { label: 'INR - Indian Rupee', value: 'INR' },
+                { label: 'BRL - Brazilian Real', value: 'BRL' },
+                { label: 'AUD - Australian Dollar', value: 'AUD' },
               ]}
             />
           </div>
