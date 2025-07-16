@@ -162,6 +162,15 @@
     "coming_soon": {
       "title": "🚧 Coming Soon",
       "description": "We are currently setting up our rental stations. The Write a review feature is not yet available."
-    }
+    },
+
+    "header": {
+    "preferences": "Preferences",
+    "currency": "Currency",
+    "language": "Language",
+    "select_currency": "Select currency",
+    "select_language": "Select language",
+    "sign_in": "Sign in"
+  }
   }
 }

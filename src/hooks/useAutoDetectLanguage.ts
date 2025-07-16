@@ -45,14 +45,19 @@ export function useAutoDetectLanguage({
 }) {
   useEffect(() => {
     if (!user) {
-      // 👤 Nếu chưa đăng nhập → mặc định là tiếng Việt
       if (i18n.language !== 'vi') {
         i18n.changeLanguage('vi');
       }
+
+      // 🔧 Cập nhật luôn document.documentElement lang nếu cần
+      document.documentElement.lang = 'vi';
+
+      // ✅ Thêm đoạn set mặc định vào localStorage hoặc context nếu có
+      localStorage.setItem('currency', 'VND');
       return;
     }
 
-    if (!preferences?.language) {
+    if (!preferences?.language || !preferences?.currency) {
       (async () => {
         try {
           const res = await fetch('https://ipapi.co/json/');
@@ -70,3 +75,4 @@ export function useAutoDetectLanguage({
     }
   }, [user, preferences, updatePreferences]);
 }
+

@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useUser } from '@/src/context/AuthContext';
 import { usePreferences } from '@/src/hooks/usePreferences';
-import { useAutoDetectLanguage } from '@/src/hooks/useAutoDetectLanguage'; // 💡 Import hook
+import { useAutoDetectLanguage } from '@/src/hooks/useAutoDetectLanguage';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/src/i18n';
 
@@ -62,8 +62,21 @@ export default function Preferences({ onClose }: PreferencesProps) {
   const { preferences, updatePreferences, loading, updating } = usePreferences(user?.uid);
   const { t } = useTranslation('common');
 
-  // ✅ Gọi hook tự động xác định ngôn ngữ nếu chưa thiết lập
+  // ✅ Gọi hook tự động phát hiện ngôn ngữ nếu preferences chưa thiết lập
   useAutoDetectLanguage({ preferences, updatePreferences });
+
+  // ✅ Đặt ngôn ngữ mặc định cho người chưa đăng nhập
+  useEffect(() => {
+    if (!user && !preferences) {
+      i18n.changeLanguage('vi');
+      document.documentElement.lang = 'vi';
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('language', 'vi');
+        localStorage.setItem('region', 'VN');
+        localStorage.setItem('currency', 'VND');
+      }
+    }
+  }, [user, preferences]);
 
   const handleRegionChange = async (lang: string, region: string) => {
     i18n.changeLanguage(lang);
@@ -89,13 +102,21 @@ export default function Preferences({ onClose }: PreferencesProps) {
 
         <div className="flex space-x-4 border-b mb-4">
           <button
-            className={`pb-2 ${activeTab === 'region' ? 'border-b-2 border-black font-medium' : 'text-gray-500'}`}
+            className={`pb-2 ${
+              activeTab === 'region'
+                ? 'border-b-2 border-black font-medium'
+                : 'text-gray-500'
+            }`}
             onClick={() => setActiveTab('region')}
           >
             {t('preferences.region_language')}
           </button>
           <button
-            className={`pb-2 ${activeTab === 'currency' ? 'border-b-2 border-black font-medium' : 'text-gray-500'}`}
+            className={`pb-2 ${
+              activeTab === 'currency'
+                ? 'border-b-2 border-black font-medium'
+                : 'text-gray-500'
+            }`}
             onClick={() => setActiveTab('currency')}
           >
             {t('preferences.currency')}
@@ -106,7 +127,9 @@ export default function Preferences({ onClose }: PreferencesProps) {
           <p className="text-gray-500 text-sm">Loading preferences...</p>
         ) : activeTab === 'region' ? (
           <div>
-            <h3 className="text-lg font-medium mb-2">{t('preferences.select_region_language')}</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {t('preferences.select_region_language')}
+            </h3>
             <div className="text-sm grid grid-cols-4 gap-3">
               {regions.map((region) => {
                 const isActive =
@@ -116,7 +139,9 @@ export default function Preferences({ onClose }: PreferencesProps) {
                 return (
                   <button
                     key={region.code}
-                    onClick={() => handleRegionChange(region.value, region.code)}
+                    onClick={() =>
+                      handleRegionChange(region.value, region.code)
+                    }
                     className={`p-2 rounded-lg border transition ${
                       isActive
                         ? 'bg-[#00d289] text-white font-semibold'
@@ -132,7 +157,9 @@ export default function Preferences({ onClose }: PreferencesProps) {
           </div>
         ) : (
           <div>
-            <h3 className="text-lg font-medium mb-2">{t('preferences.select_currency')}</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {t('preferences.select_currency')}
+            </h3>
             <div className="text-sm grid grid-cols-4 gap-4">
               {currencies.map((currency) => {
                 const isActive = preferences?.currency === currency.label;
@@ -155,7 +182,9 @@ export default function Preferences({ onClose }: PreferencesProps) {
           </div>
         )}
 
-        <p className="text-sm text-gray-500 mt-4">{t('preferences.saved_notice')}</p>
+        <p className="text-sm text-gray-500 mt-4">
+          {t('preferences.saved_notice')}
+        </p>
       </div>
     </div>
   );

@@ -176,8 +176,16 @@
       "title": "🚧 Tính năng sắp ra mắt",
       "description": "Chúng tôi đang thiết lập hệ thống trạm cho thuê. Tính năng viết đánh giá hiện chưa khả dụng."
     }
-  }
+  },
 
+  "header": {
+    "preferences": "Tùy chọn",
+    "currency": "Tiền tệ",
+    "language": "Ngôn ngữ",
+    "select_currency": "Chọn đơn vị tiền tệ",
+    "select_language": "Chọn ngôn ngữ",
+    "sign_in": "Đăng nhập"
+  }
 
 
 }
