@@ -1,19 +1,24 @@
-// Homepage
-import Head from "next/head"; 
+'use client';
+
+import Head from 'next/head';
+import { useAutoDetectLanguage } from '@/src/hooks/useAutoDetectLanguage';
+
 import Header from '../src/components/landingpage/Header';
 import Hero from '../src/components/landingpage/Hero';
 import ServiceSection from '../src/components/landingpage/ServiceSection';
-import VehicleModelsSection from   '../src/components/landingpage/VehicleModelsSection';
+import VehicleModelsSection from '../src/components/landingpage/VehicleModelsSection';
 import WhyChooseUs from '../src/components/landingpage/WhyChooseUs';
 import Footer from '../src/components/landingpage/Footer';
-import FAQ  from "@/src/components/landingpage/FAQ";
+import FAQ from '@/src/components/landingpage/FAQ';
 import TechnicianPartnerSection from '../src/components/landingpage/TechnicianPartnerSection';
-import ServicePricingSection from "@/src/components/landingpage/ServicePricingSection";
-import StationSection from "@/src/components/landingpage/StationSection";
+import ServicePricingSection from '@/src/components/landingpage/ServicePricingSection';
+import StationSection from '@/src/components/landingpage/StationSection';
 import BatteryStationCounter from '@/src/components/landingpage/BatteryStationCounter';
-import Bipbip365Section from "@/src/components/landingpage/Bipbip365Section";
+import Bipbip365Section from '@/src/components/landingpage/Bipbip365Section';
 
 const Home: React.FC = () => {
+  useAutoDetectLanguage(); // 🎯 tự động detect ngôn ngữ theo quốc gia
+
   return (
     <>
       <Head>
@@ -22,15 +27,15 @@ const Home: React.FC = () => {
       </Head>
       <Header />
       <Hero />
-      <StationSection/>
+      <StationSection />
       <TechnicianPartnerSection />
-      <ServicePricingSection/>
-      <Bipbip365Section/>
+      <ServicePricingSection />
+      <Bipbip365Section />
       <VehicleModelsSection />
       <BatteryStationCounter />
       <WhyChooseUs />
       <FAQ />
-        <Footer />
+      <Footer />
     </>
   );
 };
