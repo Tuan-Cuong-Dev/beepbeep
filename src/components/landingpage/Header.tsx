@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaBars, FaRegUserCircle, FaGlobe } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 import { useUser } from '@/src/context/AuthContext';
@@ -20,16 +19,26 @@ const Header = () => {
   const { user } = useUser();
   const { preferences } = usePreferences(user?.uid);
 
-  // 🪙 Ưu tiên currency từ preferences -> localStorage -> VND
-  const currency =
-    preferences?.currency ||
-    (typeof window !== 'undefined' ? localStorage.getItem('currency') : null) ||
-    'VND';
+  const [currency, setCurrency] = useState('VND');
+  const [hasMounted, setHasMounted] = useState(false);
 
   const [isReferencePopupOpen, setIsReferencePopupOpen] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUserSidebarOpen, setIsUserSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+
+    const localCurrency = typeof window !== 'undefined' ? localStorage.getItem('currency') : null;
+    if (preferences?.currency) {
+      setCurrency(preferences.currency);
+    } else if (localCurrency) {
+      setCurrency(localCurrency);
+    }
+  }, [preferences]);
+
+  if (!hasMounted) return null; // ✅ Tránh mismatch lúc hydration
 
   const togglePopup = () => setIsReferencePopupOpen(!isReferencePopupOpen);
   const toggleLoginPopup = () => setIsLoginPopupOpen(!isLoginPopupOpen);
@@ -99,7 +108,6 @@ const Header = () => {
             <FaGlobe className="text-lg" />
             <span className="border-l border-gray-400 h-4 mx-2"></span>
             <span>{currency}</span>
-            <span className="border-l border-gray-400 h-4 mx-2"></span>
           </button>
 
           {/* Sign in / Avatar */}

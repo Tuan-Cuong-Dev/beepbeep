@@ -5,18 +5,12 @@ import { getUserPreferences, UserPreferences } from '@/src/lib/users/getUserPref
 import { updateUserPreferences } from '@/src/lib/users/updateUserPreferences';
 
 export function usePreferences(userId: string | null | undefined) {
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    language: 'en',
-    region: 'US',
-    currency: 'USD',
-  });
-
+  const [preferences, setPreferences] = useState<UserPreferences | null>(null); // Không set mặc định là USD
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // Load once when userId changes
   useEffect(() => {
     if (!userId) {
       setLoading(false);
@@ -38,7 +32,6 @@ export function usePreferences(userId: string | null | undefined) {
     fetchPreferences();
   }, [userId]);
 
-  // Update preferences
   const updatePreferences = async (newPrefs: Partial<UserPreferences>) => {
     if (!userId) {
       setError(new Error('User ID is missing'));
@@ -50,7 +43,7 @@ export function usePreferences(userId: string | null | undefined) {
     setError(null);
 
     try {
-      const mergedPrefs = { ...preferences, ...newPrefs };
+      const mergedPrefs = { ...preferences, ...newPrefs } as UserPreferences;
       await updateUserPreferences(userId, {
         preferences: mergedPrefs,
       });
