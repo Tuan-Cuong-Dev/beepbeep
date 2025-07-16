@@ -1,20 +1,145 @@
 {
-  "preferences": "Preferences",
-  "region_language": "Region & Language",
-  "currency": "Currency",
-  "select_region_language": "Select Region | Language",
-  "select_currency": "Select Currency",
-  "vietnam": "Vietnam",
-  "englishUK": "English (UK)",
-  "japan": "Japan",
-  "china": "China",
-  "southKorea": "South Korea",
-  "russia": "Russia",
-  "france": "France",
-  "germany": "Germany",
-  "italy": "Italy",
-  "spain": "Spain",
-  "portugal": "Portugal",
-  "saudiArabia": "Saudi Arabia",
-  "saved_notice": "All preference changes will be saved to your account."
+  "preferences": {
+    "preferences": "Preferences",
+    "region_language": "Region & Language",
+    "currency": "Currency",
+    "select_region_language": "Select Region | Language",
+    "select_currency": "Select Currency",
+    "vietnam": "Vietnam",
+    "englishUK": "English (UK)",
+    "japan": "Japan",
+    "china": "China",
+    "southKorea": "South Korea",
+    "russia": "Russia",
+    "france": "France",
+    "germany": "Germany",
+    "italy": "Italy",
+    "spain": "Spain",
+    "portugal": "Portugal",
+    "saudiArabia": "Saudi Arabia",
+    "saved_notice": "All preference changes will be saved to your account."
+  },
+
+  "landing": {
+    "loading": "Loading...",
+    "hero": {
+      "titleLine1": "Rent your ride",
+      "titleLine2": "in a beep beep!",
+      "cta": "Explore Bíp Bíp"
+    },
+
+  "stationSection": {
+      "stations_title": "{{count}} stations",
+      "stations_subtitle": "are ready to serve you!",
+      "view_all": "View All",
+      "see_all_stations": "See all rental stations"
+    },
+
+  "technicianSection": {
+    "vehicle_trouble": "Vehicle trouble?",
+    "call_technician": "Call to a technician!",
+    "view_all": "View All",
+    "see_all_technicians": "See all technicians near you",
+    "notification_title": "📞 Contact Technician",
+    "notification_description": "We are building a contact system so you can reach technicians directly. Coming soon!"
+    },
+
+  "notificationTypes": {
+    "info": "Info",
+    "success": "Success",
+    "warning": "Warning",
+    "error": "Error"
+    },
+
+  "serviceSection": {
+    "title": "🛠️ Bíp Bíp 365",
+    "subtitle": "Your 24/7 Vehicles Lifesaver",
+    "view_all": "View All",
+    "see_all_services": "See all repair & rescue services",
+    "notification_title": "📞 Book Service",
+    "notification_description": "We're launching service booking soon! Stay tuned."
+  },
+
+  "vehicleModelSection": {
+  "title": "Choose your electric ride",
+  "rent_button": "🛵 Rent Now",
+  "view_all": "View All",
+  "see_all_vehicles": "See all electric vehicles",
+  "notification_title": "🚧 Coming Soon",
+  "notification_description": "We are currently setting up our rental stations. The rent feature is not yet available."
+  },
+
+  "batteryStationSection": {
+  "count_label": "Battery Swap Stations",
+  "subtitle": "Click to explore stations across the country"
+  },
+
+
+  "whyChooseUs": {
+    "title": "Why Everyone Benefits from Our Platform",
+    "roles": [
+      {
+        "title": "Customers",
+        "description": "Easily book vehicle rentals, request roadside assistance, and access trustworthy repair and maintenance services anywhere."
+      },
+      {
+        "title": "Staff",
+        "description": "Manage rentals, assist customers, update vehicle statuses, and coordinate service requests – all from one platform."
+      },
+      {
+        "title": "Station Managers",
+        "description": "Oversee station operations, manage inventory and staff, and ensure smooth vehicle dispatch and returns every day."
+      },
+      {
+        "title": "Company Owners",
+        "description": "Monitor fleet usage, customer trends, and financial performance in real-time. Expand your vehicle business with confidence."
+      },
+      {
+        "title": "Technicians",
+        "description": "Get assigned repair tasks, track issue histories, and manage vehicle service records with efficient digital tools."
+      },
+      {
+        "title": "Private Owners",
+        "description": "List your personal vehicles for rent or service on our platform and earn income while retaining full ownership control."
+      },
+      {
+        "title": "Investors",
+        "description": "Track your investment performance, view reports by region or company, and support a growing, eco-driven vehicle service network."
+      },
+      {
+        "title": "Agents (Collaborators)",
+        "description": "Connect customers with the right vehicle services, earn commission transparently, and grow your own partner network."
+      }
+    ]
+  },
+
+  "faqSection": {
+    "title": "What Would You Like to Ask?",
+    "faqs": [
+      {
+        "question": "How do I swap batteries at a station?",
+        "answer": "When you rent an electric vehicle from Bíp Bíp, we provide clear instructions on how to use our smart battery swapping stations. You can swap batteries yourself using your Bíp Bíp account at any supported location."
+      },
+      {
+        "question": "What accessories come with the rental vehicle?",
+        "answer": "Each vehicle comes with two helmets, two raincoats, and a charger (if needed). Some vehicles may also include a phone holder, rear carrier, or extra storage depending on the model."
+      },
+      {
+        "question": "Which vehicle types are available on Bíp Bíp?",
+        "answer": "We offer a wide range of vehicles including electric motorbikes, bicycles, electric cars, vans, and more – all suited for both tourism and delivery needs."
+      },
+      {
+        "question": "What should I do if I encounter a problem on the road?",
+        "answer": "In case of accidents, breakdowns, or any issues, please contact our hotline or request roadside assistance directly through the app. Our technicians will assist you promptly."
+      }
+    ]
+  },
+
+  "footer": {
+    "rights": "All rights reserved.",
+    "about": "About Us",
+    "contact": "Contact",
+    "policy": "Policy"
+    }
+  }
 }

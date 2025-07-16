@@ -7,6 +7,7 @@ import TechnicianPartnerCard from '@/src/components/techinicianPartner/Technicia
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 import SkeletonCard from '@/src/components/skeletons/SkeletonCard';
+import { useTranslation } from 'react-i18next';
 
 function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
@@ -30,6 +31,7 @@ function parseCoords(geo?: string | { lat: number; lng: number }): [number, numb
 }
 
 export default function TechnicianPartnerSection() {
+  const { t } = useTranslation();
   const { partners, loading } = usePublicTechnicianPartners();
   const { location: userLocation } = useCurrentLocation();
   const [previewPartners, setPreviewPartners] = useState<typeof partners>([]);
@@ -60,11 +62,10 @@ export default function TechnicianPartnerSection() {
       <div className="max-w-7xl mx-auto">
         {!loading && (
           <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
-            <span className="sm:text-2xl md:text-3xl font-extrabold">Vehicle trouble?</span>
+            <span className="sm:text-2xl md:text-3xl font-extrabold">{t('technicianSection.vehicle_trouble')}</span>
             <br />
             <span className="sm:text-lg md:text-xl text-gray-700">
-              Call to a technician!
-            </span>
+             {t('technicianSection.call_technician')}</span>
           </h2>
         )}
 
@@ -91,10 +92,9 @@ export default function TechnicianPartnerSection() {
                 className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
               >
                 <div className="border rounded-xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
-                  <h3 className="text-lg font-semibold text-gray-800">View All</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">{t('technicianSection.view_all')}</h3>
                   <p className="text-sm text-gray-500 mt-1">
-                    See all technicians near you
-                  </p>
+                   {t('technicianSection.see_all_technicians')}</p>
                 </div>
               </div>
             )}
@@ -106,8 +106,8 @@ export default function TechnicianPartnerSection() {
         open={showNotice}
         onClose={() => setShowNotice(false)}
         type="info"
-        title="📞 Contact Technician"
-        description="We are building a contact system so you can reach technicians directly. Coming soon!"
+        title={t('technicianSection.notification_title')}
+        description={t('technicianSection.notification_description')}
       />
     </section>
   );

@@ -95,8 +95,9 @@ export default function BipBip365LandingPage() {
             <div className="text-center md:text-left space-y-4">
               <h2 className="text-xl font-semibold">🎁 Dành cho Đối tác</h2>
               <p className="text-gray-700">
-                Giới thiệu khách hàng mua gói 365K, bạn nhận ngay <strong>30% hoa hồng/gói</strong>.
+                Giới thiệu khách hàng mua gói 365K, bạn nhận hoa hồng lên tới <strong>30%/gói</strong>.
               </p>
+              <p></p>
               <Link href="/partners/register">
                 <Button size="lg">Đăng ký làm đối tác</Button>
               </Link>

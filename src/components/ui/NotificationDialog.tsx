@@ -11,6 +11,7 @@ import {
 import { Button } from '@/src/components/ui/button';
 import { CheckCircle, AlertCircle, Info, Trash2 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export type NotificationType = 'success' | 'error' | 'info' | 'confirm';
 
@@ -31,6 +32,8 @@ export default function NotificationDialog({
   onClose,
   onConfirm,
 }: NotificationDialogProps) {
+  const { t } = useTranslation();
+
   const renderIcon = () => {
     const baseClass = 'w-8 h-8 animate-pop shrink-0';
     switch (type) {
@@ -76,14 +79,14 @@ export default function NotificationDialog({
                 className="w-full sm:w-auto"
                 onClick={onClose}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 variant="destructive"
                 className="w-full sm:w-auto"
                 onClick={onConfirm}
               >
-                Confirm
+                {t('confirm')}
               </Button>
             </>
           ) : (
@@ -91,7 +94,7 @@ export default function NotificationDialog({
               className="w-full sm:w-auto"
               onClick={onClose}
             >
-              OK
+              {t('ok')}
             </Button>
           )}
         </DialogFooter>

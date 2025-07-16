@@ -1,20 +1,146 @@
 {
-  "preferences": "Tùy chọn",
-  "region_language": "Vùng & Ngôn ngữ",
-  "currency": "Tiền tệ",
-  "select_region_language": "Chọn vùng | Ngôn ngữ",
-  "select_currency": "Chọn tiền tệ",
-  "vietnam": "Việt Nam",
-  "englishUK": "Tiếng Anh (UK)",
-  "japan": "Nhật Bản",
-  "china": "Trung Quốc",
-  "southKorea": "Hàn Quốc",
-  "russia": "Nga",
-  "france": "Pháp",
-  "germany": "Đức",
-  "italy": "Ý",
-  "spain": "Tây Ban Nha",
-  "portugal": "Bồ Đào Nha",
-  "saudiArabia": "Ả Rập Xê Út",
-  "saved_notice": "Mọi thay đổi tùy chọn sẽ được lưu vào tài khoản của bạn."
+  "preferences": {
+    "preferences": "Tùy chọn",
+    "region_language": "Khu vực & Ngôn ngữ",
+    "currency": "Tiền tệ",
+    "select_region_language": "Chọn khu vực | Ngôn ngữ",
+    "select_currency": "Chọn đơn vị tiền tệ",
+    "vietnam": "Việt Nam",
+    "englishUK": "Tiếng Anh (Anh)",
+    "japan": "Nhật Bản",
+    "china": "Trung Quốc",
+    "southKorea": "Hàn Quốc",
+    "russia": "Nga",
+    "france": "Pháp",
+    "germany": "Đức",
+    "italy": "Ý",
+    "spain": "Tây Ban Nha",
+    "portugal": "Bồ Đào Nha",
+    "saudiArabia": "Ả Rập Xê Út",
+    "saved_notice": "Tất cả thay đổi tùy chọn sẽ được lưu vào tài khoản của bạn."
+  },
+
+  "landing": {
+    "loading": "Đang tải...",
+    "hero": {
+      "titleLine1": "Thuê xe",
+      "titleLine2": "dễ như bấm còi!",
+      "cta": "Khám phá Bíp Bíp"
+    }
+  },
+
+  "stationSection": {
+  "stations_title": "{{count}} trạm cho thuê",
+  "stations_subtitle": "sẵn sàng phục vụ bạn!",
+  "view_all": "Xem tất cả",
+  "see_all_stations": "Xem tất cả các trạm cho thuê"
+  },
+
+  "technicianSection": {
+  "vehicle_trouble": "Hỏng xe?",
+  "call_technician": "Gọi kỹ thuật viên ngay!",
+  "view_all": "Xem tất cả",
+  "see_all_technicians": "Xem tất cả kỹ thuật viên gần bạn",
+  "notification_title": "📞 Liên hệ kỹ thuật viên",
+  "notification_description": "Chúng tôi đang xây dựng hệ thống liên hệ trực tiếp với kỹ thuật viên. Tính năng sắp ra mắt!"
+  },
+
+  "notificationTypes": {
+  "info": "Thông tin",
+  "success": "Thành công",
+  "warning": "Cảnh báo",
+  "error": "Lỗi"
+  },
+
+  "serviceSection": {
+    "title": "🛠️ Bíp Bíp 365",
+    "subtitle": "Người bạn đồng hành 24/7 cho xe của bạn",
+    "view_all": "Xem tất cả",
+    "see_all_services": "Xem tất cả dịch vụ sửa chữa & cứu hộ",
+    "notification_title": "📞 Đặt lịch dịch vụ",
+    "notification_description": "Chúng tôi sắp ra mắt tính năng đặt lịch sửa xe. Hãy đón chờ!"
+  },
+
+  "vehicleModelSection": {
+    "title": "Chọn chiếc xe điện phù hợp với bạn",
+    "rent_button": "🛵 Thuê ngay",
+    "view_all": "Xem tất cả",
+    "see_all_vehicles": "Xem tất cả các dòng xe điện",
+    "notification_title": "🚧 Sắp ra mắt",
+    "notification_description": "Chúng tôi đang thiết lập các trạm cho thuê. Tính năng thuê xe chưa khả dụng."
+  },
+
+  "batteryStationSection": {
+  "count_label": "Trạm đổi pin",
+  "subtitle": "Nhấn để khám phá các trạm trên toàn quốc"
+  },
+
+  "whyChooseUs": {
+    "title": "Tại sao mọi người đều được lợi từ nền tảng của chúng tôi",
+    "roles": [
+      {
+        "title": "Khách hàng",
+        "description": "Dễ dàng đặt xe, yêu cầu cứu hộ và truy cập dịch vụ sửa chữa mọi lúc mọi nơi."
+      },
+      {
+        "title": "Nhân viên",
+        "description": "Quản lý thuê xe, hỗ trợ khách hàng, cập nhật trạng thái xe và phối hợp dịch vụ trên một nền tảng."
+      },
+      {
+        "title": "Quản lý trạm",
+        "description": "Giám sát vận hành trạm, quản lý kho và nhân sự, đảm bảo giao nhận xe trơn tru mỗi ngày."
+      },
+      {
+        "title": "Chủ công ty",
+        "description": "Theo dõi tình trạng đội xe, hành vi khách hàng và hiệu suất tài chính. Mở rộng kinh doanh tự tin."
+      },
+      {
+        "title": "Kỹ thuật viên",
+        "description": "Tiếp nhận nhiệm vụ sửa chữa, theo dõi lịch sử sự cố và quản lý hồ sơ dịch vụ hiệu quả."
+      },
+      {
+        "title": "Chủ xe cá nhân",
+        "description": "Đăng xe cá nhân cho thuê hoặc dịch vụ để kiếm thu nhập và vẫn giữ quyền sở hữu."
+      },
+      {
+        "title": "Nhà đầu tư",
+        "description": "Theo dõi hiệu suất đầu tư, xem báo cáo theo vùng và hỗ trợ hệ sinh thái phương tiện xanh."
+      },
+      {
+        "title": "Cộng tác viên",
+        "description": "Kết nối khách hàng với dịch vụ phù hợp, nhận hoa hồng minh bạch và mở rộng mạng lưới của bạn."
+      }
+    ]
+  },
+
+  "faqSection": {
+    "title": "Bạn muốn hỏi gì?",
+    "faqs": [
+      {
+        "question": "Tôi đổi pin tại trạm như thế nào?",
+        "answer": "Khi bạn thuê xe điện từ Bíp Bíp, chúng tôi sẽ cung cấp hướng dẫn chi tiết để bạn dễ dàng đổi pin tại các trạm thông minh. Bạn có thể tự đổi pin bằng tài khoản Bíp Bíp tại bất kỳ điểm hỗ trợ nào."
+      },
+      {
+        "question": "Xe thuê có những phụ kiện gì kèm theo?",
+        "answer": "Mỗi xe đi kèm với hai nón bảo hiểm, hai áo mưa và bộ sạc (nếu cần). Một số xe có thêm giá đỡ điện thoại, baga hoặc cốp phụ tùy vào dòng xe."
+      },
+      {
+        "question": "Những loại xe nào có trên Bíp Bíp?",
+        "answer": "Chúng tôi cung cấp đa dạng các loại phương tiện như xe máy điện, xe đạp, ô tô điện, xe tải nhỏ, và nhiều loại xe khác – phù hợp cho cả du lịch và giao hàng."
+      },
+      {
+        "question": "Tôi nên làm gì nếu gặp sự cố trên đường?",
+        "answer": "Trong trường hợp tai nạn, hỏng xe hoặc gặp vấn đề, vui lòng gọi hotline hoặc yêu cầu hỗ trợ ngay trên ứng dụng. Kỹ thuật viên của chúng tôi sẽ hỗ trợ bạn nhanh chóng."
+      }
+    ]
+  },
+
+  "footer": {
+    "rights": "Đã đăng ký bản quyền.",
+    "about": "Về chúng tôi",
+    "contact": "Liên hệ",
+    "policy": "Chính sách"
+  }
+
 }
+

@@ -8,6 +8,7 @@ import { db } from '@/src/firebaseConfig';
 import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import SkeletonCard from '@/src/components/skeletons/SkeletonCard';
+import { useTranslation } from 'react-i18next';
 
 interface EbikeModel {
   id: string;
@@ -21,6 +22,7 @@ interface EbikeModel {
 }
 
 export default function VehicleModelsSection() {
+  const { t } = useTranslation();
   const [models, setModels] = useState<EbikeModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNotice, setShowNotice] = useState(false);
@@ -54,11 +56,11 @@ export default function VehicleModelsSection() {
   }, []);
 
   return (
-    <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
+    <section className="font-sans pt-6 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
         {!loading && (
           <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">
-            Choose Your Electric Ride
+            {t('vehicleModelSection.title')}
           </h2>
         )}
 
@@ -112,7 +114,7 @@ export default function VehicleModelsSection() {
                           className="w-full px-4 py-2 text-sm font-semibold text-[#00d289] border-[#00d289] hover:bg-[#00d289]/10 rounded-full flex items-center justify-center gap-2"
                           onClick={() => setShowNotice(true)}
                         >
-                          🛵 Rent Now
+                          {t('vehicleModelSection.rent_button')}
                         </Button>
                       </div>
                     </div>
@@ -127,7 +129,7 @@ export default function VehicleModelsSection() {
                 <div className="border rounded-2xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
                   <h3 className="text-lg font-semibold text-gray-800">View All</h3>
                   <p className="text-sm text-gray-500 mt-1">
-                    See all electric vehicles
+                    {t('vehicleModelSection.see_all_vehicles')}
                   </p>
                 </div>
               </div>
@@ -140,8 +142,8 @@ export default function VehicleModelsSection() {
         open={showNotice}
         onClose={() => setShowNotice(false)}
         type="info"
-        title="🚧 Coming Soon"
-        description="We are currently setting up our rental stations. The rent feature is not yet available."
+        title={t('vehicleModelSection.notification_title')}
+        description={t('vehicleModelSection.notification_description')}
       />
     </section>
   );

@@ -6,6 +6,7 @@ import { useStations } from '@/src/hooks/useStations';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 import StationCard from '@/src/components/rental-stations/StationCard';
 import SkeletonCard from '@/src/components/skeletons/SkeletonCard';
+import { useTranslation } from 'react-i18next';
 
 function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
@@ -26,6 +27,7 @@ const parseCoords = (location: string): [number, number] => {
 };
 
 export default function StationSection() {
+  const { t } = useTranslation();
   const { stations, loading } = useStations();
   const { location: userLocation } = useCurrentLocation();
   const [sortedPreview, setSortedPreview] = useState<typeof stations>([]);
@@ -56,11 +58,11 @@ export default function StationSection() {
         {!loading && (
           <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
             <span className="sm:text-2xl md:text-3xl font-extrabold">
-              {stations.length} stations
+              {t('stationSection.stations_title', { count: stations.length })}
             </span>
             <br />
             <span className="sm:text-lg md:text-xl text-gray-700">
-              are ready to serve you!
+              {t('stationSection.stations_subtitle')}
             </span>
           </h2>
         )}
@@ -84,8 +86,12 @@ export default function StationSection() {
                 className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
               >
                 <div className="border rounded-xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
-                  <h3 className="text-lg font-semibold text-gray-800">View All</h3>
-                  <p className="text-sm text-gray-500 mt-1">See all rental stations</p>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {t('stationSection.view_all')}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {t('stationSection.see_all_stations')}
+                  </p>
                 </div>
               </div>
             )}
