@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import i18n from '@/src/i18n';
 import { useUser } from '@/src/context/AuthContext';
@@ -61,6 +61,31 @@ export default function Preferences({ onClose }: PreferencesProps) {
   const { preferences, updatePreferences, loading, updating } = usePreferences(user?.uid);
   const { t } = useTranslation('common');
 
+  // ⏳ Auto-detect language/region if not yet set
+  useEffect(() => {
+    if (!preferences?.language && !loading && user) {
+      (async () => {
+        try {
+          const res = await fetch('https://ipapi.co/json/');
+          const data = await res.json();
+          const region = data?.country_code || 'US';
+          const language = getLanguageFromRegion(region);
+          const currency = regionCurrencyMap[region] || 'USD';
+
+          i18n.changeLanguage(language);
+          await updatePreferences({ language, region, currency });
+        } catch (err) {
+          console.warn('Could not auto-detect language', err);
+        }
+      })();
+    }
+  }, [preferences, loading, user]);
+
+  const getLanguageFromRegion = (region: string): string => {
+    const match = regions.find(r => r.code === region);
+    return match?.value || 'en';
+  };
+
   const handleRegionChange = async (lang: string, region: string) => {
     i18n.changeLanguage(lang);
     const defaultCurrency = regionCurrencyMap[region];
@@ -88,21 +113,13 @@ export default function Preferences({ onClose }: PreferencesProps) {
         {/* Tabs */}
         <div className="flex space-x-4 border-b mb-4">
           <button
-            className={`pb-2 ${
-              activeTab === 'region'
-                ? 'border-b-2 border-black font-medium'
-                : 'text-gray-500'
-            }`}
+            className={`pb-2 ${activeTab === 'region' ? 'border-b-2 border-black font-medium' : 'text-gray-500'}`}
             onClick={() => setActiveTab('region')}
           >
             {t('preferences.region_language')}
           </button>
           <button
-            className={`pb-2 ${
-              activeTab === 'currency'
-                ? 'border-b-2 border-black font-medium'
-                : 'text-gray-500'
-            }`}
+            className={`pb-2 ${activeTab === 'currency' ? 'border-b-2 border-black font-medium' : 'text-gray-500'}`}
             onClick={() => setActiveTab('currency')}
           >
             {t('preferences.currency')}
