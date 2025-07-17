@@ -1,20 +1,160 @@
 {
-  "preferences": "設定",
-  "region_language": "地域と言語",
-  "currency": "通貨",
-  "select_region_language": "地域と言語を選択",
-  "select_currency": "通貨を選択",
-  "vietnam": "ベトナム",
-  "englishUK": "英語（UK）",
-  "japan": "日本",
-  "china": "中国",
-  "southKorea": "韓国",
-  "russia": "ロシア",
-  "france": "フランス",
-  "germany": "ドイツ",
-  "italy": "イタリア",
-  "spain": "スペイン",
-  "portugal": "ポルトガル",
-  "saudiArabia": "サウジアラビア",
-  "saved_notice": "すべての設定変更はアカウントに保存されます。"
+  "preferences": {
+    "preferences": "設定",
+    "region_language": "地域と言語",
+    "currency": "通貨",
+    "select_region_language": "地域と言語を選択",
+    "select_currency": "通貨を選択",
+    "vietnam": "ベトナム",
+    "englishUK": "英語（UK）",
+    "japan": "日本",
+    "china": "中国",
+    "southKorea": "韓国",
+    "russia": "ロシア",
+    "france": "フランス",
+    "germany": "ドイツ",
+    "italy": "イタリア",
+    "spain": "スペイン",
+    "portugal": "ポルトガル",
+    "saudiArabia": "サウジアラビア",
+    "saved_notice": "すべての設定変更はアカウントに保存されます。"
+  },
+  "landing": {
+    "loading": "読み込み中...",
+    "hero": {
+      "titleLine1": "ビークルをレンタル",
+      "titleLine2": "ビッビッと！",
+      "cta": "Bíp Bíp を探す"
+    }
+  },
+  "stationSection": {
+    "stations_title": "{{count}} ステーション",
+    "stations_subtitle": "あなたをお待ちしています！",
+    "view_all": "すべて表示",
+    "see_all_stations": "すべてのレンタルステーションを見る"
+  },
+  "technicianSection": {
+    "vehicle_trouble": "車両のトラブル？",
+    "call_technician": "技術者を呼ぶ！",
+    "view_all": "すべて表示",
+    "see_all_technicians": "近くの技術者を見る",
+    "notification_title": "📞 技術者に連絡",
+    "notification_description": "直接技術者と連絡できるシステムを構築中です。近日公開！"
+  },
+  "notificationTypes": {
+    "info": "情報",
+    "success": "成功",
+    "warning": "警告",
+    "error": "エラー"
+  },
+  "serviceSection": {
+    "title": "🛠️ Bíp Bíp 365",
+    "subtitle": "あなたの24時間365日ビークルライフセーバー",
+    "view_all": "すべて表示",
+    "see_all_services": "修理とレスキューサービスを見る",
+    "notification_title": "📞 サービスを予約",
+    "notification_description": "サービス予約機能を近日開始します！"
+  },
+  "vehicleModelSection": {
+    "title": "電動ビークルを選ぶ",
+    "rent_button": "🛵 今すぐレンタル",
+    "view_all": "すべて表示",
+    "see_all_vehicles": "すべての電動車両を見る",
+    "notification_title": "🚧 近日公開",
+    "notification_description": "レンタルステーションを準備中です。レンタル機能はまだ利用できません。"
+  },
+  "batteryStationSection": {
+    "count_label": "バッテリースワップステーション",
+    "subtitle": "全国のステーションをクリックして探す"
+  },
+  "whyChooseUs": {
+    "title": "なぜ誰もが私たちのプラットフォームから恩恵を受けるのか",
+    "roles": [
+      {
+        "title": "お客様",
+        "description": "ビークルレンタル、ロードサイド支援、信頼できる修理・メンテナンスサービスをどこでも簡単に予約できます。"
+      },
+      {
+        "title": "スタッフ",
+        "description": "レンタル管理、顧客対応、車両ステータスの更新、サービスリクエストの調整などを1つのプラットフォームで行えます。"
+      },
+      {
+        "title": "ステーションマネージャー",
+        "description": "ステーションの運営、在庫・スタッフの管理、毎日のスムーズな車両の出庫と返却を監督します。"
+      },
+      {
+        "title": "企業オーナー",
+        "description": "フリート利用状況、顧客動向、財務パフォーマンスをリアルタイムで監視し、自信を持ってビジネスを拡大できます。"
+      },
+      {
+        "title": "技術者",
+        "description": "修理タスクを割り当てられ、問題履歴を追跡し、効率的なデジタルツールで整備記録を管理します。"
+      },
+      {
+        "title": "個人オーナー",
+        "description": "個人所有のビークルをレンタルやサービスとして掲載し、完全な所有権を保ちながら収入を得られます。"
+      },
+      {
+        "title": "投資家",
+        "description": "投資成果を追跡し、地域別や会社別のレポートを閲覧し、成長中のエコ志向のビークルネットワークを支援します。"
+      },
+      {
+        "title": "エージェント（コラボレーター）",
+        "description": "お客様に最適なサービスを案内し、透明性のあるコミッションを獲得しながらパートナーネットワークを拡大できます。"
+      }
+    ]
+  },
+  "faqSection": {
+    "title": "ご質問はありますか？",
+    "faqs": [
+      {
+        "question": "ステーションでバッテリーを交換するには？",
+        "answer": "Bíp Bípで電動車両をレンタルすると、スマートバッテリースワップステーションの使い方を明確にご案内します。対応ステーションでBíp Bípアカウントを使ってセルフ交換可能です。"
+      },
+      {
+        "question": "レンタル車両にはどんな付属品がありますか？",
+        "answer": "すべての車両にはヘルメット2個、レインコート2枚、必要に応じて充電器が付きます。一部の車両にはスマホホルダー、リアキャリア、収納などが付属する場合もあります。"
+      },
+      {
+        "question": "Bíp Bípではどの種類の車両が利用できますか？",
+        "answer": "電動バイク、自転車、電気自動車、バンなど、観光にも配達にも適した多様な車両を提供しています。"
+      },
+      {
+        "question": "走行中にトラブルがあった場合はどうすれば？",
+        "answer": "事故や故障、その他のトラブルの際は、ホットラインに連絡するかアプリからロードサイド支援をリクエストしてください。技術者が迅速に対応いたします。"
+      }
+    ]
+  },
+  "footer": {},
+  "preferences_sidebar": {},
+  "navigation": {},
+  "user_sidebar": {},
+  "header": {},
+  "account": {},
+  "contribute": {},
+  "repair_shop_form": {},
+  "rental_shop_form": {},
+  "battery_station_form": {},
+  "auth": {},
+  "handle_email_login": {},
+  "login_popup": {},
+  "signin_popup": {},
+  "signup_popup": {},
+  "profiles_page_content": {},
+  "mobile_profile_overview": {},
+  "desktop_profile_overview": {},
+  "profile_tabs": {},
+  "activity_feed": {},
+  "my_vehicles_section": {},
+  "edit_personal_vehicle_form": {},
+  "personal_vehicle_card": {},
+  "select_model_then_add_vehicle_form": {},
+  "available_insurance_products_section": {},
+  "my_insurance_packages_section": {},
+  "my_insurance_products_list": {},
+  "purchase_insurance_dialog": {},
+  "profile_main_content": {},
+  "settings_dropdown": {},
+  "profile_sidebar": {},
+  "my_issues_section": {}
 }
