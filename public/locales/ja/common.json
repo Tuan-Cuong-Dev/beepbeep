@@ -348,7 +348,7 @@
   "loading": "プロフィールを読み込み中...",
   "unknown_name": "未登録",
   "default_address": "ダナン",
-  "joined": "登録日",
+  "role": "役割",
   "edit_profile": "プロフィールを編集",
   "stats": {
     "contributions": "投稿数",
@@ -360,7 +360,7 @@
   "loading": "プロフィールを読み込み中...",
   "unknown_name": "未登録",
   "default_address": "ダナン（ベトナム）",
-  "joined": "登録日",
+  "role": "役割",
   "helpful_votes": "参考になった票",
   "edit_profile": "プロフィールを編集",
   "stats": {

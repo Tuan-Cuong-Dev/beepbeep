@@ -51,10 +51,11 @@ export default function MobileProfileOverview() {
 
           <div className="text-sm">
             <p className="font-semibold">{user.name || t('mobile_profile_overview.unknown_name')}</p>
-            <p className="text-gray-500">{user.address || t('mobile_profile_overview.default_address')}</p>
             <p className="text-gray-400 text-xs">
-              {t('mobile_profile_overview.joined')} {user.joinedDate || 'Mar 2025'}
+              {t('mobile_profile_overview.role')} {user.role || 'Customer'}
             </p>
+            <p className="text-gray-500">{user.address || t('mobile_profile_overview.default_address')}</p>
+
           </div>
         </div>
 

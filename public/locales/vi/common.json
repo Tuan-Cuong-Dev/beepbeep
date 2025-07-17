@@ -367,7 +367,7 @@
   "loading": "Đang tải hồ sơ...",
   "unknown_name": "Không rõ",
   "default_address": "Đà Nẵng",
-  "joined": "Gia nhập",
+  "role": "Vai trò",
   "edit_profile": "Chỉnh sửa hồ sơ",
   "stats": {
     "contributions": "Đóng góp",
@@ -380,7 +380,7 @@
   "loading": "Đang tải hồ sơ...",
   "unknown_name": "Không rõ",
   "default_address": "Đà Nẵng, Việt Nam",
-  "joined": "Gia nhập",
+  "role": "Vai trò",
   "helpful_votes": "lượt bình chọn hữu ích",
   "edit_profile": "Chỉnh sửa hồ sơ",
   "stats": {

@@ -48,28 +48,28 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
           </div>
 
           <ul className="space-y-4 text-gray-800">
-            <li className="flex items-center space-x-3 hover:text-blue-500">
+            <li className="flex items-center space-x-3 hover:text-[#00d289]">
               <FaHome />
               <Link href="/" onClick={onClose}>
                 {t('navigation.home')}
               </Link>
             </li>
             <hr />
-            <li className="flex items-center space-x-3 hover:text-blue-500">
+            <li className="flex items-center space-x-3 hover:text-[#00d289]">
               <FaInfoCircle />
               <Link href="/about" onClick={onClose}>
                 {t('navigation.about')}
               </Link>
             </li>
             <hr />
-            <li className="flex items-center space-x-3 hover:text-blue-500">
+            <li className="flex items-center space-x-3 hover:text-[#00d289]">
               <FaPhone />
               <Link href="/contact" onClick={onClose}>
                 {t('navigation.contact')}
               </Link>
             </li>
             <hr />
-            <li className="flex items-center space-x-3 hover:text-blue-500">
+            <li className="flex items-center space-x-3 hover:text-[#00d289]">
               <FaShieldAlt />
               <Link href="/policy" onClick={onClose}>
                 {t('navigation.policy')}

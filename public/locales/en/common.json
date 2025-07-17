@@ -369,7 +369,7 @@
   "loading": "Loading profile...",
   "unknown_name": "Unknown",
   "default_address": "Da Nang",
-  "joined": "Joined",
+  "role": "Role",
   "edit_profile": "Edit profile",
   "stats": {
     "contributions": "Contributions",
@@ -382,7 +382,7 @@
   "loading": "Loading profile...",
   "unknown_name": "Unknown",
   "default_address": "Da Nang, Vietnam",
-  "joined": "Joined",
+  "role": "Role",
   "helpful_votes": "helpful votes",
   "edit_profile": "Edit profile",
   "stats": {

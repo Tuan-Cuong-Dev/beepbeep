@@ -56,8 +56,8 @@ export default function DesktopProfileOverview() {
               <p className="text-gray-500 text-sm">{user.username}</p>
 
               <div className="text-sm text-gray-600">
+                <p>{t('desktop_profile_overview.role')} {user.role || 'Customer'}</p>
                 <p>{user.address || t('desktop_profile_overview.default_address')}</p>
-                <p>{t('desktop_profile_overview.joined')} {user.joinedDate || 'Mar 2025'}</p>
                 <p>{user.helpfulVotes || 0} {t('desktop_profile_overview.helpful_votes')}</p>
               </div>
             </div>
