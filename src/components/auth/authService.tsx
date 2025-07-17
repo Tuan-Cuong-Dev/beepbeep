@@ -1,53 +1,71 @@
-// Xử lý xác thực đăng nhập với google account
-// Xử lý signout
+'use client';
 
-import { auth, provider, db, signInWithPopup } from "@/src/firebaseConfig";
-import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
-import { signOut } from "firebase/auth";
+import { auth, provider, db, signInWithPopup } from '@/src/firebaseConfig';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { signOut, User } from 'firebase/auth';
+import { useTranslation } from 'react-i18next';
 
-const signOutUser = async () => {
-  try {
-    await signOut(auth);
-    console.log("✅ Signed out successfully");
-    window.location.href = "/"; // hoặc dùng router.push("/") nếu dùng Next.js router
-  } catch (error) {
-    console.error("❌ Error signing out:", error);
-  }
-};
+/**
+ * Hook to provide auth-related actions with translated messages
+ */
+export const useAuthService = () => {
+  const { t } = useTranslation('common');
 
-const signInWithGoogle = async () => {
-  try {
-    // Hiển thị popup đăng nhập Google
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-
-    // Tạo document tham chiếu tới Firestore
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    // Nếu user chưa tồn tại trong Firestore, thêm mới
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        uid: user.uid,
-        name: user.displayName || "",
-        email: user.email || "",
-        photoURL: user.photoURL || "",
-        role: "Customer", // 👈 Gán role mặc định
-        createdAt: serverTimestamp(), // ⏱ Dùng timestamp chuẩn
-      });
+  /**
+   * Sign out the current user
+   */
+  const signOutUser = async () => {
+    try {
+      await signOut(auth);
+      console.log('✅', t('auth.signout_success'));
+      window.location.href = '/'; // Or use router.push('/') if using App Router
+    } catch (error) {
+      console.error('❌', t('auth.signout_error'), error);
     }
+  };
 
-    console.log("✅ User signed in:", user);
-    return user; // Trả về user để dùng trong ứng dụng
+  /**
+   * Sign in with Google and create user in Firestore if not exists
+   * @returns user or null
+   */
+  const signInWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-  } catch (error: any) {
-    if (error.code === "auth/popup-closed-by-user") {
-      console.warn("⚠️ Người dùng đã đóng cửa sổ đăng nhập trước khi hoàn tất.");
-    } else {
-      console.error("❌ Lỗi khi đăng nhập:", error);
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await createUserInFirestore(user);
+      }
+
+      console.log('✅', t('auth.signin_success'), user);
+      return user;
+    } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        console.warn('⚠️', t('auth.popup_closed'));
+      } else {
+        console.error('❌', t('auth.signin_error'), error);
+      }
+      return null;
     }
-    return null;
-  }
-};
+  };
 
-export { signInWithGoogle, signOutUser };
+  /**
+   * Create a new user in Firestore
+   */
+  const createUserInFirestore = async (user: User) => {
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(userRef, {
+      uid: user.uid,
+      name: user.displayName || '',
+      email: user.email || '',
+      photoURL: user.photoURL || '',
+      role: 'Customer',
+      createdAt: serverTimestamp(),
+    });
+  };
+
+  return { signInWithGoogle, signOutUser };
+};

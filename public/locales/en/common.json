@@ -283,7 +283,82 @@
     "submitting": "Submitting...",
     "thank_you": "Thank you for your contribution!",
     "submission_received": "We’ve received your submission and will review it shortly."
-  }
+  },
+
+  "auth": {
+    "signin_success": "User signed in successfully",
+    "signin_error": "Error signing in",
+    "signout_success": "Signed out successfully",
+    "signout_error": "Error signing out",
+    "popup_closed": "The login popup was closed before completing sign-in"
+  },
+  "handle_email_login": {
+  "success": "Successfully signed in with email",
+  "error": "An error occurred while signing in with email",
+  "email_not_found": "Email address not found",
+  "wrong_password": "Incorrect password"
+},
+
+"login_popup": {
+    "title": "Sign in to unlock the best of Bíp Bíp.",
+    "continue_with_google": "Continue with Google",
+    "continue_with_email": "Continue with Email",
+    "agree_prefix": "By proceeding, you agree to our",
+    "terms_of_use": "Terms of Use",
+    "and_read": "and confirm you have read our",
+    "privacy_statement": "Privacy and Cookie Statement",
+    "recaptcha_note": "This site is protected by reCAPTCHA and the Google",
+    "google_privacy": "Privacy Policy",
+    "and": "and",
+    "google_terms": "Terms of Service",
+    "apply": "apply"
+  },
+  "signin_popup": {
+  "welcome": "Welcome back.",
+  "email_label": "Email address",
+  "email_placeholder": "Email",
+  "password_label": "Password",
+  "password_placeholder": "Password",
+  "fill_all_fields": "Please enter both email and password.",
+  "login_failed": "Login failed.",
+  "forgot_password": "Forgot password?",
+  "signin": "Sign in",
+  "not_a_member": "Not a member?",
+  "join": "Join",
+  "unlock_bipbip": "to unlock the best of Bíp Bíp.",
+  "agree_prefix": "By proceeding, you agree to our",
+  "terms_of_use": "Terms of Use",
+  "and_read": "and confirm you have read our",
+  "privacy_statement": "Privacy and Cookie Statement",
+  "recaptcha_note": "This site is protected by reCAPTCHA and the Google",
+  "google_privacy": "Privacy Policy",
+  "and": "and",
+  "google_terms": "Terms of Service",
+  "apply": "apply"
+},
+"signup_popup": {
+  "title": "Join to unlock the best of Bíp Bíp",
+  "first_name": "First Name",
+  "last_name": "Last Name",
+  "email": "Email address",
+  "password": "Create a password",
+  "signup_failed": "Signup failed.",
+  "join_button": "Join",
+  "already_member": "Already a member?",
+  "signin": "Sign in",
+  "with_account": "using your Bíp Bíp account.",
+  "agree_prefix": "By proceeding, you agree to our",
+  "terms_of_use": "Terms of Use",
+  "and_read": "and confirm you have read our",
+  "privacy_statement": "Privacy and Cookie Statement",
+  "recaptcha_note": "This site is protected by reCAPTCHA and the Google",
+  "google_privacy": "Privacy Policy",
+  "and": "and",
+  "google_terms": "Terms of Service",
+  "apply": "apply"
+}
+
+
 
 
 

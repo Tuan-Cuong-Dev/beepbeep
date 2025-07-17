@@ -280,6 +280,82 @@
   "submitting": "Đang gửi...",
   "thank_you": "Cảm ơn bạn đã đóng góp!",
   "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
+},
+
+"auth": {
+  "signin_success": "Đăng nhập thành công",
+  "signin_error": "Lỗi khi đăng nhập",
+  "signout_success": "Đăng xuất thành công",
+  "signout_error": "Lỗi khi đăng xuất",
+  "popup_closed": "Cửa sổ đăng nhập đã bị đóng trước khi hoàn tất"
+},
+
+"handle_email_login": {
+  "success": "Đăng nhập bằng email thành công",
+  "error": "Đã xảy ra lỗi khi đăng nhập bằng email",
+  "email_not_found": "Không tìm thấy địa chỉ email",
+  "wrong_password": "Mật khẩu không chính xác"
+},
+
+"login_popup": {
+  "title": "Đăng nhập để khám phá trọn vẹn Bíp Bíp.",
+  "continue_with_google": "Tiếp tục với Google",
+  "continue_with_email": "Tiếp tục với Email",
+  "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
+  "terms_of_use": "Điều khoản Sử dụng",
+  "and_read": "và xác nhận rằng bạn đã đọc",
+  "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
+  "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
+  "google_privacy": "Chính sách Bảo mật",
+  "and": "và",
+  "google_terms": "Điều khoản Dịch vụ",
+  "apply": "được áp dụng"
+},
+
+"signin_popup": {
+  "welcome": "Chào mừng bạn quay lại.",
+  "email_label": "Địa chỉ email",
+  "email_placeholder": "Email",
+  "password_label": "Mật khẩu",
+  "password_placeholder": "Mật khẩu",
+  "fill_all_fields": "Vui lòng nhập đầy đủ email và mật khẩu.",
+  "login_failed": "Đăng nhập thất bại.",
+  "forgot_password": "Quên mật khẩu?",
+  "signin": "Đăng nhập",
+  "not_a_member": "Chưa có tài khoản?",
+  "join": "Tham gia",
+  "unlock_bipbip": "để khám phá trọn vẹn Bíp Bíp.",
+  "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
+  "terms_of_use": "Điều khoản Sử dụng",
+  "and_read": "và xác nhận rằng bạn đã đọc",
+  "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
+  "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
+  "google_privacy": "Chính sách Bảo mật",
+  "and": "và",
+  "google_terms": "Điều khoản Dịch vụ",
+  "apply": "được áp dụng"
+},
+
+"signup_popup": {
+  "title": "Tham gia để khám phá trọn vẹn Bíp Bíp",
+  "first_name": "Tên",
+  "last_name": "Họ",
+  "email": "Địa chỉ email",
+  "password": "Tạo mật khẩu",
+  "signup_failed": "Đăng ký thất bại.",
+  "join_button": "Tham gia",
+  "already_member": "Đã có tài khoản?",
+  "signin": "Đăng nhập",
+  "with_account": "bằng tài khoản Bíp Bíp của bạn.",
+  "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
+  "terms_of_use": "Điều khoản Sử dụng",
+  "and_read": "và xác nhận rằng bạn đã đọc",
+  "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
+  "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
+  "google_privacy": "Chính sách Bảo mật",
+  "and": "và",
+  "google_terms": "Điều khoản Dịch vụ",
+  "apply": "được áp dụng"
 }
 
 

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { signOutUser } from '@/src/components/auth/authService';
+import { useAuthService } from '@/src/components/auth/authService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileContract } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -32,6 +32,7 @@ type MenuItem =
   };
 
 const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
+  const { signOutUser } = useAuthService();
   const router = useRouter();
   const pathname = usePathname();
   const { role } = useUser();

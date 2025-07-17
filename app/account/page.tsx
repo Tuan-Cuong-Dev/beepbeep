@@ -168,7 +168,7 @@ export default function AccountPage() {
                 { label: t('account.female'), value: 'female' },
                 { label: t('account.other'), value: 'other' },
               ]}
-              placeholder={t('account.select_gender')}
+              placeholder={t('account.gender')}
             />
           </div>
 

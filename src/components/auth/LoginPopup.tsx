@@ -1,33 +1,33 @@
-import { useState } from "react";
-import { FaGoogle, FaEnvelope } from "react-icons/fa";
-import { X } from "lucide-react";
-import SigninPopup from "@/src/components/auth/SigninPopup";
-import { signInWithGoogle } from "@/src/components/auth/authService";
+'use client';
 
-// Tạo interface này để đóng popup khi cần
+import { useState } from 'react';
+import { FaGoogle, FaEnvelope } from 'react-icons/fa';
+import { X } from 'lucide-react';
+import SigninPopup from '@/src/components/auth/SigninPopup';
+import { useAuthService } from '@/src/components/auth/authService';
+import { useTranslation } from 'react-i18next';
+
 interface LoginPopupProps {
   onClose: () => void;
 }
 
 export default function LoginPopup({ onClose }: LoginPopupProps) {
-
-  // Khai báo trạng thái của đăng nhập Signin là hiden
+  const { t } = useTranslation('common');
+  const { signInWithGoogle } = useAuthService();
   const [showSignin, setShowSignin] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
       const user = await signInWithGoogle();
-      console.log("User signed in:", user);
-
-      // ✅ Đóng popup sau khi đăng nhập thành công
-      onClose();
+      console.log('User signed in:', user);
+      onClose(); // ✅ Close popup on success
     } catch (error) {
-      console.error("Google Sign-In Error:", error);
+      console.error('Google Sign-In Error:', error);
     }
   };
 
   return (
-    <div className="p-3 fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="p-3 fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-2xl shadow-xl w-96 relative">
         {/* Close button */}
         <button
@@ -48,52 +48,58 @@ export default function LoginPopup({ onClose }: LoginPopupProps) {
 
         <div className="text-center">
           <h2 className="text-xl text-gray-600 font-semibold mb-4">
-            Sign in to unlock the best of <br />Bíp Bíp.
+            {t('login_popup.title')}
           </h2>
 
-          {/* Continue with Google */}
-          <button 
+          {/* Sign in with Google */}
+          <button
             className="flex text-gray-600 items-center justify-center w-full border py-2 rounded-lg mb-3 hover:bg-[#00d289] transition"
             onClick={handleGoogleSignIn}
           >
-            <FaGoogle className="mr-2" /> Continue with Google
+            <FaGoogle className="mr-2" />
+            {t('login_popup.continue_with_google')}
           </button>
 
-          {/* Continue with Email thì (Mở SigninPopup) */}
+          {/* Sign in with Email */}
           <button
             className="flex text-gray-600 items-center justify-center w-full border py-2 rounded-lg hover:bg-[#00d289] transition"
             onClick={() => setShowSignin(true)}
           >
-            <FaEnvelope className="mr-2" /> Continue with Email
+            <FaEnvelope className="mr-2" />
+            {t('login_popup.continue_with_email')}
           </button>
 
           <p className="text-xs text-gray-500 mt-4">
-            By proceeding, you agree to our{" "}
+            {t('login_popup.agree_prefix')}{' '}
             <a href="#" className="underline">
-              Terms of Use
-            </a>{" "}
-            and confirm you have read our{" "}
+              {t('login_popup.terms_of_use')}
+            </a>{' '}
+            {t('login_popup.and_read')}{' '}
             <a href="#" className="underline">
-              Privacy and Cookie Statement
+              {t('login_popup.privacy_statement')}
             </a>.
           </p>
+
           <p className="text-xs text-gray-500 mt-2">
-            This site is protected by reCAPTCHA and the Google{" "}
+            {t('login_popup.recaptcha_note')}{' '}
             <a href="#" className="underline">
-              Privacy Policy
-            </a>{" "}
-            and
-            <a href="#" className="underline"> Terms of Service</a> apply.
+              {t('login_popup.google_privacy')}
+            </a>{' '}
+            {t('login_popup.and')}{' '}
+            <a href="#" className="underline">
+              {t('login_popup.google_terms')}
+            </a>{' '}
+            {t('login_popup.apply')}.
           </p>
         </div>
       </div>
 
-      {/* Popup Signin xuất hiện khi bấm "Continue with Email" */}
+      {/* Signin popup on email login */}
       {showSignin && (
         <SigninPopup
           onClose={() => {
-            setShowSignin(false); // ẩn popup con
-            onClose();            // ẩn luôn LoginPopup cha
+            setShowSignin(false); // hide child
+            onClose(); // hide parent
           }}
         />
       )}
