@@ -2,8 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 export default function Bipbip365Section() {
+  const { i18n } = useTranslation();
+
+  // Ẩn nếu không phải tiếng Việt
+  if (i18n.language !== 'vi') return null;
+
   return (
     <Link href="/bipbip365" className="block group">
       <section className="w-full bg-white text-gray-900 py-10 px-4 md:px-16">

@@ -12,7 +12,10 @@ export default function ServicePricingSection() {
   const { services, loading } = usePublicServicePricing();
   const [showNotice, setShowNotice] = useState(false);
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // 👉 Ẩn nếu ngôn ngữ hiện tại không phải tiếng Việt
+  if (i18n.language !== 'vi') return null;
 
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
