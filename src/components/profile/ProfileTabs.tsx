@@ -2,26 +2,28 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 // Tab type definition
 export type TabType = 'activityFeed' | 'vehicles' | 'insurance' | 'issues';
 
 interface ProfileTabsProps {
-  activeTab?: TabType; // optional
+  activeTab?: TabType;
   setActiveTab?: (tab: TabType) => void;
 }
 
-const tabs: { key: TabType; label: string }[] = [
-  { key: 'activityFeed', label: 'Activity feed' },
-  { key: 'vehicles', label: 'My Vehicles' },
-  { key: 'insurance', label: 'My Insurance Packages' },
-  { key: 'issues', label: 'My Reported Issues' },
-];
-
 export default function ProfileTabs({ activeTab: externalActiveTab, setActiveTab: externalSetActiveTab }: ProfileTabsProps) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const searchParams = useSearchParams()!;
   const urlTab = searchParams.get('tab') as TabType | null;
+
+  const tabs: { key: TabType; label: string }[] = [
+    { key: 'activityFeed', label: t('profile_tabs.activity_feed') },
+    { key: 'vehicles', label: t('profile_tabs.vehicles') },
+    { key: 'insurance', label: t('profile_tabs.insurance') },
+    { key: 'issues', label: t('profile_tabs.issues') },
+  ];
 
   const isValidTab = (tab: string | null): tab is TabType => {
     return tabs.some((t) => t.key === tab);
@@ -29,7 +31,6 @@ export default function ProfileTabs({ activeTab: externalActiveTab, setActiveTab
 
   const [internalTab, setInternalTab] = useState<TabType>('activityFeed');
 
-  // Sync tab from URL
   useEffect(() => {
     if (isValidTab(urlTab)) {
       setInternalTab(urlTab);
@@ -38,9 +39,9 @@ export default function ProfileTabs({ activeTab: externalActiveTab, setActiveTab
 
   const handleTabClick = (tab: TabType) => {
     if (externalSetActiveTab) {
-      externalSetActiveTab(tab); // allow parent to control
+      externalSetActiveTab(tab);
     } else {
-      setInternalTab(tab); // internal control
+      setInternalTab(tab);
     }
     router.push(`?tab=${tab}`);
   };

@@ -19,9 +19,11 @@ import EditPersonalVehicleForm from '@/src/components/personalVehicles/EditPerso
 import NotificationDialog, {
   NotificationType,
 } from '@/src/components/ui/NotificationDialog';
+import { useTranslation } from 'react-i18next';
 
 export default function MyVehiclesSection() {
   const { currentUser, loading } = useAuth();
+  const { t } = useTranslation('common');
   const [vehicles, setVehicles] = useState<PersonalVehicle_new[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<PersonalVehicle_new | null>(null);
@@ -55,15 +57,15 @@ export default function MyVehiclesSection() {
     setNotif({
       open: true,
       type: 'confirm',
-      title: '❌ Delete this vehicle?',
-      description: `This will permanently remove "${vehicle.name}" from your list.`,
+      title: t('my_vehicles_section.delete_title'),
+      description: t('my_vehicles_section.delete_description', { name: vehicle.name }),
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'personalVehicles', vehicle.id));
           setNotif({
             open: true,
             type: 'success',
-            title: '✅ Vehicle deleted successfully!',
+            title: t('my_vehicles_section.delete_success'),
           });
           fetchVehicles();
         } catch (err) {
@@ -71,7 +73,7 @@ export default function MyVehiclesSection() {
           setNotif({
             open: true,
             type: 'error',
-            title: '❌ Failed to delete vehicle.',
+            title: t('my_vehicles_section.delete_error'),
           });
         }
       },
@@ -81,10 +83,10 @@ export default function MyVehiclesSection() {
   return (
     <section className="space-y-6 px-4 md:px-0">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">🚗 My Vehicles</h2>
+        <h2 className="text-xl font-semibold">🚗 {t('my_vehicles_section.title')}</h2>
         {!editingVehicle && (
-          <Button size='sm' variant="outline" onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Close' : '+ Add Vehicle'}
+          <Button size="sm" variant="outline" onClick={() => setShowForm(!showForm)}>
+            {showForm ? t('my_vehicles_section.close') : t('my_vehicles_section.add')}
           </Button>
         )}
       </div>
@@ -101,7 +103,7 @@ export default function MyVehiclesSection() {
       ) : showForm ? (
         <SelectModelThenAddVehicleForm onSaved={handleVehicleAdded} />
       ) : vehicles.length === 0 ? (
-        <p className="text-gray-500 text-sm">You haven't added any vehicle yet.</p>
+        <p className="text-gray-500 text-sm">{t('my_vehicles_section.no_vehicle')}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {vehicles.map((vehicle) => (

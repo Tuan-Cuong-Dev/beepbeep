@@ -5,9 +5,11 @@ import { useAuth } from '@/src/hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import SettingsDropdown from './SettingsDropdown'; 
+import SettingsDropdown from './SettingsDropdown';
+import { useTranslation } from 'react-i18next';
 
-export default function ProfileOverview() {
+export default function DesktopProfileOverview() {
+  const { t } = useTranslation('common');
   const { currentUser } = useAuth();
   const [user, setUser] = useState<any>(null);
 
@@ -21,7 +23,7 @@ export default function ProfileOverview() {
     fetchUser();
   }, [currentUser]);
 
-  if (!user) return <div className="p-4">Loading...</div>;
+  if (!user) return <div className="p-4">{t('desktop_profile_overview.loading')}</div>;
 
   return (
     <div className="relative bg-white shadow-sm">
@@ -50,45 +52,43 @@ export default function ProfileOverview() {
 
             {/* Info */}
             <div className="space-y-1">
-              <h1 className="text-xl sm:text-2xl font-bold">{user.name || 'Unknown'}</h1>
-              <p className="text-gray-500 text-sm">{user.username }</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{user.name || t('desktop_profile_overview.unknown_name')}</h1>
+              <p className="text-gray-500 text-sm">{user.username}</p>
 
-              {/* Đồng bộ với phần Intro */}
               <div className="text-sm text-gray-600">
-                <p>{user.address || 'Da Nang, Vietnam'}</p>
-                <p>Joined {user.joinedDate || 'Mar 2025'}</p>
-                <p>{user.helpfulVotes || 0} helpful votes</p>
+                <p>{user.address || t('desktop_profile_overview.default_address')}</p>
+                <p>{t('desktop_profile_overview.joined')} {user.joinedDate || 'Mar 2025'}</p>
+                <p>{user.helpfulVotes || 0} {t('desktop_profile_overview.helpful_votes')}</p>
               </div>
             </div>
           </div>
 
-
-          {/* Statistics & Buttons */}
+          {/* Stats + Buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-between">
             <div className="flex gap-6 text-center text-sm sm:text-base">
               <div>
                 <p className="font-semibold">0</p>
-                <p className="text-gray-600">Contributions</p>
+                <p className="text-gray-600">{t('desktop_profile_overview.stats.contributions')}</p>
               </div>
               <div>
                 <p className="font-semibold">0</p>
-                <p className="text-gray-600">Followers</p>
+                <p className="text-gray-600">{t('desktop_profile_overview.stats.followers')}</p>
               </div>
               <div>
                 <p className="font-semibold">0</p>
-                <p className="text-gray-600">Following</p>
+                <p className="text-gray-600">{t('desktop_profile_overview.stats.following')}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <button className="border px-4 py-1.5 rounded text-sm font-medium shadow-sm whitespace-nowrap">
-                Edit profile
+                {t('desktop_profile_overview.edit_profile')}
               </button>
               <button className="p-2 text-gray-500 hover:text-gray-700" title="Settings">
                 <SettingsDropdown />
               </button>
             </div>
           </div>
-          
+
         </div>
       </div>
     </div>

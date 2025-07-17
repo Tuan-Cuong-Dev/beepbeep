@@ -356,8 +356,106 @@
   "and": "và",
   "google_terms": "Điều khoản Dịch vụ",
   "apply": "được áp dụng"
-}
+},
 
+"profiles_page_content": {
+  "loading": "Đang tải hồ sơ...",
+  "no_address": "Chưa cập nhật"
+},
+
+"mobile_profile_overview": {
+  "loading": "Đang tải hồ sơ...",
+  "unknown_name": "Không rõ",
+  "default_address": "Đà Nẵng",
+  "joined": "Gia nhập",
+  "edit_profile": "Chỉnh sửa hồ sơ",
+  "stats": {
+    "contributions": "Đóng góp",
+    "followers": "Người theo dõi",
+    "following": "Đang theo dõi"
+  }
+},
+
+"desktop_profile_overview": {
+  "loading": "Đang tải hồ sơ...",
+  "unknown_name": "Không rõ",
+  "default_address": "Đà Nẵng, Việt Nam",
+  "joined": "Gia nhập",
+  "helpful_votes": "lượt bình chọn hữu ích",
+  "edit_profile": "Chỉnh sửa hồ sơ",
+  "stats": {
+    "contributions": "Đóng góp",
+    "followers": "Người theo dõi",
+    "following": "Đang theo dõi"
+  }
+},
+
+"profile_tabs": {
+  "activity_feed": "Hoạt động",
+  "vehicles": "Xe của tôi",
+  "insurance": "Gói bảo hiểm",
+  "issues": "Sự cố đã báo"
+},
+
+"activity_feed": {
+  "title": "Hoàn thiện hồ sơ của bạn",
+  "description": "Hãy thêm ảnh và thông tin vào hồ sơ để mọi người dễ dàng tìm thấy và hiểu rõ hơn về bạn!"
+},
+
+"my_vehicles_section": {
+  "title": "Xe của tôi",
+  "add": "+ Thêm xe",
+  "close": "Đóng",
+  "no_vehicle": "Bạn chưa thêm xe nào.",
+  "delete_title": "❌ Xóa xe này?",
+  "delete_description": "Xe \"{{name}}\" sẽ bị xóa vĩnh viễn khỏi danh sách.",
+  "delete_success": "✅ Đã xóa xe thành công!",
+  "delete_error": "❌ Xóa xe thất bại."
+},
+
+"edit_personal_vehicle_form": {
+  "title": "Chỉnh sửa xe",
+  "name": "Tên xe",
+  "license_plate": "Biển số",
+  "year": "Năm sản xuất",
+  "odo": "Số km đã đi",
+  "set_primary": "Đặt làm xe chính",
+  "save": "Lưu thay đổi",
+  "saving": "Đang lưu...",
+  "cancel": "Hủy",
+  "update_failed": "❌ Cập nhật xe thất bại."
+},
+
+"personal_vehicle_card": {
+  "no_image": "Không có ảnh",
+  "unknown": "Không rõ",
+  "plate": "Biển số",
+  "odo": "Odo",
+  "year": "Năm",
+  "type": "Loại xe",
+  "active": "Đang dùng",
+  "inactive": "Ngưng dùng",
+  "primary": "Xe chính",
+  "edit": "Sửa",
+  "delete": "Xoá"
+},
+
+"select_model_then_add_vehicle_form": {
+  "search_title": "Tìm mẫu xe của bạn",
+  "search_placeholder": "VD: VinFast Feliz, Yamaha Sirius...",
+  "add_title": "Thêm xe của bạn",
+  "selected": "Đã chọn",
+  "nickname": "Tên gọi (VD: Xe của bố)",
+  "plate": "Biển số (tuỳ chọn)",
+  "year": "Năm sản xuất",
+  "odo": "Số km đã đi",
+  "set_primary": "Đặt làm xe chính",
+  "save": "Lưu xe",
+  "saving": "Đang lưu...",
+  "change_model": "Đổi mẫu xe",
+  "no_image": "Không có ảnh",
+  "error": "❌ Không thể lưu xe. Vui lòng thử lại."
+}
 
 
 

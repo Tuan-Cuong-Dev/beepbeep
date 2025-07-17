@@ -9,27 +9,27 @@ import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import Image from 'next/image';
 import { addPersonalVehicleWithModel } from '@/src/hooks/useAddPersonalVehicle';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   onSaved: () => void;
 }
 
-  // 🔧 Convert Google Drive link to direct image URL
-  const getDirectImageUrl = (url?: string): string | undefined => {
-    if (!url) return undefined;
-    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
-    const id = match?.[1];
-    return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
-  };
-
+// 🔧 Convert Google Drive link to direct image URL
+const getDirectImageUrl = (url?: string): string | undefined => {
+  if (!url) return undefined;
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+  const id = match?.[1];
+  return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
+};
 
 export default function SelectModelThenAddVehicleForm({ onSaved }: Props) {
+  const { t } = useTranslation('common');
   const { currentUser } = useAuth();
 
   const [models, setModels] = useState<VehicleModel[]>([]);
   const [search, setSearch] = useState('');
   const [selectedModel, setSelectedModel] = useState<VehicleModel | null>(null);
-
   const [name, setName] = useState('');
   const [year, setYear] = useState<number | undefined>();
   const [odo, setOdo] = useState<number | undefined>();
@@ -73,7 +73,7 @@ export default function SelectModelThenAddVehicleForm({ onSaved }: Props) {
       onSaved();
     } catch (err) {
       console.error('❌ Failed to save vehicle:', err);
-      alert('❌ Failed to save vehicle. Please try again.');
+      alert(t('select_model_then_add_vehicle_form.error'));
     } finally {
       setLoading(false);
     }
@@ -83,68 +83,67 @@ export default function SelectModelThenAddVehicleForm({ onSaved }: Props) {
     <div className="max-w-2xl mx-auto p-6 border rounded bg-white space-y-6">
       {!selectedModel ? (
         <>
-          <h2 className="text-lg font-semibold">🔍 Search for your vehicle model</h2>
+          <h2 className="text-lg font-semibold">🔍 {t('select_model_then_add_vehicle_form.search_title')}</h2>
           <Input
-            placeholder="e.g. VinFast Feliz, Yamaha Sirius..."
+            placeholder={t('select_model_then_add_vehicle_form.search_placeholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
-            {filteredModels.map((model) => {
-              return (
-                <div
-                  key={model.id}
-                  className="border p-3 rounded hover:bg-gray-50 cursor-pointer flex gap-2 items-center"
-                  onClick={() => setSelectedModel(model)}
-                >
-                  {model.imageUrl ? (
-                    <Image
-                        src={getDirectImageUrl(model.imageUrl) as string} // ✅ ép kiểu an toàn
-                          alt={model.name}
-                          width={60}
-                          height={40}
-                          className="rounded object-cover"
-                        />
-                      ) : (
-                    <span className="text-gray-400 italic">No image</span>
-                    )}
-                  <div>
-                    <div className="font-medium">
-                      {model.brand} {model.name}
-                    </div>
-                    <div className="text-xs text-gray-500">{model.vehicleType}</div>
+            {filteredModels.map((model) => (
+              <div
+                key={model.id}
+                className="border p-3 rounded hover:bg-gray-50 cursor-pointer flex gap-2 items-center"
+                onClick={() => setSelectedModel(model)}
+              >
+                {model.imageUrl ? (
+                  <Image
+                    src={getDirectImageUrl(model.imageUrl) as string}
+                    alt={model.name}
+                    width={60}
+                    height={40}
+                    className="rounded object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-400 italic">{t('select_model_then_add_vehicle_form.no_image')}</span>
+                )}
+                <div>
+                  <div className="font-medium">
+                    {model.brand} {model.name}
                   </div>
+                  <div className="text-xs text-gray-500">{model.vehicleType}</div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </>
       ) : (
         <>
-          <h2 className="text-lg font-semibold">🚗 Add your vehicle</h2>
+          <h2 className="text-lg font-semibold">🚗 {t('select_model_then_add_vehicle_form.add_title')}</h2>
           <div className="bg-gray-100 p-3 rounded">
-            <strong>Selected:</strong> {selectedModel.brand} {selectedModel.name} ({selectedModel.vehicleType})
+            <strong>{t('select_model_then_add_vehicle_form.selected')}:</strong>{' '}
+            {selectedModel.brand} {selectedModel.name} ({selectedModel.vehicleType})
           </div>
 
           <Input
-            placeholder="Nickname (e.g. Xe của bố)"
+            placeholder={t('select_model_then_add_vehicle_form.nickname')}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <Input
-            placeholder="License Plate (optional)"
+            placeholder={t('select_model_then_add_vehicle_form.plate')}
             value={licensePlate}
             onChange={(e) => setLicensePlate(e.target.value)}
           />
           <Input
             type="number"
-            placeholder="Year of Manufacture"
+            placeholder={t('select_model_then_add_vehicle_form.year')}
             value={year || ''}
             onChange={(e) => setYear(parseInt(e.target.value) || undefined)}
           />
           <Input
             type="number"
-            placeholder="Odo (km)"
+            placeholder={t('select_model_then_add_vehicle_form.odo')}
             value={odo || ''}
             onChange={(e) => setOdo(parseInt(e.target.value) || undefined)}
           />
@@ -156,15 +155,17 @@ export default function SelectModelThenAddVehicleForm({ onSaved }: Props) {
               onChange={(e) => setIsPrimary(e.target.checked)}
               id="primary"
             />
-            <label htmlFor="primary">Set as primary vehicle</label>
+            <label htmlFor="primary">{t('select_model_then_add_vehicle_form.set_primary')}</label>
           </div>
 
           <div className="flex gap-4">
             <Button onClick={handleSubmit} disabled={!name || !selectedModel || loading}>
-              {loading ? 'Saving...' : '💾 Save Vehicle'}
+              {loading
+                ? t('select_model_then_add_vehicle_form.saving')
+                : `💾 ${t('select_model_then_add_vehicle_form.save')}`}
             </Button>
             <Button variant="ghost" onClick={() => setSelectedModel(null)}>
-              ← Change model
+              ← {t('select_model_then_add_vehicle_form.change_model')}
             </Button>
           </div>
         </>

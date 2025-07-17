@@ -1,4 +1,3 @@
-// 📁 components/personalVehicles/EditPersonalVehicleForm.tsx
 'use client';
 
 import { useState } from 'react';
@@ -7,6 +6,7 @@ import { Button } from '@/src/components/ui/button';
 import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   vehicle: PersonalVehicle_new;
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export default function EditPersonalVehicleForm({ vehicle, onSaved, onCancel }: Props) {
+  const { t } = useTranslation('common');
   const [name, setName] = useState(vehicle.name);
   const [licensePlate, setLicensePlate] = useState(vehicle.licensePlate || '');
   const [year, setYear] = useState(vehicle.yearOfManufacture || undefined);
@@ -36,7 +37,7 @@ export default function EditPersonalVehicleForm({ vehicle, onSaved, onCancel }: 
       onSaved();
     } catch (err) {
       console.error('❌ Update failed:', err);
-      alert('❌ Failed to update vehicle.');
+      alert(t('edit_personal_vehicle_form.update_failed'));
     } finally {
       setLoading(false);
     }
@@ -44,24 +45,39 @@ export default function EditPersonalVehicleForm({ vehicle, onSaved, onCancel }: 
 
   return (
     <div className="border p-4 rounded bg-white space-y-4 max-w-xl mx-auto">
-      <h3 className="text-lg font-semibold">✏️ Edit Vehicle</h3>
+      <h3 className="text-lg font-semibold">✏️ {t('edit_personal_vehicle_form.title')}</h3>
 
-      <Input placeholder="Vehicle name" value={name} onChange={(e) => setName(e.target.value)} />
-      <Input placeholder="License Plate" value={licensePlate} onChange={(e) => setLicensePlate(e.target.value)} />
-      <Input type="number" placeholder="Year of Manufacture" value={year || ''} onChange={(e) => setYear(parseInt(e.target.value) || undefined)} />
-      <Input type="number" placeholder="Odo (km)" value={odo || ''} onChange={(e) => setOdo(parseInt(e.target.value) || undefined)} />
+      <Input placeholder={t('edit_personal_vehicle_form.name')} value={name} onChange={(e) => setName(e.target.value)} />
+      <Input placeholder={t('edit_personal_vehicle_form.license_plate')} value={licensePlate} onChange={(e) => setLicensePlate(e.target.value)} />
+      <Input
+        type="number"
+        placeholder={t('edit_personal_vehicle_form.year')}
+        value={year || ''}
+        onChange={(e) => setYear(parseInt(e.target.value) || undefined)}
+      />
+      <Input
+        type="number"
+        placeholder={t('edit_personal_vehicle_form.odo')}
+        value={odo || ''}
+        onChange={(e) => setOdo(parseInt(e.target.value) || undefined)}
+      />
 
       <div className="flex items-center gap-2">
-        <input type="checkbox" checked={isPrimary} onChange={(e) => setIsPrimary(e.target.checked)} id="primary-edit" />
-        <label htmlFor="primary-edit">Set as primary vehicle</label>
+        <input
+          type="checkbox"
+          checked={isPrimary}
+          onChange={(e) => setIsPrimary(e.target.checked)}
+          id="primary-edit"
+        />
+        <label htmlFor="primary-edit">{t('edit_personal_vehicle_form.set_primary')}</label>
       </div>
 
       <div className="flex gap-3">
         <Button onClick={handleUpdate} disabled={loading}>
-          {loading ? 'Saving...' : '💾 Save Changes'}
+          {loading ? t('edit_personal_vehicle_form.saving') : `💾 ${t('edit_personal_vehicle_form.save')}`}
         </Button>
         <Button variant="ghost" onClick={onCancel}>
-          Cancel
+          {t('edit_personal_vehicle_form.cancel')}
         </Button>
       </div>
     </div>

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
 import { Button } from '@/src/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   vehicle: PersonalVehicle_new;
@@ -20,6 +21,8 @@ const getDirectImageUrl = (url?: string): string | undefined => {
 };
 
 export default function PersonalVehicleCard({ vehicle, onEdit, onDelete }: Props) {
+  const { t } = useTranslation('common');
+
   const {
     name,
     brand,
@@ -47,7 +50,7 @@ export default function PersonalVehicleCard({ vehicle, onEdit, onDelete }: Props
           />
         ) : (
           <div className="w-[80px] h-[60px] bg-gray-100 flex items-center justify-center text-xs text-gray-400 rounded">
-            No image
+            {t('personal_vehicle_card.no_image')}
           </div>
         )}
 
@@ -55,17 +58,19 @@ export default function PersonalVehicleCard({ vehicle, onEdit, onDelete }: Props
         <div className="flex-1">
           <h3 className="font-semibold">{name}</h3>
           <p className="text-xs text-gray-500">
-            {brand || 'Unknown'} · {model || 'Unknown'}
+            {brand || t('personal_vehicle_card.unknown')} · {model || t('personal_vehicle_card.unknown')}
           </p>
 
           {licensePlate && (
-            <p className="text-sm mt-1">Plate: {licensePlate}</p>
+            <p className="text-sm mt-1">
+              {t('personal_vehicle_card.plate')}: {licensePlate}
+            </p>
           )}
 
           <div className="text-xs text-gray-400 mt-1 space-y-0.5">
-            {odo !== undefined && <p>Odo: {odo.toLocaleString()} km</p>}
-            {yearOfManufacture && <p>Year: {yearOfManufacture}</p>}
-            <p>Type: {vehicleType}</p>
+            {odo !== undefined && <p>{t('personal_vehicle_card.odo')}: {odo.toLocaleString()} km</p>}
+            {yearOfManufacture && <p>{t('personal_vehicle_card.year')}: {yearOfManufacture}</p>}
+            <p>{t('personal_vehicle_card.type')}: {vehicleType}</p>
           </div>
         </div>
       </div>
@@ -79,12 +84,12 @@ export default function PersonalVehicleCard({ vehicle, onEdit, onDelete }: Props
               : 'bg-red-100 text-red-700'
           }`}
         >
-          {isActive ? 'Active' : 'Inactive'}
+          {isActive ? t('personal_vehicle_card.active') : t('personal_vehicle_card.inactive')}
         </span>
 
         {isPrimary && (
           <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-medium">
-            🌟 Primary
+            🌟 {t('personal_vehicle_card.primary')}
           </span>
         )}
       </div>
@@ -98,7 +103,7 @@ export default function PersonalVehicleCard({ vehicle, onEdit, onDelete }: Props
             className="text-xs"
             onClick={() => onEdit(vehicle)}
           >
-            <Pencil className="w-4 h-4 mr-1" /> Edit
+            <Pencil className="w-4 h-4 mr-1" /> {t('personal_vehicle_card.edit')}
           </Button>
         )}
         {onDelete && (
@@ -108,7 +113,7 @@ export default function PersonalVehicleCard({ vehicle, onEdit, onDelete }: Props
             className="text-xs"
             onClick={() => onDelete(vehicle)}
           >
-            <Trash2 className="w-4 h-4 mr-1" /> Delete
+            <Trash2 className="w-4 h-4 mr-1" /> {t('personal_vehicle_card.delete')}
           </Button>
         )}
       </div>

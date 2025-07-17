@@ -356,6 +356,104 @@
   "and": "and",
   "google_terms": "Terms of Service",
   "apply": "apply"
+},
+
+"profiles_page_content": {
+  "loading": "Loading profile...",
+  "no_address": "Not updated yet"
+},
+
+"mobile_profile_overview": {
+  "loading": "Loading profile...",
+  "unknown_name": "Unknown",
+  "default_address": "Da Nang",
+  "joined": "Joined",
+  "edit_profile": "Edit profile",
+  "stats": {
+    "contributions": "Contributions",
+    "followers": "Followers",
+    "following": "Following"
+  }
+},
+
+"desktop_profile_overview": {
+  "loading": "Loading profile...",
+  "unknown_name": "Unknown",
+  "default_address": "Da Nang, Vietnam",
+  "joined": "Joined",
+  "helpful_votes": "helpful votes",
+  "edit_profile": "Edit profile",
+  "stats": {
+    "contributions": "Contributions",
+    "followers": "Followers",
+    "following": "Following"
+  },
+
+"profile_tabs": {
+  "activity_feed": "Activity Feed",
+  "vehicles": "My Vehicles",
+  "insurance": "My Insurance Packages",
+  "issues": "My Reported Issues"
+  },
+
+"activity_feed": {
+  "title": "Fill Out Your Profile",
+  "description": "Add photos and info to your profile so people can find you easily and get to know you better!"
+},
+
+"my_vehicles_section": {
+  "title": "My Vehicles",
+  "add": "+ Add Vehicle",
+  "close": "Close",
+  "no_vehicle": "You haven't added any vehicle yet.",
+  "delete_title": "❌ Delete this vehicle?",
+  "delete_description": "This will permanently remove \"{{name}}\" from your list.",
+  "delete_success": "✅ Vehicle deleted successfully!",
+  "delete_error": "❌ Failed to delete vehicle."
+},
+
+"edit_personal_vehicle_form": {
+  "title": "Edit Vehicle",
+  "name": "Vehicle name",
+  "license_plate": "License Plate",
+  "year": "Year of Manufacture",
+  "odo": "Odo (km)",
+  "set_primary": "Set as primary vehicle",
+  "save": "Save Changes",
+  "saving": "Saving...",
+  "cancel": "Cancel",
+  "update_failed": "❌ Failed to update vehicle."
+},
+
+"personal_vehicle_card": {
+  "no_image": "No image",
+  "unknown": "Unknown",
+  "plate": "Plate",
+  "odo": "Odo",
+  "year": "Year",
+  "type": "Type",
+  "active": "Active",
+  "inactive": "Inactive",
+  "primary": "Primary",
+  "edit": "Edit",
+  "delete": "Delete"
+},
+
+"select_model_then_add_vehicle_form": {
+  "search_title": "Search for your vehicle model",
+  "search_placeholder": "e.g. VinFast Feliz, Yamaha Sirius...",
+  "add_title": "Add your vehicle",
+  "selected": "Selected",
+  "nickname": "Nickname (e.g. Dad's bike)",
+  "plate": "License Plate (optional)",
+  "year": "Year of Manufacture",
+  "odo": "Odo (km)",
+  "set_primary": "Set as primary vehicle",
+  "save": "Save Vehicle",
+  "saving": "Saving...",
+  "change_model": "Change model",
+  "no_image": "No image",
+  "error": "❌ Failed to save vehicle. Please try again."
 }
 
 
@@ -363,4 +461,6 @@
 
 
 
+
+}
 }

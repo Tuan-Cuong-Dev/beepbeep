@@ -6,21 +6,28 @@ import { db } from '@/src/firebaseConfig';
 import { useAuth } from '@/src/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import ProfileOverview from '@/src/components/profiles/ProfileOverview';
-import ProfileTabs, { TabType } from '@/src/components/profiles/ProfileTabs';
-import ProfileSidebar from '@/src/components/profiles/ProfileSidebar';
-import ProfileMainContent from '@/src/components/profiles/ProfileMainContent';
+import ProfileOverview from '@/src/components/profile/ProfileOverview';
+import ProfileTabs, { TabType } from '@/src/components/profile/ProfileTabs';
+import ProfileSidebar from '@/src/components/profile/ProfileSidebar';
+import ProfileMainContent from '@/src/components/profile/ProfileMainContent';
 import MyVehiclesSection from '@/src/components/personalVehicles/MyVehiclesSection';
-import MyInsuranceSection from '@/src/components/profiles/MyInsuranceSection';
-import MyIssuesSection from '@/src/components/profiles/MyIssuesSection';
+import MyInsuranceSection from '@/src/components/profile/MyInsuranceSection';
+import MyIssuesSection from '@/src/components/profile/MyIssuesSection';
+import { useTranslation } from 'react-i18next';
 
 const mockIssues = [
-  { title: 'Xe không khởi động', status: 'pending', location: 'Gần Lotte Mart', reportedAt: '2025-07-01' },
+  {
+    title: 'Xe không khởi động',
+    status: 'pending',
+    location: 'Gần Lotte Mart',
+    reportedAt: '2025-07-01',
+  },
 ];
 
 const validTabs: TabType[] = ['activityFeed', 'vehicles', 'insurance', 'issues'];
 
 export default function ProfilesPageContent() {
+  const { t } = useTranslation('common');
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState<any>(null);
 
@@ -53,27 +60,34 @@ export default function ProfilesPageContent() {
     fetchUser();
   }, [currentUser]);
 
-  if (!userData) return <div className="p-4">Loading profile...</div>;
+  if (!userData) {
+    return <div className="p-4">{t('profiles_page_content.loading')}</div>;
+  }
 
   return (
     <div className="bg-gray-100 min-h-screen">
+      {/* Tổng quan hồ sơ */}
       <div className="bg-white shadow-sm">
         <ProfileOverview />
       </div>
 
+      {/* Tabs điều hướng */}
       <div className="bg-white border-t border-b sticky top-0 z-10">
         <ProfileTabs activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
 
+      {/* Nội dung chính */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:flex md:gap-6">
+        {/* Sidebar trái */}
         <div className="w-full md:flex-[1_1_33.333%] md:max-w-[33.333%]">
           <ProfileSidebar
-            location={userData.address || 'Chưa cập nhật'}
+            location={userData.address || t('profiles_page_content.no_address')}
             joinedDate={userData.joinedDate || '2025-01'}
             helpfulVotes={userData.helpfulVotes || 0}
           />
         </div>
 
+        {/* Nội dung tab phải */}
         <div className="w-full md:flex-[1_1_66.666%] md:max-w-[66.666%] space-y-6 mt-6 md:mt-0 min-w-0">
           {activeTab === 'activityFeed' && <ProfileMainContent activeTab="profile" />}
           {activeTab === 'vehicles' && <MyVehiclesSection />}

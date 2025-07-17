@@ -91,7 +91,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
       { divider: true },
       { icon: FaMapMarkerAlt, label: t('user_sidebar.menu.add_to_map'), path: '/contribute' },
       { divider: true },
-      { icon: FaUser, label: t('user_sidebar.menu.profile'), path: '/profiles' },
+      { icon: FaUser, label: t('user_sidebar.menu.profile'), path: '/profile' },
     ];
 
     if (!['support', 'technician', 'technician_assistant', 'technician_partner'].includes(normalizedRole)) {

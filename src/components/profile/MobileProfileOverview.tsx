@@ -6,8 +6,10 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import SettingsDropdown from './SettingsDropdown';
+import { useTranslation } from 'react-i18next';
 
 export default function MobileProfileOverview() {
+  const { t } = useTranslation('common');
   const { currentUser } = useAuth();
   const [user, setUser] = useState<any>(null);
 
@@ -21,7 +23,7 @@ export default function MobileProfileOverview() {
     fetchUser();
   }, [currentUser]);
 
-  if (!user) return <div className="p-4">Loading...</div>;
+  if (!user) return <div className="p-4">{t('mobile_profile_overview.loading')}</div>;
 
   return (
     <div className="bg-white">
@@ -48,37 +50,38 @@ export default function MobileProfileOverview() {
           </div>
 
           <div className="text-sm">
-            <p className="font-semibold">{user.name || 'Unknown'}</p>
-            <p className="text-gray-500">{user.address || 'Da Nang'}</p>
-            <p className="text-gray-400 text-xs">Joined {user.joinedDate || 'Mar 2025'}</p>
+            <p className="font-semibold">{user.name || t('mobile_profile_overview.unknown_name')}</p>
+            <p className="text-gray-500">{user.address || t('mobile_profile_overview.default_address')}</p>
+            <p className="text-gray-400 text-xs">
+              {t('mobile_profile_overview.joined')} {user.joinedDate || 'Mar 2025'}
+            </p>
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center">
-        <button className="flex items-center px-3 h-8 text-sm border border-gray-300 rounded-l-md shadow-sm hover:bg-gray-50">
-            Edit profile
-        </button>
-        <div className="h-8 border border-l-0 border-gray-300 rounded-r-md flex items-center justify-center px-2 hover:bg-gray-50">
+          <button className="flex items-center px-3 h-8 text-sm border border-gray-300 rounded-l-md shadow-sm hover:bg-gray-50">
+            {t('mobile_profile_overview.edit_profile')}
+          </button>
+          <div className="h-8 border border-l-0 border-gray-300 rounded-r-md flex items-center justify-center px-2 hover:bg-gray-50">
             <SettingsDropdown />
+          </div>
         </div>
-        </div>
-
       </div>
 
       {/* Stats */}
       <div className="flex justify-around text-center py-2 border-t border-gray-100 text-sm text-gray-700">
         <div>
           <p className="font-semibold">0</p>
-          <p className="text-xs">Contributions</p>
+          <p className="text-xs">{t('mobile_profile_overview.stats.contributions')}</p>
         </div>
         <div>
           <p className="font-semibold">0</p>
-          <p className="text-xs">Followers</p>
+          <p className="text-xs">{t('mobile_profile_overview.stats.followers')}</p>
         </div>
         <div>
           <p className="font-semibold">0</p>
-          <p className="text-xs">Following</p>
+          <p className="text-xs">{t('mobile_profile_overview.stats.following')}</p>
         </div>
       </div>
     </div>
