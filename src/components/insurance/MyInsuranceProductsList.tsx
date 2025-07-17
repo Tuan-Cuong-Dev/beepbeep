@@ -4,14 +4,25 @@ import Image from 'next/image';
 import { useInsuranceProducts } from '@/src/hooks/useInsuranceProducts';
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
 import { cn } from '@/src/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function MyInsuranceProductsList() {
+  const { t } = useTranslation('common');
   const { products, loading } = useInsuranceProducts();
 
-  if (loading) return <p className="text-sm text-gray-500">Loading insurance products...</p>;
+  if (loading)
+    return (
+      <p className="text-sm text-gray-500">
+        {t('my_insurance_products_list.loading')}
+      </p>
+    );
 
   if (!products || products.length === 0)
-    return <p className="text-sm text-gray-500">No insurance products available.</p>;
+    return (
+      <p className="text-sm text-gray-500">
+        {t('my_insurance_products_list.no_products')}
+      </p>
+    );
 
   return (
     <div className="space-y-6">
@@ -32,16 +43,18 @@ export default function MyInsuranceProductsList() {
               />
             ) : (
               <div className="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm rounded">
-                No image available
+                {t('my_insurance_products_list.no_image')}
               </div>
             )}
 
             <div className="mt-4 space-y-1 text-sm">
               <p className="font-semibold">{product.name}</p>
               <p className="text-gray-700">{product.coverageDetails}</p>
-              <p className="text-gray-500">Duration: {product.durationInDays} days</p>
+              <p className="text-gray-500">
+                {t('my_insurance_products_list.duration')}: {product.durationInDays} {t('my_insurance_products_list.days')}
+              </p>
               <p className="text-gray-800 font-medium">
-                Price: {product.price.toLocaleString()}₫
+                {t('my_insurance_products_list.price')}: {product.price.toLocaleString()}₫
               </p>
               <div className="flex gap-1 flex-wrap text-xs text-gray-600">
                 {product.features?.map((f, i) => (
@@ -59,10 +72,12 @@ export default function MyInsuranceProductsList() {
                   product.isActive ? 'text-green-600' : 'text-gray-400'
                 )}
               >
-                {product.isActive ? 'Active' : 'Inactive'}
+                {product.isActive
+                  ? t('my_insurance_products_list.active')
+                  : t('my_insurance_products_list.inactive')}
               </p>
               <p className="text-xs text-gray-400">
-                Created: {safeFormatDate(product.createdAt)}
+                {t('my_insurance_products_list.created')}: {safeFormatDate(product.createdAt)}
               </p>
             </div>
           </div>
@@ -86,16 +101,18 @@ export default function MyInsuranceProductsList() {
               />
             ) : (
               <div className="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm rounded">
-                No image available
+                {t('my_insurance_products_list.no_image')}
               </div>
             )}
 
             <div className="text-sm space-y-1">
               <p className="font-semibold">{product.name}</p>
               <p className="text-gray-700">{product.coverageDetails}</p>
-              <p className="text-gray-500">Duration: {product.durationInDays} days</p>
+              <p className="text-gray-500">
+                {t('my_insurance_products_list.duration')}: {product.durationInDays} {t('my_insurance_products_list.days')}
+              </p>
               <p className="text-gray-800 font-medium">
-                Price: {product.price.toLocaleString()}₫
+                {t('my_insurance_products_list.price')}: {product.price.toLocaleString()}₫
               </p>
               <div className="flex gap-1 flex-wrap text-xs text-gray-600">
                 {product.features?.map((f, i) => (
@@ -113,10 +130,12 @@ export default function MyInsuranceProductsList() {
                   product.isActive ? 'text-green-600' : 'text-gray-400'
                 )}
               >
-                {product.isActive ? 'Active' : 'Inactive'}
+                {product.isActive
+                  ? t('my_insurance_products_list.active')
+                  : t('my_insurance_products_list.inactive')}
               </p>
               <p className="text-xs text-gray-400">
-                Created: {safeFormatDate(product.createdAt)}
+                {t('my_insurance_products_list.created')}: {safeFormatDate(product.createdAt)}
               </p>
             </div>
           </div>

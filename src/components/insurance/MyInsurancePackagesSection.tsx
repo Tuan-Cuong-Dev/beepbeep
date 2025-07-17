@@ -8,8 +8,10 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/src/components/ui/button';
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
 import { cn } from '@/src/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function MyInsurancePackagesSection() {
+  const { t } = useTranslation('common');
   const { packages, loading: loadingPackages } = useInsurancePackages();
   const { products, loading: loadingProducts } = useInsuranceProducts();
   const { vehicles, loading: loadingVehicles } = useMyPersonalVehicles();
@@ -18,16 +20,26 @@ export default function MyInsurancePackagesSection() {
   const isLoading = loadingPackages || loadingProducts || loadingVehicles;
 
   if (isLoading) {
-    return <p className="text-sm text-gray-500">Loading your insurance packages...</p>;
+    return (
+      <p className="text-sm text-gray-500">
+        {t('my_insurance_packages_section.loading')}
+      </p>
+    );
   }
 
   if (packages.length === 0) {
-    return <p className="text-sm text-gray-500">You haven't purchased any insurance packages yet.</p>;
+    return (
+      <p className="text-sm text-gray-500">
+        {t('my_insurance_packages_section.no_packages')}
+      </p>
+    );
   }
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-semibold">🛡️ My Insurance Packages</h2>
+      <h2 className="text-lg font-semibold">
+        🛡️ {t('my_insurance_packages_section.title')}
+      </h2>
 
       {packages.map((pkg) => {
         const product = products.find((p) => p.id === pkg.productId);
@@ -45,19 +57,19 @@ export default function MyInsurancePackagesSection() {
         let statusColor = 'text-gray-500';
 
         if (isPending) {
-          statusLabel = '⏳ Pending Approval';
+          statusLabel = t('my_insurance_packages_section.status.pending');
           statusColor = 'text-yellow-600';
         } else if (isRejected) {
-          statusLabel = '❌ Rejected';
+          statusLabel = t('my_insurance_packages_section.status.rejected');
           statusColor = 'text-red-600';
         } else if (isExpired) {
-          statusLabel = '🗕️ Expired';
+          statusLabel = t('my_insurance_packages_section.status.expired');
           statusColor = 'text-gray-500';
         } else if (isActive) {
-          statusLabel = '✅ Active';
+          statusLabel = t('my_insurance_packages_section.status.active');
           statusColor = 'text-green-600';
         } else {
-          statusLabel = '⛔ Inactive';
+          statusLabel = t('my_insurance_packages_section.status.inactive');
           statusColor = 'text-gray-500';
         }
 
@@ -81,7 +93,7 @@ export default function MyInsurancePackagesSection() {
                 />
               ) : (
                 <div className="w-full h-[140px] bg-gray-100 flex items-center justify-center text-gray-400 text-sm rounded">
-                  No image available
+                  {t('my_insurance_packages_section.no_image')}
                 </div>
               )}
             </div>
@@ -89,15 +101,43 @@ export default function MyInsurancePackagesSection() {
             {/* Info section */}
             <div className="flex-1 flex flex-col justify-between">
               <div className="space-y-1 text-sm">
-                <p className="text-base font-semibold text-gray-800">{product?.name || 'Unnamed Product'}</p>
-                <p className="text-xs text-gray-600">Code: {pkg.packageCode}</p>
-                {vehicle && <p className="text-xs text-gray-600">Vehicle: {vehicle.name}</p>}
-                {pkg.frameNumber && <p className="text-xs text-gray-600">Frame No.: {pkg.frameNumber}</p>}
-                {pkg.engineNumber && <p className="text-xs text-gray-600">Engine No.: {pkg.engineNumber}</p>}
-                {pkg.plateNumber && <p className="text-xs text-gray-600">Plate No.: {pkg.plateNumber}</p>}
-                {expiredDate && <p className="text-xs text-gray-600">Expires: {safeFormatDate(expiredDate)}</p>}
+                <p className="text-base font-semibold text-gray-800">
+                  {product?.name || t('my_insurance_packages_section.unnamed_product')}
+                </p>
+                <p className="text-xs text-gray-600">
+                  {t('my_insurance_packages_section.code')}: {pkg.packageCode}
+                </p>
+                {vehicle && (
+                  <p className="text-xs text-gray-600">
+                    {t('my_insurance_packages_section.vehicle')}: {vehicle.name}
+                  </p>
+                )}
+                {pkg.frameNumber && (
+                  <p className="text-xs text-gray-600">
+                    {t('my_insurance_packages_section.frame')}: {pkg.frameNumber}
+                  </p>
+                )}
+                {pkg.engineNumber && (
+                  <p className="text-xs text-gray-600">
+                    {t('my_insurance_packages_section.engine')}: {pkg.engineNumber}
+                  </p>
+                )}
+                {pkg.plateNumber && (
+                  <p className="text-xs text-gray-600">
+                    {t('my_insurance_packages_section.plate')}: {pkg.plateNumber}
+                  </p>
+                )}
+                {expiredDate && (
+                  <p className="text-xs text-gray-600">
+                    {t('my_insurance_packages_section.expires')}: {safeFormatDate(expiredDate)}
+                  </p>
+                )}
                 <p className={cn('text-sm font-semibold', statusColor)}>{statusLabel}</p>
-                {createdDate && <p className="text-[11px] text-gray-400">Created: {safeFormatDate(createdDate)}</p>}
+                {createdDate && (
+                  <p className="text-[11px] text-gray-400">
+                    {t('my_insurance_packages_section.created')}: {safeFormatDate(createdDate)}
+                  </p>
+                )}
               </div>
 
               {/* Actions */}
@@ -107,14 +147,14 @@ export default function MyInsurancePackagesSection() {
                   variant="outline"
                   onClick={() => router.push(`/insurance-packages/${pkg.id}`)}
                 >
-                  View Details
+                  {t('my_insurance_packages_section.view')}
                 </Button>
                 <Button
                   size="sm"
                   onClick={() => router.push(`/insurance/${pkg.id}/extend`)}
                   disabled={!isActive}
                 >
-                  Extend Insurance
+                  {t('my_insurance_packages_section.extend')}
                 </Button>
               </div>
             </div>

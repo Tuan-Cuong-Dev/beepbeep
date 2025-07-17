@@ -454,6 +454,67 @@
   "change_model": "Change model",
   "no_image": "No image",
   "error": "❌ Failed to save vehicle. Please try again."
+},
+
+"available_insurance_products_section": {
+  "loading": "Loading insurance products...",
+  "no_products": "No insurance products available at the moment.",
+  "title": "Available Insurance Products",
+  "no_image": "No image",
+  "duration": "Duration",
+  "days": "days",
+  "price": "Price",
+  "view_and_buy": "View & Buy"
+},
+
+"my_insurance_packages_section": {
+  "loading": "Loading your insurance packages...",
+  "no_packages": "You haven't purchased any insurance packages yet.",
+  "title": "My Insurance Packages",
+  "no_image": "No image available",
+  "unnamed_product": "Unnamed Product",
+  "code": "Code",
+  "vehicle": "Vehicle",
+  "frame": "Frame No.",
+  "engine": "Engine No.",
+  "plate": "Plate No.",
+  "expires": "Expires",
+  "created": "Created",
+  "status": {
+    "pending": "⏳ Pending Approval",
+    "rejected": "❌ Rejected",
+    "expired": "🗕️ Expired",
+    "active": "✅ Active",
+    "inactive": "⛔ Inactive"
+  },
+  "view": "View Details",
+  "extend": "Extend Insurance"
+},
+
+"my_insurance_products_list": {
+  "loading": "Loading insurance products...",
+  "no_products": "No insurance products available.",
+  "no_image": "No image available",
+  "duration": "Duration",
+  "days": "days",
+  "price": "Price",
+  "active": "Active",
+  "inactive": "Inactive",
+  "created": "Created"
+},
+
+"purchase_insurance_dialog": {
+  "title": "Select your motorbike",
+  "no_motorbike": "No motorbike available in your personal vehicles.",
+  "select_placeholder": "-- Choose your motorbike --",
+  "no_plate": "No plate",
+  "name": "Name",
+  "license_plate": "License Plate",
+  "brand": "Brand",
+  "model": "Model",
+  "color": "Color",
+  "odo": "Odo",
+  "confirm_button": "Confirm Purchase"
 }
 
 

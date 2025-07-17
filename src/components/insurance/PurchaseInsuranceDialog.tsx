@@ -1,10 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/src/components/ui/dialog';
 import { Button } from '@/src/components/ui/button';
 import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
 import { useUserPersonalVehicles } from '@/src/hooks/useUserPersonalVehicles';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   open: boolean;
@@ -12,22 +18,29 @@ interface Props {
   onConfirm: (vehicle: PersonalVehicle_new) => void;
 }
 
-export default function PurchaseInsuranceDialog({ open, onClose, onConfirm }: Props) {
+export default function PurchaseInsuranceDialog({
+  open,
+  onClose,
+  onConfirm,
+}: Props) {
+  const { t } = useTranslation('common');
   const { vehicles } = useUserPersonalVehicles();
   const [selectedId, setSelectedId] = useState('');
 
-  const motorbikeVehicles = vehicles.filter(v => v.vehicleType === 'motorbike');
-  const selected = motorbikeVehicles.find(v => v.id === selectedId);
+  const motorbikeVehicles = vehicles.filter((v) => v.vehicleType === 'motorbike');
+  const selected = motorbikeVehicles.find((v) => v.id === selectedId);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Select your motorbike</DialogTitle>
+          <DialogTitle>{t('purchase_insurance_dialog.title')}</DialogTitle>
         </DialogHeader>
 
         {motorbikeVehicles.length === 0 ? (
-          <p className="text-sm text-gray-500">No motorbike available in your personal vehicles.</p>
+          <p className="text-sm text-gray-500">
+            {t('purchase_insurance_dialog.no_motorbike')}
+          </p>
         ) : (
           <>
             <select
@@ -35,22 +48,41 @@ export default function PurchaseInsuranceDialog({ open, onClose, onConfirm }: Pr
               onChange={(e) => setSelectedId(e.target.value)}
               className="w-full border p-2 rounded"
             >
-              <option value="">-- Choose your motorbike --</option>
+              <option value="">
+                {t('purchase_insurance_dialog.select_placeholder')}
+              </option>
               {motorbikeVehicles.map((v) => (
                 <option key={v.id} value={v.id}>
-                  {v.name} ({v.licensePlate || 'No plate'})
+                  {v.name} ({v.licensePlate || t('purchase_insurance_dialog.no_plate')})
                 </option>
               ))}
             </select>
 
             {selected && (
               <div className="mt-3 border p-3 rounded text-sm text-gray-600 space-y-1">
-                <p><strong>Name:</strong> {selected.name}</p>
-                <p><strong>License Plate:</strong> {selected.licensePlate || 'N/A'}</p>
-                <p><strong>Brand:</strong> {selected.brand || 'N/A'}</p>
-                <p><strong>Model:</strong> {selected.model || 'N/A'}</p>
-                <p><strong>Color:</strong> {selected.color || 'N/A'}</p>
-                <p><strong>Odo:</strong> {selected.odo ? `${selected.odo} km` : 'N/A'}</p>
+                <p>
+                  <strong>{t('purchase_insurance_dialog.name')}:</strong> {selected.name}
+                </p>
+                <p>
+                  <strong>{t('purchase_insurance_dialog.license_plate')}:</strong>{' '}
+                  {selected.licensePlate || 'N/A'}
+                </p>
+                <p>
+                  <strong>{t('purchase_insurance_dialog.brand')}:</strong>{' '}
+                  {selected.brand || 'N/A'}
+                </p>
+                <p>
+                  <strong>{t('purchase_insurance_dialog.model')}:</strong>{' '}
+                  {selected.model || 'N/A'}
+                </p>
+                <p>
+                  <strong>{t('purchase_insurance_dialog.color')}:</strong>{' '}
+                  {selected.color || 'N/A'}
+                </p>
+                <p>
+                  <strong>{t('purchase_insurance_dialog.odo')}:</strong>{' '}
+                  {selected.odo ? `${selected.odo} km` : 'N/A'}
+                </p>
               </div>
             )}
 
@@ -59,7 +91,7 @@ export default function PurchaseInsuranceDialog({ open, onClose, onConfirm }: Pr
               className="mt-4 w-full"
               onClick={() => selected && onConfirm(selected)}
             >
-              ✅ Confirm Purchase
+              ✅ {t('purchase_insurance_dialog.confirm_button')}
             </Button>
           </>
         )}

@@ -455,7 +455,68 @@
   "change_model": "Đổi mẫu xe",
   "no_image": "Không có ảnh",
   "error": "❌ Không thể lưu xe. Vui lòng thử lại."
+},
+
+"available_insurance_products_section": {
+  "loading": "Đang tải danh sách bảo hiểm...",
+  "no_products": "Hiện tại chưa có gói bảo hiểm nào.",
+  "title": "Danh sách gói bảo hiểm hiện có",
+  "no_image": "Không có ảnh",
+  "duration": "Thời hạn",
+  "days": "ngày",
+  "price": "Giá",
+  "view_and_buy": "Xem & Mua"
+},
+"my_insurance_packages_section": {
+  "loading": "Đang tải gói bảo hiểm của bạn...",
+  "no_packages": "Bạn chưa mua gói bảo hiểm nào.",
+  "title": "Gói Bảo Hiểm Của Tôi",
+  "no_image": "Không có hình ảnh",
+  "unnamed_product": "Gói chưa đặt tên",
+  "code": "Mã gói",
+  "vehicle": "Xe",
+  "frame": "Số khung",
+  "engine": "Số máy",
+  "plate": "Biển số",
+  "expires": "Hết hạn",
+  "created": "Ngày tạo",
+  "status": {
+    "pending": "⏳ Chờ duyệt",
+    "rejected": "❌ Bị từ chối",
+    "expired": "🗕️ Đã hết hạn",
+    "active": "✅ Đang hoạt động",
+    "inactive": "⛔ Không hoạt động"
+  },
+  "view": "Xem chi tiết",
+  "extend": "Gia hạn bảo hiểm"
+},
+"my_insurance_products_list": {
+  "loading": "Đang tải các sản phẩm bảo hiểm...",
+  "no_products": "Không có sản phẩm bảo hiểm nào.",
+  "no_image": "Không có hình ảnh",
+  "duration": "Thời hạn",
+  "days": "ngày",
+  "price": "Giá",
+  "active": "Đang hoạt động",
+  "inactive": "Không hoạt động",
+  "created": "Ngày tạo"
+},
+
+"purchase_insurance_dialog": {
+  "title": "Chọn xe máy của bạn",
+  "no_motorbike": "Không có xe máy nào trong danh sách xe cá nhân của bạn.",
+  "select_placeholder": "-- Chọn xe máy --",
+  "no_plate": "Chưa có biển số",
+  "name": "Tên xe",
+  "license_plate": "Biển số",
+  "brand": "Hãng",
+  "model": "Dòng xe",
+  "color": "Màu sắc",
+  "odo": "Số km đã đi",
+  "confirm_button": "Xác nhận mua bảo hiểm"
 }
+
+
 
 
 
