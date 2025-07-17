@@ -515,7 +515,44 @@
   "color": "Color",
   "odo": "Odo",
   "confirm_button": "Confirm Purchase"
+},
+
+"profile_main_content": {
+  "welcome_title": "Welcome to your profile",
+  "welcome_description": "Here you can find your activity summary and manage your vehicle-related services."
+},
+
+"settings_dropdown": {
+  "settings": "Settings",
+  "edit_profile": "Edit your profile",
+  "edit_photo": "Edit profile photo",
+  "edit_cover": "Edit cover photo",
+  "account_info": "Account info",
+  "account_settings": "Account settings",
+  "subscriptions": "Subscriptions",
+  "payments": "Payment Options",
+  "connect_drive": "Connect Google Drive"
+},
+
+"profile_sidebar": {
+  "achievements": "Your Achievements",
+  "unlock_prompt": "Start sharing to unlock",
+  "write_first_review": "Write your first review",
+  "review_milestone": "Unlock review milestones",
+  "upload_first_photo": "Upload your first photo",
+  "photo_milestone": "Unlock photo milestones",
+  "view_all": "View all",
+  "intro": "Intro",
+  "joined_in": "Joined in",
+  "helpful_votes": "helpful votes",
+  "feedback_prompt": "Help improve Bíp Bíp with your feedback",
+  "post_photos": "Post photos",
+  "write_review": "Write review"
 }
+
+
+
+
 
 
 

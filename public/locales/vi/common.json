@@ -230,7 +230,7 @@
 
 "contribute": {
   "add_to_map": "Thêm vào bản đồ",
-  "repair": "Sửa xe",
+  "repair": "Trạm sửa xe",
   "rental": "Trạm cho thuê",
   "battery": "Trạm đổi pin"
   },
@@ -514,7 +514,56 @@
   "color": "Màu sắc",
   "odo": "Số km đã đi",
   "confirm_button": "Xác nhận mua bảo hiểm"
+},
+
+"profile_main_content": {
+  "welcome_title": "Chào mừng đến với hồ sơ của bạn",
+  "welcome_description": "Tại đây bạn có thể xem tổng quan hoạt động và quản lý các dịch vụ liên quan đến xe của mình."
+},
+
+"settings_dropdown": {
+  "settings": "Cài đặt",
+  "edit_profile": "Chỉnh sửa hồ sơ",
+  "edit_photo": "Chỉnh sửa ảnh đại diện",
+  "edit_cover": "Chỉnh sửa ảnh bìa",
+  "account_info": "Thông tin tài khoản",
+  "account_settings": "Cài đặt tài khoản",
+  "subscriptions": "Gói dịch vụ",
+  "payments": "Tùy chọn thanh toán",
+  "connect_drive": "Kết nối Google Drive"
+},
+
+"profile_sidebar": {
+  "achievements": "Thành tích của bạn",
+  "unlock_prompt": "Bắt đầu chia sẻ để mở khóa",
+  "write_first_review": "Viết đánh giá đầu tiên",
+  "review_milestone": "Mở khóa mốc đánh giá",
+  "upload_first_photo": "Tải ảnh đầu tiên",
+  "photo_milestone": "Mở khóa mốc ảnh",
+  "view_all": "Xem tất cả",
+  "intro": "Giới thiệu",
+  "joined_in": "Tham gia từ",
+  "helpful_votes": "lượt bình chọn hữu ích",
+  "feedback_prompt": "Hãy giúp cải thiện Bíp Bíp bằng phản hồi của bạn",
+  "post_photos": "Đăng ảnh",
+  "write_review": "Viết đánh giá"
+},
+
+"my_issues_section": {
+  "title": "Sự cố bạn đã báo cáo",
+  "no_issues": "Bạn chưa báo cáo sự cố nào về phương tiện.",
+  "table": {
+    "title": "Tiêu đề",
+    "status": "Trạng thái",
+    "location": "Vị trí",
+    "reported_at": "Thời gian báo cáo"
+  },
+  "na": "Không có"
 }
+
+
+
+
 
 
 

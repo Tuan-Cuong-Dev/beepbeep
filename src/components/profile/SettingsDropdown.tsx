@@ -8,41 +8,43 @@ import {
 } from '@/src/components/ui/dropdown-menu';
 import { FiSettings } from 'react-icons/fi';
 import Link from 'next/link';
-import { Button } from '@/src/components/ui/button'; // nếu bạn dùng button tuỳ biến
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsDropdown() {
+  const { t } = useTranslation('common');
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <span title="Settings">
+        <span title={t('settings_dropdown.settings')}>
           <FiSettings className="w-5 h-5 cursor-pointer text-gray-500 hover:text-gray-700" />
         </span>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem asChild>
-          <Link href="/profile/edit" className="w-full">Edit your profile</Link>
+          <Link href="/profile/edit" className="w-full">✏️ {t('settings_dropdown.edit_profile')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/profile/edit-photo" className="w-full">Edit profile photo</Link>
+          <Link href="/profile/edit-photo" className="w-full">🖼️ {t('settings_dropdown.edit_photo')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/profile/edit-cover" className="w-full">Edit cover photo</Link>
+          <Link href="/profile/edit-cover" className="w-full">🌄 {t('settings_dropdown.edit_cover')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/account" className="w-full">Account info</Link>
+          <Link href="/account" className="w-full">👤 {t('settings_dropdown.account_info')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/account/settings" className="w-full">Account settings</Link>
+          <Link href="/account/settings" className="w-full">⚙️ {t('settings_dropdown.account_settings')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/subscriptions" className="w-full">Subscriptions</Link>
+          <Link href="/subscriptions" className="w-full">💳 {t('settings_dropdown.subscriptions')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/payments" className="w-full">Payment Options</Link>
+          <Link href="/payments" className="w-full">💰 {t('settings_dropdown.payments')}</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/connectgoogledriver" className="w-full">Connect Google Driver</Link>
+          <Link href="/connectgoogledriver" className="w-full">🔗 {t('settings_dropdown.connect_drive')}</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
