@@ -114,7 +114,7 @@ export default function Preferences({ onClose }: PreferencesProps) {
           </div>
         ) : (
           <div>
-            <h3 className="text-lg font-medium mb-2">{t('select_currency')}</h3>
+            <h3 className="text-lg font-medium mb-2">{t('preferences.select_currency')}</h3>
             <div className="text-sm grid grid-cols-4 gap-4">
               {currencies.map((currency) => (
                 <button

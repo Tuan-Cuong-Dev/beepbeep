@@ -292,7 +292,8 @@
     "signout_error": "Error signing out",
     "popup_closed": "The login popup was closed before completing sign-in"
   },
-  "handle_email_login": {
+
+"handle_email_login": {
   "success": "Successfully signed in with email",
   "error": "An error occurred while signing in with email",
   "email_not_found": "Email address not found",
@@ -336,6 +337,7 @@
   "google_terms": "Terms of Service",
   "apply": "apply"
 },
+
 "signup_popup": {
   "title": "Join to unlock the best of Bíp Bíp",
   "first_name": "First Name",
@@ -548,12 +550,57 @@
   "feedback_prompt": "Help improve Bíp Bíp with your feedback",
   "post_photos": "Post photos",
   "write_review": "Write review"
+},
+
+"my_issues_section": {
+  "title": "My Reported Issues",
+  "no_issues": "You haven't reported any vehicle issues yet.",
+  "table": {
+    "title": "Title",
+    "status": "Status",
+    "location": "Location",
+    "reported_at": "Reported At"
+  },
+  "na": "N/A"
+},
+
+"about_page": {
+  "title": "About Us",
+  "p1": "At Bíp Bíp, we are building an advanced platform that transforms how electric vehicle rentals are managed and scaled. Our system empowers multiple stakeholders to participate in a transparent and efficient rental ecosystem — from customers and staff to investors, technicians, and business owners.",
+  "p2": "Our goal is to streamline all rental operations — from booking, maintenance, staff coordination, to performance tracking — making it easy for anyone to join the growing e-mobility movement.",
+  "p3": "Whether you're a customer looking for a reliable ride, a technician handling maintenance requests, a company owner managing fleets, or even an investor tracking ROI — Bíp Bíp provides the right tools for you.",
+  "p4": "Our platform supports:",
+  "roles": {
+    "customers": "Customers – Convenient rentals, flexible delivery options, and access to quality electric bikes anytime.",
+    "staff": "Staff – Tools to manage orders, assist users, and handle bikes in real-time.",
+    "station_managers": "Station Managers – Operational oversight, performance tracking, and staff management.",
+    "company_owners": "Company Owners – Centralized control, business analytics, and confident scaling.",
+    "technicians": "Technicians – Maintenance tracking, service history, and task assignments.",
+    "private_owners": "Private Owners – Earn from listed vehicles with full transparency.",
+    "investors": "Investors – Insight into ROI and sustainable business performance.",
+    "agents": "Agents – Commission-based referrals through user-friendly tools."
+  },
+  "p5": "We are committed to shaping a smarter, greener future for transportation in Vietnam and beyond."
+},
+"contact_page": {
+  "title": "Contact",
+  "description": "We'd love to hear from you!",
+  "email_label": "Email",
+  "phone_label": "Phone",
+  "address_label": "Address"
+},
+
+"policy_page": {
+  "title": "Privacy & Policy",
+  "intro": "At Bíp Bíp, we value your privacy and data protection. We are committed to being transparent with how we handle your data.",
+  "point1": "We do not sell or share your personal information.",
+  "point2": "All transactions and data are secured via industry-standard encryption.",
+  "point3": {
+    "part1": "You may request account deletion at any time by contacting",
+    "part2": "."
+  },
+  "footer_note": "Please refer to our full privacy policy for more details or contact us directly with any concerns."
 }
-
-
-
-
-
 
 
 

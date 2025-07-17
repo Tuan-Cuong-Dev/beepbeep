@@ -559,7 +559,46 @@
     "reported_at": "Thời gian báo cáo"
   },
   "na": "Không có"
+},
+"about_page": {
+  "title": "Về chúng tôi",
+  "p1": "Tại Bíp Bíp, chúng tôi đang xây dựng một nền tảng tiên tiến để quản lý và mở rộng hoạt động cho thuê xe điện. Hệ thống của chúng tôi cho phép nhiều đối tượng tham gia vào hệ sinh thái thuê xe minh bạch và hiệu quả — từ khách hàng, nhân viên đến nhà đầu tư, kỹ thuật viên và chủ doanh nghiệp.",
+  "p2": "Mục tiêu của chúng tôi là đơn giản hóa mọi hoạt động thuê xe — từ đặt xe, bảo trì, điều phối nhân sự đến theo dõi hiệu suất — giúp bất kỳ ai cũng dễ dàng tham gia vào phong trào di chuyển bằng điện đang phát triển.",
+  "p3": "Dù bạn là khách hàng đang tìm kiếm chuyến đi tin cậy, kỹ thuật viên xử lý bảo trì, chủ doanh nghiệp quản lý đội xe hay nhà đầu tư theo dõi lợi nhuận — Bíp Bíp đều có công cụ phù hợp dành cho bạn.",
+  "p4": "Nền tảng của chúng tôi hỗ trợ:",
+  "roles": {
+    "customers": "Khách hàng – Thuê xe dễ dàng, giao nhận linh hoạt, truy cập xe điện chất lượng bất cứ lúc nào.",
+    "staff": "Nhân viên – Công cụ quản lý đơn hàng, hỗ trợ người dùng và xử lý xe theo thời gian thực.",
+    "station_managers": "Quản lý trạm – Giám sát vận hành, theo dõi hiệu suất và điều phối nhân viên.",
+    "company_owners": "Chủ doanh nghiệp – Quản lý tập trung, phân tích hoạt động kinh doanh, mở rộng dễ dàng.",
+    "technicians": "Kỹ thuật viên – Theo dõi bảo trì, lịch sử sửa chữa, và phân công công việc.",
+    "private_owners": "Chủ xe cá nhân – Kiếm thu nhập từ xe đã đăng ký với sự minh bạch hoàn toàn.",
+    "investors": "Nhà đầu tư – Theo dõi lợi nhuận và hiệu suất kinh doanh bền vững.",
+    "agents": "Cộng tác viên – Giới thiệu và nhận hoa hồng thông qua các công cụ dễ sử dụng."
+  },
+  "p5": "Chúng tôi cam kết xây dựng một tương lai di chuyển thông minh và xanh hơn cho Việt Nam và toàn thế giới."
+},
+
+"contact_page": {
+  "title": "Liên hệ",
+  "description": "Chúng tôi rất mong nhận được phản hồi từ bạn!",
+  "email_label": "Email",
+  "phone_label": "Điện thoại",
+  "address_label": "Địa chỉ"
+},
+
+"policy_page": {
+  "title": "Chính sách bảo mật",
+  "intro": "Tại Bíp Bíp, chúng tôi tôn trọng quyền riêng tư và dữ liệu cá nhân của bạn. Chúng tôi cam kết minh bạch trong cách xử lý thông tin.",
+  "point1": "Chúng tôi không bán hoặc chia sẻ thông tin cá nhân của bạn.",
+  "point2": "Tất cả giao dịch và dữ liệu đều được bảo mật bằng công nghệ mã hóa chuẩn ngành.",
+  "point3": {
+    "part1": "Bạn có thể yêu cầu xóa tài khoản bất kỳ lúc nào bằng cách liên hệ",
+    "part2": "."
+  },
+  "footer_note": "Vui lòng xem đầy đủ chính sách bảo mật hoặc liên hệ trực tiếp với chúng tôi nếu có bất kỳ thắc mắc nào."
 }
+
 
 
 
