@@ -355,10 +355,11 @@
     "apply": "apply"
   },
 
-  "profiles_page_content": {
-    "loading": "Loading profile...",
-    "no_address": "Not updated yet"
-  },
+"profiles_page_content": {
+  "loading": "Loading profile...",
+  "no_address": "Not updated",
+  "no_contributions": "You haven't made any contributions yet."
+},
 
   "mobile_profile_overview": {
     "loading": "Loading profile...",
@@ -386,12 +387,14 @@
       "following": "Following"
     }
   },     
+
 "profile_tabs": {
-    "activity_feed": "Activity Feed",
-    "vehicles": "My Vehicles",
-    "insurance": "My Insurance Packages",
-    "issues": "My Reported Issues"
-    },
+  "activity_feed": "Activity Feed",
+  "vehicles": "My Vehicles",
+  "insurance": "Insurance Packages",
+  "issues": "Reported Issues",
+  "contributions": "Contributions"
+},
 
   "activity_feed": {
     "title": "Fill Out Your Profile",

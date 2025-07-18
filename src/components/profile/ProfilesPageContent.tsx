@@ -13,6 +13,7 @@ import ProfileMainContent from '@/src/components/profile/ProfileMainContent';
 import MyVehiclesSection from '@/src/components/personalVehicles/MyVehiclesSection';
 import MyInsuranceSection from '@/src/components/profile/MyInsuranceSection';
 import MyIssuesSection from '@/src/components/profile/MyIssuesSection';
+import MyContributionsSection from '@/src/components/profile/MyContributionsSection';
 import { useTranslation } from 'react-i18next';
 
 const mockIssues = [
@@ -24,7 +25,13 @@ const mockIssues = [
   },
 ];
 
-const validTabs: TabType[] = ['activityFeed', 'vehicles', 'insurance', 'issues'];
+const validTabs: TabType[] = [
+  'activityFeed',
+  'vehicles',
+  'insurance',
+  'issues',
+  'contributions', // ✅ NEW
+];
 
 export default function ProfilesPageContent() {
   const { t } = useTranslation('common');
@@ -93,6 +100,7 @@ export default function ProfilesPageContent() {
           {activeTab === 'vehicles' && <MyVehiclesSection />}
           {activeTab === 'insurance' && <MyInsuranceSection />}
           {activeTab === 'issues' && <MyIssuesSection issues={mockIssues} />}
+          {activeTab === 'contributions' && <MyContributionsSection />} {/* ✅ NEW */}
         </div>
       </div>
     </div>

@@ -7,7 +7,6 @@ export type VehicleType = 'car' | 'motorbike' | 'bike';
 export interface TechnicianPartner {
   id?: string;
   userId?: string;
-  createdBy: string;
 
   name: string;
   phone: string;
@@ -47,7 +46,8 @@ export interface TechnicianPartner {
   ratingCount?: number;
 
   isActive: boolean;
-
+  
+  createdBy: string;
   createdAt: Timestamp | FieldValue;
   updatedAt: Timestamp | FieldValue;
   avatarUrl?: string;

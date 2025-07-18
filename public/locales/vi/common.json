@@ -363,7 +363,8 @@
 
 "profiles_page_content": {
   "loading": "Đang tải hồ sơ...",
-  "no_address": "Chưa cập nhật"
+  "no_address": "Chưa cập nhật",
+  "no_contributions": "Bạn chưa có đóng góp nào."
 },
 
 "mobile_profile_overview": {
@@ -397,8 +398,10 @@
   "activity_feed": "Bản tin hoạt động",
   "vehicles": "Xe của tôi",
   "insurance": "Gói bảo hiểm",
-  "issues": "Sự cố đã báo"
+  "issues": "Sự cố đã báo",
+  "contributions": "Đóng góp" 
 },
+
 
 "activity_feed": {
   "title": "Hoàn thiện hồ sơ của bạn",

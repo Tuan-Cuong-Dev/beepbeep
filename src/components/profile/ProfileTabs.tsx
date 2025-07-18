@@ -5,14 +5,22 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 // Tab type definition
-export type TabType = 'activityFeed' | 'vehicles' | 'insurance' | 'issues';
+export type TabType =
+  | 'activityFeed'
+  | 'vehicles'
+  | 'insurance'
+  | 'issues'
+  | 'contributions'; // ✅ Thêm contributions
 
 interface ProfileTabsProps {
   activeTab?: TabType;
   setActiveTab?: (tab: TabType) => void;
 }
 
-export default function ProfileTabs({ activeTab: externalActiveTab, setActiveTab: externalSetActiveTab }: ProfileTabsProps) {
+export default function ProfileTabs({
+  activeTab: externalActiveTab,
+  setActiveTab: externalSetActiveTab,
+}: ProfileTabsProps) {
   const { t } = useTranslation('common');
   const router = useRouter();
   const searchParams = useSearchParams()!;
@@ -23,6 +31,7 @@ export default function ProfileTabs({ activeTab: externalActiveTab, setActiveTab
     { key: 'vehicles', label: t('profile_tabs.vehicles') },
     { key: 'insurance', label: t('profile_tabs.insurance') },
     { key: 'issues', label: t('profile_tabs.issues') },
+    { key: 'contributions', label: t('profile_tabs.contributions') }, // ✅ Thêm tab đóng góp
   ];
 
   const isValidTab = (tab: string | null): tab is TabType => {

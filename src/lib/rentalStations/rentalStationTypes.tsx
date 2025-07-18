@@ -10,6 +10,7 @@ export interface RentalStation {
   mapAddress: string;          // Địa chỉ dạng Google Maps (chuẩn hóa)
   location: string;            // Tọa độ dạng text: '16.0226° N, 108.1207° E'
 
+  createdBy?: string; // ✅ thêm dòng này
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 }

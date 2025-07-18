@@ -344,10 +344,13 @@
   "google_terms": "サービス利用規約",
   "apply": "が適用されます"
 },
+
 "profiles_page_content": {
   "loading": "プロフィールを読み込み中...",
-  "no_address": "まだ更新されていません"
+  "no_address": "未更新",
+  "no_contributions": "まだ貢献がありません。"
 },
+
 "mobile_profile_overview": {
   "loading": "プロフィールを読み込み中...",
   "unknown_name": "未登録",
@@ -373,12 +376,15 @@
     "following": "フォロー中"
   }
 },
+
 "profile_tabs": {
   "activity_feed": "アクティビティフィード",
-  "vehicles": "マイビークル",
-  "insurance": "マイ保険パッケージ",
-  "issues": "報告した不具合"
+  "vehicles": "自分の車両",
+  "insurance": "保険パッケージ",
+  "issues": "報告された問題",
+  "contributions": "投稿"
 },
+
 "activity_feed": {
   "title": "プロフィールを完成させましょう",
   "description": "写真や情報を追加すると、他の人があなたを見つけやすくなり、より良く知ってもらえます！"

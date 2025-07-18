@@ -45,7 +45,7 @@ export default function ProfileSidebar({
             <span className="text-xl">🔒</span>
           </div>
         </div>
-        <Button className="mt-4 w-full bg-green-900 text-white hover:bg-green-800" size="sm">
+        <Button className="mt-4 w-full bg-[#00d289] text-white hover:bg-[#00d289]" size="sm">
           {t('profile_sidebar.view_all')}
         </Button>
       </div>

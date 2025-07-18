@@ -14,6 +14,7 @@ export interface BatteryStation {
   };
   vehicleType?: VehicleType; // ✅ Loại phương tiện được hỗ trợ (car, motorbike)
   isActive: boolean;
+  createdBy?: string; // ✅ thêm dòng này
   createdAt?: Timestamp | FieldValue;
   updatedAt?: Timestamp | FieldValue;
 }
