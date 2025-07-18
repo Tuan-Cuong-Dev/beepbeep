@@ -681,6 +681,20 @@
   "no_phone": "Không có số điện thoại",
   "call_now": "📞 Gọi ngay",
   "location_error": "⚠️ {{message}}"
+},
+
+"battery_station_card": {
+  "car_station": "Trạm xe ô tô",
+  "motorbike_station": "Trạm xe máy",
+  "distance_away": "Cách {{distance}} km",
+  "battery_station": "Trạm đổi pin"
+},
+
+"battery_station_map": {
+  "you_are_here": "Bạn đang ở đây",
+  "car_station": "Trạm ô tô",
+  "motorbike_station": "Trạm xe máy",
+  "distance_away": "Cách {{distance}} km"
 }
 
 

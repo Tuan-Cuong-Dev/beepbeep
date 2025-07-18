@@ -147,7 +147,7 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
                     <p className="font-semibold text-black">{station.name}</p>
                     <p className="text-xs text-gray-600">{station.displayAddress}</p>
                     <p className="text-xs text-gray-500">
-                      🚗 {station.vehicleType === 'car'
+                         {station.vehicleType === 'car'
                         ? t('battery_station_map.car_station')
                         : t('battery_station_map.motorbike_station')}
                     </p>
