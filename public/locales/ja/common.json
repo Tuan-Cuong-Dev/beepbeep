@@ -699,7 +699,40 @@
   },
   "status_label": "ステータス：",
   "edit": "編集"
+},
+
+"repair_shop_edit_form": {
+  "technician_name": "技術者の名前",
+  "phone_number": "電話番号",
+  "shop_name_optional": "店舗名（任意）",
+  "shop_address": "店舗の住所",
+  "map_address": "地図の住所",
+  "latitude": "緯度",
+  "longitude": "経度",
+  "select_vehicle_type": "対応する車両タイプを選択",
+  "vehicle_bike": "自転車",
+  "vehicle_motorbike": "バイク",
+  "vehicle_car": "自動車",
+  "update_error": "修理店の更新に失敗しました。"
+},
+"common": {
+  "cancel": "キャンセル",
+  "save": "保存",
+  "saving": "保存中...",
+  "loading": "読み込み中..."
+},
+
+"edit_contribution_modal": {
+  "title": "{{typeLabel}}を編集する",
+  "not_found": "該当するフォームが見つかりません。",
+  "types": {
+    "repair_shop": "修理店",
+    "rental_shop": "レンタルステーション",
+    "battery_station": "バッテリーステーション"
+  }
 }
+
+
 
 
 

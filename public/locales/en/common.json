@@ -726,7 +726,39 @@
   },
   "status_label": "Status:",
   "edit": "Edit"
+},
+
+"repair_shop_edit_form": {
+  "technician_name": "Technician Name",
+  "phone_number": "Phone Number",
+  "shop_name_optional": "Shop Name (optional)",
+  "shop_address": "Shop Address",
+  "map_address": "Map Address",
+  "latitude": "Latitude",
+  "longitude": "Longitude",
+  "select_vehicle_type": "Select Supported Vehicle Type",
+  "vehicle_bike": "Bicycle",
+  "vehicle_motorbike": "Motorbike",
+  "vehicle_car": "Car",
+  "update_error": "Failed to update repair shop."
+},
+"common": {
+  "cancel": "Cancel",
+  "save": "Save",
+  "saving": "Saving...",
+  "loading": "Loading..."
+},
+
+"edit_contribution_modal": {
+  "title": "Edit {{typeLabel}}",
+  "not_found": "No matching form found.",
+  "types": {
+    "repair_shop": "Repair Shop",
+    "rental_shop": "Rental Station",
+    "battery_station": "Battery Station"
+  }
 }
+
 
 
 

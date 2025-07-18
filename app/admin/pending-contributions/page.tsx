@@ -2,7 +2,7 @@
 
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-import PendingContributionsTable from '@/src/components/contribute/PendingContributionsTable';
+import PendingContributionsTable from '@/src/components/contribute/pending/PendingContributionsTable';
 
 export default function PendingContributionsPage() {
   return (

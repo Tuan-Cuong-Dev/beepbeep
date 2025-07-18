@@ -731,7 +731,39 @@
   },
   "status_label": "Trạng thái:",
   "edit": "Chỉnh sửa"
+},
+
+"repair_shop_edit_form": {
+  "technician_name": "Tên kỹ thuật viên",
+  "phone_number": "Số điện thoại",
+  "shop_name_optional": "Tên cửa hàng (không bắt buộc)",
+  "shop_address": "Địa chỉ cửa hàng",
+  "map_address": "Địa chỉ trên bản đồ",
+  "latitude": "Vĩ độ",
+  "longitude": "Kinh độ",
+  "select_vehicle_type": "Chọn loại xe hỗ trợ",
+  "vehicle_bike": "Xe đạp",
+  "vehicle_motorbike": "Xe máy",
+  "vehicle_car": "Ô tô",
+  "update_error": "Cập nhật thông tin tiệm sửa xe thất bại."
+},
+"common": {
+  "cancel": "Hủy",
+  "save": "Lưu",
+  "saving": "Đang lưu...",
+  "loading": "Đang tải..."
+},
+"edit_contribution_modal": {
+  "title": "Chỉnh sửa {{typeLabel}}",
+  "not_found": "Không tìm thấy biểu mẫu phù hợp.",
+  "types": {
+    "repair_shop": "Tiệm sửa xe",
+    "rental_shop": "Điểm cho thuê",
+    "battery_station": "Trạm pin"
+  }
 }
+
+
 
 
 
