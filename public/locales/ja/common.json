@@ -697,9 +697,9 @@
     "approved": "承認済み",
     "pending": "承認待ち"
   },
-  "status_label": "ステータス："
+  "status_label": "ステータス：",
+  "edit": "編集"
 }
-
 
 
 

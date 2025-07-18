@@ -729,8 +729,10 @@
     "approved": "Đã duyệt",
     "pending": "Đang chờ duyệt"
   },
-  "status_label": "Trạng thái:"
+  "status_label": "Trạng thái:",
+  "edit": "Chỉnh sửa"
 }
+
 
 
 

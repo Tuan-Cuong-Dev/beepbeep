@@ -724,7 +724,8 @@
     "approved": "Approved",
     "pending": "Pending Approval"
   },
-  "status_label": "Status:"
+  "status_label": "Status:",
+  "edit": "Edit"
 }
 
 
