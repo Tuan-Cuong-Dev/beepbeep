@@ -695,7 +695,28 @@
   "car_station": "Trạm ô tô",
   "motorbike_station": "Trạm xe máy",
   "distance_away": "Cách {{distance}} km"
+},
+
+"station_card": {
+  "status": {
+    "active": "Đang hoạt động",
+    "inactive": "Ngừng hoạt động",
+    "maintenance": "Đang bảo trì"
+  },
+  "distance_away": "Cách {{distance}} km",
+  "view_on_map": "Xem trên bản đồ"
+},
+
+"station_map": {
+  "you_are_here": "Bạn đang ở đây",
+  "latitude": "Vĩ độ",
+  "longitude": "Kinh độ",
+  "phone": "Sđt",
+  "popup_title": "Thông tin trạm",
+  "getting_location_failed": "Không thể lấy vị trí của bạn"
 }
+
+
 
 
 

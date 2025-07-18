@@ -4,6 +4,7 @@ import { Station } from '@/src/lib/stations/stationTypes';
 import Image from 'next/image';
 import { MapPin, Phone, ArrowUpRight } from 'lucide-react';
 import { Badge } from '@/src/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   station: Station;
@@ -23,6 +24,7 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 export default function StationCard({ station, userLocation }: Props) {
+  const { t } = useTranslation('common');
   const { name, displayAddress, status, mapAddress, contactPhone, geo } = station;
 
   const statusColor = {
@@ -33,7 +35,9 @@ export default function StationCard({ station, userLocation }: Props) {
 
   const distanceText =
     geo && userLocation
-      ? `${haversineDistance(userLocation[0], userLocation[1], geo.lat, geo.lng).toFixed(1)} km away`
+      ? t('station_card.distance_away', {
+          distance: haversineDistance(userLocation[0], userLocation[1], geo.lat, geo.lng).toFixed(1),
+        })
       : '';
 
   return (
@@ -52,11 +56,12 @@ export default function StationCard({ station, userLocation }: Props) {
             />
           </div>
         </div>
+
         {/* Name + Status */}
         <div className="w-2/3">
           <h3 className="text-base font-semibold text-gray-900 leading-tight">{name}</h3>
           <Badge className={`text-xs rounded-full mt-1 px-2 py-0.5 ${statusColor}`}>
-            {status}
+            {t(`station_card.status.${status || 'inactive'}`)}
           </Badge>
         </div>
       </div>
@@ -82,7 +87,7 @@ export default function StationCard({ station, userLocation }: Props) {
           <p className="text-xs text-gray-500 mt-1">📍 {distanceText}</p>
         )}
 
-        {/* Map link luôn nằm cuối cùng */}
+        {/* Map link */}
         {mapAddress && (
           <div className="mt-auto pt-3">
             <a
@@ -91,7 +96,7 @@ export default function StationCard({ station, userLocation }: Props) {
               rel="noopener noreferrer"
               className="text-sm text-[#00d289] font-medium inline-flex items-center gap-1 hover:underline"
             >
-              View on map <ArrowUpRight className="w-4 h-4" />
+              {t('station_card.view_on_map')} <ArrowUpRight className="w-4 h-4" />
             </a>
           </div>
         )}

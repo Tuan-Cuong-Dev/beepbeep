@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Station } from '@/src/lib/stations/stationTypes';
-import { useAuth } from '@/src/hooks/useAuth'; // Hook để lấy thông tin user
+import { useAuth } from '@/src/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 // Icon mặc định cho station
 const stationIcon = new L.Icon({
@@ -28,9 +29,11 @@ interface Props {
 }
 
 export default function StationMap({ stations, userLocation }: Props) {
-  const { currentUser } = useAuth(); // 🔄 Get current user info
+  const { t } = useTranslation('common');
+  const { currentUser } = useAuth();
   const [userPosition, setUserPosition] = useState<[number, number] | null>(userLocation || null);
   const [userIcon, setUserIcon] = useState<L.Icon | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // CSS tùy chỉnh
   useEffect(() => {
@@ -52,15 +55,11 @@ export default function StationMap({ stations, userLocation }: Props) {
   useEffect(() => {
     if (!userLocation && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserPosition([pos.coords.latitude, pos.coords.longitude]);
-        },
-        (err) => {
-          console.warn('📍 Could not get location:', err);
-        }
+        (pos) => setUserPosition([pos.coords.latitude, pos.coords.longitude]),
+        (err) => setLocationError(t('station_map.getting_location_failed') + ': ' + err.message)
       );
     }
-  }, [userLocation]);
+  }, [userLocation, t]);
 
   // Tạo icon người dùng từ avatar hoặc icon mặc định
   useEffect(() => {
@@ -103,7 +102,7 @@ export default function StationMap({ stations, userLocation }: Props) {
                   {station.contactPhone && (
                     <>
                       <br />
-                      📞 {station.contactPhone}
+                      📞 {t('station_map.phone')}: {station.contactPhone}
                     </>
                   )}
                 </Popup>
@@ -114,13 +113,21 @@ export default function StationMap({ stations, userLocation }: Props) {
         {userPosition && userIcon && (
           <Marker position={userPosition} icon={userIcon}>
             <Popup>
-              🧍 You are here<br />
-              Lat: {userPosition[0].toFixed(5)}<br />
-              Lng: {userPosition[1].toFixed(5)}
+              🧍 {t('station_map.you_are_here')}
+              <br />
+              {t('station_map.latitude')}: {userPosition[0].toFixed(5)}
+              <br />
+              {t('station_map.longitude')}: {userPosition[1].toFixed(5)}
             </Popup>
           </Marker>
         )}
       </MapContainer>
+
+      {locationError && (
+        <p className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-sm text-red-500 bg-white px-3 py-1 rounded shadow">
+          ⚠️ {locationError}
+        </p>
+      )}
     </div>
   );
 }

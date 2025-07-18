@@ -675,7 +675,43 @@
   "no_phone": "No phone",
   "call_now": "📞 Call Now",
   "location_error": "⚠️ {{message}}"
+},
+
+"battery_station_card": {
+  "car_station": "Car Station",
+  "motorbike_station": "Motorbike Station",
+  "distance_away": "{{distance}} km away",
+  "battery_station": "Battery Station"
+},
+
+
+"battery_station_map": {
+  "you_are_here": "You are here",
+  "car_station": "Car Station",
+  "motorbike_station": "Motorbike Station",
+  "distance_away": "{{distance}} km away"
+},
+
+"station_card": {
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "maintenance": "Under Maintenance"
+  },
+  "distance_away": "{{distance}} km away",
+  "view_on_map": "View on map"
+},
+
+"station_map": {
+  "you_are_here": "You are here",
+  "latitude": "Latitude",
+  "longitude": "Longitude",
+  "phone": "Phone number",
+  "popup_title": "Station Info",
+  "getting_location_failed": "Could not retrieve your location"
 }
+
+
 
 
 

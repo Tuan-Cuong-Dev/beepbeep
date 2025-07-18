@@ -660,7 +660,28 @@
   "car_station": "自動車ステーション",
   "motorbike_station": "バイクステーション",
   "distance_away": "{{distance}} km 離れています"
+},
+
+"station_card": {
+  "status": {
+    "active": "稼働中",
+    "inactive": "停止中",
+    "maintenance": "メンテナンス中"
+  },
+  "distance_away": "{{distance}} km 離れています",
+  "view_on_map": "地図で表示"
+},
+
+"station_map": {
+  "you_are_here": "あなたはここにいます",
+  "latitude": "緯度",
+  "longitude": "経度",
+  "phone": "電話番号",
+  "popup_title": "ステーション情報",
+  "getting_location_failed": "現在地を取得できませんでした"
 }
+
+
 
 
 
