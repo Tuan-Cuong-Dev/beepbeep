@@ -10,8 +10,10 @@ import Footer from '@/src/components/landingpage/Footer';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
 import { ServicePricing } from '@/src/lib/servicePricing/servicePricingTypes';
+import { useTranslation } from 'react-i18next';
 
 export default function ServicesPage() {
+  const { t } = useTranslation('common');
   const [services, setServices] = useState<ServicePricing[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -29,7 +31,7 @@ export default function ServicesPage() {
               ...d,
             } as ServicePricing;
           })
-          .filter((service) => service.isActive === true); // ✅ Chỉ lấy dịch vụ đang hoạt động
+          .filter((service) => service.isActive === true);
 
         setServices(data);
       } catch (error) {
@@ -42,17 +44,21 @@ export default function ServicesPage() {
     fetchServices();
   }, []);
 
-  // ✅ Lấy danh sách category, thay undefined bằng 'Uncategorized'
+  const normalizeCategory = (cat: string) => cat.toLowerCase().replace(/\s+/g, '_');
+
+  const categoryTranslationMap: Record<string, string> = {
+    all: t('services_page.all'),
+    uncategorized: t('services_page.uncategorized'),
+    repair: t('services_page.categories.repair'),
+    insurance: t('services_page.categories.insurance'),
+    parts_replacement: t('services_page.categories.parts_replacement'),
+  };
+
   const categories = [
     'All',
-    ...Array.from(
-      new Set(
-        services.map((s) => s.category ?? 'Uncategorized')
-      )
-    ),
+    ...Array.from(new Set(services.map((s) => s.category ?? 'Uncategorized'))),
   ];
 
-  // ✅ Lọc dịch vụ theo category
   const filteredServices =
     activeCategory === 'All'
       ? services
@@ -66,31 +72,30 @@ export default function ServicesPage() {
 
       <main className="flex-1 container mx-auto px-4 py-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-gray-800">
-          🛠️ Explore Our Services
+          🛠️ {t('services_page.title')}
         </h1>
 
-        {/* Tabs by Category */}
         <div className="w-full overflow-x-auto px-4 mb-6">
           <Tabs value={activeCategory} onValueChange={setActiveCategory}>
             <TabsList className="flex gap-2 bg-white rounded-full p-2 shadow overflow-x-auto whitespace-nowrap no-scrollbar min-w-max">
-              {categories.map((cat) => (
-                <TabsTrigger
-                  key={cat}
-                  value={cat}
-                  className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 data-[state=active]:bg-[#00d289] data-[state=active]:text-white whitespace-nowrap"
-                >
-                  {cat}
-                </TabsTrigger>
-              ))}
+              {categories.map((cat) => {
+                const key = normalizeCategory(cat);
+                return (
+                  <TabsTrigger
+                    key={cat}
+                    value={cat}
+                    className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 data-[state=active]:bg-[#00d289] data-[state=active]:text-white whitespace-nowrap"
+                  >
+                    {categoryTranslationMap[key] || cat}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </Tabs>
         </div>
 
-
-
-        {/* Services Grid */}
         {loading ? (
-          <p className="text-center text-gray-500">⏳ Loading services...</p>
+          <p className="text-center text-gray-500">{t('services_page.loading')}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredServices.map((service) => (
@@ -98,7 +103,6 @@ export default function ServicesPage() {
                 key={service.id}
                 className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
               >
-                {/* Image Section */}
                 <div className="relative w-full h-[220px] overflow-hidden">
                   {service.imageUrl ? (
                     <Image
@@ -109,16 +113,17 @@ export default function ServicesPage() {
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center text-gray-400">
-                      No Image
+                      {t('services_page.no_image')}
                     </div>
                   )}
                 </div>
 
-                {/* Content */}
                 <div className="flex flex-col justify-between flex-grow p-4">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800">{service.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{service.description}</p>
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                      {service.description}
+                    </p>
 
                     <ul className="text-xs text-gray-500 list-disc pl-4 mt-2 space-y-1">
                       {service.features?.slice(0, 4).map((f, i) => (
@@ -127,11 +132,14 @@ export default function ServicesPage() {
                     </ul>
                   </div>
 
-                  {/* Bottom Info */}
                   <div className="flex justify-between items-center mt-4 text-sm font-medium">
-                    <span className="text-[#00d289]">{formatCurrency(service.price)} VND</span>
+                    <span className="text-[#00d289]">
+                      {formatCurrency(service.price)} {t('services_page.price_unit')}
+                    </span>
                     {service.durationEstimate && (
-                      <span className="text-gray-400">⏱ {service.durationEstimate}</span>
+                      <span className="text-gray-400">
+                        ⏱ {service.durationEstimate}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -139,7 +147,6 @@ export default function ServicesPage() {
             ))}
           </div>
         )}
-
       </main>
 
       <Footer />

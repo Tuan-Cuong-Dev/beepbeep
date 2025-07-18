@@ -19,7 +19,7 @@
   "portugal": "Bồ Đào Nha",
   "saudiArabia": "Ả Rập Xê Út",
   "saved_notice": "Tất cả thay đổi tùy chọn sẽ được lưu vào tài khoản của bạn."
-},
+  },
 
   "landing": {
     "loading": "Đang tải...",
@@ -228,135 +228,135 @@
     "login_email_note": "Đây là email bạn đã dùng để đăng nhập. Nếu bạn muốn thay đổi, vui lòng liên hệ hỗ trợ."
   },
 
-"contribute": {
-  "add_to_map": "Thêm vào bản đồ",
-  "repair": "Trạm sửa xe",
-  "rental": "Trạm cho thuê",
-  "battery": "Trạm đổi pin"
+  "contribute": {
+    "add_to_map": "Thêm vào bản đồ",
+    "repair": "Trạm sửa xe",
+    "rental": "Trạm cho thuê",
+    "battery": "Trạm đổi pin"
   },
 
-"repair_shop_form": {
-  "technician_name": "Tên thợ sửa xe",
-  "phone_number": "Số điện thoại",
-  "shop_name_optional": "Tên cửa hàng (không bắt buộc)",
-  "shop_address": "Địa chỉ cửa hàng",
-  "map_address": "Địa chỉ Google Maps (không bắt buộc)",
-  "latitude": "Vĩ độ",
-  "longitude": "Kinh độ",
-  "select_vehicle_type": "Chọn loại xe",
-  "vehicle_bike": "Xe đạp",
-  "vehicle_motorbike": "Xe máy",
-  "vehicle_car": "Ô tô",
-  "submit_repair_shop": "Gửi thông tin cửa hàng",
-  "submitting": "Đang gửi...",
-  "thank_you": "Cảm ơn bạn đã đóng góp!",
-  "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
-},
-"rental_shop_form": {
-  "shop_name": "Tên cửa hàng",
-  "display_address": "Địa chỉ hiển thị",
-  "map_address": "Địa chỉ Google Maps (không bắt buộc)",
-  "location": "Tọa độ (vd: 16.07° N, 108.22° E)",
-  "phone": "Số điện thoại (không bắt buộc)",
-  "select_vehicle_type": "Chọn loại xe",
-  "vehicle_bike": "Xe đạp",
-  "vehicle_motorbike": "Xe máy",
-  "vehicle_car": "Ô tô",
-  "submit_rental_shop": "Gửi thông tin trạm cho thuê",
-  "submitting": "Đang gửi...",
-  "thank_you": "Cảm ơn bạn đã đóng góp!",
-  "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
-},
+  "repair_shop_form": {
+    "technician_name": "Tên thợ sửa xe",
+    "phone_number": "Số điện thoại",
+    "shop_name_optional": "Tên cửa hàng (không bắt buộc)",
+    "shop_address": "Địa chỉ cửa hàng",
+    "map_address": "Địa chỉ Google Maps (không bắt buộc)",
+    "latitude": "Vĩ độ",
+    "longitude": "Kinh độ",
+    "select_vehicle_type": "Chọn loại xe",
+    "vehicle_bike": "Xe đạp",
+    "vehicle_motorbike": "Xe máy",
+    "vehicle_car": "Ô tô",
+    "submit_repair_shop": "Gửi thông tin cửa hàng",
+    "submitting": "Đang gửi...",
+    "thank_you": "Cảm ơn bạn đã đóng góp!",
+    "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
+  },
+  "rental_shop_form": {
+    "shop_name": "Tên cửa hàng",
+    "display_address": "Địa chỉ hiển thị",
+    "map_address": "Địa chỉ Google Maps (không bắt buộc)",
+    "location": "Tọa độ (vd: 16.07° N, 108.22° E)",
+    "phone": "Số điện thoại (không bắt buộc)",
+    "select_vehicle_type": "Chọn loại xe",
+    "vehicle_bike": "Xe đạp",
+    "vehicle_motorbike": "Xe máy",
+    "vehicle_car": "Ô tô",
+    "submit_rental_shop": "Gửi thông tin trạm cho thuê",
+    "submitting": "Đang gửi...",
+    "thank_you": "Cảm ơn bạn đã đóng góp!",
+    "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
+  },
 
-"battery_station_form": {
-  "station_name": "Tên trạm",
-  "display_address": "Địa chỉ hiển thị",
-  "map_address": "Địa chỉ Google Maps (không bắt buộc)",
-  "location": "Tọa độ (vd: 16.07° N, 108.22° E)",
-  "select_vehicle_type": "Chọn loại xe",
-  "vehicle_motorbike": "Xe máy",
-  "vehicle_car": "Ô tô",
-  "submit_battery_station": "Gửi thông tin trạm pin",
-  "submitting": "Đang gửi...",
-  "thank_you": "Cảm ơn bạn đã đóng góp!",
-  "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
-},
+  "battery_station_form": {
+    "station_name": "Tên trạm",
+    "display_address": "Địa chỉ hiển thị",
+    "map_address": "Địa chỉ Google Maps (không bắt buộc)",
+    "location": "Tọa độ (vd: 16.07° N, 108.22° E)",
+    "select_vehicle_type": "Chọn loại xe",
+    "vehicle_motorbike": "Xe máy",
+    "vehicle_car": "Ô tô",
+    "submit_battery_station": "Gửi thông tin trạm pin",
+    "submitting": "Đang gửi...",
+    "thank_you": "Cảm ơn bạn đã đóng góp!",
+    "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
+  },
 
-"auth": {
-  "signin_success": "Đăng nhập thành công",
-  "signin_error": "Lỗi khi đăng nhập",
-  "signout_success": "Đăng xuất thành công",
-  "signout_error": "Lỗi khi đăng xuất",
-  "popup_closed": "Cửa sổ đăng nhập đã bị đóng trước khi hoàn tất"
-},
+  "auth": {
+    "signin_success": "Đăng nhập thành công",
+    "signin_error": "Lỗi khi đăng nhập",
+    "signout_success": "Đăng xuất thành công",
+    "signout_error": "Lỗi khi đăng xuất",
+    "popup_closed": "Cửa sổ đăng nhập đã bị đóng trước khi hoàn tất"
+  },
 
-"handle_email_login": {
-  "success": "Đăng nhập bằng email thành công",
-  "error": "Đã xảy ra lỗi khi đăng nhập bằng email",
-  "email_not_found": "Không tìm thấy địa chỉ email",
-  "wrong_password": "Mật khẩu không chính xác"
-},
+  "handle_email_login": {
+    "success": "Đăng nhập bằng email thành công",
+    "error": "Đã xảy ra lỗi khi đăng nhập bằng email",
+    "email_not_found": "Không tìm thấy địa chỉ email",
+    "wrong_password": "Mật khẩu không chính xác"
+  },
 
-"login_popup": {
-  "title": "Đăng nhập để khám phá trọn vẹn Bíp Bíp.",
-  "continue_with_google": "Tiếp tục với Google",
-  "continue_with_email": "Tiếp tục với Email",
-  "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
-  "terms_of_use": "Điều khoản Sử dụng",
-  "and_read": "và xác nhận rằng bạn đã đọc",
-  "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
-  "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
-  "google_privacy": "Chính sách Bảo mật",
-  "and": "và",
-  "google_terms": "Điều khoản Dịch vụ",
-  "apply": "được áp dụng"
-},
+  "login_popup": {
+    "title": "Đăng nhập để khám phá trọn vẹn Bíp Bíp.",
+    "continue_with_google": "Tiếp tục với Google",
+    "continue_with_email": "Tiếp tục với Email",
+    "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
+    "terms_of_use": "Điều khoản Sử dụng",
+    "and_read": "và xác nhận rằng bạn đã đọc",
+    "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
+    "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
+    "google_privacy": "Chính sách Bảo mật",
+    "and": "và",
+    "google_terms": "Điều khoản Dịch vụ",
+    "apply": "được áp dụng"
+  },
 
-"signin_popup": {
-  "welcome": "Chào mừng bạn quay lại.",
-  "email_label": "Địa chỉ email",
-  "email_placeholder": "Email",
-  "password_label": "Mật khẩu",
-  "password_placeholder": "Mật khẩu",
-  "fill_all_fields": "Vui lòng nhập đầy đủ email và mật khẩu.",
-  "login_failed": "Đăng nhập thất bại.",
-  "forgot_password": "Quên mật khẩu?",
-  "signin": "Đăng nhập",
-  "not_a_member": "Chưa có tài khoản?",
-  "join": "Tham gia",
-  "unlock_bipbip": "để khám phá trọn vẹn Bíp Bíp.",
-  "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
-  "terms_of_use": "Điều khoản Sử dụng",
-  "and_read": "và xác nhận rằng bạn đã đọc",
-  "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
-  "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
-  "google_privacy": "Chính sách Bảo mật",
-  "and": "và",
-  "google_terms": "Điều khoản Dịch vụ",
-  "apply": "được áp dụng"
-},
+  "signin_popup": {
+    "welcome": "Chào mừng bạn quay lại.",
+    "email_label": "Địa chỉ email",
+    "email_placeholder": "Email",
+    "password_label": "Mật khẩu",
+    "password_placeholder": "Mật khẩu",
+    "fill_all_fields": "Vui lòng nhập đầy đủ email và mật khẩu.",
+    "login_failed": "Đăng nhập thất bại.",
+    "forgot_password": "Quên mật khẩu?",
+    "signin": "Đăng nhập",
+    "not_a_member": "Chưa có tài khoản?",
+    "join": "Tham gia",
+    "unlock_bipbip": "để khám phá trọn vẹn Bíp Bíp.",
+    "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
+    "terms_of_use": "Điều khoản Sử dụng",
+    "and_read": "và xác nhận rằng bạn đã đọc",
+    "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
+    "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
+    "google_privacy": "Chính sách Bảo mật",
+    "and": "và",
+    "google_terms": "Điều khoản Dịch vụ",
+    "apply": "được áp dụng"
+  },
 
-"signup_popup": {
-  "title": "Tham gia để khám phá trọn vẹn Bíp Bíp",
-  "first_name": "Tên",
-  "last_name": "Họ",
-  "email": "Địa chỉ email",
-  "password": "Tạo mật khẩu",
-  "signup_failed": "Đăng ký thất bại.",
-  "join_button": "Tham gia",
-  "already_member": "Đã có tài khoản?",
-  "signin": "Đăng nhập",
-  "with_account": "bằng tài khoản Bíp Bíp của bạn.",
-  "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
-  "terms_of_use": "Điều khoản Sử dụng",
-  "and_read": "và xác nhận rằng bạn đã đọc",
-  "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
-  "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
-  "google_privacy": "Chính sách Bảo mật",
-  "and": "và",
-  "google_terms": "Điều khoản Dịch vụ",
-  "apply": "được áp dụng"
-},
+  "signup_popup": {
+    "title": "Tham gia để khám phá trọn vẹn Bíp Bíp",
+    "first_name": "Tên",
+    "last_name": "Họ",
+    "email": "Địa chỉ email",
+    "password": "Tạo mật khẩu",
+    "signup_failed": "Đăng ký thất bại.",
+    "join_button": "Tham gia",
+    "already_member": "Đã có tài khoản?",
+    "signin": "Đăng nhập",
+    "with_account": "bằng tài khoản Bíp Bíp của bạn.",
+    "agree_prefix": "Khi tiếp tục, bạn đồng ý với",
+    "terms_of_use": "Điều khoản Sử dụng",
+    "and_read": "và xác nhận rằng bạn đã đọc",
+    "privacy_statement": "Chính sách Quyền riêng tư và Cookie",
+    "recaptcha_note": "Trang này được bảo vệ bởi reCAPTCHA của Google",
+    "google_privacy": "Chính sách Bảo mật",
+    "and": "và",
+    "google_terms": "Điều khoản Dịch vụ",
+    "apply": "được áp dụng"
+  },
 
 "profiles_page_content": {
   "loading": "Đang tải hồ sơ...",
@@ -391,7 +391,7 @@
 },
 
 "profile_tabs": {
-  "activity_feed": "Hoạt động",
+  "activity_feed": "Bản tin hoạt động",
   "vehicles": "Xe của tôi",
   "insurance": "Gói bảo hiểm",
   "issues": "Sự cố đã báo"
@@ -467,6 +467,7 @@
   "price": "Giá",
   "view_and_buy": "Xem & Mua"
 },
+
 "my_insurance_packages_section": {
   "loading": "Đang tải gói bảo hiểm của bạn...",
   "no_packages": "Bạn chưa mua gói bảo hiểm nào.",
@@ -560,6 +561,7 @@
   },
   "na": "Không có"
 },
+
 "about_page": {
   "title": "Về chúng tôi",
   "p1": "Tại Bíp Bíp, chúng tôi đang xây dựng một nền tảng tiên tiến để quản lý và mở rộng hoạt động cho thuê xe điện. Hệ thống của chúng tôi cho phép nhiều đối tượng tham gia vào hệ sinh thái thuê xe minh bạch và hiệu quả — từ khách hàng, nhân viên đến nhà đầu tư, kỹ thuật viên và chủ doanh nghiệp.",
@@ -597,17 +599,57 @@
     "part2": "."
   },
   "footer_note": "Vui lòng xem đầy đủ chính sách bảo mật hoặc liên hệ trực tiếp với chúng tôi nếu có bất kỳ thắc mắc nào."
+},
+
+"services_page": {
+  "title": "Khám phá các dịch vụ",
+  "loading": "Đang tải dịch vụ...",
+  "no_image": "Không có ảnh",
+  "price_unit": "VND",
+  "all": "Tất cả",
+  "uncategorized": "Chưa phân loại",
+  "categories": {
+    "repair": "Sửa chữa",
+    "insurance": "Bảo hiểm",
+    "parts_replacement": "Thay thế linh kiện"
+  }
+},
+
+"user_top_menu": {
+  "bookings": "Quản lý đơn thuê",
+  "rental_companies": "Quản lý công ty cho thuê",
+  "vehicle_management": "Quản lý xe",
+  "users_management": "Quản lý người dùng",
+  "customers_management": "Quản lý khách hàng",
+  "staff_management": "Quản lý nhân sự",
+  "battery_management": "Quản lý pin",
+  "accessories_management": "Quản lý phụ kiện",
+  "accessory_exports": "Xuất kho phụ kiện",
+  "subscription_packages": "Gói thuê xe"
+},
+
+"messages_page": {
+  "title": "📩 Tin nhắn",
+  "invitations_title": "Lời mời",
+  "loading_invitations": "Đang tải lời mời...",
+  "no_invitations": "Hiện tại bạn không có lời mời nào.",
+  "role_label": "Vai trò",
+  "accept": "Chấp nhận",
+  "reject": "Từ chối",
+  "accepted_message": "Bạn đã chấp nhận lời mời này.",
+  "rejected_message": "Bạn đã từ chối lời mời này.",
+  "notifications_title": "Thông báo hệ thống",
+  "loading_notifications": "Đang tải thông báo...",
+  "no_notifications": "Không có thông báo mới.",
+  "types": {
+    "notification": "THÔNG BÁO",
+    "system_alert": "CẢNH BÁO HỆ THỐNG",
+    "booking_update": "CẬP NHẬT ĐƠN THUÊ"
+  }
 }
 
 
 
 
 
-
-
-
-
-
-
 }
-

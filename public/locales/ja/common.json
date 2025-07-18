@@ -563,7 +563,55 @@
     "part2": "。"
   },
   "footer_note": "詳細については当社の完全なプライバシーポリシーをご覧いただくか、ご不明点があればお気軽にお問い合わせください。"
+},
+
+"services_page": {
+  "title": "サービスを探す",
+  "loading": "サービスを読み込み中...",
+  "no_image": "画像がありません",
+  "price_unit": "VND",
+  "all": "すべて",
+  "uncategorized": "未分類",
+  "categories": {
+    "repair": "修理",
+    "insurance": "保険",
+    "parts_replacement": "部品交換"
+  }
+},
+
+"user_top_menu": {
+  "bookings": "予約管理",
+  "rental_companies": "レンタル会社の管理",
+  "vehicle_management": "車両管理",
+  "users_management": "ユーザー管理",
+  "customers_management": "顧客管理",
+  "staff_management": "スタッフ管理",
+  "battery_management": "バッテリー管理",
+  "accessories_management": "アクセサリー管理",
+  "accessory_exports": "アクセサリー出庫",
+  "subscription_packages": "サブスクリプションプラン"
+},
+
+"messages_page": {
+  "title": "📩 メッセージ",
+  "invitations_title": "招待",
+  "loading_invitations": "招待を読み込んでいます...",
+  "no_invitations": "現在、招待はありません。",
+  "role_label": "役割",
+  "accept": "承諾する",
+  "reject": "拒否する",
+  "accepted_message": "この招待を承諾しました。",
+  "rejected_message": "この招待を拒否しました。",
+  "notifications_title": "システム通知",
+  "loading_notifications": "通知を読み込んでいます...",
+  "no_notifications": "新しい通知はありません。",
+  "types": {
+    "notification": "通知",
+    "system_alert": "システムアラート",
+    "booking_update": "予約の更新"
+  }
 }
+
 
 
 

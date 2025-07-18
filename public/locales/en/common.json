@@ -1,27 +1,27 @@
 {
-"preferences": {
-  "preferences": "Preferences",
-  "region_language": "Region & Language",
-  "currency": "Currency",
-  "select_region_language": "Select Region & Language",
-  "select_currency": "Select Currency",
-  "englishUS": "English (US)",
-  "englishUK": "English (UK)",
-  "vietnam": "Vietnam",
-  "japan": "Japan",
-  "china": "China",
-  "southKorea": "South Korea",
-  "russia": "Russia",
-  "france": "France",
-  "germany": "Germany",
-  "italy": "Italy",
-  "spain": "Spain",
-  "portugal": "Portugal",
-  "saudiArabia": "Saudi Arabia",
-  "saved_notice": "All preference changes will be saved to your account."
-},
+  "preferences": {
+    "preferences": "Preferences",
+    "region_language": "Region & Language",
+    "currency": "Currency",
+    "select_region_language": "Select Region & Language",
+    "select_currency": "Select Currency",
+    "englishUS": "English (US)",
+    "englishUK": "English (UK)",
+    "vietnam": "Vietnam",
+    "japan": "Japan",
+    "china": "China",
+    "southKorea": "South Korea",
+    "russia": "Russia",
+    "france": "France",
+    "germany": "Germany",
+    "italy": "Italy",
+    "spain": "Spain",
+    "portugal": "Portugal",
+    "saudiArabia": "Saudi Arabia",
+    "saved_notice": "All preference changes will be saved to your account."
+  },
 
-"landing": {
+  "landing": {
     "loading": "Loading...",
     "hero": {
       "titleLine1": "Rent your ride",
@@ -30,14 +30,14 @@
     }
   },
 
-"stationSection": {
+  "stationSection": {
     "stations_title": "{{count}} stations",
     "stations_subtitle": "are ready to serve you!",
     "view_all": "View All",
     "see_all_stations": "See all rental stations"
   },
 
-"technicianSection": {
+  "technicianSection": {
     "vehicle_trouble": "Vehicle trouble?",
     "call_technician": "Call to a technician!",
     "view_all": "View All",
@@ -46,14 +46,14 @@
     "notification_description": "We are building a contact system so you can reach technicians directly. Coming soon!"
   },
 
-"notificationTypes": {
+  "notificationTypes": {
     "info": "Info",
     "success": "Success",
     "warning": "Warning",
     "error": "Error"
   },
 
-"serviceSection": {
+  "serviceSection": {
     "title": "🛠️ Bíp Bíp 365",
     "subtitle": "Your 24/7 Vehicles Lifesaver",
     "view_all": "View All",
@@ -62,7 +62,7 @@
     "notification_description": "We're launching service booking soon! Stay tuned."
   },
 
-"vehicleModelSection": {
+  "vehicleModelSection": {
     "title": "Choose your electric ride",
     "rent_button": "🛵 Rent Now",
     "view_all": "View All",
@@ -71,12 +71,12 @@
     "notification_description": "We are currently setting up our rental stations. The rent feature is not yet available."
   },
 
-"batteryStationSection": {
+  "batteryStationSection": {
     "count_label": "Battery Swap Stations",
     "subtitle": "Click to explore stations across the country"
   },
 
-"whyChooseUs": {
+  "whyChooseUs": {
     "title": "Why Everyone Benefits from Our Platform",
     "roles": [
       {
@@ -114,7 +114,7 @@
     ]
   },
 
-"faqSection": {
+  "faqSection": {
     "title": "What Would You Like to Ask?",
     "faqs": [
       {
@@ -136,25 +136,25 @@
     ]
   },
 
-"footer": {
+  "footer": {
     "rights": "All rights reserved.",
     "about": "About Us",
     "contact": "Contact",
     "policy": "Policy"
   },
 
-"preferences_sidebar": {
+  "preferences_sidebar": {
     "label": "United States, EN | USD"
   },
 
-"navigation": {
+  "navigation": {
     "home": "Home",
     "about": "About Us",
     "contact": "Contact",
     "policy": "Policies"
   },
 
-"user_sidebar": {
+  "user_sidebar": {
     "welcome": "Welcome",
     "account_disabled": "Account Disabled",
     "total_earnings": "Total Earnings",
@@ -172,21 +172,11 @@
       "request_payment": "Request Payment",
       "sign_out": "Sign out"
     },
-
-  "coming_soon": {
+    "coming_soon": {
       "title": "🚧 Coming Soon",
       "description": "We are currently setting up our rental stations. The Write a review feature is not yet available."
     }
   },
-
-  "header": {
-    "preferences": "Preferences",
-    "language": "Language",
-    "region": "Region",
-    "currency": "Currency",
-    "sign_in": "Sign in"
-  },
-
 
   "account": {
     "title": "Account Info",
@@ -230,7 +220,7 @@
     "login_email_note": "This is the email you used to sign in. If you want to change it, please contact support."
   },
 
- "contribute": {
+  "contribute": {
     "add_to_map": "Add to the Map",
     "repair": "Repair",
     "rental": "Rental",
@@ -256,22 +246,22 @@
   },
 
   "rental_shop_form": {
-  "shop_name": "Shop name",
-  "display_address": "Display address",
-  "map_address": "Google Maps address (optional)",
-  "location": "Coordinates (e.g. 16.07° N, 108.22° E)",
-  "phone": "Phone number (optional)",
-  "select_vehicle_type": "Select vehicle type",
-  "vehicle_bike": "Bike",
-  "vehicle_motorbike": "Motorbike",
-  "vehicle_car": "Car",
-  "submit_rental_shop": "Submit Rental Shop",
-  "submitting": "Submitting...",
-  "thank_you": "Thank you for your contribution!",
-  "submission_received": "We’ve received your submission and will review it shortly."
-},
+    "shop_name": "Shop name",
+    "display_address": "Display address",
+    "map_address": "Google Maps address (optional)",
+    "location": "Coordinates (e.g. 16.07° N, 108.22° E)",
+    "phone": "Phone number (optional)",
+    "select_vehicle_type": "Select vehicle type",
+    "vehicle_bike": "Bike",
+    "vehicle_motorbike": "Motorbike",
+    "vehicle_car": "Car",
+    "submit_rental_shop": "Submit Rental Shop",
+    "submitting": "Submitting...",
+    "thank_you": "Thank you for your contribution!",
+    "submission_received": "We’ve received your submission and will review it shortly."
+  },
 
-"battery_station_form": {
+  "battery_station_form": {
     "station_name": "Station name",
     "display_address": "Display address",
     "map_address": "Google Maps address (optional)",
@@ -293,14 +283,15 @@
     "popup_closed": "The login popup was closed before completing sign-in"
   },
 
-"handle_email_login": {
-  "success": "Successfully signed in with email",
-  "error": "An error occurred while signing in with email",
-  "email_not_found": "Email address not found",
-  "wrong_password": "Incorrect password"
-},
 
-"login_popup": {
+  "handle_email_login": {
+    "success": "Successfully signed in with email",
+    "error": "An error occurred while signing in with email",
+    "email_not_found": "Email address not found",
+    "wrong_password": "Incorrect password"
+  },
+
+  "login_popup": {
     "title": "Sign in to unlock the best of Bíp Bíp.",
     "continue_with_google": "Continue with Google",
     "continue_with_email": "Continue with Email",
@@ -314,298 +305,342 @@
     "google_terms": "Terms of Service",
     "apply": "apply"
   },
+
   "signin_popup": {
-  "welcome": "Welcome back.",
-  "email_label": "Email address",
-  "email_placeholder": "Email",
-  "password_label": "Password",
-  "password_placeholder": "Password",
-  "fill_all_fields": "Please enter both email and password.",
-  "login_failed": "Login failed.",
-  "forgot_password": "Forgot password?",
-  "signin": "Sign in",
-  "not_a_member": "Not a member?",
-  "join": "Join",
-  "unlock_bipbip": "to unlock the best of Bíp Bíp.",
-  "agree_prefix": "By proceeding, you agree to our",
-  "terms_of_use": "Terms of Use",
-  "and_read": "and confirm you have read our",
-  "privacy_statement": "Privacy and Cookie Statement",
-  "recaptcha_note": "This site is protected by reCAPTCHA and the Google",
-  "google_privacy": "Privacy Policy",
-  "and": "and",
-  "google_terms": "Terms of Service",
-  "apply": "apply"
-},
-
-"signup_popup": {
-  "title": "Join to unlock the best of Bíp Bíp",
-  "first_name": "First Name",
-  "last_name": "Last Name",
-  "email": "Email address",
-  "password": "Create a password",
-  "signup_failed": "Signup failed.",
-  "join_button": "Join",
-  "already_member": "Already a member?",
-  "signin": "Sign in",
-  "with_account": "using your Bíp Bíp account.",
-  "agree_prefix": "By proceeding, you agree to our",
-  "terms_of_use": "Terms of Use",
-  "and_read": "and confirm you have read our",
-  "privacy_statement": "Privacy and Cookie Statement",
-  "recaptcha_note": "This site is protected by reCAPTCHA and the Google",
-  "google_privacy": "Privacy Policy",
-  "and": "and",
-  "google_terms": "Terms of Service",
-  "apply": "apply"
-},
-
-"profiles_page_content": {
-  "loading": "Loading profile...",
-  "no_address": "Not updated yet"
-},
-
-"mobile_profile_overview": {
-  "loading": "Loading profile...",
-  "unknown_name": "Unknown",
-  "default_address": "Da Nang",
-  "role": "Role",
-  "edit_profile": "Edit profile",
-  "stats": {
-    "contributions": "Contributions",
-    "followers": "Followers",
-    "following": "Following"
-  }
-},
-
-"desktop_profile_overview": {
-  "loading": "Loading profile...",
-  "unknown_name": "Unknown",
-  "default_address": "Da Nang, Vietnam",
-  "role": "Role",
-  "helpful_votes": "helpful votes",
-  "edit_profile": "Edit profile",
-  "stats": {
-    "contributions": "Contributions",
-    "followers": "Followers",
-    "following": "Following"
+    "welcome": "Welcome back.",
+    "email_label": "Email address",
+    "email_placeholder": "Email",
+    "password_label": "Password",
+    "password_placeholder": "Password",
+    "fill_all_fields": "Please enter both email and password.",
+    "login_failed": "Login failed.",
+    "forgot_password": "Forgot password?",
+    "signin": "Sign in",
+    "not_a_member": "Not a member?",
+    "join": "Join",
+    "unlock_bipbip": "to unlock the best of Bíp Bíp.",
+    "agree_prefix": "By proceeding, you agree to our",
+    "terms_of_use": "Terms of Use",
+    "and_read": "and confirm you have read our",
+    "privacy_statement": "Privacy and Cookie Statement",
+    "recaptcha_note": "This site is protected by reCAPTCHA and the Google",
+    "google_privacy": "Privacy Policy",
+    "and": "and",
+    "google_terms": "Terms of Service",
+    "apply": "apply"
   },
 
+  "signup_popup": {
+    "title": "Join to unlock the best of Bíp Bíp",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email address",
+    "password": "Create a password",
+    "signup_failed": "Signup failed.",
+    "join_button": "Join",
+    "already_member": "Already a member?",
+    "signin": "Sign in",
+    "with_account": "using your Bíp Bíp account.",
+    "agree_prefix": "By proceeding, you agree to our",
+    "terms_of_use": "Terms of Use",
+    "and_read": "and confirm you have read our",
+    "privacy_statement": "Privacy and Cookie Statement",
+    "recaptcha_note": "This site is protected by reCAPTCHA and the Google",
+    "google_privacy": "Privacy Policy",
+    "and": "and",
+    "google_terms": "Terms of Service",
+    "apply": "apply"
+  },
+
+  "profiles_page_content": {
+    "loading": "Loading profile...",
+    "no_address": "Not updated yet"
+  },
+
+  "mobile_profile_overview": {
+    "loading": "Loading profile...",
+    "unknown_name": "Unknown",
+    "default_address": "Da Nang",
+    "role": "Role",
+    "edit_profile": "Edit profile",
+    "stats": {
+      "contributions": "Contributions",
+      "followers": "Followers",
+      "following": "Following"
+    }
+  },
+
+  "desktop_profile_overview": {
+    "loading": "Loading profile...",
+    "unknown_name": "Unknown",
+    "default_address": "Da Nang, Vietnam",
+    "role": "Role",
+    "helpful_votes": "helpful votes",
+    "edit_profile": "Edit profile",
+    "stats": {
+      "contributions": "Contributions",
+      "followers": "Followers",
+      "following": "Following"
+    }
+  },     
 "profile_tabs": {
-  "activity_feed": "Activity Feed",
-  "vehicles": "My Vehicles",
-  "insurance": "My Insurance Packages",
-  "issues": "My Reported Issues"
+    "activity_feed": "Activity Feed",
+    "vehicles": "My Vehicles",
+    "insurance": "My Insurance Packages",
+    "issues": "My Reported Issues"
+    },
+
+  "activity_feed": {
+    "title": "Fill Out Your Profile",
+    "description": "Add photos and info to your profile so people can find you easily and get to know you better!"
   },
 
-"activity_feed": {
-  "title": "Fill Out Your Profile",
-  "description": "Add photos and info to your profile so people can find you easily and get to know you better!"
-},
-
-"my_vehicles_section": {
-  "title": "My Vehicles",
-  "add": "+ Add Vehicle",
-  "close": "Close",
-  "no_vehicle": "You haven't added any vehicle yet.",
-  "delete_title": "❌ Delete this vehicle?",
-  "delete_description": "This will permanently remove \"{{name}}\" from your list.",
-  "delete_success": "✅ Vehicle deleted successfully!",
-  "delete_error": "❌ Failed to delete vehicle."
-},
-
-"edit_personal_vehicle_form": {
-  "title": "Edit Vehicle",
-  "name": "Vehicle name",
-  "license_plate": "License Plate",
-  "year": "Year of Manufacture",
-  "odo": "Odo (km)",
-  "set_primary": "Set as primary vehicle",
-  "save": "Save Changes",
-  "saving": "Saving...",
-  "cancel": "Cancel",
-  "update_failed": "❌ Failed to update vehicle."
-},
-
-"personal_vehicle_card": {
-  "no_image": "No image",
-  "unknown": "Unknown",
-  "plate": "Plate",
-  "odo": "Odo",
-  "year": "Year",
-  "type": "Type",
-  "active": "Active",
-  "inactive": "Inactive",
-  "primary": "Primary",
-  "edit": "Edit",
-  "delete": "Delete"
-},
-
-"select_model_then_add_vehicle_form": {
-  "search_title": "Search for your vehicle model",
-  "search_placeholder": "e.g. VinFast Feliz, Yamaha Sirius...",
-  "add_title": "Add your vehicle",
-  "selected": "Selected",
-  "nickname": "Nickname (e.g. Dad's bike)",
-  "plate": "License Plate (optional)",
-  "year": "Year of Manufacture",
-  "odo": "Odo (km)",
-  "set_primary": "Set as primary vehicle",
-  "save": "Save Vehicle",
-  "saving": "Saving...",
-  "change_model": "Change model",
-  "no_image": "No image",
-  "error": "❌ Failed to save vehicle. Please try again."
-},
-
-"available_insurance_products_section": {
-  "loading": "Loading insurance products...",
-  "no_products": "No insurance products available at the moment.",
-  "title": "Available Insurance Products",
-  "no_image": "No image",
-  "duration": "Duration",
-  "days": "days",
-  "price": "Price",
-  "view_and_buy": "View & Buy"
-},
-
-"my_insurance_packages_section": {
-  "loading": "Loading your insurance packages...",
-  "no_packages": "You haven't purchased any insurance packages yet.",
-  "title": "My Insurance Packages",
-  "no_image": "No image available",
-  "unnamed_product": "Unnamed Product",
-  "code": "Code",
-  "vehicle": "Vehicle",
-  "frame": "Frame No.",
-  "engine": "Engine No.",
-  "plate": "Plate No.",
-  "expires": "Expires",
-  "created": "Created",
-  "status": {
-    "pending": "⏳ Pending Approval",
-    "rejected": "❌ Rejected",
-    "expired": "🗕️ Expired",
-    "active": "✅ Active",
-    "inactive": "⛔ Inactive"
+  "my_vehicles_section": {
+    "title": "My Vehicles",
+    "add": "+ Add Vehicle",
+    "close": "Close",
+    "no_vehicle": "You haven't added any vehicle yet.",
+    "delete_title": "❌ Delete this vehicle?",
+    "delete_description": "This will permanently remove \"{{name}}\" from your list.",
+    "delete_success": "✅ Vehicle deleted successfully!",
+    "delete_error": "❌ Failed to delete vehicle."
   },
-  "view": "View Details",
-  "extend": "Extend Insurance"
-},
 
-"my_insurance_products_list": {
-  "loading": "Loading insurance products...",
-  "no_products": "No insurance products available.",
-  "no_image": "No image available",
-  "duration": "Duration",
-  "days": "days",
-  "price": "Price",
-  "active": "Active",
-  "inactive": "Inactive",
-  "created": "Created"
-},
-
-"purchase_insurance_dialog": {
-  "title": "Select your motorbike",
-  "no_motorbike": "No motorbike available in your personal vehicles.",
-  "select_placeholder": "-- Choose your motorbike --",
-  "no_plate": "No plate",
-  "name": "Name",
-  "license_plate": "License Plate",
-  "brand": "Brand",
-  "model": "Model",
-  "color": "Color",
-  "odo": "Odo",
-  "confirm_button": "Confirm Purchase"
-},
-
-"profile_main_content": {
-  "welcome_title": "Welcome to your profile",
-  "welcome_description": "Here you can find your activity summary and manage your vehicle-related services."
-},
-
-"settings_dropdown": {
-  "settings": "Settings",
-  "edit_profile": "Edit your profile",
-  "edit_photo": "Edit profile photo",
-  "edit_cover": "Edit cover photo",
-  "account_info": "Account info",
-  "account_settings": "Account settings",
-  "subscriptions": "Subscriptions",
-  "payments": "Payment Options",
-  "connect_drive": "Connect Google Drive"
-},
-
-"profile_sidebar": {
-  "achievements": "Your Achievements",
-  "unlock_prompt": "Start sharing to unlock",
-  "write_first_review": "Write your first review",
-  "review_milestone": "Unlock review milestones",
-  "upload_first_photo": "Upload your first photo",
-  "photo_milestone": "Unlock photo milestones",
-  "view_all": "View all",
-  "intro": "Intro",
-  "joined_in": "Joined in",
-  "helpful_votes": "helpful votes",
-  "feedback_prompt": "Help improve Bíp Bíp with your feedback",
-  "post_photos": "Post photos",
-  "write_review": "Write review"
-},
-
-"my_issues_section": {
-  "title": "My Reported Issues",
-  "no_issues": "You haven't reported any vehicle issues yet.",
-  "table": {
-    "title": "Title",
-    "status": "Status",
-    "location": "Location",
-    "reported_at": "Reported At"
+  "edit_personal_vehicle_form": {
+    "title": "Edit Vehicle",
+    "name": "Vehicle name",
+    "license_plate": "License Plate",
+    "year": "Year of Manufacture",
+    "odo": "Odo (km)",
+    "set_primary": "Set as primary vehicle",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "update_failed": "❌ Failed to update vehicle."
   },
-  "na": "N/A"
+
+  "personal_vehicle_card": {
+    "no_image": "No image",
+    "unknown": "Unknown",
+    "plate": "Plate",
+    "odo": "Odo",
+    "year": "Year",
+    "type": "Type",
+    "active": "Active",
+    "inactive": "Inactive",
+    "primary": "Primary",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+
+  "select_model_then_add_vehicle_form": {
+    "search_title": "Search for your vehicle model",
+    "search_placeholder": "e.g. VinFast Feliz, Yamaha Sirius...",
+    "add_title": "Add your vehicle",
+    "selected": "Selected",
+    "nickname": "Nickname (e.g. Dad's bike)",
+    "plate": "License Plate (optional)",
+    "year": "Year of Manufacture",
+    "odo": "Odo (km)",
+    "set_primary": "Set as primary vehicle",
+    "save": "Save Vehicle",
+    "saving": "Saving...",
+    "change_model": "Change model",
+    "no_image": "No image",
+    "error": "❌ Failed to save vehicle. Please try again."
+  },
+
+  "available_insurance_products_section": {
+    "loading": "Loading insurance products...",
+    "no_products": "No insurance products available at the moment.",
+    "title": "Available Insurance Products",
+    "no_image": "No image",
+    "duration": "Duration",
+    "days": "days",
+    "price": "Price",
+    "view_and_buy": "View & Buy"
+  },
+
+  "my_insurance_packages_section": {
+    "loading": "Loading your insurance packages...",
+    "no_packages": "You haven't purchased any insurance packages yet.",
+    "title": "My Insurance Packages",
+    "no_image": "No image available",
+    "unnamed_product": "Unnamed Product",
+    "code": "Code",
+    "vehicle": "Vehicle",
+    "frame": "Frame No.",
+    "engine": "Engine No.",
+    "plate": "Plate No.",
+    "expires": "Expires",
+    "created": "Created",
+    "status": {
+      "pending": "⏳ Pending Approval",
+      "rejected": "❌ Rejected",
+      "expired": "🗕️ Expired",
+      "active": "✅ Active",
+      "inactive": "⛔ Inactive"
+    },
+    "view": "View Details",
+    "extend": "Extend Insurance"
+  },
+
+  "my_insurance_products_list": {
+    "loading": "Loading insurance products...",
+    "no_products": "No insurance products available.",
+    "no_image": "No image available",
+    "duration": "Duration",
+    "days": "days",
+    "price": "Price",
+    "active": "Active",
+    "inactive": "Inactive",
+    "created": "Created"
+  },
+
+  "purchase_insurance_dialog": {
+    "title": "Select your motorbike",
+    "no_motorbike": "No motorbike available in your personal vehicles.",
+    "select_placeholder": "-- Choose your motorbike --",
+    "no_plate": "No plate",
+    "name": "Name",
+    "license_plate": "License Plate",
+    "brand": "Brand",
+    "model": "Model",
+    "color": "Color",
+    "odo": "Odo",
+    "confirm_button": "Confirm Purchase"
+  },
+
+  "profile_main_content": {
+    "welcome_title": "Welcome to your profile",
+    "welcome_description": "Here you can find your activity summary and manage your vehicle-related services."
+  },
+
+  "settings_dropdown": {
+    "settings": "Settings",
+    "edit_profile": "Edit your profile",
+    "edit_photo": "Edit profile photo",
+    "edit_cover": "Edit cover photo",
+    "account_info": "Account info",
+    "account_settings": "Account settings",
+    "subscriptions": "Subscriptions",
+    "payments": "Payment Options",
+    "connect_drive": "Connect Google Drive"
+  },
+
+  "profile_sidebar": {
+    "achievements": "Your Achievements",
+    "unlock_prompt": "Start sharing to unlock",
+    "write_first_review": "Write your first review",
+    "review_milestone": "Unlock review milestones",
+    "upload_first_photo": "Upload your first photo",
+    "photo_milestone": "Unlock photo milestones",
+    "view_all": "View all",
+    "intro": "Intro",
+    "joined_in": "Joined in",
+    "helpful_votes": "helpful votes",
+    "feedback_prompt": "Help improve Bíp Bíp with your feedback",
+    "post_photos": "Post photos",
+    "write_review": "Write review"
+  },
+
+  "my_issues_section": {
+    "title": "My Reported Issues",
+    "no_issues": "You haven't reported any vehicle issues yet.",
+    "table": {
+      "title": "Title",
+      "status": "Status",
+      "location": "Location",
+      "reported_at": "Reported At"
+    },
+    "na": "N/A"
+  },
+
+  "about_page": {
+    "title": "About Us",
+    "p1": "At Bíp Bíp, we are building an advanced platform that transforms how electric vehicle rentals are managed and scaled. Our system empowers multiple stakeholders to participate in a transparent and efficient rental ecosystem — from customers and staff to investors, technicians, and business owners.",
+    "p2": "Our goal is to streamline all rental operations — from booking, maintenance, staff coordination, to performance tracking — making it easy for anyone to join the growing e-mobility movement.",
+    "p3": "Whether you're a customer looking for a reliable ride, a technician handling maintenance requests, a company owner managing fleets, or even an investor tracking ROI — Bíp Bíp provides the right tools for you.",
+    "p4": "Our platform supports:",
+    "roles": {
+      "customers": "Customers – Convenient rentals, flexible delivery options, and access to quality electric bikes anytime.",
+      "staff": "Staff – Tools to manage orders, assist users, and handle bikes in real-time.",
+      "station_managers": "Station Managers – Operational oversight, performance tracking, and staff management.",
+      "company_owners": "Company Owners – Centralized control, business analytics, and confident scaling.",
+      "technicians": "Technicians – Maintenance tracking, service history, and task assignments.",
+      "private_owners": "Private Owners – Earn from listed vehicles with full transparency.",
+      "investors": "Investors – Insight into ROI and sustainable business performance.",
+      "agents": "Agents – Commission-based referrals through user-friendly tools."
+    },
+    "p5": "We are committed to shaping a smarter, greener future for transportation in Vietnam and beyond."
+  },
+
+  "contact_page": {
+    "title": "Contact",
+    "description": "We'd love to hear from you!",
+    "email_label": "Email",
+    "phone_label": "Phone",
+    "address_label": "Address"
+  },
+
+  "policy_page": {
+    "title": "Privacy & Policy",
+    "intro": "At Bíp Bíp, we value your privacy and data protection. We are committed to being transparent with how we handle your data.",
+    "point1": "We do not sell or share your personal information.",
+    "point2": "All transactions and data are secured via industry-standard encryption.",
+    "point3": {
+      "part1": "You may request account deletion at any time by contacting",
+      "part2": "."
+    },
+    "footer_note": "Please refer to our full privacy policy for more details or contact us directly with any concerns."
+  },
+
+  "services_page": {
+    "title": "Explore Our Services",
+    "loading": "Loading services...",
+    "no_image": "No Image",
+    "price_unit": "VND",
+    "all": "All",
+    "uncategorized": "Uncategorized",
+    "categories": {
+      "repair": "Repair",
+      "insurance": "Insurance",
+      "parts_replacement": "Parts Replacement"
+    }  
+  },
+
+  "user_top_menu": {
+  "bookings": "Bookings",
+  "rental_companies": "Rental Companies",
+  "vehicle_management": "Vehicle Management",
+  "users_management": "Users Management",
+  "customers_management": "Customers Management",
+  "staff_management": "Staff Management",
+  "battery_management": "Battery Management",
+  "accessories_management": "Accessories Management",
+  "accessory_exports": "Accessory Exports",
+  "subscription_packages": "Subscription Packages"
 },
 
-"about_page": {
-  "title": "About Us",
-  "p1": "At Bíp Bíp, we are building an advanced platform that transforms how electric vehicle rentals are managed and scaled. Our system empowers multiple stakeholders to participate in a transparent and efficient rental ecosystem — from customers and staff to investors, technicians, and business owners.",
-  "p2": "Our goal is to streamline all rental operations — from booking, maintenance, staff coordination, to performance tracking — making it easy for anyone to join the growing e-mobility movement.",
-  "p3": "Whether you're a customer looking for a reliable ride, a technician handling maintenance requests, a company owner managing fleets, or even an investor tracking ROI — Bíp Bíp provides the right tools for you.",
-  "p4": "Our platform supports:",
-  "roles": {
-    "customers": "Customers – Convenient rentals, flexible delivery options, and access to quality electric bikes anytime.",
-    "staff": "Staff – Tools to manage orders, assist users, and handle bikes in real-time.",
-    "station_managers": "Station Managers – Operational oversight, performance tracking, and staff management.",
-    "company_owners": "Company Owners – Centralized control, business analytics, and confident scaling.",
-    "technicians": "Technicians – Maintenance tracking, service history, and task assignments.",
-    "private_owners": "Private Owners – Earn from listed vehicles with full transparency.",
-    "investors": "Investors – Insight into ROI and sustainable business performance.",
-    "agents": "Agents – Commission-based referrals through user-friendly tools."
-  },
-  "p5": "We are committed to shaping a smarter, greener future for transportation in Vietnam and beyond."
-},
-"contact_page": {
-  "title": "Contact",
-  "description": "We'd love to hear from you!",
-  "email_label": "Email",
-  "phone_label": "Phone",
-  "address_label": "Address"
-},
-
-"policy_page": {
-  "title": "Privacy & Policy",
-  "intro": "At Bíp Bíp, we value your privacy and data protection. We are committed to being transparent with how we handle your data.",
-  "point1": "We do not sell or share your personal information.",
-  "point2": "All transactions and data are secured via industry-standard encryption.",
-  "point3": {
-    "part1": "You may request account deletion at any time by contacting",
-    "part2": "."
-  },
-  "footer_note": "Please refer to our full privacy policy for more details or contact us directly with any concerns."
+"messages_page": {
+  "title": "📩 Messages",
+  "invitations_title": "Invitations",
+  "loading_invitations": "Loading invitations...",
+  "no_invitations": "You have no invitations at the moment.",
+  "role_label": "Role",
+  "accept": "Accept",
+  "reject": "Reject",
+  "accepted_message": "You have accepted this invitation.",
+  "rejected_message": "You have rejected this invitation.",
+  "notifications_title": "System Notifications",
+  "loading_notifications": "Loading notifications...",
+  "no_notifications": "No new notifications.",
+  "types": {
+    "notification": "NOTIFICATION",
+    "system_alert": "SYSTEM ALERT",
+    "booking_update": "BOOKING UPDATE"
+  }
 }
 
 
-
-
-
-
-}
 }

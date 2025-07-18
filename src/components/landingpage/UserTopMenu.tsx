@@ -1,6 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/src/context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import {
   FaCalendarAlt,
   FaStore,
@@ -12,11 +14,10 @@ import {
 } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileContract } from '@fortawesome/free-solid-svg-icons';
-import { useUser } from '@/src/context/AuthContext';
 import { IconType } from 'react-icons';
 
 type MenuItem = {
-  label: string;
+  key: string; // i18n key
   path: string;
   icon: IconType | typeof faFileContract;
   roles: string[];
@@ -24,61 +25,61 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
   {
-    label: 'Bookings',
+    key: 'bookings',
     path: '/bookings',
     icon: FaCalendarAlt,
     roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'staff'],
   },
   {
-    label: 'Rental Companies',
+    key: 'rental_companies',
     path: '/rental-companies',
     icon: FaStore,
     roles: ['admin'],
   },
   {
-    label: 'Vehicle Management',
+    key: 'vehicle_management',
     path: '/vehicles',
     icon: FaMotorcycle,
     roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'staff'],
   },
   {
-    label: 'Users Management',
+    key: 'users_management',
     path: '/users',
     icon: FaUser,
     roles: ['admin'],
   },
   {
-    label: 'Customers Management',
+    key: 'customers_management',
     path: '/customers',
     icon: FaUserCog,
     roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'staff'],
   },
   {
-    label: 'Staff Management',
+    key: 'staff_management',
     path: '/my-business/staff',
     icon: FaUserCog,
-    roles: ['admin', 'company_owner', 'company_admin'], // ✅ mới thêm
+    roles: ['admin', 'company_owner', 'company_admin'],
   },
   {
-    label: 'Battery Management',
+    key: 'battery_management',
     path: '/battery',
     icon: FaBatteryFull,
     roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'technician'],
   },
   {
-    label: 'Accessories Management',
+    key: 'accessories_management',
     path: '/accessories',
     icon: FaToolbox,
     roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'technician'],
   },
   {
-    label: 'Accessory Exports',
+    key: 'accessory_exports',
     path: '/accessories/exports',
     icon: FaToolbox,
     roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'technician'],
   },
   {
-    label: 'Subscription Packages',
+    key: 'subscription_packages',
     path: '/subscriptionPackages',
     icon: faFileContract,
     roles: ['admin', 'company_owner', 'private_owner', 'company_admin'],
@@ -88,26 +89,28 @@ const menuItems: MenuItem[] = [
 export default function UserTopMenu() {
   const router = useRouter();
   const { role } = useUser();
+  const { t } = useTranslation('common');
 
   if (!role) return null;
   const normalizedRole = role.toLowerCase();
 
   const filteredMenu = menuItems.filter((item) => item.roles.includes(normalizedRole));
-
   if (!filteredMenu.length) return null;
 
   return (
-    <nav className="hidden md:flex font-inter bg-[#00d289] text-white w-full px-2 py-2 justify-center gap-x-6 items-center shadow">
-      {filteredMenu.map((item) => (
-        <button
-          key={item.label}
-          onClick={() => router.push(item.path)}
-          className="flex items-center gap-2 font-medium text-sm hover:underline transition"
-        >
-          {renderIcon(item.icon)}
-          <span>{item.label}</span>
-        </button>
-      ))}
+    <nav className="hidden md:block font-inter bg-[#00d289] text-white w-full shadow overflow-x-auto no-scrollbar">
+      <div className="flex gap-x-6 items-center px-4 py-2 min-w-max">
+        {filteredMenu.map((item) => (
+          <button
+            key={item.key}
+            onClick={() => router.push(item.path)}
+            className="flex items-center gap-2 font-medium text-sm hover:underline transition whitespace-nowrap flex-shrink-0"
+          >
+            {renderIcon(item.icon)}
+            <span>{t(`user_top_menu.${item.key}`)}</span>
+          </button>
+        ))}
+      </div>
     </nav>
   );
 }
