@@ -229,10 +229,13 @@
   },
 
   "contribute": {
-    "add_to_map": "Thêm vào bản đồ",
-    "repair": "Trạm sửa xe",
-    "rental": "Trạm cho thuê",
-    "battery": "Trạm đổi pin"
+    "add_to_map": "Thêm địa điểm của bạn lên bản đồ",
+    "repair": "Sửa xe",
+    "rental": "Cho thuê xe",
+    "battery": "Trạm đổi pin",
+    "coordinate_guide": "📍 Vui lòng nhập đúng tọa độ (vĩ độ, kinh độ) để địa điểm hiển thị chính xác trên bản đồ.",
+    "coordinate_warning": "Nếu tọa độ sai, khách hàng sẽ không thể tìm thấy bạn.",
+    "check_location_on_maps": "🔗 Hướng dẫn lấy tọa độ từ Google Maps"
   },
 
   "repair_shop_form": {

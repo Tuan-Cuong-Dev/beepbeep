@@ -220,12 +220,15 @@
     "login_email_note": "This is the email you used to sign in. If you want to change it, please contact support."
   },
 
-  "contribute": {
-    "add_to_map": "Add to the Map",
-    "repair": "Repair",
-    "rental": "Rental",
-    "battery": "Battery Station"
-  },
+"contribute": {
+  "add_to_map": "Add your place to the map",
+  "repair": "Repair Shop",
+  "rental": "Rental Shop",
+  "battery": "Battery Station",
+  "coordinate_guide": "📍 Please enter the correct coordinates (latitude, longitude) so your place appears accurately on the map.",
+  "coordinate_warning": "If the coordinates are incorrect, customers won’t be able to find your location.",
+  "check_location_on_maps": "🔗 How to get coordinates from Google Maps"
+},
 
   "repair_shop_form":{
     "technician_name": "Technician Name",

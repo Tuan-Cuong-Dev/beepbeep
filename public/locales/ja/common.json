@@ -214,14 +214,18 @@
   "reset_sent_description": "パスワードリセット用のメールを送信しました。",
   "reset_failed": "リセットに失敗しました",
   "login_email_note": "これはログイン時に使用するメールアドレスです。変更したい場合はサポートにお問い合わせください。"
-}
-,
+},
+
 "contribute": {
   "add_to_map": "地図に追加",
-  "repair": "修理",
-  "rental": "レンタル",
-  "battery": "バッテリーステーション"
+  "repair": "修理店",
+  "rental": "レンタル店",
+  "battery": "バッテリーステーション",
+  "coordinate_guide": "📍 正確な座標（緯度・経度）を入力してください。場所が正しく地図に表示されます。",
+  "coordinate_warning": "座標が間違っていると、顧客があなたの場所を見つけられません。",
+  "check_location_on_maps": "🔗 Googleマップから座標を取得する方法"
 },
+
 
 "repair_shop_form": {
   "technician_name": "技術者の名前",
