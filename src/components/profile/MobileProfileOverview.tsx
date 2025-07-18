@@ -49,14 +49,16 @@ export default function MobileProfileOverview() {
             )}
           </div>
 
-          <div className="text-sm">
+          <div className="text-sm max-w-[180px] sm:max-w-xs truncate">
             <p className="font-semibold">{user.name || t('mobile_profile_overview.unknown_name')}</p>
-            <p className="text-gray-400 text-xs">
+            <p className="text-gray-400 text-xs truncate">
               {t('mobile_profile_overview.role')} {user.role || 'Customer'}
             </p>
-            <p className="text-gray-500">{user.address || t('mobile_profile_overview.default_address')}</p>
-
+            <p className="text-gray-500 truncate">
+              {user.address || t('mobile_profile_overview.default_address')}
+            </p>
           </div>
+
         </div>
 
         {/* Actions */}
