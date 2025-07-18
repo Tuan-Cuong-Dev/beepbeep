@@ -669,6 +669,18 @@
   "rating": "{{rating}} ({{count}} đánh giá)",
   "call_now": "Gọi ngay",
   "contact": "Liên hệ"
+},
+
+"technician_map": {
+  "you_are_here": "🧍 Bạn đang ở đây",
+  "lat": "Vĩ độ: {{lat}}",
+  "lng": "Kinh độ: {{lng}}",
+  "shop_technician": "Kỹ thuật viên cửa hàng",
+  "mobile_technician": "Kỹ thuật viên di động",
+  "no_address": "Không có địa chỉ",
+  "no_phone": "Không có số điện thoại",
+  "call_now": "📞 Gọi ngay",
+  "location_error": "⚠️ {{message}}"
 }
 
 

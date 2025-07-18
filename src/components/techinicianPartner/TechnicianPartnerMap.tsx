@@ -4,9 +4,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { useEffect, useState } from 'react';
 import L from 'leaflet';
-import { useAuth } from '@/src/hooks/useAuth'; // nếu bạn muốn dùng avatar làm icon
+import { useAuth } from '@/src/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
-// Icon kỹ thuật viên
 const technicianIcon = new L.Icon({
   iconUrl: '/assets/images/technician.png',
   iconSize: [32, 32],
@@ -14,7 +14,6 @@ const technicianIcon = new L.Icon({
   popupAnchor: [0, -32],
 });
 
-// FlyToUser đến user location
 function FlyToUser({ userPosition }: { userPosition: [number, number] }) {
   const map = useMap();
   useEffect(() => {
@@ -26,19 +25,19 @@ function FlyToUser({ userPosition }: { userPosition: [number, number] }) {
   return null;
 }
 
-
 interface Props {
   partners: TechnicianPartner[];
   userLocation?: [number, number] | null;
 }
 
 export default function TechnicianMap({ partners, userLocation }: Props) {
+  const { t } = useTranslation('common');
   const { currentUser } = useAuth();
+
   const [userPosition, setUserPosition] = useState<[number, number] | null>(userLocation || null);
   const [userIcon, setUserIcon] = useState<L.Icon | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  // Custom style cho leaflet control
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -54,7 +53,6 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
     };
   }, []);
 
-  // Lấy vị trí nếu chưa có
   useEffect(() => {
     if (!userLocation && typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -64,7 +62,6 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
     }
   }, [userLocation]);
 
-  // Tạo icon user từ avatar hoặc fallback
   useEffect(() => {
     const icon = new L.Icon({
       iconUrl: currentUser?.photoURL || '/assets/images/usericon.png',
@@ -86,21 +83,20 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
           attribution="© OpenStreetMap contributors"
         />
 
-        {/* Zoom đến vị trí người dùng */}
         {userPosition && <FlyToUser userPosition={userPosition} />}
 
-        {/* Marker người dùng */}
         {userPosition && userIcon && (
           <Marker position={userPosition} icon={userIcon}>
             <Popup>
-              🧍 You are here<br />
-              Lat: {userPosition[0].toFixed(5)}<br />
-              Lng: {userPosition[1].toFixed(5)}
+              <div className="text-sm">
+                <p>{t('technician_map.you_are_here')}</p>
+                <p>{t('technician_map.lat', { lat: userPosition[0].toFixed(5) })}</p>
+                <p>{t('technician_map.lng', { lng: userPosition[1].toFixed(5) })}</p>
+              </div>
             </Popup>
           </Marker>
         )}
 
-        {/* Marker kỹ thuật viên */}
         {partners
           .filter((p) => p.coordinates)
           .map((p) => (
@@ -113,17 +109,25 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
                 <div className="text-sm leading-snug max-w-[220px]">
                   <p className="font-semibold text-black">{p.name}</p>
                   <p className="text-gray-700 text-xs mb-1">
-                    {p.type === 'shop' ? 'Shop Technician' : 'Mobile Technician'}
+                    {t(
+                      p.type === 'shop'
+                        ? 'technician_map.shop_technician'
+                        : 'technician_map.mobile_technician'
+                    )}
                   </p>
-                  <p className="text-gray-600 text-xs">📍 {p.shopAddress || 'No address'}</p>
-                  <p className="text-gray-600 text-xs mb-1">📞 {p.phone || 'No phone'}</p>
+                  <p className="text-gray-600 text-xs">
+                    📍 {p.shopAddress || t('technician_map.no_address')}
+                  </p>
+                  <p className="text-gray-600 text-xs mb-1">
+                    📞 {p.phone || t('technician_map.no_phone')}
+                  </p>
 
                   {p.phone && (
                     <a
                       href={`tel:${p.phone}`}
                       className="inline-block text-xs text-white bg-green-500 px-3 py-1 rounded mt-1 hover:bg-green-600"
                     >
-                      📞 Call Now
+                      {t('technician_map.call_now')}
                     </a>
                   )}
                 </div>
@@ -134,7 +138,7 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
 
       {locationError && (
         <p className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-sm text-red-500 bg-white px-3 py-1 rounded shadow">
-          ⚠️ {locationError}
+          {t('technician_map.location_error', { message: locationError })}
         </p>
       )}
     </div>

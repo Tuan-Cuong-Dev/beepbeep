@@ -663,6 +663,18 @@
   "rating": "{{rating}} ({{count}})",
   "call_now": "Call Now",
   "contact": "Contact"
+},
+
+"technician_map": {
+  "you_are_here": "🧍 You are here",
+  "lat": "Lat: {{lat}}",
+  "lng": "Lng: {{lng}}",
+  "shop_technician": "Shop Technician",
+  "mobile_technician": "Mobile Technician",
+  "no_address": "No address",
+  "no_phone": "No phone",
+  "call_now": "📞 Call Now",
+  "location_error": "⚠️ {{message}}"
 }
 
 

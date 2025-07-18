@@ -2,6 +2,7 @@
 
 import { BatteryStation } from '@/src/lib/batteryStations/batteryStationTypes';
 import { MapPin, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   station: BatteryStation;
@@ -21,6 +22,7 @@ function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): 
 }
 
 export default function BatteryStationCard({ station, userLocation }: Props) {
+  const { t } = useTranslation('common');
   const { name, displayAddress, vehicleType, coordinates } = station;
 
   let distanceText = '';
@@ -31,14 +33,15 @@ export default function BatteryStationCard({ station, userLocation }: Props) {
       coordinates.lat,
       coordinates.lng
     );
-    distanceText = `${Math.round(dist * 10) / 10} km away`;
+    distanceText = t('battery_station_card.distance_away', {
+      distance: Math.round(dist * 10) / 10,
+    });
   }
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-4 flex flex-col h-full hover:shadow-xl transition-all">
-      {/* ✅ Hàng đầu tiên: icon và tên */}
+      {/* ✅ Top section: icon + name */}
       <div className="flex items-center gap-3 mb-2">
-        {/* Icon chiếm 1/3 */}
         <div className="w-1/3 flex justify-center">
           <img
             src="/assets/images/batterystation_new.png"
@@ -47,30 +50,31 @@ export default function BatteryStationCard({ station, userLocation }: Props) {
           />
         </div>
 
-        {/* Tên + loại chiếm 2/3 */}
         <div className="w-2/3">
           <h3 className="text-base font-semibold text-gray-800 leading-tight">{name}</h3>
           <p className="text-sm text-gray-500 leading-tight">
-            {vehicleType === 'car' ? 'Car' : 'Motorbike'} Station
+            {vehicleType === 'car'
+              ? t('battery_station_card.car_station')
+              : t('battery_station_card.motorbike_station')}
           </p>
         </div>
       </div>
 
-      {/* 📍 Địa chỉ */}
+      {/* 📍 Address */}
       <div className="flex items-start text-xs text-gray-500 gap-1">
         <MapPin className="w-4 h-4 mt-0.5" />
         <span>{displayAddress}</span>
       </div>
 
-      {/* 📏 Khoảng cách */}
+      {/* 📏 Distance */}
       {distanceText && (
         <p className="text-xs text-green-700 mt-1">📍 {distanceText}</p>
       )}
 
-      {/* ⚡ Ghi chú cuối */}
+      {/* ⚡ Footer */}
       <div className="mt-auto text-xs text-gray-400 pt-2 flex items-center gap-1">
         <Zap className="w-4 h-4" />
-        <span>Battery Station</span>
+        <span>{t('battery_station_card.battery_station')}</span>
       </div>
     </div>
   );

@@ -634,8 +634,33 @@
   "rating": "{{rating}}（{{count}}件）",
   "call_now": "今すぐ電話",
   "contact": "連絡する"
-}
+},
 
+"technician_map": {
+  "you_are_here": "🧍 現在地",
+  "lat": "緯度: {{lat}}",
+  "lng": "経度: {{lng}}",
+  "shop_technician": "店舗の整備士",
+  "mobile_technician": "出張整備士",
+  "no_address": "住所なし",
+  "no_phone": "電話番号なし",
+  "call_now": "📞 今すぐ電話",
+  "location_error": "⚠️ {{message}}"
+},
+
+"battery_station_card": {
+  "car_station": "自動車用ステーション",
+  "motorbike_station": "バイク用ステーション",
+  "distance_away": "{{distance}} km 離れています",
+  "battery_station": "バッテリーステーション"
+},
+
+"battery_station_map": {
+  "you_are_here": "現在地",
+  "car_station": "自動車ステーション",
+  "motorbike_station": "バイクステーション",
+  "distance_away": "{{distance}} km 離れています"
+}
 
 
 

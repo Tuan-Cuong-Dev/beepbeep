@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { BatteryStation } from '@/src/lib/batteryStations/batteryStationTypes';
 import { useAuth } from '@/src/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 // Icon trạm đổi pin
 const stationIcon = L.icon({
@@ -22,6 +23,18 @@ const userIconDefault = L.icon({
   popupAnchor: [0, -28],
 });
 
+function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (x: number) => (x * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 // Zoom đến vị trí người dùng
 function FlyToUser({ userPosition }: { userPosition: [number, number] }) {
   const map = useMap();
@@ -37,12 +50,12 @@ interface Props {
 }
 
 export default function BatteryStationMap({ stations, userLocation }: Props) {
+  const { t } = useTranslation('common');
   const { currentUser } = useAuth();
   const [userPosition, setUserPosition] = useState<[number, number] | null>(userLocation || null);
   const [userIcon, setUserIcon] = useState<L.Icon>(userIconDefault);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  // Lấy avatar nếu có
   useEffect(() => {
     if (currentUser?.photoURL) {
       const customUserIcon = L.icon({
@@ -56,7 +69,6 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
     }
   }, [currentUser]);
 
-  // Lấy vị trí người dùng nếu chưa có
   useEffect(() => {
     if (!userLocation && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -66,7 +78,6 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
     }
   }, [userLocation]);
 
-  // CSS để điều chỉnh vị trí nút zoom
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -99,37 +110,55 @@ export default function BatteryStationMap({ stations, userLocation }: Props) {
 
         {userPosition && <FlyToUser userPosition={userPosition} />}
 
-        {/* Marker người dùng */}
         {userPosition && (
           <Marker position={userPosition} icon={userIcon}>
             <Popup>
-              🧍 You are here<br />
+              🧍 {t('battery_station_map.you_are_here')}<br />
               Lat: {userPosition[0].toFixed(5)}<br />
               Lng: {userPosition[1].toFixed(5)}
             </Popup>
           </Marker>
         )}
 
-        {/* Marker trạm đổi pin */}
         {stations
           .filter((s) => s.coordinates?.lat != null && s.coordinates?.lng != null)
-          .map((station) => (
-            <Marker
-              key={station.id}
-              position={[station.coordinates!.lat, station.coordinates!.lng]}
-              icon={stationIcon}
-            >
-              <Popup>
-                <div className="text-sm max-w-[220px]">
-                  <p className="font-semibold text-black">{station.name}</p>
-                  <p className="text-xs text-gray-600">{station.displayAddress}</p>
-                  <p className="text-xs text-gray-500">
-                    🚗 {station.vehicleType === 'car' ? 'Car' : 'Motorbike'}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          .map((station) => {
+            let distanceText = '';
+            if (userPosition && station.coordinates) {
+              const dist = getDistanceKm(
+                userPosition[0],
+                userPosition[1],
+                station.coordinates.lat,
+                station.coordinates.lng
+              );
+              distanceText = t('battery_station_map.distance_away', {
+                distance: Math.round(dist * 10) / 10,
+              });
+            }
+
+            return (
+              <Marker
+                key={station.id}
+                position={[station.coordinates!.lat, station.coordinates!.lng]}
+                icon={stationIcon}
+              >
+                <Popup>
+                  <div className="text-sm max-w-[220px]">
+                    <p className="font-semibold text-black">{station.name}</p>
+                    <p className="text-xs text-gray-600">{station.displayAddress}</p>
+                    <p className="text-xs text-gray-500">
+                      🚗 {station.vehicleType === 'car'
+                        ? t('battery_station_map.car_station')
+                        : t('battery_station_map.motorbike_station')}
+                    </p>
+                    {distanceText && (
+                      <p className="text-xs text-green-700">📍 {distanceText}</p>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
       </MapContainer>
 
       {locationError && (
