@@ -717,7 +717,22 @@
   "phone": "Sđt",
   "popup_title": "Thông tin trạm",
   "getting_location_failed": "Không thể lấy vị trí của bạn"
+},
+
+"my_contributions_section": {
+  "types": {
+    "repair_shop": "Tiệm sửa xe",
+    "rental_shop": "Điểm cho thuê",
+    "battery_station": "Trạm pin"
+  },
+  "status": {
+    "approved": "Đã duyệt",
+    "pending": "Đang chờ duyệt"
+  },
+  "status_label": "Trạng thái:"
 }
+
+
 
 
 

@@ -685,7 +685,21 @@
   "phone": "電話番号",
   "popup_title": "ステーション情報",
   "getting_location_failed": "現在地を取得できませんでした"
+},
+
+"my_contributions_section": {
+  "types": {
+    "repair_shop": "修理店",
+    "rental_shop": "レンタルステーション",
+    "battery_station": "バッテリーステーション"
+  },
+  "status": {
+    "approved": "承認済み",
+    "pending": "承認待ち"
+  },
+  "status_label": "ステータス："
 }
+
 
 
 

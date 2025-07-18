@@ -712,7 +712,21 @@
   "phone": "Phone number",
   "popup_title": "Station Info",
   "getting_location_failed": "Could not retrieve your location"
+},
+
+"my_contributions_section": {
+  "types": {
+    "repair_shop": "Repair Shop",
+    "rental_shop": "Rental Station",
+    "battery_station": "Battery Station"
+  },
+  "status": {
+    "approved": "Approved",
+    "pending": "Pending Approval"
+  },
+  "status_label": "Status:"
 }
+
 
 
 
