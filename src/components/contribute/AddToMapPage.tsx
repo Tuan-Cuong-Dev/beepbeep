@@ -46,7 +46,7 @@ export default function AddToMapPage() {
           </p>
           <Link
             href="https://www.google.com/maps"
-            className="text-blue-600 underline inline-block mt-2"
+            className="text-[#00d289] underline inline-block mt-2"
           >
             {t('contribute.check_location_on_maps') || 'How to get coordinates'}
           </Link>
