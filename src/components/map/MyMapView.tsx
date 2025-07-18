@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
 import { X } from 'lucide-react';
 import Header from '@/src/components/landingpage/Header';
 import VehicleSwitcher from './VehicleSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const MapWrapper = dynamic(() => import('./MapWrapper'), { ssr: false });
 const TechnicianMarkers = dynamic(() => import('./TechnicianMarkers'), { ssr: false });
@@ -19,13 +20,12 @@ interface MyMapViewProps {
 export default function MyMapView({ onClose }: MyMapViewProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'rental' | 'battery' | 'maintenance'>('all');
   const [vehicleType, setVehicleType] = useState<'car' | 'motorbike' | 'bike'>('motorbike');
+  const { t } = useTranslation('common');
 
   const showAll = activeTab === 'all';
 
-  // Sửa đoạn này:
   const shouldShowBatteryStations =
     showAll || (activeTab === 'battery' && vehicleType !== 'bike');
-  // ✅ KHÔNG hiển thị BatteryStations nếu là 'bike'
 
   return (
     <div className="h-full w-full relative flex flex-col">
@@ -33,6 +33,7 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
         <button
           onClick={onClose}
           className="absolute top-3 right-3 z-[1000] bg-white rounded-full shadow p-2 hover:bg-gray-100"
+          title={t('my_map_view.close_button')}
         >
           <X className="w-6 h-6 text-gray-800" />
         </button>
@@ -40,10 +41,8 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
 
       <Header />
 
-      {/* Vehicle switcher */}
       <VehicleSwitcher vehicleType={vehicleType} onChange={setVehicleType} />
 
-      {/* Map display */}
       <div className="flex-1 relative">
         <MapWrapper key={activeTab + '-' + vehicleType}>
           {(showAll || activeTab === 'rental') && (
@@ -58,15 +57,14 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
         </MapWrapper>
       </div>
 
-      {/* Bottom tabs */}
       <div className="bg-white border-t py-2">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <div className="w-full overflow-x-auto">
             <TabsList className="flex gap-2 bg-white rounded-full px-4 py-2 min-w-max whitespace-nowrap">
-              <TabsTrigger value="all" onClick={() => setActiveTab('all')}>🗺️ All</TabsTrigger>
-              <TabsTrigger value="rental" onClick={() => setActiveTab('rental')}>🏪 Rental Stations</TabsTrigger>
-              <TabsTrigger value="maintenance" onClick={() => setActiveTab('maintenance')}>🔧 Maintenance</TabsTrigger>
-              <TabsTrigger value="battery" onClick={() => setActiveTab('battery')}>🔄 Battery Swap</TabsTrigger>
+              <TabsTrigger value="all">{t('my_map_view.tabs.all')}</TabsTrigger>
+              <TabsTrigger value="rental">{t('my_map_view.tabs.rental')}</TabsTrigger>
+              <TabsTrigger value="maintenance">{t('my_map_view.tabs.maintenance')}</TabsTrigger>
+              <TabsTrigger value="battery">{t('my_map_view.tabs.battery')}</TabsTrigger>
             </TabsList>
           </div>
         </Tabs>

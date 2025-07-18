@@ -614,7 +614,29 @@
     "system_alert": "システムアラート",
     "booking_update": "予約の更新"
   }
+},
+
+"my_map_view": {
+  "tabs": {
+    "all": "🗺️ すべて",
+    "rental": "🏪 レンタルステーション",
+    "maintenance": "🔧 メンテナンス",
+    "battery": "🔄 バッテリースワップ"
+  },
+  "close_button": "閉じる"
+},
+
+"technician_partner_card": {
+  "shop_technician": "店舗の整備士",
+  "mobile_technician": "出張整備士",
+  "distance": "{{km}} km",
+  "address_not_available": "住所不明",
+  "rating": "{{rating}}（{{count}}件）",
+  "call_now": "今すぐ電話",
+  "contact": "連絡する"
 }
+
+
 
 
 

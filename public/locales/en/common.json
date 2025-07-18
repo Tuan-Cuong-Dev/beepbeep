@@ -643,7 +643,29 @@
     "system_alert": "SYSTEM ALERT",
     "booking_update": "BOOKING UPDATE"
   }
+},
+
+"my_map_view": {
+  "tabs": {
+    "all": "🗺️ All",
+    "rental": "🏪 Rental Stations",
+    "maintenance": "🔧 Maintenance",
+    "battery": "🔄 Battery Swap"
+  },
+  "close_button": "Close"
+},
+
+"technician_partner_card": {
+  "shop_technician": "Shop Technician",
+  "mobile_technician": "Mobile Technician",
+  "distance": "{{km}} km",
+  "address_not_available": "N/A",
+  "rating": "{{rating}} ({{count}})",
+  "call_now": "Call Now",
+  "contact": "Contact"
 }
+
+
 
 
 }

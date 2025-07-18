@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { Button } from '@/src/components/ui/button';
 import { PhoneCall, Star, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   partner: TechnicianPartner;
@@ -24,25 +25,37 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 export default function TechnicianPartnerCard({ partner, onContact, userLocation }: Props) {
+  const { t } = useTranslation('common');
   const avatar = partner.avatarUrl || '/assets/images/technician.png';
-  const roleLabel = partner.type === 'shop' ? 'Shop Technician' : 'Mobile Technician';
-  const fullAddress = partner.shopAddress || 'N/A';
+
+  const roleLabel = partner.type === 'shop'
+    ? t('technician_partner_card.shop_technician')
+    : t('technician_partner_card.mobile_technician');
+
+  const fullAddress = partner.shopAddress || t('technician_partner_card.address_not_available');
 
   const distanceText =
     partner.coordinates && userLocation
-      ? `📍 ${Math.round(
-          haversineDistance(
-            userLocation[0],
-            userLocation[1],
-            partner.coordinates.lat,
-            partner.coordinates.lng
-          ) * 10
-        ) / 10} km`
+      ? `📍 ${t('technician_partner_card.distance', {
+          km: Math.round(
+            haversineDistance(
+              userLocation[0],
+              userLocation[1],
+              partner.coordinates.lat,
+              partner.coordinates.lng
+            ) * 10
+          ) / 10,
+        })}`
       : '';
+
+  const ratingText = t('technician_partner_card.rating', {
+    rating: partner.averageRating?.toFixed(1) || 'N/A',
+    count: partner.ratingCount || 0,
+  });
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-5 flex flex-col h-full hover:shadow-xl transition-all">
-      {/* ✅ Hàng trên: Avatar 1/3 + Tên + Role 2/3 */}
+      {/* Avatar + Name + Role */}
       <div className="flex items-start gap-3 mb-2 w-full">
         {/* Avatar */}
         <div className="w-1/3 flex justify-start">
@@ -57,22 +70,20 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
           </div>
         </div>
 
-        {/* Tên + loại */}
+        {/* Name + Role */}
         <div className="w-2/3">
-          <h3 className="text-base font-semibold text-gray-800 leading-tight">
-            {partner.name}
-          </h3>
+          <h3 className="text-base font-semibold text-gray-800 leading-tight">{partner.name}</h3>
           <p className="text-sm text-gray-600 leading-tight">{roleLabel}</p>
         </div>
       </div>
 
-      {/* Địa chỉ */}
+      {/* Address */}
       <div className="text-sm text-gray-600 mt-1 flex items-start gap-1 w-full">
         <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
         <span>{fullAddress}</span>
       </div>
 
-      {/* Khoảng cách nếu có */}
+      {/* Distance */}
       {distanceText && (
         <p className="text-xs text-green-700 mt-1">{distanceText}</p>
       )}
@@ -80,10 +91,10 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       {/* Rating */}
       <p className="text-sm text-yellow-600 mt-2 w-full">
         <Star className="inline-block w-4 h-4 mr-1" />
-        {partner.averageRating?.toFixed(1) || 'N/A'} ({partner.ratingCount || 0})
+        {ratingText}
       </p>
 
-      {/* Nút gọi */}
+      {/* Call / Contact Button */}
       <div className="mt-auto w-full pt-3">
         {partner.phone ? (
           <a href={`tel:${partner.phone}`} className="w-full block">
@@ -93,7 +104,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
               className="w-full px-4 py-2 text-sm font-semibold text-[#00d289] border-[#00d289] hover:bg-[#00d289]/10 rounded-full flex items-center justify-center gap-2"
             >
               <PhoneCall className="w-4 h-4" />
-              Call Now
+              {t('technician_partner_card.call_now')}
             </Button>
           </a>
         ) : (
@@ -104,7 +115,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
             className="w-full px-4 py-2 text-sm font-semibold text-[#00d289] border-[#00d289] hover:bg-[#00d289]/10 rounded-full flex items-center justify-center gap-2"
           >
             <PhoneCall className="w-4 h-4" />
-            Contact
+            {t('technician_partner_card.contact')}
           </Button>
         )}
       </div>

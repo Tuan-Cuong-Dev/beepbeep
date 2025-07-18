@@ -31,7 +31,7 @@
   },
 
   "stationSection": {
-  "stations_title": "{{count}} trạm cho thuê",
+  "stations_title": "{{count}} Trạm cho thuê xe",
   "stations_subtitle": "sẵn sàng phục vụ bạn!",
   "view_all": "Xem tất cả",
   "see_all_stations": "Xem tất cả các trạm cho thuê"
@@ -649,7 +649,29 @@
     "system_alert": "CẢNH BÁO HỆ THỐNG",
     "booking_update": "CẬP NHẬT ĐƠN THUÊ"
   }
+},
+
+"my_map_view": {
+  "tabs": {
+    "all": "🗺️ Tất cả",
+    "rental": "🏪 Trạm cho thuê",
+    "maintenance": "🔧 Kỹ thuật viên",
+    "battery": "🔄 Trạm đổi pin"
+  },
+  "close_button": "Đóng"
+},
+
+"technician_partner_card": {
+  "shop_technician": "Kỹ thuật viên cửa hàng",
+  "mobile_technician": "Kỹ thuật viên di động",
+  "distance": "{{km}} km",
+  "address_not_available": "Không có địa chỉ",
+  "rating": "{{rating}} ({{count}} đánh giá)",
+  "call_now": "Gọi ngay",
+  "contact": "Liên hệ"
 }
+
+
 
 
 
