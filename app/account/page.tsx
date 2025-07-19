@@ -215,7 +215,7 @@ export default function AccountPage() {
 
           {/* Preferences - Language */}
           <div>
-            <Label>{t('header.language')}</Label>
+            <Label>{t('account.language')}</Label>
             <SimpleSelect
               value={localPrefs.language ?? ''}
               onChange={(val) => {
@@ -241,7 +241,7 @@ export default function AccountPage() {
 
           {/* Preferences - Region */}
           <div>
-            <Label>{t('header.region')}</Label>
+            <Label>{t('account.region')}</Label>
             <SimpleSelect
               value={localPrefs.region ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, region: val }))}
@@ -264,7 +264,7 @@ export default function AccountPage() {
 
           {/* Preferences - Currency */}
           <div>
-            <Label>{t('header.currency')}</Label>
+            <Label>{t('account.currency')}</Label>
             <SimpleSelect
               value={localPrefs.currency ?? ''}
               onChange={(val) => setLocalPrefs((prev) => ({ ...prev, currency: val }))}

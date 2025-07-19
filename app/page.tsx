@@ -20,7 +20,6 @@ import Footer from '@/src/components/landingpage/Footer';
 const Home: React.FC = () => {
   const { user } = useUser();
   const { preferences, updatePreferences } = usePreferences(user?.uid);
-
   // ✅ Gọi hook với đầy đủ đối số
   useAutoDetectLanguage({ preferences, updatePreferences });
 
