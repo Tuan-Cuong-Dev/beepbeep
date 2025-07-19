@@ -75,9 +75,9 @@ export function useAutoDetectLanguage({
         return;
       }
 
-      // 🔹 Nếu chưa có preferences → detect IP
+      // 🔹 Nếu chưa có preferences → gọi API proxy nội bộ
       try {
-        const res = await fetch('https://ipapi.co/json/');
+        const res = await fetch('/api/geo'); // 👈 dùng API nội bộ, không bị CORS
         const data = await res.json();
         const region = data?.country_code || 'US';
         const language = countryToLanguageMap[region] || 'en';
