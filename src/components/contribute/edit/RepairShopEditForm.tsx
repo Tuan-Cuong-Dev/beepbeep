@@ -106,7 +106,7 @@ export default function RepairShopEditForm({ id, onClose }: Props) {
 
       <div>
         <Label>{t('repair_shop_edit_form.map_address')}</Label>
-        <Textarea value={form.mapAddress || ''} onChange={(e) => handleChange('mapAddress', e.target.value)} />
+        <Textarea className="min-h-[180px]" value={form.mapAddress || ''} onChange={(e) => handleChange('mapAddress', e.target.value)} />
       </div>
 
       <div className="grid grid-cols-2 gap-2">

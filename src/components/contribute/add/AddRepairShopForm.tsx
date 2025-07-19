@@ -117,6 +117,7 @@ export default function AddRepairShopForm() {
         onChange={(e) => handleChange('shopAddress', e.target.value)}
       />
       <Textarea
+        className="min-h-[180px]"
         placeholder={t('repair_shop_form.map_address')}
         value={form.mapAddress || ''}
         onChange={(e) => handleChange('mapAddress', e.target.value)}

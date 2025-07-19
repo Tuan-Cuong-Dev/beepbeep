@@ -88,6 +88,7 @@ export default function AddRentalShopForm() {
         onChange={(e) => handleChange('displayAddress', e.target.value)}
       />
       <Textarea
+        className="min-h-[180px]"
         placeholder={t('rental_shop_form.map_address')}
         value={form.mapAddress}
         onChange={(e) => handleChange('mapAddress', e.target.value)}

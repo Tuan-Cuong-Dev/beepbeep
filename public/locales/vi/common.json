@@ -761,16 +761,39 @@
     "rental_shop": "Điểm cho thuê",
     "battery_station": "Trạm pin"
   }
-}
+},
 
+"rental_shop_edit_form": {
+  "shop_name": "Tên điểm cho thuê",
+  "display_address": "Địa chỉ hiển thị",
+  "map_address": "Địa chỉ bản đồ (dùng để định vị)",
+  "location": "Toạ độ (tự động cập nhật từ địa chỉ bản đồ)",
+  "phone": "Số điện thoại liên hệ",
+  "select_vehicle_type": "Chọn loại phương tiện phục vụ",
+  "vehicle_bike": "Xe đạp",
+  "vehicle_motorbike": "Xe máy",
+  "vehicle_car": "Ô tô",
+  "update_error": "Cập nhật điểm cho thuê thất bại."
+},
 
+"battery_station_edit_form": {
+    "title": "Chỉnh sửa trạm pin",
+    "name": "Tên trạm pin",
+    "display_address": "Địa chỉ hiển thị",
+    "map_address": "Địa chỉ Google Maps",
+    "vehicle_type": "Loại phương tiện hỗ trợ",
+    "select_vehicle_type": "Chọn loại phương tiện",
+    "vehicle_motorbike": "Xe máy điện",
+    "vehicle_car": "Ô tô điện",
+    "is_active": "Đang hoạt động",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "loading": "Đang tải dữ liệu...",
+    "update_error": "❌ Lỗi khi cập nhật trạm pin."
+  }
 
-
-
-
-
-
-
+  
 
 
 

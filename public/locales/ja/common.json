@@ -730,7 +730,39 @@
     "rental_shop": "レンタルステーション",
     "battery_station": "バッテリーステーション"
   }
+},
+
+"rental_shop_edit_form": {
+  "shop_name": "レンタルステーション名",
+  "display_address": "表示住所",
+  "map_address": "地図住所（位置情報に使用）",
+  "location": "座標（地図住所から自動更新）",
+  "phone": "連絡先電話番号",
+  "select_vehicle_type": "対応する車両タイプを選択",
+  "vehicle_bike": "自転車",
+  "vehicle_motorbike": "バイク",
+  "vehicle_car": "自動車",
+  "update_error": "レンタルステーションの更新に失敗しました。"
+},
+
+"battery_station_edit_form": {
+  "title": "バッテリーステーションを編集",
+  "name": "ステーション名",
+  "display_address": "表示住所",
+  "map_address": "Google マップの住所",
+  "vehicle_type": "対応車両の種類",
+  "select_vehicle_type": "車両の種類を選択",
+  "vehicle_motorbike": "電動バイク",
+  "vehicle_car": "電気自動車",
+  "is_active": "稼働中",
+  "cancel": "キャンセル",
+  "save": "保存",
+  "saving": "保存中...",
+  "loading": "データを読み込んでいます...",
+  "update_error": "❌ バッテリーステーションの更新中にエラーが発生しました。"
 }
+
+
 
 
 

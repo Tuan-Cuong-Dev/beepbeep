@@ -1,50 +1,61 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { doc, getDoc, updateDoc, Timestamp, GeoPoint } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
+import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import { Input } from '@/src/components/ui/input';
+import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { Label } from '@/src/components/ui/label';
-import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
-import { Textarea } from '@/src/components/ui/textarea';
-import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'react-i18next';
 
 const MapPreview = dynamic(() => import('@/src/components/map/MapPreview'), { ssr: false });
 
-export default function RentalShopEditForm({
-  id,
-  onClose,
-}: {
+interface Props {
   id: string;
   onClose: () => void;
-}) {
+}
+
+export default function RentalShopEditForm({ id, onClose }: Props) {
   const { t } = useTranslation('common');
   const [station, setStation] = useState<Partial<RentalStation> | null>(null);
   const [saving, setSaving] = useState(false);
   const { coords, geocode } = useGeocodeAddress();
 
+  // Fetch data on mount
   useEffect(() => {
-    const fetch = async () => {
+    const fetchStation = async () => {
       const ref = doc(db, 'rentalStations', id);
       const snap = await getDoc(ref);
       if (snap.exists()) {
         setStation(snap.data() as RentalStation);
       }
     };
-    fetch();
+    fetchStation();
   }, [id]);
 
-  useEffect(() => {
-    if (station?.mapAddress) geocode(station.mapAddress);
-  }, [station?.mapAddress]);
+  // Auto geocode when mapAddress changes
+  const [lastGeocodedAddress, setLastGeocodedAddress] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (
+      station?.mapAddress &&
+      station.mapAddress !== lastGeocodedAddress
+    ) {
+      geocode(station.mapAddress);
+      setLastGeocodedAddress(station.mapAddress);
+    }
+  }, [station?.mapAddress, lastGeocodedAddress, geocode]);
+
+
+  // Update coordinates + location string
   useEffect(() => {
     if (coords) {
       const newLocation = `${coords.lat.toFixed(6)}° N, ${coords.lng.toFixed(6)}° E`;
-      const geo = new GeoPoint(coords.lat, coords.lng); // ✅ chuyển đổi chính xác
+      const geo = new GeoPoint(coords.lat, coords.lng);
 
       setStation((prev) => ({
         ...prev,
@@ -54,10 +65,9 @@ export default function RentalShopEditForm({
     }
   }, [coords]);
 
-
-  const handleChange = (field: keyof RentalStation, value: any) => {
+  const handleChange = useCallback((field: keyof RentalStation, value: any) => {
     setStation((prev) => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
   const handleSave = async () => {
     if (!station) return;
@@ -76,56 +86,48 @@ export default function RentalShopEditForm({
       await updateDoc(doc(db, 'rentalStations', id), updateData);
       onClose();
     } catch (err) {
-      alert(t('rental_shop_edit_form.update_error') || '❌ Lỗi khi cập nhật điểm cho thuê.');
+      alert(t('rental_shop_edit_form.update_error'));
     } finally {
       setSaving(false);
     }
   };
 
-  if (!station) return <p className="p-4 text-center">{t('loading') || 'Đang tải dữ liệu...'}</p>;
+  if (!station) {
+    return <p className="p-4 text-center">{t('loading')}</p>;
+  }
 
   return (
     <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
-      <div>
-        <Label>{t('rental_shop_edit_form.shop_name')}</Label>
-        <Input
-          value={station.name || ''}
-          onChange={(e) => handleChange('name', e.target.value)}
-        />
-      </div>
+      <StationField
+        label={t('rental_shop_edit_form.shop_name')}
+        value={station.name}
+        onChange={(v) => handleChange('name', v)}
+      />
+      <StationField
+        label={t('rental_shop_edit_form.display_address')}
+        value={station.displayAddress}
+        onChange={(v) => handleChange('displayAddress', v)}
+        textarea
+      />
+      <StationField
+        label={t('rental_shop_edit_form.map_address')}
+        value={station.mapAddress}
+        onChange={(v) => handleChange('mapAddress', v)}
+        textarea
+        className="min-h-[180px]"
+      />
+      <StationField
+        label={t('rental_shop_edit_form.location')}
+        value={station.location}
+        onChange={(v) => handleChange('location', v)}
+      />
+      <StationField
+        label={t('rental_shop_edit_form.phone')}
+        value={station.contactPhone}
+        onChange={(v) => handleChange('contactPhone', v)}
+      />
 
-      <div>
-        <Label>{t('rental_shop_edit_form.display_address')}</Label>
-        <Textarea
-          value={station.displayAddress || ''}
-          onChange={(e) => handleChange('displayAddress', e.target.value)}
-        />
-      </div>
-
-      <div>
-        <Label>{t('rental_shop_edit_form.map_address')}</Label>
-        <Textarea
-          value={station.mapAddress || ''}
-          onChange={(e) => handleChange('mapAddress', e.target.value)}
-        />
-      </div>
-
-      <div>
-        <Label>{t('rental_shop_edit_form.location')}</Label>
-        <Input
-          value={station.location || ''}
-          onChange={(e) => handleChange('location', e.target.value)}
-        />
-      </div>
-
-      <div>
-        <Label>{t('rental_shop_edit_form.phone')}</Label>
-        <Input
-          value={station.contactPhone || ''}
-          onChange={(e) => handleChange('contactPhone', e.target.value)}
-        />
-      </div>
-
+      {/* Vehicle Type Selector */}
       <div>
         <Label>{t('rental_shop_edit_form.select_vehicle_type')}</Label>
         <select
@@ -157,3 +159,37 @@ export default function RentalShopEditForm({
     </div>
   );
 }
+
+function StationField({
+  label,
+  value,
+  onChange,
+  textarea = false,
+  className = '',
+}: {
+  label: string;
+  value?: string;
+  onChange: (v: string) => void;
+  textarea?: boolean;
+  className?: string;
+}) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      {textarea ? (
+        <Textarea
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          className={className}
+        />
+      ) : (
+        <Input
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          className={className}
+        />
+      )}
+    </div>
+  );
+}
+

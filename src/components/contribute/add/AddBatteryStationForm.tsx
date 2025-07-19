@@ -82,6 +82,7 @@ export default function AddBatteryStationForm() {
         onChange={(e) => handleChange('displayAddress', e.target.value)}
       />
       <Textarea
+        className="min-h-[180px]"
         placeholder={t('battery_station_form.map_address')}
         value={form.mapAddress}
         onChange={(e) => handleChange('mapAddress', e.target.value)}

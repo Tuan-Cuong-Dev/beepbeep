@@ -757,8 +757,37 @@
     "rental_shop": "Rental Station",
     "battery_station": "Battery Station"
   }
-}
+},
 
+"rental_shop_edit_form": {
+  "shop_name": "Rental shop name",
+  "display_address": "Display address",
+  "map_address": "Map address (used for geolocation)",
+  "location": "Coordinates (auto-updated from map address)",
+  "phone": "Contact phone number",
+  "select_vehicle_type": "Select the supported vehicle type",
+  "vehicle_bike": "Bike",
+  "vehicle_motorbike": "Motorbike",
+  "vehicle_car": "Car",
+  "update_error": "Failed to update rental shop."
+},
+
+"battery_station_edit_form": {
+    "title": "Edit Battery Station",
+    "name": "Station Name",
+    "display_address": "Display Address",
+    "map_address": "Google Maps Address",
+    "vehicle_type": "Supported Vehicle Type",
+    "select_vehicle_type": "Select vehicle type",
+    "vehicle_motorbike": "Electric Motorbike",
+    "vehicle_car": "Electric Car",
+    "is_active": "Active",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "loading": "Loading data...",
+    "update_error": "❌ Error while updating battery station."
+  }
 
 
 
