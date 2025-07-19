@@ -62,14 +62,20 @@ export default function MobileProfileOverview() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center">
-          <button className="flex items-center px-3 h-8 text-sm border border-gray-300 rounded-l-md shadow-sm hover:bg-gray-50">
+        <div className="flex items-center max-w-full ml-auto">
+          <button
+            className="h-8 px-3 max-w-[110px] truncate text-sm border border-gray-300 rounded-l-md shadow-sm bg-white hover:bg-gray-50"
+          >
             {t('mobile_profile_overview.edit_profile')}
           </button>
-          <div className="h-8 border border-l-0 border-gray-300 rounded-r-md flex items-center justify-center px-2 hover:bg-gray-50">
+          <div
+            className="h-8 w-9 border border-l-0 border-gray-300 rounded-r-md flex items-center justify-center shadow-sm bg-white hover:bg-gray-50"
+          >
             <SettingsDropdown />
           </div>
         </div>
+
+
       </div>
 
       {/* Stats */}
