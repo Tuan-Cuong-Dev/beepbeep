@@ -44,35 +44,46 @@ export function useAutoDetectLanguage({
   user?: { uid: string } | null;
 }) {
   useEffect(() => {
+  const applyLanguage = async () => {
     if (!user) {
       if (i18n.language !== 'vi') {
         i18n.changeLanguage('vi');
       }
-
-      // 🔧 Cập nhật luôn document.documentElement lang nếu cần
       document.documentElement.lang = 'vi';
-
-      // ✅ Thêm đoạn set mặc định vào localStorage hoặc context nếu có
       localStorage.setItem('currency', 'VND');
       return;
     }
 
-    if (!preferences?.language || !preferences?.currency) {
-      (async () => {
-        try {
-          const res = await fetch('https://ipapi.co/json/');
-          const data = await res.json();
-          const region = data?.country_code || 'US';
-          const language = countryToLanguageMap[region] || 'en';
-          const currency = regionCurrencyMap[region] || 'USD';
-
-          i18n.changeLanguage(language);
-          await updatePreferences({ language, region, currency });
-        } catch (err) {
-          console.warn('Failed to auto-detect language', err);
-        }
-      })();
+    // Nếu user đã có preferences → dùng ngay
+    if (preferences?.language && preferences?.currency) {
+      if (i18n.language !== preferences.language) {
+        i18n.changeLanguage(preferences.language);
+        document.documentElement.lang = preferences.language;
+      }
+      localStorage.setItem('currency', preferences.currency);
+      return;
     }
-  }, [user, preferences, updatePreferences]);
+
+    // Nếu chưa có preferences → auto detect
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      const data = await res.json();
+      const region = data?.country_code || 'US';
+      const language = countryToLanguageMap[region] || 'en';
+      const currency = regionCurrencyMap[region] || 'USD';
+
+      i18n.changeLanguage(language);
+      document.documentElement.lang = language;
+      localStorage.setItem('currency', currency);
+
+      await updatePreferences({ language, region, currency });
+    } catch (err) {
+      console.warn('Failed to auto-detect language', err);
+    }
+  };
+
+  applyLanguage();
+}, [user, preferences, updatePreferences]);
+
 }
 
