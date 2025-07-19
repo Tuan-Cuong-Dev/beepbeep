@@ -1,4 +1,5 @@
-// hooks/useAutoDetectLanguage.ts
+'use client';
+
 import { useEffect } from 'react';
 import i18n from '@/src/i18n';
 
@@ -43,53 +44,56 @@ export function useAutoDetectLanguage({
   updatePreferences: (data: any) => Promise<void>;
   user?: { uid: string } | null;
 }) {
-
   useEffect(() => {
-  const applyLanguage = async () => {
-    // Nếu chưa đăng nhập
-    if (!user) {
-      // Ưu tiên lấy từ localStorage nếu có
-      const localLang = localStorage.getItem('language') || 'vi';
-      const localCurrency = localStorage.getItem('currency') || 'VND';
+    const applyLanguage = async () => {
+      // 🔹 Nếu chưa đăng nhập → dùng localStorage hoặc fallback 'vi'
+      if (!user) {
+        const localLang = localStorage.getItem('language') || 'vi';
+        const localCurrency = localStorage.getItem('currency') || 'VND';
 
-      if (i18n.language !== localLang) {
-        i18n.changeLanguage(localLang);
+        if (i18n.language !== localLang) {
+          i18n.changeLanguage(localLang);
+        }
+
+        document.documentElement.lang = localLang;
+        localStorage.setItem('currency', localCurrency);
+        return;
       }
-      document.documentElement.lang = localLang;
-      localStorage.setItem('currency', localCurrency);
-      return;
-    }
 
-    // Đã đăng nhập và đã có preferences → dùng luôn
-    if (preferences?.language && preferences?.currency) {
-      if (i18n.language !== preferences.language) {
-        i18n.changeLanguage(preferences.language);
+      // 🔹 Nếu đã đăng nhập và có preferences → áp dụng
+      if (preferences?.language && preferences?.currency) {
+        const prefLang = preferences.language;
+        const prefCurrency = preferences.currency;
+
+        if (i18n.language !== prefLang) {
+          i18n.changeLanguage(prefLang);
+        }
+
+        document.documentElement.lang = prefLang;
+        localStorage.setItem('language', prefLang);
+        localStorage.setItem('currency', prefCurrency);
+        return;
       }
-      document.documentElement.lang = preferences.language;
-      localStorage.setItem('language', preferences.language);
-      localStorage.setItem('currency', preferences.currency);
-      return;
-    }
 
-    // Chưa có preferences → Detect IP và lưu
-    try {
-      const res = await fetch('https://ipapi.co/json/');
-      const data = await res.json();
-      const region = data?.country_code || 'US';
-      const language = countryToLanguageMap[region] || 'en';
-      const currency = regionCurrencyMap[region] || 'USD';
+      // 🔹 Nếu chưa có preferences → detect IP
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        const region = data?.country_code || 'US';
+        const language = countryToLanguageMap[region] || 'en';
+        const currency = regionCurrencyMap[region] || 'USD';
 
-      i18n.changeLanguage(language);
-      document.documentElement.lang = language;
-      localStorage.setItem('language', language);
-      localStorage.setItem('currency', currency);
+        i18n.changeLanguage(language);
+        document.documentElement.lang = language;
+        localStorage.setItem('language', language);
+        localStorage.setItem('currency', currency);
 
-      await updatePreferences({ language, region, currency });
-    } catch (err) {
-      console.warn('Failed to auto-detect language', err);
-    }
-  };
+        await updatePreferences({ language, region, currency });
+      } catch (err) {
+        console.warn('🌐 Failed to auto-detect language or region:', err);
+      }
+    };
 
-  applyLanguage();
-}, [user, preferences, updatePreferences]);
+    applyLanguage();
+  }, [user, preferences, updatePreferences]);
 }

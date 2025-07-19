@@ -1,29 +1,43 @@
-'use client';
-
 import { useEffect, useState } from 'react';
-import { getUserPreferences, UserPreferences } from '@/src/lib/users/getUserPreferences';
-import { updateUserPreferences } from '@/src/lib/users/updateUserPreferences';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
+import { UserPreferences } from '@/src/lib/users/userTypes'; // nếu bạn có tách type riêng
 
-export function usePreferences(userId: string | null | undefined) {
-  const [preferences, setPreferences] = useState<UserPreferences | null>(null); // Không set mặc định là USD
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+const DEFAULT_PREFERENCES: UserPreferences = {
+  language: 'vi',
+  region: 'VN',
+  currency: 'VND',
+};
 
+export const usePreferences = (userId?: string | null) => {
+  const [preferences, setPreferences] = useState<UserPreferences | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // 🔁 Lấy preferences khi userId thay đổi
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
+    if (!userId) return;
 
     const fetchPreferences = async () => {
+      setLoading(true);
       try {
-        const prefs = await getUserPreferences(userId);
-        setPreferences(prefs);
-      } catch (err: any) {
-        console.error('❌ Failed to fetch preferences:', err);
-        setError(err);
+        const ref = doc(db, 'users', userId);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          const data = snap.data();
+          setPreferences({
+            language: data.preferences?.language || DEFAULT_PREFERENCES.language,
+            region: data.preferences?.region || DEFAULT_PREFERENCES.region,
+            currency: data.preferences?.currency || DEFAULT_PREFERENCES.currency,
+          });
+        } else {
+          // 🧩 Nếu chưa có doc user → có thể tạo mới luôn nếu muốn
+          await setDoc(ref, { preferences: DEFAULT_PREFERENCES }, { merge: true });
+          setPreferences(DEFAULT_PREFERENCES);
+        }
+      } catch (error) {
+        console.error('Failed to load preferences:', error);
+        setPreferences(DEFAULT_PREFERENCES);
       } finally {
         setLoading(false);
       }
@@ -32,37 +46,24 @@ export function usePreferences(userId: string | null | undefined) {
     fetchPreferences();
   }, [userId]);
 
+  // ✅ Cập nhật preferences
   const updatePreferences = async (newPrefs: Partial<UserPreferences>) => {
-    if (!userId) {
-      setError(new Error('User ID is missing'));
-      return;
-    }
+    if (!userId) return;
 
-    setUpdating(true);
-    setSuccess(false);
-    setError(null);
+    const ref = doc(db, 'users', userId);
+    const current = preferences || DEFAULT_PREFERENCES;
+    const updated = { ...current, ...newPrefs };
 
-    try {
-      const mergedPrefs = { ...preferences, ...newPrefs } as UserPreferences;
-      await updateUserPreferences(userId, {
-        preferences: mergedPrefs,
-      });
-      setPreferences(mergedPrefs);
-      setSuccess(true);
-    } catch (err: any) {
-      console.error('❌ Failed to update preferences:', err);
-      setError(err);
-    } finally {
-      setUpdating(false);
-    }
+    await updateDoc(ref, {
+      preferences: updated,
+    });
+
+    setPreferences(updated);
   };
 
   return {
     preferences,
     updatePreferences,
     loading,
-    updating,
-    success,
-    error,
   };
-}
+};
