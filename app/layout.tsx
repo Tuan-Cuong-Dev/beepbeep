@@ -11,9 +11,13 @@ const inter = Inter({
 
 // ✅ CHỈ title + description giữ lại ở metadata
 export const metadata: Metadata = {
-  title: "Bíp Bíp - Rent your ride in a beep!",
-  description: "An electric vehicle rental app that's fast, simple, and convenient in Vietnam.",
+  title: "Bíp Bíp - Thuê xe dễ như bấm còi!",
+  description: "Ứng dụng dịch vụ xe điện nhanh chóng, đơn giản và tiện lợi – từ Việt Nam vươn ra thế giới.",
+  icons: {
+    icon: "/assets/images/favicon-bipbip.png",
+  },
 };
+
 
 // ✅ TÁCH viewport thành export riêng
 export const viewport: Viewport = {
