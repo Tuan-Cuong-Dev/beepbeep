@@ -76,12 +76,9 @@ export default function TechnicianPartnerSection() {
               </span>
               <br />
               <span className="sm:text-lg md:text-xl text-gray-700">
-                {t('technicianSection.call_technician')}
+                {t('technicianSection.call_technician_with_count', { count: totalActive })}
               </span>
             </h2>
-            <p className="text-base text-green-600 font-semibold mt-2">
-              🚀 {totalActive} technicians ready to help
-            </p>
           </div>
         )}
 

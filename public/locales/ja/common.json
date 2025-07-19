@@ -41,9 +41,10 @@
     "see_all_technicians": "すべての利用可能な整備士を見る",
     "notification_title": "整備士に連絡",
     "notification_description": "まもなく整備士とつながります。",
-    "technicians_ready": "{{count}} 人の整備士が対応可能です"
+    "technicians_ready": "{{count}} 人の整備士が対応可能です",
+    "call_technician_with_count": "🚀 近くに対応可能な整備士が{{count}}人います"
   },
-  
+
   "notificationTypes": {
     "info": "情報",
     "success": "成功",
