@@ -45,7 +45,7 @@
     "notification_title": "Liên hệ kỹ thuật viên",
     "notification_description": "Chúng tôi sẽ kết nối bạn với kỹ thuật viên gần nhất.",
     "technicians_ready": "{{count}} kỹ thuật viên sẵn sàng phục vụ",
-    "call_technician_with_count": "🚀 Có {{count}} kỹ thuật viên sẵn sàng phục vụ gần bạn"
+    "call_technician_with_count": "{{count}} kỹ thuật viên sẵn sàng phục vụ bạn!"
   },
 
   "notificationTypes": {

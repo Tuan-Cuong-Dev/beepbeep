@@ -43,7 +43,8 @@
   "view_all": "View All",
   "see_all_technicians": "See all available technicians",
   "notification_title": "Contact Technician",
-  "notification_description": "We’ll connect you to a technician partner shortly."
+  "notification_description": "We’ll connect you to a technician partner shortly.",
+  "call_technician_with_count": "{{count}} technicians are ready to help you!"
   },
 
   "notificationTypes": {
