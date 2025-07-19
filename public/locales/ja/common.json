@@ -33,14 +33,17 @@
     "view_all": "すべて表示",
     "see_all_stations": "すべてのレンタルステーションを見る"
   },
+
   "technicianSection": {
-    "vehicle_trouble": "車両のトラブル？",
-    "call_technician": "技術者を呼ぶ！",
+    "vehicle_trouble": "車のトラブルですか？",
+    "call_technician": "近くの整備士に連絡しましょう",
     "view_all": "すべて表示",
-    "see_all_technicians": "近くの技術者を見る",
-    "notification_title": "📞 技術者に連絡",
-    "notification_description": "直接技術者と連絡できるシステムを構築中です。近日公開！"
+    "see_all_technicians": "すべての利用可能な整備士を見る",
+    "notification_title": "整備士に連絡",
+    "notification_description": "まもなく整備士とつながります。",
+    "technicians_ready": "{{count}} 人の整備士が対応可能です"
   },
+  
   "notificationTypes": {
     "info": "情報",
     "success": "成功",

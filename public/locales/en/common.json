@@ -38,12 +38,12 @@
   },
 
   "technicianSection": {
-    "vehicle_trouble": "Vehicle trouble?",
-    "call_technician": "Call to a technician!",
-    "view_all": "View All",
-    "see_all_technicians": "See all technicians near you",
-    "notification_title": "📞 Contact Technician",
-    "notification_description": "We are building a contact system so you can reach technicians directly. Coming soon!"
+  "vehicle_trouble": "Having vehicle trouble?",
+  "call_technician": "Call a technician nearby",
+  "view_all": "View All",
+  "see_all_technicians": "See all available technicians",
+  "notification_title": "Contact Technician",
+  "notification_description": "We’ll connect you to a technician partner shortly."
   },
 
   "notificationTypes": {

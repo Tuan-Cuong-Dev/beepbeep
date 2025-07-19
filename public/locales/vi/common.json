@@ -38,12 +38,13 @@
   },
 
   "technicianSection": {
-  "vehicle_trouble": "Hỏng xe?",
-  "call_technician": "Gọi kỹ thuật viên ngay!",
-  "view_all": "Xem tất cả",
-  "see_all_technicians": "Xem tất cả kỹ thuật viên gần bạn",
-  "notification_title": "📞 Liên hệ kỹ thuật viên",
-  "notification_description": "Chúng tôi đang xây dựng hệ thống liên hệ trực tiếp với kỹ thuật viên. Tính năng sắp ra mắt!"
+    "vehicle_trouble": "Hỏng xe ?",
+    "call_technician": "Gọi thợ sửa xe gần bạn",
+    "view_all": "Xem tất cả",
+    "see_all_technicians": "Xem tất cả kỹ thuật viên sẵn sàng",
+    "notification_title": "Liên hệ kỹ thuật viên",
+    "notification_description": "Chúng tôi sẽ kết nối bạn với kỹ thuật viên gần nhất.",
+    "technicians_ready": "{{count}} kỹ thuật viên sẵn sàng phục vụ"
   },
 
   "notificationTypes": {

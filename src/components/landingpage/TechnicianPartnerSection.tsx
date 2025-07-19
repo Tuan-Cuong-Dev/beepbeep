@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
-import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
-import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
-import SkeletonCard from '@/src/components/skeletons/SkeletonCard';
 import { useTranslation } from 'react-i18next';
+
+import TechnicianPartnerCard from '@/src/components/techinicianPartner/TechnicianPartnerCard';
+import SkeletonCard from '@/src/components/skeletons/SkeletonCard';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
@@ -23,7 +24,7 @@ function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: n
 
 function parseCoords(geo?: string | { lat: number; lng: number }): [number, number] {
   if (!geo) return [0, 0];
-  if (typeof geo === 'object' && 'lat' in geo && 'lng' in geo) return [geo.lat, geo.lng];
+  if (typeof geo === 'object' && 'lat' in geo) return [geo.lat, geo.lng];
 
   const match = geo.match(/([-]?\d+(\.\d+)?)°\s*N?,?\s*([-]?\d+(\.\d+)?)°\s*E?/i);
   if (!match) return [0, 0];
@@ -34,39 +35,54 @@ export default function TechnicianPartnerSection() {
   const { t } = useTranslation();
   const { partners, loading } = usePublicTechnicianPartners();
   const { location: userLocation } = useCurrentLocation();
-  const [previewPartners, setPreviewPartners] = useState<typeof partners>([]);
   const [showNotice, setShowNotice] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!partners.length) return;
+  // Tổng số technician đang hoạt động (isActive = true)
+  const totalActive = useMemo(
+    () => partners.filter((p) => p.isActive).length,
+    [partners]
+  );
+
+  // Top 10 technician gần nhất
+  const previewPartners = useMemo(() => {
+    if (!partners.length) return [];
+
     if (!userLocation || !Array.isArray(userLocation)) {
-      setPreviewPartners(partners.slice(0, 10));
-      return;
+      return partners.slice(0, 10);
     }
 
     const [userLat, userLng] = userLocation;
-    const sorted = [...partners].sort((a, b) => {
-      const [latA, lngA] = parseCoords(a.geo);
-      const [latB, lngB] = parseCoords(b.geo);
-      const distA = getDistanceFromLatLng(userLat, userLng, latA, lngA);
-      const distB = getDistanceFromLatLng(userLat, userLng, latB, lngB);
-      return distA - distB;
-    });
 
-    setPreviewPartners(sorted.slice(0, 10));
+    return [...partners]
+      .sort((a, b) => {
+        const [latA, lngA] = parseCoords(a.geo);
+        const [latB, lngB] = parseCoords(b.geo);
+        const distA = getDistanceFromLatLng(userLat, userLng, latA, lngA);
+        const distB = getDistanceFromLatLng(userLat, userLng, latB, lngB);
+        return distA - distB;
+      })
+      .slice(0, 10);
   }, [partners, userLocation]);
 
   return (
     <section className="font-sans pt-0 pb-6 px-4 bg-gray-100">
       <div className="max-w-7xl mx-auto">
         {!loading && (
-          <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pt-6">
-            <span className="sm:text-2xl md:text-3xl font-extrabold">{t('technicianSection.vehicle_trouble')}</span>
-            <br />
-            <span className="sm:text-lg md:text-xl text-gray-700">
-             {t('technicianSection.call_technician')}</span>
-          </h2>
+          <div className="text-center pt-6">
+            <h2 className="text-2xl font-bold mb-2 text-gray-800">
+              <span className="sm:text-2xl md:text-3xl font-extrabold">
+                {t('technicianSection.vehicle_trouble')}
+              </span>
+              <br />
+              <span className="sm:text-lg md:text-xl text-gray-700">
+                {t('technicianSection.call_technician')}
+              </span>
+            </h2>
+            <p className="text-base text-green-600 font-semibold mt-2">
+              🚀 {totalActive} technicians ready to help
+            </p>
+          </div>
         )}
 
         <div className="overflow-x-auto">
@@ -74,10 +90,7 @@ export default function TechnicianPartnerSection() {
             {loading
               ? [...Array(4)].map((_, i) => <SkeletonCard key={i} />)
               : previewPartners.slice(0, 6).map((partner) => (
-                  <div
-                    key={partner.id}
-                    className="min-w-[260px] max-w-[260px] flex-shrink-0"
-                  >
+                  <div key={partner.id} className="min-w-[260px] max-w-[260px] flex-shrink-0">
                     <TechnicianPartnerCard
                       partner={partner}
                       onContact={() => setShowNotice(true)}
@@ -92,9 +105,12 @@ export default function TechnicianPartnerSection() {
                 className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
               >
                 <div className="border rounded-xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">
-                  <h3 className="text-lg font-semibold text-gray-800">{t('technicianSection.view_all')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {t('technicianSection.view_all')}
+                  </h3>
                   <p className="text-sm text-gray-500 mt-1">
-                   {t('technicianSection.see_all_technicians')}</p>
+                    {t('technicianSection.see_all_technicians')}
+                  </p>
                 </div>
               </div>
             )}
