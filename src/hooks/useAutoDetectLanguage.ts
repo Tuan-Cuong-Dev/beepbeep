@@ -46,7 +46,7 @@ export function useAutoDetectLanguage({
 }) {
   useEffect(() => {
     const applyLanguage = async () => {
-      // 🔹 Nếu chưa đăng nhập → dùng localStorage hoặc fallback 'vi'
+      // ✅ Trường hợp chưa đăng nhập → dùng localStorage hoặc mặc định
       if (!user) {
         const localLang = localStorage.getItem('language') || 'vi';
         const localCurrency = localStorage.getItem('currency') || 'VND';
@@ -60,8 +60,13 @@ export function useAutoDetectLanguage({
         return;
       }
 
-      // 🔹 Nếu đã đăng nhập và có preferences → áp dụng
-      if (preferences?.language && preferences?.currency) {
+      // ✅ Trường hợp preferences chưa load (tránh chạy sớm)
+      if (preferences === null || preferences === undefined) {
+        return;
+      }
+
+      // ✅ Nếu đã có preferences → áp dụng
+      if (preferences.language && preferences.currency) {
         const prefLang = preferences.language;
         const prefCurrency = preferences.currency;
 
@@ -75,9 +80,9 @@ export function useAutoDetectLanguage({
         return;
       }
 
-      // 🔹 Nếu chưa có preferences → gọi API proxy nội bộ
+      // ✅ Nếu preferences trống → detect từ API nội bộ
       try {
-        const res = await fetch('/api/geo'); // 👈 dùng API nội bộ, không bị CORS
+        const res = await fetch('/api/geo'); // 🔁 dùng API nội bộ để tránh CORS
         const data = await res.json();
         const region = data?.country_code || 'US';
         const language = countryToLanguageMap[region] || 'en';
