@@ -20,14 +20,19 @@ export const fetchBatteryStations = async () => {
   return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as BatteryStation));
 };
 
-export const createBatteryStation = async (data: Omit<BatteryStation, 'id' | 'createdAt' | 'updatedAt'>) => {
+export const createBatteryStation = async (
+  data: Omit<BatteryStation, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>,
+  createdBy: string
+) => {
   const payload = {
     ...data,
+    createdBy,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   };
   return await addDoc(colRef, payload);
 };
+
 
 export const updateBatteryStation = async (id: string, data: Partial<BatteryStation>) => {
   const ref = doc(db, 'batteryStations', id);

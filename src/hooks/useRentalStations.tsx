@@ -1,44 +1,49 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/src/firebaseConfig';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
+import {
+  fetchRentalStations,
+  createRentalStation as _createRentalStation,
+  updateRentalStation,
+  deleteRentalStation,
+} from '@/src/lib/rentalStations/rentalStationService';
+import { useAuth } from '@/src/hooks/useAuth';
 
 export function useRentalStations(companyId: string, isAdmin = false) {
   const [stations, setStations] = useState<RentalStation[]>([]);
   const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth(); // 👈 lấy user
+
+  const loadStations = async () => {
+    setLoading(true);
+    const data = await fetchRentalStations(companyId, isAdmin);
+    setStations(data);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchStations = async () => {
-      try {
-        let q;
-        if (isAdmin) {
-          // Admin thì lấy tất cả các stations
-          q = query(collection(db, 'rentalStations'));
-        } else {
-          // Công ty thường thì lọc theo companyId
-          q = query(collection(db, 'rentalStations'), where('companyId', '==', companyId));
-        }
-
-        const snapshot = await getDocs(q);
-        const data: RentalStation[] = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<RentalStation, 'id'>),
-        }));
-
-        setStations(data);
-      } catch (error) {
-        console.error('❌ Failed to fetch rental stations:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (companyId || isAdmin) {
-      fetchStations();
+      loadStations();
     }
   }, [companyId, isAdmin]);
 
-  return { stations, loading };
+  const create = async (
+    data: Omit<RentalStation, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>
+  ) => {
+    if (!currentUser?.uid) {
+      console.warn('No currentUser for createdBy');
+      return;
+    }
+    return await _createRentalStation(data, currentUser.uid);
+  };
+
+  return {
+    stations,
+    loading,
+    reload: loadStations,
+    create,
+    update: updateRentalStation,
+    remove: deleteRentalStation,
+  };
 }
