@@ -52,9 +52,11 @@ export default function AddRentalShopForm() {
         ...form,
         companyId: 'contributed',
         status: 'inactive',
+        createdBy: user.uid, // ✅ thêm dòng này
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       };
+      
       await addDoc(collection(db, 'rentalStations'), data);
       setForm({
         name: '',
