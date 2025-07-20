@@ -204,14 +204,14 @@ export default function AccountPage() {
           </div>
 
           {/* Email */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <Label>{t('account.email')}</Label>
             <Input value={localUser.email ?? ''} readOnly />
             <p className="text-sm text-gray-500 mt-1">{t('account.login_email_note')}</p>
           </div>
 
           {/* Password */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <Label>{t('account.password')}</Label>
             <Input type="password" value="********" disabled />
             <button type="button" onClick={handleResetPassword} className="text-sm text-[#00d289] mt-2 hover:underline">
