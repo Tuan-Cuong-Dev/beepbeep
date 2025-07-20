@@ -11,10 +11,14 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useTranslation } from 'react-i18next';
+import { useContributions } from '@/src/hooks/useContributions'; 
 
 export default function AddRepairShopForm() {
   const { t } = useTranslation('common');
   const { user } = useUser();
+  const { coords, geocode } = useGeocodeAddress();
+  const { submitContribution } = useContributions();
+
   const [form, setForm] = useState<Partial<TechnicianPartner>>({
     type: 'shop',
     name: '',
@@ -29,14 +33,11 @@ export default function AddRepairShopForm() {
     isActive: false,
   });
 
-  const { coords, geocode } = useGeocodeAddress();
   const [submitting, setSubmitting] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
-    if (form.mapAddress) {
-      geocode(form.mapAddress);
-    }
+    if (form.mapAddress) geocode(form.mapAddress);
   }, [form.mapAddress]);
 
   useEffect(() => {
@@ -71,24 +72,29 @@ export default function AddRepairShopForm() {
         userId: '',
       };
 
+      // ➕ B1. Tạo technician partner
       await addDoc(collection(db, 'technicianPartners'), data);
 
+      // ➕ B2. Ghi nhận đóng góp
+      await submitContribution('repair_station', data);
+
+      // ➕ B3. Reset form & mở thông báo
       setForm({
-        type: 'shop',
-        name: '',
-        phone: '',
-        shopName: '',
-        shopAddress: '',
-        mapAddress: '',
-        coordinates: { lat: 0, lng: 0 },
-        assignedRegions: [],
-        workingHours: [],
-        vehicleType: 'motorbike',
-        isActive: false,
-      });
+      type: 'shop',
+      name: '',
+      phone: '',
+      shopName: '',
+      shopAddress: '',
+      mapAddress: '',
+      coordinates: { lat: 0, lng: 0 },
+      assignedRegions: [],
+      workingHours: [],
+      vehicleType: 'motorbike',
+      isActive: false,
+    });
       setShowDialog(true);
     } catch (error) {
-      console.error('❌ Error submitting technician:', error);
+      console.error('❌ Error submitting repair shop:', error);
     } finally {
       setSubmitting(false);
     }

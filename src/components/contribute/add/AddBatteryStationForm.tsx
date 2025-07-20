@@ -8,11 +8,15 @@ import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import { useBatteryStations } from '@/src/hooks/useBatteryStations';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@/src/context/AuthContext'; // ✅ Thêm
+import { useContributions } from '@/src/hooks/useContributions'; // ✅ Thêm
 
 export default function AddBatteryStationForm() {
   const { t } = useTranslation('common');
   const { create, reload } = useBatteryStations();
   const { coords, geocode, loading: geocodeLoading } = useGeocodeAddress();
+  const { user } = useUser(); // ✅
+  const { submitContribution } = useContributions(); // ✅
 
   const [form, setForm] = useState({
     name: '',
@@ -45,13 +49,24 @@ export default function AddBatteryStationForm() {
   };
 
   const handleSubmit = async () => {
-    if (!form.name || !form.displayAddress || !form.location) return;
+    if (!user?.uid || !form.name || !form.displayAddress || !form.location) return;
     setSubmitting(true);
     try {
-      await create({
+      const data = {
         ...form,
         isActive: false,
-      });
+        createdBy: user.uid,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      // ➕ B1. Tạo battery station
+      await create(data);
+
+      // ➕ B2. Ghi nhận đóng góp
+      await submitContribution('battery_station', data);
+
+      // ➕ B3. Reset & reload
       setForm({
         name: '',
         displayAddress: '',
@@ -60,6 +75,7 @@ export default function AddBatteryStationForm() {
         coordinates: undefined,
         vehicleType: 'motorbike',
       });
+
       setShowDialog(true);
       reload();
     } catch (err) {

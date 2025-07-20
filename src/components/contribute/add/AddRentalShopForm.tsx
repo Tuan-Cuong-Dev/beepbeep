@@ -11,10 +11,14 @@ import { Button } from '@/src/components/ui/button';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useTranslation } from 'react-i18next';
+import { useContributions } from '@/src/hooks/useContributions'; // ✅ THÊM
 
 export default function AddRentalShopForm() {
   const { t } = useTranslation('common');
   const { user } = useUser();
+  const { coords, geocode } = useGeocodeAddress();
+  const { submitContribution } = useContributions(); // ✅ THÊM
+
   const [form, setForm] = useState<StationFormValues>({
     name: '',
     displayAddress: '',
@@ -25,7 +29,6 @@ export default function AddRentalShopForm() {
     vehicleType: 'motorbike',
   });
 
-  const { coords, geocode } = useGeocodeAddress();
   const [submitting, setSubmitting] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -52,21 +55,27 @@ export default function AddRentalShopForm() {
         ...form,
         companyId: 'contributed',
         status: 'inactive',
-        createdBy: user.uid, // ✅ thêm dòng này
+        createdBy: user.uid,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       };
-      
+
+      // ➕ B1. Tạo station mới
       await addDoc(collection(db, 'rentalStations'), data);
+
+      // ➕ B2. Ghi nhận đóng góp
+      await submitContribution('rental_shop', data);
+
+      // ➕ B3. Reset form và thông báo
       setForm({
-        name: '',
-        displayAddress: '',
-        mapAddress: '',
-        location: '',
-        geo: undefined,
-        contactPhone: '',
-        vehicleType: 'motorbike',
-      });
+      name: '',
+      displayAddress: '',
+      mapAddress: '',
+      location: '',
+      geo: undefined,
+      contactPhone: '',
+      vehicleType: 'motorbike',
+    });
       setShowDialog(true);
     } catch (err) {
       console.error('❌ Error adding rental shop:', err);

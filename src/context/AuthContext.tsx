@@ -1,19 +1,28 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import {
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  collection, 
+} from 'firebase/firestore';
 import { auth, db } from '@/src/firebaseConfig';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import i18n from '@/src/i18n'; // ✅ Import từ nơi đã init, KHÔNG import từ 'i18next'
+import i18n from '@/src/i18n';
 
-interface UserPreferences {
-  language: string;
-  region: string;
-  currency?: string;
-}
+import { User as AppUser, UserPreferences } from '@/src/lib/users/userTypes';
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   companyId: string;
   stationId: string;
   role: string;
@@ -34,11 +43,11 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [companyId, setCompanyId] = useState<string>('');
-  const [stationId, setStationId] = useState<string>('');
-  const [role, setRole] = useState<string>('');
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [companyId, setCompanyId] = useState('');
+  const [stationId, setStationId] = useState('');
+  const [role, setRole] = useState('');
   const [preferences, setPreferences] = useState<UserPreferences>({
     language: 'en',
     region: 'US',
@@ -48,55 +57,80 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
+      setLoading(true);
 
       if (currentUser) {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const userData = userDoc.exists() ? userDoc.data() : null;
+        const userSnap = await getDoc(doc(db, 'users', currentUser.uid));
+        const userData = userSnap.exists() ? userSnap.data() : null;
+
+        const staffSnap = await getDocs(
+          query(collection(db, 'staffs'), where('userId', '==', currentUser.uid))
+        );
+        const staffData = !staffSnap.empty ? staffSnap.docs[0].data() : null;
+
+        const prefs = userData?.preferences || {};
+        const loadedPrefs: UserPreferences = {
+          language: prefs.language || 'en',
+          region: prefs.region || 'US',
+          currency: prefs.currency || 'USD',
+        };
+        setPreferences(loadedPrefs);
+
+        // Ngôn ngữ
+        if (i18n.isInitialized && i18n.language !== loadedPrefs.language) {
+          i18n.changeLanguage(loadedPrefs.language);
+        } else {
+          setTimeout(() => i18n.changeLanguage(loadedPrefs.language), 100);
+        }
+
+        // Phân quyền & liên kết
+        setRole(staffData?.role || userData?.role || '');
+        setCompanyId(staffData?.companyId || userData?.companyId || '');
+        setStationId(staffData?.stationId || userData?.stationId || '');
 
         if (userData) {
-          // 👉 Gán thông tin staff nếu có
-          const staffSnap = await getDocs(
-            query(collection(db, 'staffs'), where('userId', '==', currentUser.uid))
-          );
+          setUser({
+            uid: currentUser.uid,
+            name: userData.name || '',
+            email: userData.email || currentUser.email || '',
+            phone: userData.phone || currentUser.phoneNumber || '',
+            photoURL: userData.photoURL || currentUser.photoURL || '',
 
-          if (!staffSnap.empty) {
-            const staffData = staffSnap.docs[0].data();
-            setRole(staffData.role || '');
-            setCompanyId(staffData.companyId || '');
-            setStationId(staffData.stationId || '');
-          } else {
-            setRole(userData.role || '');
-            setCompanyId(userData.companyId || '');
-            setStationId(userData.stationId || '');
-          }
+            role: userData.role || '',
 
-          // 👉 Gán preferences
-          const prefs = userData.preferences || {};
-          const loadedPrefs: UserPreferences = {
-            language: prefs.language || 'en',
-            region: prefs.region || 'US',
-            currency: prefs.currency || 'USD',
-          };
-          setPreferences(loadedPrefs);
+            address: userData.address || '',
+            address2: userData.address2,
+            city: userData.city,
+            state: userData.state,
+            zip: userData.zip,
+            country: userData.country,
+            homeAirport: userData.homeAirport,
 
-          // 👉 Chỉ đổi ngôn ngữ nếu khác hiện tại
-          if (i18n.isInitialized && i18n.language !== loadedPrefs.language) {
-            i18n.changeLanguage(loadedPrefs.language);
-          } else {
-            // Delay một chút để tránh lỗi chưa init
-            setTimeout(() => {
-              i18n.changeLanguage(loadedPrefs.language);
-            }, 100);
-          }
+            preferences: loadedPrefs,
+
+            idNumber: userData.idNumber,
+            gender: userData.gender,
+            dateOfBirth: userData.dateOfBirth,
+            coverURL: userData.coverURL,
+
+            lastKnownLocation: userData.lastKnownLocation,
+
+            contributionPoints: userData.contributionPoints || 0,
+            contributionLevel: userData.contributionLevel || 1,
+            totalContributions: userData.totalContributions || 0,
+
+            referralCode: userData.referralCode,
+            referredBy: userData.referredBy,
+            referralPoints: userData.referralPoints || 0,
+            totalReferrals: userData.totalReferrals || 0,
+
+            createdAt: userData.createdAt?.toDate?.() || new Date(),
+            updatedAt: userData.updatedAt?.toDate?.() || new Date(),
+          });
         } else {
-          // Nếu user không tồn tại trong Firestore
-          setCompanyId('');
-          setStationId('');
-          setRole('');
+          setUser(null);
         }
       } else {
-        // Khi người dùng đăng xuất
         setUser(null);
         setCompanyId('');
         setStationId('');

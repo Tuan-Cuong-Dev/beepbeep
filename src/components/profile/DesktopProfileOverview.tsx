@@ -52,7 +52,9 @@ export default function DesktopProfileOverview() {
 
             {/* Info */}
             <div className="space-y-1">
-              <h1 className="text-xl sm:text-2xl font-bold">{user.name || t('desktop_profile_overview.unknown_name')}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold">
+                {user.name || t('desktop_profile_overview.unknown_name')}
+              </h1>
               <p className="text-gray-500 text-sm">{user.username}</p>
 
               <div className="text-sm text-gray-600">
@@ -67,16 +69,22 @@ export default function DesktopProfileOverview() {
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-between">
             <div className="flex gap-6 text-center text-sm sm:text-base">
               <div>
-                <p className="font-semibold">0</p>
-                <p className="text-gray-600">{t('desktop_profile_overview.stats.contributions')}</p>
+                <p className="font-semibold">{user.totalContributions || 0}</p>
+                <p className="text-gray-600">
+                  {t('desktop_profile_overview.stats.contributions')}
+                </p>
               </div>
               <div>
                 <p className="font-semibold">0</p>
-                <p className="text-gray-600">{t('desktop_profile_overview.stats.followers')}</p>
+                <p className="text-gray-600">
+                  {t('desktop_profile_overview.stats.followers')}
+                </p>
               </div>
               <div>
                 <p className="font-semibold">0</p>
-                <p className="text-gray-600">{t('desktop_profile_overview.stats.following')}</p>
+                <p className="text-gray-600">
+                  {t('desktop_profile_overview.stats.following')}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -88,7 +96,6 @@ export default function DesktopProfileOverview() {
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </div>

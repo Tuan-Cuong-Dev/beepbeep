@@ -1,5 +1,4 @@
-// Cập nhật ngày 8/07/2025 - Cho phép mở rộng thêm các tính năng quan trọng cần xây.
-
+// 📁 lib/users/userTypes.ts
 import { Timestamp } from 'firebase/firestore';
 
 export interface UserPreferences {
@@ -27,7 +26,7 @@ export interface User {
   photoURL: string;
 
   // Phân quyền
-  role: string; // hoặc roles?: string[] nếu cần đa vai trò
+  role: string;
 
   // Địa chỉ tĩnh
   address: string;
@@ -50,6 +49,17 @@ export interface User {
 
   // 🚨 Vị trí gần nhất được hệ thống ghi nhận
   lastKnownLocation?: UserLocation;
+
+  // 🎯 TÍNH NĂNG ĐÓNG GÓP
+  contributionPoints?: number;
+  contributionLevel?: 1 | 2 | 3;
+  totalContributions?: number;
+
+  // 📣 MÃ GIỚI THIỆU
+  referralCode?: string;
+  referredBy?: string;
+  referralPoints?: number;
+  totalReferrals?: number;
 
   // Thời gian
   createdAt: Date;

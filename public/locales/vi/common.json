@@ -722,17 +722,21 @@
 },
 
 "my_contributions_section": {
-  "types": {
-    "repair_shop": "Tiệm sửa xe",
-    "rental_shop": "Điểm cho thuê",
-    "battery_station": "Trạm pin"
-  },
-  "status": {
-    "approved": "Đã duyệt",
-    "pending": "Đang chờ duyệt"
+  "tabs": {
+    "contributions": "Đóng góp của tôi",
+    "points": "Điểm thưởng"
   },
   "status_label": "Trạng thái:",
-  "edit": "Chỉnh sửa"
+  "status": {
+    "approved": "Đã duyệt",
+    "pending": "Chờ duyệt"
+  },
+  "edit": "Chỉnh sửa",
+  "types": {
+    "repair_shop": "Tiệm sửa xe",
+    "rental_shop": "Trạm cho thuê xe",
+    "battery_station": "Trạm pin"
+  }
 },
 
 "repair_shop_edit_form": {
@@ -793,7 +797,23 @@
     "saving": "Đang lưu...",
     "loading": "Đang tải dữ liệu...",
     "update_error": "❌ Lỗi khi cập nhật trạm pin."
+  },
+
+   "contribution_points_summary": {
+    "title": "🎖️ Tổng quan đóng góp của bạn",
+    "points": "Điểm đóng góp: <1>{{points}}</1>",
+    "total": "Tổng số lượt đóng góp: <1>{{total}}</1>",
+    "level": "Cấp độ đóng góp: <1>Cấp {{contributionLevel}}</1>"
+  },
+
+  "contribution_points_section": {
+    "title": "📋 Lịch sử điểm thưởng",
+    "loading": "Đang tải lịch sử điểm của bạn...",
+    "empty": "Không tìm thấy dữ liệu điểm.",
+    "status": "Trạng thái: <1>{{status}}</1>",
+    "type": "📝 {{type}}"
   }
+
 
   
 

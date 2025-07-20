@@ -716,17 +716,21 @@
 },
 
 "my_contributions_section": {
+  "tabs": {
+    "contributions": "My Contributions",
+    "points": "Points"
+  },
+  "status_label": "Status:",
+  "status": {
+    "approved": "Approved",
+    "pending": "Pending"
+  },
+  "edit": "Edit",
   "types": {
     "repair_shop": "Repair Shop",
     "rental_shop": "Rental Station",
     "battery_station": "Battery Station"
-  },
-  "status": {
-    "approved": "Approved",
-    "pending": "Pending Approval"
-  },
-  "status_label": "Status:",
-  "edit": "Edit"
+  }
 },
 
 "repair_shop_edit_form": {
@@ -788,9 +792,22 @@
     "saving": "Saving...",
     "loading": "Loading data...",
     "update_error": "❌ Error while updating battery station."
+  },
+
+  "contribution_points_summary": {
+    "title": "🎖️ Your Contribution Summary",
+    "points": "Contribution Points: <1>{{points}}</1>",
+    "total": "Total Contributions: <1>{{total}}</1>",
+    "level": "Contribution Level: <1>Level {{contributionLevel}}</1>"
+  },
+
+  "contribution_points_section": {
+    "title": "📋 Points History",
+    "loading": "Loading your points history...",
+    "empty": "No point records found.",
+    "status": "Status: <1>{{status}}</1>",
+    "type": "📝 {{type}}"
   }
-
-
 
 
 
