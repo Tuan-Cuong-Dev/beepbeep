@@ -806,7 +806,8 @@
     "loading": "Loading your points history...",
     "empty": "No point records found.",
     "status": "Status: <1>{{status}}</1>",
-    "type": "📝 {{type}}"
+    "type": "📝 {{type}}",
+    "no_records": "No point records found."
   }
 
 

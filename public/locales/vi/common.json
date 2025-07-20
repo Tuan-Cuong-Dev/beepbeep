@@ -811,7 +811,8 @@
     "loading": "Đang tải lịch sử điểm của bạn...",
     "empty": "Không tìm thấy dữ liệu điểm.",
     "status": "Trạng thái: <1>{{status}}</1>",
-    "type": "📝 {{type}}"
+    "type": "📝 {{type}}",
+    "no_records": "Không có dữ liệu điểm nào được tìm thấy."
   }
 
 
