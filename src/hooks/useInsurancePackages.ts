@@ -1,8 +1,11 @@
 // hooks/useInsurancePackages.ts
+'use client';
+
 import { useEffect, useState } from 'react';
 import {
   collection,
   query,
+  where,
   orderBy,
   getDocs,
   addDoc,
@@ -13,26 +16,39 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+import { useUser } from '@/src/context/AuthContext';
 import { InsurancePackage } from '@/src/lib/insurancePackages/insurancePackageTypes';
 import { generateRandomCode } from '@/src/utils/generateRandomCode';
 
 export function useInsurancePackages() {
+  const { user } = useUser();
   const [packages, setPackages] = useState<InsurancePackage[]>([]);
   const [loading, setLoading] = useState(true);
 
   const ref = collection(db, 'insurancePackages');
 
-  // 🔄 Fetch all packages
+  // 🔄 Fetch packages for current user
   const fetchAll = async () => {
+    if (!user?.uid) return;
+
     setLoading(true);
-    const q = query(ref, orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as InsurancePackage[];
-    setPackages(data);
-    setLoading(false);
+    try {
+      const q = query(
+        ref,
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc')
+      );
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as InsurancePackage[];
+      setPackages(data);
+    } catch (err) {
+      console.error('❌ Failed to fetch insurance packages:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ➕ Create new insurance package
@@ -79,11 +95,10 @@ export function useInsurancePackages() {
     return created;
   };
 
-  // 🧾 Extend by days
+  // 🧾 Extend package
   const extend = async (id: string, additionalDays: number) => {
     const packageRef = doc(db, 'insurancePackages', id);
     const snap = await getDoc(packageRef);
-
     if (!snap.exists()) return;
 
     const data = snap.data() as InsurancePackage;
@@ -97,10 +112,10 @@ export function useInsurancePackages() {
       updatedAt: Timestamp.now(),
     });
 
-    await fetchAll();
+    await fetchAll(); // Refresh list
   };
 
-  // ❌ Delete
+  // ❌ Remove package
   const remove = async (id: string) => {
     await deleteDoc(doc(ref, id));
     setPackages((prev) => prev.filter((p) => p.id !== id));
@@ -108,7 +123,7 @@ export function useInsurancePackages() {
 
   useEffect(() => {
     fetchAll();
-  }, []);
+  }, [user?.uid]);
 
   return {
     packages,
