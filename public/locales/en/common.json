@@ -156,6 +156,7 @@
   },
 
   "user_sidebar": {
+    "points": "Points",
     "welcome": "Welcome",
     "account_disabled": "Account Disabled",
     "total_earnings": "Total Earnings",
