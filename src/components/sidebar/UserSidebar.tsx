@@ -16,6 +16,8 @@ import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/fire
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useTranslation } from 'react-i18next';
 import { User as AppUser } from '@/src/lib/users/userTypes';
+import QRCode from 'react-qr-code';
+import { generateReferralCode } from '@/src/lib/users/generateReferralCode';
 
 interface UserSidebarProps {
   user: AppUser;
@@ -133,7 +135,6 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
           />
           <p className="mt-2 text-gray-600 text-sm">{t('user_sidebar.welcome')}</p>
           <p className="font-semibold text-gray-800 mt-1 text-center">{user?.name || "User"}</p>
-          {user.email && <p className="text-xs text-gray-500 text-center">{user.email}</p>}
           {user.contributionPoints !== undefined && (
             <p className="text-xs text-gray-600 mt-1">
               {t('user_sidebar.points')}: <strong>{user.contributionPoints}</strong>
@@ -180,6 +181,19 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
                 <span>{item.label}</span>
               </button>
             )
+          )}
+          
+        <hr className="my-2 border-gray-200" />
+          {user.idNumber && (
+            <div className="p-4 border-b text-center">
+              <p className="text-xs text-gray-500 mb-1">{t('user_sidebar.referral_code')}</p>
+              <p className="text-sm font-semibold text-[#00d289]">
+                {generateReferralCode(user.idNumber)}
+              </p>
+              <div className="flex justify-center mt-2 bg-white p-2 rounded">
+                <QRCode value={generateReferralCode(user.idNumber) || ''} size={96} />
+              </div>
+            </div>
           )}
         </nav>
 

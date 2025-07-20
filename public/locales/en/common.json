@@ -161,6 +161,7 @@
     "account_disabled": "Account Disabled",
     "total_earnings": "Total Earnings",
     "pending_payment": "Pending Payment",
+    "referral_code": "Your Referral Code",
     "menu": {
       "write_review": "Write a review",
       "add_to_map": "Add to the Map",
@@ -191,6 +192,8 @@
     "other": "Other",
     "date_of_birth": "Date of Birth",
     "id_number": "ID Number",
+    "referral_code": "Referral Code",
+    "referral_hint": "Your ID number will be used as your referral code on the Bíp Bíp system. Please enter it if it's missing.",
     "phone": "Phone",
     "email": "Email",
     "email_note": "* This email is your login email.",
@@ -369,6 +372,7 @@
     "default_address": "Da Nang",
     "role": "Role",
     "edit_profile": "Edit profile",
+    "referral_code": "Mã giới thiệu của bạn:",
     "stats": {
       "contributions": "Contributions",
       "followers": "Followers",

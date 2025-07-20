@@ -162,6 +162,7 @@
   "account_disabled": "Tài khoản đã bị vô hiệu hóa",
   "total_earnings": "Tổng hoa hồng",
   "pending_payment": "Chờ thanh toán",
+  "referral_code": "Mã giới thiệu của bạn",
   "menu": {
     "write_review": "Viết đánh giá",
     "add_to_map": "Thêm vào bản đồ",
@@ -174,6 +175,7 @@
     "earnings": "Thu nhập",
     "request_payment": "Yêu cầu thanh toán",
     "sign_out": "Đăng xuất"
+
   },
     "coming_soon": {
       "title": "🚧 Tính năng sắp ra mắt",
@@ -200,6 +202,8 @@
     "other": "Khác",
     "date_of_birth": "Ngày sinh",
     "id_number": "CMND/CCCD",
+    "referral_code": "Mã giới thiệu",
+    "referral_hint": "Số CCCD của bạn sẽ được dùng làm mã giới thiệu trên hệ thống Bíp Bíp. Vui lòng nhập nếu để trống.",
     "phone": "Số điện thoại",
     "email": "Email",
     "email_note": "* Đây là email đăng nhập của bạn.",
@@ -376,6 +380,7 @@
   "default_address": "Đà Nẵng",
   "role": "Vai trò",
   "edit_profile": "Chỉnh sửa hồ sơ",
+  "referral_code": "Mã giới thiệu của bạn:",
   "stats": {
     "contributions": "Đóng góp",
     "followers": "Người theo dõi",

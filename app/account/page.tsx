@@ -21,6 +21,7 @@ import { useUserPreferences } from '@/src/hooks/useUserPreferences';
 import { useUserLocation } from '@/src/hooks/useUserLocation';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
 import { UserLocation } from '@/src/lib/users/userTypes';
+import { generateReferralCode } from '@/src/lib/users/generateReferralCode'; // hoặc file bạn để hàm đó
 
 export default function AccountPage() {
   const { t } = useTranslation('common');
@@ -90,44 +91,43 @@ export default function AccountPage() {
   };
 
   const handleSaveAll = async () => {
-    if (!user?.uid || !localUser) return;
+  if (!user?.uid || !localUser) return;
 
-    try {
-      const cleanedUserData = Object.fromEntries(
-        Object.entries({
-          firstName: localUser.firstName,
-          lastName: localUser.lastName,
-          name: localUser.name,
-          gender: localUser.gender,
-          dateOfBirth: localUser.dateOfBirth,
-          idNumber: localUser.idNumber,
-          phone: localUser.phone,
-          address: localUser.address,
-          city: localUser.city,
-          state: localUser.state,
-          zip: localUser.zip,
-          country: localUser.country,
-        }).filter(([_, value]) => value !== undefined)
-      );
+  try {
+    // Tạo referralCode từ idNumber nếu có
+    const referralCode = localUser.idNumber?.trim().toUpperCase();
 
-      await update(cleanedUserData);
-      await updatePreferences(localPrefs);
+    const cleanedUserData = {
+      ...localUser,
+      referralCode, // ✅ Gán vào nếu hợp lệ
+    };
 
-      if (localLoc?.lat !== undefined && localLoc?.lng !== undefined) {
-        await updateLocation({
-          lat: localLoc.lat,
-          lng: localLoc.lng,
-          address: localLoc.address || '',
-          updatedAt: localLoc.updatedAt ?? Timestamp.now(),
-        });
-      }
+    // Lọc bỏ các trường undefined/null
+    const userDataToSave = Object.fromEntries(
+      Object.entries(cleanedUserData).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
+    );
 
-      showNotification('success', t('account.update_success'), t('account.saved'));
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unknown error';
-      showNotification('error', t('account.update_failed'), msg);
+    await update(userDataToSave);
+    await updatePreferences(localPrefs);
+
+    if (localLoc?.lat !== undefined && localLoc?.lng !== undefined) {
+      await updateLocation({
+        lat: localLoc.lat,
+        lng: localLoc.lng,
+        address: localLoc.address || '',
+        updatedAt: localLoc.updatedAt ?? Timestamp.now(),
+      });
     }
-  };
+
+    showNotification('success', t('account.update_success'), t('account.saved'));
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    showNotification('error', t('account.update_failed'), msg);
+  }
+};
+
 
   if (loading || !user || !localUser) return <div className="p-6">{t('landing.loading')}</div>;
 
@@ -186,9 +186,15 @@ export default function AccountPage() {
           </div>
 
           {/* ID Number */}
-          <div>
+          <div className="md:col-span-1">
             <Label>{t('account.id_number')}</Label>
-            <Input value={localUser.idNumber ?? ''} onChange={(e) => handleFieldChange('idNumber', e.target.value)} />
+            <Input
+              value={localUser.idNumber ?? ''}
+              onChange={(e) => handleFieldChange('idNumber', e.target.value)}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {t('account.referral_hint')}
+            </p>
           </div>
 
           {/* Phone */}
