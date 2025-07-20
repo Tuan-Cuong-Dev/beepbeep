@@ -15,9 +15,10 @@ import { db } from '@/src/firebaseConfig';
 import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/firestore';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useTranslation } from 'react-i18next';
+import { User as AppUser } from '@/src/lib/users/userTypes';
 
 interface UserSidebarProps {
-  user: any;
+  user: AppUser;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -25,11 +26,11 @@ interface UserSidebarProps {
 type MenuItem =
   | { divider: true }
   | {
-    icon: IconType | typeof faFileContract;
-    label: string;
-    path?: string;
-    onClick?: () => void;
-  };
+      icon: IconType | typeof faFileContract;
+      label: string;
+      path?: string;
+      onClick?: () => void;
+    };
 
 const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
   const { signOutUser } = useAuthService();
@@ -131,9 +132,15 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
             className="w-16 h-16 rounded-full object-cover"
           />
           <p className="mt-2 text-gray-600 text-sm">{t('user_sidebar.welcome')}</p>
-          <p className="font-semibold text-gray-800 mt-1 text-center">{user?.displayName || "User"}</p>
+          <p className="font-semibold text-gray-800 mt-1 text-center">{user?.name || "User"}</p>
+          {user.email && <p className="text-xs text-gray-500 text-center">{user.email}</p>}
+          {user.contributionPoints !== undefined && (
+            <p className="text-xs text-gray-600 mt-1">
+              {t('user_sidebar.points')}: <strong>{user.contributionPoints}</strong>
+            </p>
+          )}
           {normalizedRole === 'agent' && !agentDisabled && (
-            <div className="mt-4 space-y-1 text-sm text-gray-600 text-center">
+            <div className="mt-3 space-y-1 text-sm text-gray-600 text-center">
               <p>{t('user_sidebar.total_earnings')}: <b>${agentStats.total.toFixed(2)}</b></p>
               <p>{t('user_sidebar.pending_payment')}: <b>${agentStats.pending.toFixed(2)}</b></p>
             </div>
@@ -158,15 +165,18 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
                     item.onClick?.();
                   }
                 }}
-                className={`flex items-center space-x-3 w-full text-left rounded-lg px-3 py-2 transition ${pathname === item.path ? 'bg-[#00d289] text-white' : 'text-gray-700 hover:text-black hover:bg-gray-100'}`}
+                className={`flex items-center space-x-3 w-full text-left rounded-lg px-3 py-2 transition ${
+                  pathname === item.path
+                    ? 'bg-[#00d289] text-white'
+                    : 'text-gray-700 hover:text-black hover:bg-gray-100'
+                }`}
               >
-                {'icon' in item && (
-                  typeof item.icon === 'function' ? (
+                {'icon' in item &&
+                  (typeof item.icon === 'function' ? (
                     <item.icon />
                   ) : (
                     <FontAwesomeIcon icon={item.icon} className="w-4 h-4" />
-                  )
-                )}
+                  ))}
                 <span>{item.label}</span>
               </button>
             )
