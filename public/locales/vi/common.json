@@ -407,7 +407,8 @@
   "vehicles": "Xe của tôi",
   "insurance": "Gói bảo hiểm",
   "issues": "Sự cố đã báo",
-  "contributions": "Đóng góp" 
+  "contributions": "Đóng góp",
+  "business": "Kinh doanh"
 },
 
 
@@ -819,7 +820,13 @@
     "status": "Trạng thái: <1>{{status}}</1>",
     "type": "📝 {{type}}",
     "no_records": "Không có dữ liệu điểm nào được tìm thấy."
-  }
+  },
+
+  "my_business_section": {
+  "services_title": "🔧 Dịch vụ bạn cung cấp",
+  "organization_title": "🏢 Doanh nghiệp hoặc tổ chức bạn đang tham gia"
+}
+
 
 
   

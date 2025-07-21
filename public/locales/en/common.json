@@ -399,7 +399,8 @@
   "vehicles": "My Vehicles",
   "insurance": "Insurance Packages",
   "issues": "Reported Issues",
-  "contributions": "Contributions"
+  "contributions": "Contributions",
+  "business": "Business"
 },
 
   "activity_feed": {
@@ -813,7 +814,13 @@
     "status": "Status: <1>{{status}}</1>",
     "type": "📝 {{type}}",
     "no_records": "No point records found."
+  },
+
+  "my_business_section": {
+  "services_title": "🔧 Services You Offer",
+  "organization_title": "🏢 Your Business or Affiliated Organization"
   }
+
 
 
 

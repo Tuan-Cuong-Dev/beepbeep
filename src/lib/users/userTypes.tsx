@@ -25,6 +25,9 @@ export interface User {
   phone: string;
   photoURL: string;
 
+  // Làm việc tại công ty nào ?
+  companyId?: string;
+
   // Phân quyền
   role: string;
 

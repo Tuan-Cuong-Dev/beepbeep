@@ -15,13 +15,16 @@ import MyVehiclesSection from '@/src/components/personalVehicles/MyVehiclesSecti
 import MyInsuranceSection from '@/src/components/profile/MyInsuranceSection';
 import MyIssuesSection from '@/src/components/profile/MyIssuesSection';
 import MyContributionsSection from '@/src/components/profile/MyContributionsSection';
+import MyBusinessSection from '@/src/components/profile/MyBusinessSection'; // ✅ NEW
 
+// ✅ Include 'business' in the valid tabs
 const validTabs: TabType[] = [
   'activityFeed',
   'vehicles',
   'insurance',
   'issues',
   'contributions',
+  'business',
 ];
 
 export default function ProfilesPageContent() {
@@ -32,7 +35,7 @@ export default function ProfilesPageContent() {
   const [userData, setUserData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>('activityFeed');
 
-  // Set tab từ URL lúc load đầu tiên
+  // Load initial tab from URL
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
@@ -42,7 +45,7 @@ export default function ProfilesPageContent() {
     }
   }, []);
 
-  // Cập nhật URL khi đổi tab
+  // Update URL when tab changes
   const handleTabChange = (tab: TabType) => {
     if (tab !== activeTab) {
       setActiveTab(tab);
@@ -50,7 +53,7 @@ export default function ProfilesPageContent() {
     }
   };
 
-  // Lấy thông tin người dùng
+  // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       if (!currentUser) return;
@@ -77,7 +80,7 @@ export default function ProfilesPageContent() {
         <ProfileTabs activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
 
-      {/* Main content */}
+      {/* Main layout */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:flex md:gap-6">
         {/* Sidebar */}
         <aside className="w-full md:flex-[1_1_33.333%] md:max-w-[33.333%]">
@@ -97,6 +100,7 @@ export default function ProfilesPageContent() {
           {activeTab === 'insurance' && <MyInsuranceSection />}
           {activeTab === 'issues' && <MyIssuesSection issues={[]} />}
           {activeTab === 'contributions' && <MyContributionsSection />}
+          {activeTab === 'business' && <MyBusinessSection />} {/* ✅ NEW */}
         </section>
       </div>
     </div>

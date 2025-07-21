@@ -17,16 +17,30 @@ export type SupportedVehicleType = 'bike' | 'motorbike' | 'car' | 'van' | 'bus';
 
 // 🛠️ Loại dịch vụ mà công ty cung cấp
 export type SupportedServiceType =
+  | 'repair_basic'
+  | 'repair_advanced'
+  | 'battery_replacement'
+  | 'charging_issue'
+  | 'maintenance_routine'
+  | 'brake_service'
   | 'rental_self_drive'
   | 'rental_with_driver'
-  | 'carpool'
-  | 'shared_trip'
-  | 'fixed_route'
-  | 'wedding'
-  | 'tour'
-  | 'delivery'
-  | 'repair'
-  | 'insurance';
+  | 'tour_rental'
+  | 'short_term_rental'
+  | 'long_term_rental'
+  | 'battery_swap'
+  | 'mobile_swap'
+  | 'battery_health_check'
+  | 'towing'
+  | 'vehicle_delivery'
+  | 'intercity_transport'
+  | 'cleaning'
+  | 'customization'
+  | 'accessory_sale'
+  | 'license_support'
+  | 'insurance_sale'
+  | 'registration_assist';
+
 
 export interface RentalCompany_new {
   id: string;
