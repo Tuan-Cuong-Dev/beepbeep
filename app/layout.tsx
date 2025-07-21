@@ -14,9 +14,14 @@ export const metadata: Metadata = {
   title: "Bíp Bíp - Thuê xe dễ như bấm còi!",
   description: "Ứng dụng dịch vụ xe điện nhanh chóng, đơn giản và tiện lợi – từ Việt Nam vươn ra thế giới.",
   icons: {
-    icon: "/assets/images/favicon-bipbip.png",
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/assets/images/favicon-bipbip.png", type: "image/png" },
+    ],
+    apple: "/assets/images/apple-touch-icon.png",
   },
 };
+
 
 
 // ✅ TÁCH viewport thành export riêng
