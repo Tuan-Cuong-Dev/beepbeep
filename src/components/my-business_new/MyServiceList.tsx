@@ -5,6 +5,7 @@ import { db } from '@/src/firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useAuth } from '@/src/hooks/useAuth';
 import { SupportedServiceType } from '@/src/lib/rentalCompanies/rentalCompaniesTypes_new';
+import { useTranslation } from 'react-i18next';
 
 interface UserService {
   id: string;
@@ -16,7 +17,6 @@ interface UserService {
   description?: string;
 }
 
-// Optional: Friendly labels for service types
 const SERVICE_LABELS: Record<SupportedServiceType, string> = {
   repair_basic: 'Basic Repair',
   repair_advanced: 'Advanced Repair',
@@ -50,6 +50,7 @@ const SERVICE_LABELS: Record<SupportedServiceType, string> = {
 
 export default function MyServiceList() {
   const { currentUser } = useAuth();
+  const { t } = useTranslation('common');
   const [services, setServices] = useState<UserService[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -76,14 +77,12 @@ export default function MyServiceList() {
   }, [currentUser]);
 
   if (loading) {
-    return <p className="text-sm text-gray-500">Loading your services...</p>;
+    return <p className="text-sm text-gray-500">{t('my_service_list.loading')}</p>;
   }
 
   if (services.length === 0) {
     return (
-      <p className="text-sm text-gray-500">
-        You haven't published any services yet.
-      </p>
+      <p className="text-sm text-gray-500">{t('my_service_list.no_services')}</p>
     );
   }
 
@@ -100,8 +99,7 @@ export default function MyServiceList() {
                 {service.name}
               </h3>
               <p className="text-sm text-gray-500 capitalize">
-                {SERVICE_LABELS[service.category]} •{' '}
-                {service.vehicleTypes.join(', ')}
+                {t(`service_labels.${service.category}`)} • {service.vehicleTypes.join(', ')}
               </p>
               <p className="text-sm text-gray-400">{service.location}</p>
               {service.description && (
@@ -119,7 +117,7 @@ export default function MyServiceList() {
                   : 'bg-gray-200 text-gray-600'
               }`}
             >
-              {service.status}
+              {t(`my_service_list.status.${service.status}`)}
             </span>
           </div>
         </div>

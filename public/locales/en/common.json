@@ -819,7 +819,18 @@
   "my_business_section": {
   "services_title": "🔧 Services You Offer",
   "organization_title": "🏢 Your Business or Affiliated Organization"
+  },
+
+  "my_service_list": {
+  "loading": "Loading your services...",
+  "no_services": "You haven't published any services yet.",
+  "status": {
+    "active": "Active",
+    "pending": "Pending Approval",
+    "inactive": "Inactive"
   }
+}
+
 
 
 

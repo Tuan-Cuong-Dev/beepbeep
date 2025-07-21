@@ -796,7 +796,50 @@
   "my_business_section": {
   "services_title": "🔧 提供しているサービス",
   "organization_title": "🏢 所属する事業または組織"
+},
+
+"my_service_list": {
+  "loading": "サービスを読み込み中...",
+  "no_services": "まだサービスを公開していません。",
+  "status": {
+    "active": "アクティブ",
+    "pending": "審査中",
+    "inactive": "非アクティブ"
+  }
+},
+
+"service_labels": {
+  "repair_basic": "基本修理",
+  "repair_advanced": "高度修理",
+  "battery_replacement": "バッテリー交換",
+  "charging_issue": "充電の問題",
+  "maintenance_routine": "定期メンテナンス",
+  "brake_service": "ブレーキサービス",
+
+  "rental_self_drive": "セルフドライブレンタル",
+  "rental_with_driver": "運転手付きレンタル",
+  "tour_rental": "車両でのツアー",
+  "short_term_rental": "短期レンタル",
+  "long_term_rental": "長期レンタル",
+
+  "battery_swap": "ステーションでのバッテリー交換",
+  "mobile_swap": "モバイルバッテリー交換",
+  "battery_health_check": "バッテリー診断",
+
+  "towing": "けん引 / 救助",
+  "vehicle_delivery": "車両の配送",
+  "intercity_transport": "都市間輸送",
+
+  "cleaning": "車両クリーニング",
+  "customization": "カスタマイズ / アップグレード",
+  "accessory_sale": "アクセサリー販売",
+
+  "license_support": "免許サポート",
+  "insurance_sale": "保険販売",
+  "registration_assist": "登録サポート"
 }
+
+
 
 
   

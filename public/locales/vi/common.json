@@ -825,7 +825,48 @@
   "my_business_section": {
   "services_title": "🔧 Dịch vụ bạn cung cấp",
   "organization_title": "🏢 Doanh nghiệp hoặc tổ chức bạn đang tham gia"
+},
+
+"my_service_list": {
+  "loading": "Đang tải danh sách dịch vụ của bạn...",
+  "no_services": "Bạn chưa đăng bất kỳ dịch vụ nào.",
+  "status": {
+    "active": "Đang hoạt động",
+    "pending": "Chờ duyệt",
+    "inactive": "Không hoạt động"
+  }
+},
+"service_labels": {
+  "repair_basic": "Sửa chữa cơ bản",
+  "repair_advanced": "Sửa chữa nâng cao",
+  "battery_replacement": "Thay pin",
+  "charging_issue": "Lỗi sạc",
+  "maintenance_routine": "Bảo trì định kỳ",
+  "brake_service": "Dịch vụ phanh",
+
+  "rental_self_drive": "Thuê xe tự lái",
+  "rental_with_driver": "Thuê xe có tài xế",
+  "tour_rental": "Tour bằng xe điện",
+  "short_term_rental": "Thuê ngắn hạn",
+  "long_term_rental": "Thuê dài hạn",
+
+  "battery_swap": "Đổi pin tại trạm",
+  "mobile_swap": "Đổi pin di động",
+  "battery_health_check": "Kiểm tra tình trạng pin",
+
+  "towing": "Cứu hộ xe",
+  "vehicle_delivery": "Giao xe tận nơi",
+  "intercity_transport": "Vận chuyển liên tỉnh",
+
+  "cleaning": "Rửa xe",
+  "customization": "Độ xe / nâng cấp",
+  "accessory_sale": "Bán phụ kiện",
+
+  "license_support": "Hỗ trợ bằng lái",
+  "insurance_sale": "Bán bảo hiểm",
+  "registration_assist": "Hỗ trợ đăng ký xe"
 }
+
 
 
 
