@@ -47,11 +47,17 @@ export default function MyServiceList() {
     fetchServices();
   }, [currentUser]);
 
+  // ✅ Reset serviceType khi đổi category
+  const handleSelectCategory = (newCategory: string) => {
+    setCategory(newCategory);
+    setServiceType(undefined);
+  };
+
   return (
     <div className="grid gap-6">
       <AddNewServiceCard
         category={category}
-        onSelectCategory={setCategory}
+        onSelectCategory={handleSelectCategory}
         serviceType={serviceType}
         onSelectServiceType={setServiceType}
       />
@@ -94,6 +100,7 @@ function AddNewServiceCard({
     <div className="bg-white border rounded-xl p-4 shadow-sm space-y-6">
       <h3 className="text-base font-semibold">{t('my_service_list.add_new')}</h3>
 
+      {/* Step 1: Select Category */}
       <section className="border border-gray-200 rounded-lg p-4 bg-gray-50">
         <p className="text-sm font-medium text-gray-700 mb-3">
           {t('my_service_list.step1')}
@@ -104,6 +111,7 @@ function AddNewServiceCard({
         />
       </section>
 
+      {/* Step 2: Select Specific Service */}
       {category && (
         <section className="border border-gray-200 rounded-lg p-4 bg-gray-50">
           <p className="text-sm font-medium text-gray-700 mb-3">
@@ -117,17 +125,20 @@ function AddNewServiceCard({
           />
 
           {serviceType && (
-          <div className="mt-4">
-            <p className="text-sm text-gray-600">
-              {t('my_service_list.selected')}:{' '}
-              <strong>{t(`service_type_selector.${category}.${serviceType}.label`)}</strong>
-            </p>
-            <button className="mt-2 px-4 py-2 bg-[#00d289] text-white rounded-lg text-sm shadow">
-              {t('my_service_list.continue')}
-            </button>
-          </div>
-        )}
-
+            <div className="mt-4">
+              <p className="text-sm text-gray-600">
+                {t('my_service_list.selected')}:{' '}
+                <strong>
+                  {t(`service_type_selector.${category}.${serviceType}.label`, {
+                    defaultValue: serviceType,
+                  })}
+                </strong>
+              </p>
+              <button className="mt-2 px-4 py-2 bg-[#00d289] text-white rounded-lg text-sm shadow">
+                {t('my_service_list.continue')}
+              </button>
+            </div>
+          )}
         </section>
       )}
     </div>
@@ -143,7 +154,8 @@ function ServiceListItem({ service }: { service: UserService }) {
         <div>
           <h4 className="text-base font-semibold text-gray-800">{service.name}</h4>
           <p className="text-sm text-gray-500 capitalize">
-            {t(`service_labels.${service.category}`)} • {service.vehicleTypes.join(', ')}
+            {t(`service_labels.${service.category}`, { defaultValue: service.category })} •{' '}
+            {service.vehicleTypes.join(', ')}
           </p>
           <p className="text-sm text-gray-400">{service.location}</p>
           {service.description && (
@@ -159,7 +171,9 @@ function ServiceListItem({ service }: { service: UserService }) {
               : 'bg-gray-200 text-gray-600'
           }`}
         >
-          {t(`my_service_list.status.${service.status}`)}
+          {t(`my_service_list.status.${service.status}`, {
+            defaultValue: service.status,
+          })}
         </span>
       </div>
     </div>
