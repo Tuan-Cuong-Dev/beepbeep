@@ -947,7 +947,7 @@
     },
     "intercity_transport": {
       "label": "Vận chuyển liên tỉnh",
-      "description": "Vận chuyển phương tiện giữa các tỉnh"
+      "description": "Vận chuyển giữa các tỉnh"
     }
   },
   "care": {

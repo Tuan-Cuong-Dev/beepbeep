@@ -918,7 +918,7 @@
     },
     "intercity_transport": {
       "label": "都市間輸送",
-      "description": "県をまたぐ車両の輸送"
+      "description": "都道府県間の輸送サービス"
     }
   },
   "care": {

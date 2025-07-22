@@ -942,8 +942,9 @@
     },
     "intercity_transport": {
       "label": "Intercity Transport",
-      "description": "Transport between cities"
+      "description": "Transportation between cities or provinces"
     }
+
   },
   "care": {
     "vehicle_cleaning": {
