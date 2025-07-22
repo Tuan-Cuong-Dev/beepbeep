@@ -828,7 +828,13 @@
 },
 
 "my_service_list": {
-  "loading": "Đang tải danh sách dịch vụ của bạn...",
+  "title": "Dịch vụ của bạn",
+  "add_new": "Thêm dịch vụ mới",
+  "step1": "Bước 1: Chọn danh mục dịch vụ",
+  "step2": "Bước 2: Chọn dịch vụ cụ thể",
+  "selected": "Dịch vụ đã chọn",
+  "continue": "Tiếp tục tạo dịch vụ",
+  "loading": "Đang tải danh sách dịch vụ...",
   "no_services": "Bạn chưa đăng bất kỳ dịch vụ nào.",
   "status": {
     "active": "Đang hoạt động",
@@ -836,6 +842,7 @@
     "inactive": "Không hoạt động"
   }
 },
+
 "service_labels": {
   "repair_basic": "Sửa chữa cơ bản",
   "repair_advanced": "Sửa chữa nâng cao",
@@ -865,7 +872,102 @@
   "license_support": "Hỗ trợ bằng lái",
   "insurance_sale": "Bán bảo hiểm",
   "registration_assist": "Hỗ trợ đăng ký xe"
+},
+
+"service_category_selector": {
+  "repair": {
+    "label": "Sửa chữa & Bảo trì",
+    "description": "Sửa chữa cơ bản, pin, phanh, chẩn đoán"
+  },
+  "rental": {
+    "label": "Dịch vụ cho thuê xe",
+    "description": "Tự lái, tour, thuê ngắn hạn/dài hạn"
+  },
+  "battery": {
+    "label": "Dịch vụ pin",
+    "description": "Đổi pin, kiểm tra pin, giao pin tận nơi"
+  },
+  "transport": {
+    "label": "Vận chuyển & Cứu hộ",
+    "description": "Cứu hộ, giao xe liên tỉnh, nhận xe"
+  },
+  "care": {
+    "label": "Phụ kiện & Chăm sóc xe",
+    "description": "Rửa xe, độ xe, bán phụ kiện"
+  },
+  "legal": {
+    "label": "Bảo hiểm & Giấy tờ",
+    "description": "Bằng lái, đăng ký xe, bảo hiểm"
+  }
+},
+
+"service_type_selector": {
+  "repair": {
+    "repair": {
+      "label": "Sửa chữa tổng quát",
+      "description": "Dịch vụ sửa chữa tại chỗ hoặc tại cửa hàng"
+    },
+    "battery_check": {
+      "label": "Kiểm tra pin",
+      "description": "Kiểm tra sức khỏe và hiệu suất pin"
+    }
+  },
+  "rental": {
+    "rental_self_drive": {
+      "label": "Thuê xe tự lái",
+      "description": "Khách hàng tự điều khiển phương tiện"
+    },
+    "rental_with_driver": {
+      "label": "Thuê xe có tài xế",
+      "description": "Có tài xế chuyên nghiệp đi kèm"
+    },
+    "tour": {
+      "label": "Tour tham quan",
+      "description": "Tour tham quan bằng xe có hướng dẫn"
+    }
+  },
+  "battery": {
+    "battery_swap": {
+      "label": "Đổi pin",
+      "description": "Thay pin cũ nhanh chóng"
+    },
+    "battery_delivery": {
+      "label": "Giao pin tận nơi",
+      "description": "Giao pin đến vị trí của bạn"
+    }
+  },
+  "transport": {
+    "vehicle_rescue": {
+      "label": "Cứu hộ xe",
+      "description": "Kéo xe hoặc hỗ trợ khẩn cấp"
+    },
+    "intercity_transport": {
+      "label": "Vận chuyển liên tỉnh",
+      "description": "Giao xe giữa các tỉnh"
+    }
+  },
+  "care": {
+    "vehicle_cleaning": {
+      "label": "Rửa xe",
+      "description": "Dịch vụ rửa xe trong và ngoài"
+    },
+    "accessories_sales": {
+      "label": "Bán phụ kiện",
+      "description": "Mũ bảo hiểm, giá đỡ, dụng cụ, v.v."
+    }
+  },
+  "legal": {
+    "insurance": {
+      "label": "Hỗ trợ bảo hiểm",
+      "description": "Tư vấn hoặc bán bảo hiểm"
+    },
+    "registration_support": {
+      "label": "Đăng ký & giấy tờ",
+      "description": "Hỗ trợ thủ tục pháp lý"
+    }
+  }
 }
+
 
 
 

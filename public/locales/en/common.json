@@ -822,14 +822,148 @@
   },
 
   "my_service_list": {
+  "title": "Your Services",
+  "add_new": "Add a New Service",
+  "step1": "Step 1: Select a Service Category",
+  "step2": "Step 2: Choose a Specific Service",
+  "selected": "Selected Service",
+  "continue": "Continue to Create Service",
   "loading": "Loading your services...",
   "no_services": "You haven't published any services yet.",
   "status": {
     "active": "Active",
-    "pending": "Pending Approval",
+    "pending": "Pending",
     "inactive": "Inactive"
   }
+},
+
+"service_labels": {
+  "repair_basic": "Basic Repair",
+  "repair_advanced": "Advanced Repair",
+  "battery_replacement": "Battery Replacement",
+  "charging_issue": "Charging Issue",
+  "maintenance_routine": "Routine Maintenance",
+  "brake_service": "Brake Service",
+
+  "rental_self_drive": "Self-drive Rental",
+  "rental_with_driver": "Rental with Driver",
+  "tour_rental": "Tour by Electric Vehicle",
+  "short_term_rental": "Short-term Rental",
+  "long_term_rental": "Long-term Rental",
+
+  "battery_swap": "Battery Swap at Station",
+  "mobile_swap": "Mobile Battery Swap",
+  "battery_health_check": "Battery Health Check",
+
+  "towing": "Vehicle Towing / Rescue",
+  "vehicle_delivery": "Vehicle Delivery",
+  "intercity_transport": "Intercity Transport",
+
+  "cleaning": "Vehicle Cleaning",
+  "customization": "Customization / Upgrade",
+  "accessory_sale": "Accessory Sales",
+
+  "license_support": "Driver License Support",
+  "insurance_sale": "Vehicle Insurance",
+  "registration_assist": "Vehicle Registration Assistance"
+},
+
+"service_category_selector": {
+  "repair": {
+    "label": "Repair & Maintenance",
+    "description": "Basic fixes, battery, brakes, diagnostics"
+  },
+  "rental": {
+    "label": "Vehicle Rental",
+    "description": "Self-drive, tour rental, short-term and long-term"
+  },
+  "battery": {
+    "label": "Battery Services",
+    "description": "Battery swap, health check, mobile delivery"
+  },
+  "transport": {
+    "label": "Transport & Rescue",
+    "description": "Towing, intercity transport, vehicle pickup"
+  },
+  "care": {
+    "label": "Accessories & Care",
+    "description": "Cleaning, customization, accessory sales"
+  },
+  "legal": {
+    "label": "Insurance & Documents",
+    "description": "License support, registration, insurance"
+  }
+},
+
+"service_type_selector": {
+  "repair": {
+    "repair": {
+      "label": "一般修理",
+      "description": "現場または店舗での修理サービス"
+    },
+    "battery_check": {
+      "label": "バッテリー診断",
+      "description": "バッテリーの健康状態と性能をチェック"
+    }
+  },
+  "rental": {
+    "rental_self_drive": {
+      "label": "自走レンタル",
+      "description": "お客様自身が運転するレンタル"
+    },
+    "rental_with_driver": {
+      "label": "運転手付きレンタル",
+      "description": "プロの運転手が付き添うレンタル"
+    },
+    "tour": {
+      "label": "市内ツアー",
+      "description": "観光やガイド付きツアー"
+    }
+  },
+  "battery": {
+    "battery_swap": {
+      "label": "バッテリー交換",
+      "description": "古いバッテリーを即時交換"
+    },
+    "battery_delivery": {
+      "label": "バッテリー配達",
+      "description": "指定場所までバッテリーをお届け"
+    }
+  },
+  "transport": {
+    "vehicle_rescue": {
+      "label": "車両救助",
+      "description": "けん引や緊急対応サービス"
+    },
+    "intercity_transport": {
+      "label": "都市間輸送",
+      "description": "他の県への車両輸送"
+    }
+  },
+  "care": {
+    "vehicle_cleaning": {
+      "label": "車両クリーニング",
+      "description": "外装・内装の洗車サービス"
+    },
+    "accessories_sales": {
+      "label": "アクセサリー販売",
+      "description": "ヘルメット、スマホホルダー、工具などの販売"
+    }
+  },
+  "legal": {
+    "insurance": {
+      "label": "保険サポート",
+      "description": "保険の提供または相談"
+    },
+    "registration_support": {
+      "label": "登録・免許支援",
+      "description": "法的手続きのサポート"
+    }
+  }
 }
+
+
+
 
 
 

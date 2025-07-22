@@ -799,6 +799,12 @@
 },
 
 "my_service_list": {
+  "title": "あなたのサービス",
+  "add_new": "新しいサービスを追加",
+  "step1": "ステップ1：サービスカテゴリを選択",
+  "step2": "ステップ2：具体的なサービスを選択",
+  "selected": "選択されたサービス",
+  "continue": "サービス作成を続ける",
   "loading": "サービスを読み込み中...",
   "no_services": "まだサービスを公開していません。",
   "status": {
@@ -806,7 +812,8 @@
     "pending": "審査中",
     "inactive": "非アクティブ"
   }
-},
+}
+,
 
 "service_labels": {
   "repair_basic": "基本修理",
@@ -837,7 +844,103 @@
   "license_support": "免許サポート",
   "insurance_sale": "保険販売",
   "registration_assist": "登録サポート"
+},
+
+"service_category_selector": {
+  "repair": {
+    "label": "修理・メンテナンス",
+    "description": "基本的な修理、バッテリー、ブレーキ、診断"
+  },
+  "rental": {
+    "label": "車両レンタル",
+    "description": "自走レンタル、ツアー、短期・長期"
+  },
+  "battery": {
+    "label": "バッテリーサービス",
+    "description": "バッテリー交換、健康チェック、モバイル配達"
+  },
+  "transport": {
+    "label": "輸送・レスキュー",
+    "description": "牽引、都市間輸送、車両引取"
+  },
+  "care": {
+    "label": "アクセサリー＆ケア",
+    "description": "洗車、カスタマイズ、アクセサリー販売"
+  },
+  "legal": {
+    "label": "保険・書類",
+    "description": "免許サポート、登録、保険"
+  }
+},
+
+
+"service_type_selector": {
+  "repair": {
+    "repair": {
+      "label": "一般修理",
+      "description": "現場または店舗での修理サービス"
+    },
+    "battery_check": {
+      "label": "バッテリー診断",
+      "description": "バッテリーの健康状態と性能をチェック"
+    }
+  },
+  "rental": {
+    "rental_self_drive": {
+      "label": "自走レンタル",
+      "description": "お客様自身が運転するレンタル"
+    },
+    "rental_with_driver": {
+      "label": "運転手付きレンタル",
+      "description": "プロの運転手が付き添うレンタル"
+    },
+    "tour": {
+      "label": "市内ツアー",
+      "description": "観光やガイド付きツアー"
+    }
+  },
+  "battery": {
+    "battery_swap": {
+      "label": "バッテリー交換",
+      "description": "古いバッテリーを即時交換"
+    },
+    "battery_delivery": {
+      "label": "バッテリー配達",
+      "description": "指定場所までバッテリーをお届け"
+    }
+  },
+  "transport": {
+    "vehicle_rescue": {
+      "label": "車両救助",
+      "description": "けん引や緊急対応サービス"
+    },
+    "intercity_transport": {
+      "label": "都市間輸送",
+      "description": "他の県への車両輸送"
+    }
+  },
+  "care": {
+    "vehicle_cleaning": {
+      "label": "車両クリーニング",
+      "description": "外装・内装の洗車サービス"
+    },
+    "accessories_sales": {
+      "label": "アクセサリー販売",
+      "description": "ヘルメット、スマホホルダー、工具などの販売"
+    }
+  },
+  "legal": {
+    "insurance": {
+      "label": "保険サポート",
+      "description": "保険の提供または相談"
+    },
+    "registration_support": {
+      "label": "登録・免許支援",
+      "description": "法的手続きのサポート"
+    }
+  }
 }
+
 
 
 
