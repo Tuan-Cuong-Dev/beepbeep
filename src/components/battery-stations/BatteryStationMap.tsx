@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 // Icon trạm đổi pin
 const stationIcon = L.icon({
   iconUrl: '/assets/images/batterystation_new.png',
-  iconSize: [32, 38],
+  iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
 });
