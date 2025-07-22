@@ -736,7 +736,10 @@
     "repair_shop": "Repair Shop",
     "rental_shop": "Rental Station",
     "battery_station": "Battery Station"
-  }
+  }, 
+  "previous": "Previous",
+  "next": "Next",
+  "page": "Page"
 },
 
 "repair_shop_edit_form": {

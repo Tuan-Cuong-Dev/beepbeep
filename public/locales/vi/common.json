@@ -743,7 +743,10 @@
     "repair_shop": "Tiệm sửa xe",
     "rental_shop": "Trạm cho thuê xe",
     "battery_station": "Trạm pin"
-  }
+  },
+  "previous": "Trước",
+  "next": "Sau",
+  "page": "Trang"
 },
 
 "repair_shop_edit_form": {

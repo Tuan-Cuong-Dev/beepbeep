@@ -713,7 +713,10 @@
     "repair_shop": "修理店",
     "rental_shop": "レンタルステーション",
     "battery_station": "バッテリーステーション"
-  }
+  },
+  "previous": "前へ",
+  "next": "次へ",
+  "page": "ページ"
 },
 
 "repair_shop_edit_form": {

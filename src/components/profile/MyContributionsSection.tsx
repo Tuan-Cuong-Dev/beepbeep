@@ -22,6 +22,8 @@ interface MappedContribution {
   status: 'approved' | 'pending';
 }
 
+const ITEMS_PER_PAGE = 5;
+
 export default function MyContributionsSection() {
   const { currentUser } = useAuth();
   const { getMyContributions } = useContributions();
@@ -32,9 +34,10 @@ export default function MyContributionsSection() {
   const [loading, setLoading] = useState(true);
   const [pointsLoading, setPointsLoading] = useState(true);
 
-  // Modal state
   const [editing, setEditing] = useState<MappedContribution | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!currentUser?.uid) return;
@@ -85,11 +88,7 @@ export default function MyContributionsSection() {
       }));
 
       setContributions(
-        all.sort((a, b) => {
-          const tA = a.createdAt?.toMillis?.() || 0;
-          const tB = b.createdAt?.toMillis?.() || 0;
-          return tB - tA;
-        })
+        all.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0))
       );
       setLoading(false);
     };
@@ -159,6 +158,12 @@ export default function MyContributionsSection() {
     );
   };
 
+  const totalPages = Math.ceil(pointHistory.length / ITEMS_PER_PAGE);
+  const paginatedPoints = pointHistory.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <>
       <Tabs defaultValue="contributions" className="space-y-6">
@@ -191,7 +196,7 @@ export default function MyContributionsSection() {
             <div className="bg-white shadow rounded p-4 border mt-4">
               <h3 className="text-lg font-bold mb-4">{t('contribution_points_section.title')}</h3>
               <ul className="divide-y divide-gray-200">
-                {pointHistory.map((c) => (
+                {paginatedPoints.map((c) => (
                   <li key={c.id} className="py-2">
                     <div className="flex justify-between items-start">
                       <div>
@@ -214,10 +219,28 @@ export default function MyContributionsSection() {
                   </li>
                 ))}
               </ul>
+              <div className="flex justify-center mt-4 space-x-2 text-sm">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  {t('my_contributions_section.previous')}
+                </button>
+                <span className="px-3 py-1 border rounded text-gray-600">
+                  {t('my_contributions_section.page')} {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  {t('my_contributions_section.next')}
+                </button>
+              </div>
             </div>
           )}
         </TabsContent>
-
       </Tabs>
 
       <EditContributionModal
