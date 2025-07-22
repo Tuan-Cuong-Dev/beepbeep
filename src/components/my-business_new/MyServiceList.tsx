@@ -117,15 +117,17 @@ function AddNewServiceCard({
           />
 
           {serviceType && (
-            <div className="mt-4">
-              <p className="text-sm text-gray-600">
-                {t('my_service_list.selected')}: <strong>{serviceType}</strong>
-              </p>
-              <button className="mt-2 px-4 py-2 bg-[#00d289] text-white rounded-lg text-sm shadow">
-                {t('my_service_list.continue')}
-              </button>
-            </div>
-          )}
+          <div className="mt-4">
+            <p className="text-sm text-gray-600">
+              {t('my_service_list.selected')}:{' '}
+              <strong>{t(`service_type_selector.${category}.${serviceType}.label`)}</strong>
+            </p>
+            <button className="mt-2 px-4 py-2 bg-[#00d289] text-white rounded-lg text-sm shadow">
+              {t('my_service_list.continue')}
+            </button>
+          </div>
+        )}
+
         </section>
       )}
     </div>

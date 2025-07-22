@@ -901,15 +901,16 @@
   }
 },
 
+
 "service_type_selector": {
   "repair": {
     "repair": {
       "label": "Sửa chữa tổng quát",
-      "description": "Dịch vụ sửa chữa tại chỗ hoặc tại cửa hàng"
+      "description": "Dịch vụ sửa chữa tại chỗ và tại cửa hàng"
     },
     "battery_check": {
       "label": "Kiểm tra pin",
-      "description": "Kiểm tra sức khỏe và hiệu suất pin"
+      "description": "Đánh giá tình trạng và hiệu suất của pin"
     }
   },
   "rental": {
@@ -919,55 +920,54 @@
     },
     "rental_with_driver": {
       "label": "Thuê xe có tài xế",
-      "description": "Có tài xế chuyên nghiệp đi kèm"
+      "description": "Bao gồm tài xế chuyên nghiệp"
     },
     "tour": {
       "label": "Tour tham quan",
-      "description": "Tour tham quan bằng xe có hướng dẫn"
+      "description": "Tham quan thành phố và tour hướng dẫn"
     }
   },
   "battery": {
     "battery_swap": {
       "label": "Đổi pin",
-      "description": "Thay pin cũ nhanh chóng"
+      "description": "Thay pin cũ ngay lập tức"
     },
     "battery_delivery": {
       "label": "Giao pin tận nơi",
-      "description": "Giao pin đến vị trí của bạn"
+      "description": "Giao pin đến địa điểm của bạn"
     }
   },
   "transport": {
     "vehicle_rescue": {
-      "label": "Cứu hộ xe",
+      "label": "Cứu hộ phương tiện",
       "description": "Kéo xe hoặc hỗ trợ khẩn cấp"
     },
     "intercity_transport": {
       "label": "Vận chuyển liên tỉnh",
-      "description": "Giao xe giữa các tỉnh"
+      "description": "Vận chuyển phương tiện giữa các tỉnh"
     }
   },
   "care": {
     "vehicle_cleaning": {
       "label": "Rửa xe",
-      "description": "Dịch vụ rửa xe trong và ngoài"
+      "description": "Dịch vụ rửa trong và ngoài xe"
     },
     "accessories_sales": {
       "label": "Bán phụ kiện",
-      "description": "Mũ bảo hiểm, giá đỡ, dụng cụ, v.v."
+      "description": "Bán mũ bảo hiểm, giá đỡ điện thoại, dụng cụ..."
     }
   },
   "legal": {
     "insurance": {
       "label": "Hỗ trợ bảo hiểm",
-      "description": "Tư vấn hoặc bán bảo hiểm"
+      "description": "Cung cấp hoặc tư vấn bảo hiểm"
     },
     "registration_support": {
-      "label": "Đăng ký & giấy tờ",
-      "description": "Hỗ trợ thủ tục pháp lý"
+      "label": "Đăng ký & cấp phép",
+      "description": "Hỗ trợ giấy tờ pháp lý"
     }
   }
 }
-
 
 
 

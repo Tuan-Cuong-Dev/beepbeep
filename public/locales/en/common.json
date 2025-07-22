@@ -868,6 +868,7 @@
   "registration_assist": "Vehicle Registration Assistance"
 },
 
+
 "service_category_selector": {
   "repair": {
     "label": "Repair & Maintenance",
@@ -895,72 +896,76 @@
   }
 },
 
+
 "service_type_selector": {
   "repair": {
     "repair": {
-      "label": "一般修理",
-      "description": "現場または店舗での修理サービス"
+      "label": "Repair Service",
+      "description": "General repairs and diagnostics"
     },
     "battery_check": {
-      "label": "バッテリー診断",
-      "description": "バッテリーの健康状態と性能をチェック"
+      "label": "Battery Check",
+      "description": "Inspect and test battery condition"
     }
   },
   "rental": {
     "rental_self_drive": {
-      "label": "自走レンタル",
-      "description": "お客様自身が運転するレンタル"
+      "label": "Self-drive Rental",
+      "description": "Rent a vehicle and drive yourself"
     },
     "rental_with_driver": {
-      "label": "運転手付きレンタル",
-      "description": "プロの運転手が付き添うレンタル"
+      "label": "Rental with Driver",
+      "description": "Hire a vehicle with a driver"
     },
     "tour": {
-      "label": "市内ツアー",
-      "description": "観光やガイド付きツアー"
+      "label": "Tour Service",
+      "description": "Guided tours and travel packages"
     }
   },
   "battery": {
     "battery_swap": {
-      "label": "バッテリー交換",
-      "description": "古いバッテリーを即時交換"
+      "label": "Battery Swap",
+      "description": "Quick swap service for batteries"
     },
     "battery_delivery": {
-      "label": "バッテリー配達",
-      "description": "指定場所までバッテリーをお届け"
+      "label": "Battery Delivery",
+      "description": "Get batteries delivered to you"
     }
   },
   "transport": {
     "vehicle_rescue": {
-      "label": "車両救助",
-      "description": "けん引や緊急対応サービス"
+      "label": "Vehicle Rescue",
+      "description": "Breakdown and rescue service"
     },
     "intercity_transport": {
-      "label": "都市間輸送",
-      "description": "他の県への車両輸送"
+      "label": "Intercity Transport",
+      "description": "Transport between cities"
     }
   },
   "care": {
     "vehicle_cleaning": {
-      "label": "車両クリーニング",
-      "description": "外装・内装の洗車サービス"
+      "label": "Vehicle Cleaning",
+      "description": "Washing and polishing"
     },
     "accessories_sales": {
-      "label": "アクセサリー販売",
-      "description": "ヘルメット、スマホホルダー、工具などの販売"
+      "label": "Accessories Sales",
+      "description": "Buy vehicle accessories"
     }
   },
   "legal": {
     "insurance": {
-      "label": "保険サポート",
-      "description": "保険の提供または相談"
+      "label": "Insurance",
+      "description": "Insurance plans and support"
     },
     "registration_support": {
-      "label": "登録・免許支援",
-      "description": "法的手続きのサポート"
+      "label": "Registration Support",
+      "description": "Help with paperwork and licensing"
     }
   }
 }
+
+
+
 
 
 
