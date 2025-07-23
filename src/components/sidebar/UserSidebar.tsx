@@ -103,7 +103,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
 
     items.push(
       { icon: FaEnvelope, label: t('user_sidebar.menu.messages'), path: '/messages' },
-      { icon: FaBuilding, label: t('user_sidebar.menu.my_business'), path: '/my-business' },
+      { icon: FaBuilding, label: t('user_sidebar.menu.dashboard'), path: '/dashboard' },
       { divider: true }
     );
 

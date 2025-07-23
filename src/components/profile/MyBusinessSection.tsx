@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import MyServiceList from '@/src/components/my-business_new/MyServiceList';
-import MyOrganizationInfo from '@/src/components/my-business_new/MyOrganizationInfo';
+import MyServiceList from '@/src/components/my-business/MyServiceList';
+import MyOrganizationInfo from '@/src/components/my-business/MyOrganizationInfo';
 
 export default function MyBusinessSection() {
   const { t } = useTranslation('common');

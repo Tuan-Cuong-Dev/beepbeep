@@ -1,11 +1,14 @@
+// Điều hướng đến các UI của từng account theo vai trò
+// Hiển thị giao diện theo logic của Account đăng nhập.
+
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-import CreateBusinessForm from '@/src/components/my-business/CreateBusinessForm';
-import CreateAgentForm from '@/src/components/my-business/CreateAgentForm';
+import CreateBusinessForm from '@/src/components/my-business/create/CreateBusinessForm';
+import CreateAgentForm from '@/src/components/my-business/create/CreateAgentForm';
 import { BusinessType, BUSINESS_TYPE_LABELS } from '@/src/lib/my-business/businessTypes';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';

@@ -160,7 +160,7 @@
     "profile": "プロフィール",
     "bookings": "予約",
     "messages": "メッセージ",
-    "my_business": "マイビジネス",
+    "dashboard": "ダッシュボード",
     "account_info": "アカウント情報",
     "agent_dashboard": "代理店ダッシュボード",
     "earnings": "収益",
@@ -941,7 +941,72 @@
       "description": "法的書類のサポート"
     }
   }
+},
+
+"my_organization_info": {
+  "loading": "組織情報を読み込んでいます..."
+},
+
+"organization_card": {
+  "your_role": "あなたの役割",
+  "manage": "管理する",
+  "role": {
+    "owner": "オーナー",
+    "creator": "作成者",
+    "staff": "スタッフ",
+    "member": "メンバー"
+  },
+  "type": {
+    "rental_company": "レンタル会社",
+    "technician_partner": "技術パートナー",
+    "agent": "代理店",
+    "private_owner": "個人オーナー",
+    "tour_guide": "ツアーガイド",
+    "intercity_bus": "都市間バス",
+    "vehicle_transport": "車両輸送"
+  }
+},
+
+"organization_create_chooser": {
+  "intro": "まだ組織に参加または作成していません。まずは役割を選択してください：",
+  "technician_partner": {
+    "mobile": {
+      "title": "独立系技術者",
+      "description": "出張修理を提供するモバイル技術者。"
+    },
+    "shop": {
+      "title": "修理工場",
+      "description": "バッテリーやブレーキなどのガレージ修理サービス。"
+    }
+  },
+  "rental_company": {
+    "title": "レンタル会社",
+    "description": "車両・拠点・予約・スタッフを管理します。"
+  },
+  "private_owner": {
+    "title": "個人オーナー",
+    "description": "自分の車両をレンタルしたり、サービスを提供。"
+  },
+  "agent": {
+    "title": "紹介者 / エージェント",
+    "description": "顧客を紹介して報酬を得る。"
+  },
+  "intercity_bus": {
+    "title": "長距離バス運行会社",
+    "description": "都道府県間のルートと乗客輸送を管理。"
+  },
+  "vehicle_transport": {
+    "title": "車両輸送業者",
+    "description": "けん引や長距離輸送サービスを提供。"
+  },
+  "tour_guide": {
+    "title": "ツアーガイド",
+    "description": "バイクツアーやセルフドライブ体験を提供。"
+  }
 }
+
+
+
 
 
 

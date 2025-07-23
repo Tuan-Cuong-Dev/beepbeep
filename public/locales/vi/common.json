@@ -169,7 +169,7 @@
     "profile": "Hồ sơ",
     "bookings": "Đơn đặt xe",
     "messages": "Tin nhắn",
-    "my_business": "Doanh nghiệp của tôi",
+    "dashboard": "Bảng điểu khiển",
     "account_info": "Thông tin tài khoản",
     "agent_dashboard": "Bảng điều khiển Cộng tác viên",
     "earnings": "Thu nhập",
@@ -970,7 +970,72 @@
       "description": "Hỗ trợ giấy tờ pháp lý"
     }
   }
+},
+
+"my_organization_info": {
+  "loading": "Đang tải thông tin tổ chức..."
+},
+
+"organization_card": {
+  "your_role": "Vai trò của bạn",
+  "manage": "Quản lý",
+  "role": {
+    "owner": "Chủ sở hữu",
+    "creator": "Người tạo",
+    "staff": "Nhân viên",
+    "member": "Thành viên"
+  },
+  "type": {
+    "rental_company": "Công ty cho thuê xe",
+    "technician_partner": "Đối tác kỹ thuật",
+    "agent": "Đại lý",
+    "private_owner": "Chủ xe cá nhân",
+    "tour_guide": "Hướng dẫn viên",
+    "intercity_bus": "Xe liên tỉnh",
+    "vehicle_transport": "Vận chuyển xe"
+  }
+},
+
+"organization_create_chooser": {
+  "intro": "Bạn chưa tham gia hoặc tạo bất kỳ tổ chức nào. Hãy chọn vai trò để bắt đầu:",
+  "technician_partner": {
+    "mobile": {
+      "title": "Kỹ thuật viên độc lập",
+      "description": "Kỹ thuật viên di động cung cấp sửa chữa tận nơi."
+    },
+    "shop": {
+      "title": "Cửa hàng sửa xe",
+      "description": "Dịch vụ tại garage: sửa pin, phanh, và xe."
+    }
+  },
+  "rental_company": {
+    "title": "Công ty cho thuê xe",
+    "description": "Quản lý đội xe, trạm, đơn đặt và nhân sự."
+  },
+  "private_owner": {
+    "title": "Chủ xe cá nhân",
+    "description": "Cho thuê xe cá nhân hoặc cung cấp dịch vụ."
+  },
+  "agent": {
+    "title": "Cộng tác viên / Người giới thiệu",
+    "description": "Giới thiệu khách hàng và nhận hoa hồng."
+  },
+  "intercity_bus": {
+    "title": "Nhà xe liên tỉnh",
+    "description": "Quản lý tuyến đường và vận chuyển hành khách giữa các tỉnh."
+  },
+  "vehicle_transport": {
+    "title": "Dịch vụ vận chuyển xe",
+    "description": "Cung cấp kéo xe và giao xe đường dài."
+  },
+  "tour_guide": {
+    "title": "Hướng dẫn viên du lịch",
+    "description": "Tổ chức tour xe hoặc hành trình tự lái."
+  }
 }
+
+
+
 
 
 

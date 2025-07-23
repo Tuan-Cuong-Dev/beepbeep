@@ -168,7 +168,7 @@
       "profile": "Profile",
       "bookings": "Bookings",
       "messages": "Messages",
-      "my_business": "My business",
+      "dashboard": "Dashboard",
       "account_info": "Account Info",
       "agent_dashboard": "Agent Dashboard",
       "earnings": "Earnings",
@@ -966,7 +966,73 @@
       "description": "Help with paperwork and licensing"
     }
   }
+},
+
+"my_organization_info": {
+    "loading": "Loading organization information..."
+  },
+
+"organization_card": {
+  "your_role": "Your role",
+  "manage": "Manage",
+  "role": {
+    "owner": "Owner",
+    "creator": "Creator",
+    "staff": "Staff",
+    "member": "Member"
+  },
+  "type": {
+    "rental_company": "Rental Company",
+    "technician_partner": "Technician Partner",
+    "agent": "Agent",
+    "private_owner": "Private Owner",
+    "tour_guide": "Tour Guide",
+    "intercity_bus": "Intercity Bus",
+    "vehicle_transport": "Vehicle Transport"
+  }
+},
+
+"organization_create_chooser": {
+  "intro": "You haven’t joined or created any organization yet. Choose a role to get started:",
+  "technician_partner": {
+    "mobile": {
+      "title": "Independent Technician",
+      "description": "Mobile technician offering on-site repairs."
+    },
+    "shop": {
+      "title": "Repair Shop",
+      "description": "Garage-based service for battery, brakes, repairs."
+    }
+  },
+  "rental_company": {
+    "title": "Rental Company",
+    "description": "Manage fleet, stations, bookings, and staff."
+  },
+  "private_owner": {
+    "title": "Private Owner",
+    "description": "Rent out your personal vehicle or offer services."
+  },
+  "agent": {
+    "title": "Agent / Referrer",
+    "description": "Refer customers and earn commissions."
+  },
+  "intercity_bus": {
+    "title": "Intercity Bus Operator",
+    "description": "Manage routes and transport passengers between provinces."
+  },
+  "vehicle_transport": {
+    "title": "Vehicle Transporter",
+    "description": "Offer towing and long-distance vehicle delivery."
+  },
+  "tour_guide": {
+    "title": "Tour Guide",
+    "description": "Offer bike tours or self-drive experiences."
+  }
 }
+
+
+
+
 
 
 

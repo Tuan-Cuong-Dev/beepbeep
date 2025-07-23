@@ -112,53 +112,18 @@ export default function MyContributionsSection() {
   const getStatusColor = (status: MappedContribution['status']) =>
     status === 'approved' ? 'text-green-600' : 'text-yellow-600';
 
-  const grouped = {
-    repair_shop: contributions.filter((c) => c.type === 'repair_shop'),
-    rental_shop: contributions.filter((c) => c.type === 'rental_shop'),
-    battery_station: contributions.filter((c) => c.type === 'battery_station'),
-  };
-
   const openEditModal = (item: MappedContribution) => {
     setEditing(item);
     setModalOpen(true);
   };
 
-  const renderSection = (type: MappedContribution['type']) => {
-    const items = grouped[type];
-    if (!items.length) return null;
+  const totalContribPages = Math.ceil(contributions.length / ITEMS_PER_PAGE);
+  const paginatedContributions = contributions.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
-    return (
-      <section className="mb-6">
-        <h2 className="text-lg font-semibold text-[#00d289] mb-2">
-          {t(`my_contributions_section.types.${type}`)}
-        </h2>
-        <div className="space-y-4">
-          {items.map((item) => (
-            <div key={item.id} className="border rounded-lg p-4 shadow-sm bg-white">
-              <div className="flex justify-between items-center mb-1">
-                <p className="font-medium text-gray-800">{item.name}</p>
-                <p className="text-xs text-gray-500">
-                  {item.createdAt ? format(item.createdAt.toDate(), 'dd/MM/yyyy') : '—'}
-                </p>
-              </div>
-              <p className="text-sm text-gray-600">{item.address}</p>
-              <div className="flex justify-between items-center mt-2">
-                <p className="text-xs text-gray-500">
-                  {t('my_contributions_section.status_label')}{' '}
-                  <span className={getStatusColor(item.status)}>{getStatusLabel(item.status)}</span>
-                </p>
-                <Button variant="outline" size="sm" onClick={() => openEditModal(item)}>
-                  {t('my_contributions_section.edit')}
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  };
-
-  const totalPages = Math.ceil(pointHistory.length / ITEMS_PER_PAGE);
+  const totalPointPages = Math.ceil(pointHistory.length / ITEMS_PER_PAGE);
   const paginatedPoints = pointHistory.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -179,9 +144,47 @@ export default function MyContributionsSection() {
             <p className="p-4">{t('profiles_page_content.no_contributions')}</p>
           ) : (
             <>
-              {renderSection('repair_shop')}
-              {renderSection('rental_shop')}
-              {renderSection('battery_station')}
+              <div className="space-y-4">
+                {paginatedContributions.map((item) => (
+                  <div key={item.id} className="border rounded-lg p-4 shadow-sm bg-white">
+                    <div className="flex justify-between items-center mb-1">
+                      <p className="font-medium text-gray-800">{item.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {item.createdAt ? format(item.createdAt.toDate(), 'dd/MM/yyyy') : '—'}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-600">{item.address}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <p className="text-xs text-gray-500">
+                        {t('my_contributions_section.status_label')}{' '}
+                        <span className={getStatusColor(item.status)}>{getStatusLabel(item.status)}</span>
+                      </p>
+                      <Button variant="outline" size="sm" onClick={() => openEditModal(item)}>
+                        {t('my_contributions_section.edit')}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-center mt-4 space-x-2 text-sm">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  {t('my_contributions_section.previous')}
+                </button>
+                <span className="px-3 py-1 border rounded text-gray-600">
+                  {t('my_contributions_section.page')} {currentPage} / {totalContribPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalContribPages))}
+                  disabled={currentPage === totalContribPages}
+                  className="px-3 py-1 border rounded disabled:opacity-50"
+                >
+                  {t('my_contributions_section.next')}
+                </button>
+              </div>
             </>
           )}
         </TabsContent>
@@ -228,11 +231,11 @@ export default function MyContributionsSection() {
                   {t('my_contributions_section.previous')}
                 </button>
                 <span className="px-3 py-1 border rounded text-gray-600">
-                  {t('my_contributions_section.page')} {currentPage} / {totalPages}
+                  {t('my_contributions_section.page')} {currentPage} / {totalPointPages}
                 </span>
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPointPages))}
+                  disabled={currentPage === totalPointPages}
                   className="px-3 py-1 border rounded disabled:opacity-50"
                 >
                   {t('my_contributions_section.next')}

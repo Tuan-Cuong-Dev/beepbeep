@@ -6,16 +6,16 @@ import { getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useUser } from '@/src/context/AuthContext';
 
-import RentalCompanyDashboard from '@/src/components/my-business/dashboards/RentalCompanyDashboard';
-import PrivateProviderDashboard from '@/src/components/my-business/dashboards/PrivateProviderDashboard';
-import AgentDashboard from '@/src/components/my-business/dashboards/AgentDashboard';
-import AdminDashboard from '@/src/components/my-business/dashboards/AdminDashboard';
-import StaffDashboard from '@/src/components/my-business/dashboards/StaffDashboard';
-import TechnicianDashboard from '@/src/components/my-business/dashboards/TechnicianDashboard';
-import CompanyAdminDashboard from '@/src/components/my-business/dashboards/CompanyAdminDashboard';
-import StationManagerDashboard from '@/src/components/my-business/dashboards/StationManagerDashboard';
-import TechnicianAssistantDashboard from '@/src/components/my-business/dashboards/TechnicianAssistantDashboard'; // ✅ Mới thêm
-import TechnicianPartnerDashboard from '@/src/components/my-business/dashboards/TechnicianPartnerDashboard';
+import RentalCompanyDashboard from '@/src/components/dashboards/RentalCompanyDashboard';
+import PrivateProviderDashboard from '@/src/components/dashboards/PrivateProviderDashboard';
+import AgentDashboard from '@/src/components/dashboards/AgentDashboard';
+import AdminDashboard from '@/src/components/dashboards/AdminDashboard';
+import StaffDashboard from '@/src/components/dashboards/StaffDashboard';
+import TechnicianDashboard from '@/src/components/dashboards/TechnicianDashboard';
+import CompanyAdminDashboard from '@/src/components/dashboards/CompanyAdminDashboard';
+import StationManagerDashboard from '@/src/components/dashboards/StationManagerDashboard';
+import TechnicianAssistantDashboard from '@/src/components/dashboards/TechnicianAssistantDashboard'; // ✅ Mới thêm
+import TechnicianPartnerDashboard from '@/src/components/dashboards/TechnicianPartnerDashboard';
 
 interface StaffEntry {
   id: string;
