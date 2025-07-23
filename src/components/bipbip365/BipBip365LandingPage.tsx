@@ -113,28 +113,41 @@ export default function BipBip365LandingPage() {
               Câu hỏi thường gặp
             </h2>
 
-            <div className="space-y-6 text-base text-gray-700">
-              <div>
-                <p className="font-semibold">Gói Dịch vụ cứu hộ áp dụng cho xe nào?</p>
-                <p>Xe máy điện, xe đạp điện, xe xăng cá nhân.</p>
+            <section className="bg-[#f0fdf4] py-16 px-6">
+              <div className="max-w-6xl mx-auto">
+                <h2 className="text-2xl font-semibold text-center mb-10">
+                  Câu hỏi thường gặp
+                </h2>
+
+                <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 text-base text-gray-700">
+                  <div>
+                    <p className="font-semibold">Gói Dịch vụ cứu hộ áp dụng cho xe nào?</p>
+                    <p>Xe máy điện, xe đạp điện, xe xăng cá nhân.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold">Tôi có thể mua cho người thân không?</p>
+                    <p>Có, chỉ cần nhập thông tin xe và chủ xe.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold">Nếu xe tôi hỏng ở xa thì sao?</p>
+                    <p>Mở app/web Bíp Bíp và bấm "HỎNG XE" – kỹ thuật viên sẽ đến hỗ trợ tận nơi.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold">Dịch vụ đang áp dụng tại tỉnh thành phố nào?</p>
+                    <p>Chúng tôi hiện chỉ áp dụng tại Thành phố Đà Nẵng.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold">Không dùng web/app Bíp Bíp thì gọi số nào?</p>
+                    <p>Bạn có thể gọi tổng đài <strong>1800 8389</strong> để được hỗ trợ nhanh chóng.</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold">Tôi có thể mua cho người thân không?</p>
-                <p>Có, chỉ cần nhập thông tin xe và chủ xe.</p>
-              </div>
-              <div>
-                <p className="font-semibold">Nếu xe tôi hỏng ở xa thì sao?</p>
-                <p>Mở app/web Bíp Bíp và bấm "HỎNG XE" – kỹ thuật viên sẽ đến hỗ trợ tận nơi.</p>
-              </div>
-              <div>
-                <p className="font-semibold">Dịch vụ đang áp dụng tại tỉnh thành phố nào?</p>
-                <p>Chúng tôi hiện chỉ áp dụng tại Thành phố Đà Nẵng.</p>
-              </div>
-              <div>
-                <p className="font-semibold">Không dùng web/app Bíp Bíp thì gọi số nào?</p>
-                <p>Bạn có thể gọi tổng đài <strong>1800 8389</strong> để được hỗ trợ nhanh chóng.</p>
-              </div>
-            </div>
+            </section>
+
 
           </div>
         </section>
