@@ -29,7 +29,7 @@ export interface OrgCardData {
   description?: string;
   createdAt?: any;
   updatedAt?: any;
-  userRoleInOrg: 'owner';
+  userRoleInOrg: 'owner' | 'company_admin' | 'station_manager' | 'technician' | 'support';
 }
 
 export async function getUserOrganizations(uid: string): Promise<OrgCardData[]> {
@@ -70,44 +70,55 @@ export async function getUserOrganizations(uid: string): Promise<OrgCardData[]> 
     });
   };
 
+  // 1️⃣ Lấy các tổ chức user là owner
   await Promise.all([
-    fetch({
-      col: 'rentalCompanies',
-      type: 'rental_company',
-      nameField: 'name',
-    }),
-    fetch({
-      col: 'technicianPartners',
-      type: 'technician_partner',
-      nameField: 'shopName',
-      subtypeField: 'type', // 'shop' | 'mobile'
-    }),
-    fetch({
-      col: 'agents',
-      type: 'agent',
-      nameField: 'name',
-    }),
-    fetch({
-      col: 'privateOwners',
-      type: 'private_owner',
-      nameField: 'name',
-    }),
-    fetch({
-      col: 'tourGuides',
-      type: 'tour_guide',
-      nameField: 'name',
-    }),
-    fetch({
-      col: 'intercityBuses',
-      type: 'intercity_bus',
-      nameField: 'companyName',
-    }),
-    fetch({
-      col: 'vehicleTransporters',
-      type: 'vehicle_transport',
-      nameField: 'companyName',
-    }),
+    fetch({ col: 'rentalCompanies', type: 'rental_company', nameField: 'name' }),
+    fetch({ col: 'technicianPartners', type: 'technician_partner', nameField: 'shopName', subtypeField: 'type' }),
+    fetch({ col: 'agents', type: 'agent', nameField: 'name' }),
+    fetch({ col: 'privateOwners', type: 'private_owner', nameField: 'name' }),
+    fetch({ col: 'tourGuides', type: 'tour_guide', nameField: 'name' }),
+    fetch({ col: 'intercityBuses', type: 'intercity_bus', nameField: 'companyName' }),
+    fetch({ col: 'vehicleTransporters', type: 'vehicle_transport', nameField: 'companyName' }),
   ]);
+
+  // 2️⃣ Lấy các tổ chức user là staff
+  const staffSnap = await getDocs(
+    query(collection(db, 'staffs'), where('userId', '==', uid))
+  );
+
+  const rentalCompanyIds = staffSnap.docs.map((doc) => ({
+    companyId: doc.data().companyId,
+    role: doc.data().role as OrgCardData['userRoleInOrg'],
+  }));
+
+  const ownedCompanyIds = new Set(results.map((org) => org.id));
+
+  for (const { companyId, role } of rentalCompanyIds) {
+    if (ownedCompanyIds.has(companyId)) continue;
+
+    const companySnap = await getDocs(
+      query(collection(db, 'rentalCompanies'), where('__name__', '==', companyId))
+    );
+
+    companySnap.forEach((docSnap) => {
+      const d = docSnap.data();
+      results.push({
+        id: docSnap.id,
+        type: 'rental_company',
+        ownerId: d.ownerId,
+        name: d.name,
+        logoUrl: d.logoUrl || '',
+        displayAddress: d.displayAddress || '',
+        email: d.email || '',
+        phone: d.phone || '',
+        website: d.website || '',
+        description: d.description || '',
+        createdAt: d.createdAt,
+        updatedAt: d.updatedAt,
+        userRoleInOrg: role || 'staff',
+      });
+    });
+  }
 
   return results;
 }
