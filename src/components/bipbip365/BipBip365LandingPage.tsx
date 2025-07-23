@@ -25,7 +25,7 @@ export default function BipBip365LandingPage() {
                 {bipbip365?.name || 'Gói Bíp Bíp 365K'}
               </h1>
               <p className="text-xl font-medium">
-                Bảo hiểm cho xe điện cá nhân – chỉ 365.000đ/năm
+                Gói dịch vụ cứu hộ cho xe điện cá nhân – chỉ 365.000đ/năm
               </p>
               <p className="text-gray-600">
                 {bipbip365?.description || 'An tâm vận hành – Đồng hành suốt 365 ngày'}
@@ -40,7 +40,7 @@ export default function BipBip365LandingPage() {
             <div className="relative aspect-[3/2] w-full max-w-md mx-auto rounded-xl overflow-hidden shadow-xl border">
               <Image
                 src="https://drive.google.com/uc?export=view&id=1knGrrixxRoCwYW8SU3ihhJuCqZm8fKqE"
-                alt="Thẻ bảo hiểm Bíp Bíp 365K"
+                alt="Gói dịch vụ cứu hộ Bíp Bíp 365K"
                 fill
                 className="object-cover"
                 priority
@@ -58,10 +58,10 @@ export default function BipBip365LandingPage() {
                 bipbip365.features.map((f, i) => <li key={i}>✅ {f}</li>)
               ) : (
                 <>
-                  <li>✅ Miễn phí 3 lần cứu hộ/năm</li>
+                  <li>✅ Miễn phí không giới hạn số lần cứu hộ/năm</li>
                   <li>✅ Sửa chữa tại chỗ hoặc kéo xe về trạm</li>
                   <li>✅ Giảm giá phụ tùng & dịch vụ kỹ thuật</li>
-                  <li>✅ Theo dõi lịch sử bảo hiểm & cứu hộ</li>
+                  <li>✅ Theo dõi lịch sử Dịch vụ cứu hộ & cứu hộ</li>
                 </>
               )}
             </ul>
@@ -84,10 +84,11 @@ export default function BipBip365LandingPage() {
             <div className="text-center md:text-left space-y-4">
               <h2 className="text-2xl font-semibold text-[#00d289]">Cách tham gia gói 365K</h2>
               <ol className="text-left list-decimal list-inside space-y-3 text-gray-700 text-base">
-                <li>Chọn xe cá nhân cần bảo hiểm</li>
+                <li>Chọn xe cá nhân cần Dịch vụ cứu hộ</li>
                 <li>Mua gói Bíp Bíp 365K trực tuyến</li>
-                <li>Nhận mã bảo hiểm/thẻ điện tử ngay sau thanh toán</li>
+                <li>Nhận mã Dịch vụ cứu hộ/thẻ điện tử ngay sau thanh toán</li>
                 <li>Gọi cứu hộ/Bảo trì bất cứ khi nào cần</li>
+                <li>Mở Bíp Bíp và bấm "HỎNG XE" thì các kỹ thuật gần bạn sẽ đến xữ lý nhanh nhất có thể.</li>
               </ol>
             </div>
 
@@ -113,7 +114,7 @@ export default function BipBip365LandingPage() {
             </h2>
 
             <div>
-              <p className="font-semibold">Gói bảo hiểm áp dụng cho xe nào?</p>
+              <p className="font-semibold">Gói Dịch vụ cứu hộ áp dụng cho xe nào?</p>
               <p>Xe máy điện, xe đạp điện, xe xăng cá nhân.</p>
             </div>
             <div>
@@ -122,7 +123,7 @@ export default function BipBip365LandingPage() {
             </div>
             <div>
               <p className="font-semibold">Nếu xe tôi hỏng ở xa thì sao?</p>
-              <p>Gọi cứu hộ qua app/web – kỹ thuật viên sẽ đến hỗ trợ tận nơi.</p>
+              <p>Mở app/web Bíp Bíp và Bấm "HỎNG XE" – kỹ thuật viên sẽ đến hỗ trợ tận nơi.</p>
             </div>
           </div>
         </section>
