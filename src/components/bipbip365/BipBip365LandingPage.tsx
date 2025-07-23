@@ -49,6 +49,60 @@ export default function BipBip365LandingPage() {
           </div>
         </section>
 
+        {/* Quy trình cứu hộ của Bíp Bíp */}
+        <section className="py-12 px-4 sm:px-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-center mb-8">
+            Quy trình cứu hộ của Bíp Bíp
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center text-sm md:text-base max-w-6xl mx-auto">
+            {[
+              {
+                step: 'Bước 1',
+                image: 'https://drive.google.com/uc?export=view&id=1KVgbjCq5_6Ddk8xA6diT-XgXoawJ_2Bd',
+                description: 'Khi xe bạn gặp sự cố',
+              },
+              {
+                step: 'Bước 2',
+                image: 'https://drive.google.com/uc?export=view&id=1ByPMroxtYdX5SNpX5RDLxyVeEEVskqCJ',
+                description: (
+                  <>
+                    Mở web/app và bấm <strong>“Hỏng Xe”</strong>
+                    <br />
+                    hoặc gọi hotline <strong>1800 8389</strong>
+                  </>
+                ),
+              },
+              {
+                step: 'Bước 3',
+                image: 'https://drive.google.com/uc?export=view&id=1GNEtSladI2iwkp_5iUXuJGJqule5gdqS',
+                description: 'Chờ xác thực và xác nhận từ hệ thống',
+              },
+              {
+                step: 'Bước 4',
+                image: 'https://drive.google.com/uc?export=view&id=16KiNdewciBd4hVipV0EmtyA6JxJ3sFka',
+                description: 'Kỹ thuật viên đến hỗ trợ tận nơi',
+              },
+            ].map((item, index) => (
+              <div key={index} className="space-y-2">
+                <Image
+                  src={item.image}
+                  alt={item.step}
+                  className="rounded-xl shadow mx-auto w-full max-w-[200px] border border-gray-200"
+                  width={200}
+                  height={150}
+                />
+                <p className="font-semibold">{item.step}</p>
+                <p>{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+
+
+
+
         {/* BENEFITS */}
         <section className="py-16 px-4 md:px-16 bg-white">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -107,15 +161,9 @@ export default function BipBip365LandingPage() {
         </section>
 
         {/* FAQ */}
-        <section className="bg-[#f0fdf4] py-16 px-4 md:px-16">
-          <div className="max-w-3xl mx-auto space-y-6 text-base text-gray-700">
-            <h2 className="text-2xl font-semibold text-center text-[#00d289] mb-6">
-              Câu hỏi thường gặp
-            </h2>
-
             <section className="bg-[#f0fdf4] py-16 px-6">
               <div className="max-w-6xl mx-auto">
-                <h2 className="text-2xl font-semibold text-center mb-10">
+                <h2 className="text-2xl font-semibold text-center text-[#00d289] mb-10">
                   Câu hỏi thường gặp
                 </h2>
 
@@ -147,10 +195,6 @@ export default function BipBip365LandingPage() {
                 </div>
               </div>
             </section>
-
-
-          </div>
-        </section>
       </main>
 
       <Footer />
