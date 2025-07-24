@@ -35,11 +35,11 @@ const Home: React.FC = () => {
       <Hero />
       <StationSection />
       <TechnicianPartnerSection />
-      <ServicePricingSection />
-      <Bipbip365Section />
       {/*<VehicleModelsSection /> - Xây dựng xong hãy đưa lên cho bài bản*/}
       <BatteryStationCounter />
       <BatteryChargingStationCounter />
+      <ServicePricingSection />
+      <Bipbip365Section />
       <WhyChooseUs />
       <FAQ />
       <Footer />
