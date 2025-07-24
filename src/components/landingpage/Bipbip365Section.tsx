@@ -16,7 +16,7 @@ export default function Bipbip365Section() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           {/* Text content */}
           <div className="space-y-4 text-center md:text-left">
-            <h2 className="text-4xl md:text-5xl font-bold text-[#00d289]">Gói Bíp Bíp 365K</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-[#00d289]">Bíp Bíp 365K</h2>
             <p className="text-xl font-medium">Gói dịch vụ cứu hộ dành cho xe điện cá nhân</p>
             <p className="text-gray-600">
               Chỉ <span className="font-semibold text-black">365.000đ/năm</span> – Đăng ký nhanh, hỗ trợ tận nơi.
