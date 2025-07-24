@@ -2,19 +2,17 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
-import { Input } from '@/src/components/ui/input';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-import BatteryChargingStationCard from './BatteryChargingStationCard';
-import { useBatteryChargingStations } from '@/src/hooks/useBatteryChargingStations';
+import { Input } from '@/src/components/ui/input';
+import { BatteryChargingStation } from '@/src/lib/batteryChargingStations/batteryChargingStationTypes';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
-import { BatteryStation } from '@/src/lib/batteryStations/batteryStationTypes';
 
-const BatteryChargingStationMap = dynamic(() => import('./BatteryChargingStationMap'), {
-  ssr: false,
-});
+const BatteryChargingStationMap = dynamic(() => import('./BatteryChargingStationMap'), { ssr: false });
 
-// Tính khoảng cách Haversine
+// ✅ Tính khoảng cách
 function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const toRad = (value: number) => (value * Math.PI) / 180;
   const R = 6371;
@@ -28,14 +26,32 @@ function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: n
 }
 
 export default function BatteryChargingStationsClientPage() {
-  const { stations, loading } = useBatteryChargingStations();
   const { location: userLocation } = useCurrentLocation();
+  const [stations, setStations] = useState<BatteryChargingStation[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const fetchStations = async () => {
+      try {
+        const q = query(collection(db, 'batteryChargingStations'), where('isActive', '==', true));
+        const snap = await getDocs(q);
+        const data = snap.docs.map((doc) => ({
+          ...(doc.data() as BatteryChargingStation),
+          id: doc.id,
+        }));
+        setStations(data);
+      } catch (err) {
+        console.error('Error loading charging stations:', err);
+      }
+    };
+
+    fetchStations();
+  }, []);
 
   const sortedStations = useMemo(() => {
     const filtered = stations.filter((station) => {
       const searchMatch =
-        station.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        station.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         station.displayAddress?.toLowerCase().includes(searchTerm.toLowerCase());
       return searchMatch;
     });
@@ -74,18 +90,6 @@ export default function BatteryChargingStationsClientPage() {
 
           {/* Bản đồ */}
           <BatteryChargingStationMap stations={sortedStations} />
-        </div>
-
-        <div className="px-4 py-6 max-w-6xl mx-auto space-y-4">
-          {loading ? (
-            <p className="text-center text-gray-500">Loading...</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {sortedStations.map((station) => (
-                <BatteryChargingStationCard key={station.id} station={station} />
-              ))}
-            </div>
-          )}
         </div>
       </main>
       <Footer />

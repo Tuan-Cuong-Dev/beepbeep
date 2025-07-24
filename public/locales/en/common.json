@@ -1065,8 +1065,8 @@
 },
 
 "batteryChargingStationSection": {
-  "count_label": "Charging Stations Available",
-  "subtitle": "Efficient, reliable energy wherever you go"
+  "count_label": "Active Charging Stations",
+  "subtitle": "Feeling tired? Take a break – Bíp Bíp is here while you recharge and enjoy a refreshing drink"
 }
 
 
