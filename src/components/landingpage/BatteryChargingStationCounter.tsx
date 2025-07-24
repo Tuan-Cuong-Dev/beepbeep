@@ -28,7 +28,7 @@ export default function BatteryChargingStationCounter() {
         className="relative w-full h-[320px] md:h-[400px] bg-black text-white cursor-pointer"
       >
         <Image
-          src="https://drive.google.com/uc?export=view&id=1ynyQPMH1reiUhFPKAYc5y4J1wjQoXL1j"
+          src="https://drive.google.com/uc?export=view&id=1Z4S1bjehO-LkojSXIG5aJIHBtqL0yxVe"
           alt="Battery Station Background"
           fill
           className="object-cover"
