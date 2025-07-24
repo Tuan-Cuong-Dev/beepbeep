@@ -7,8 +7,8 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 export default function BatteryChargingStationCounter() {
-  const count = useBatteryChargingStationStats();
   const { t } = useTranslation();
+  const count = useBatteryChargingStationStats();
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
@@ -17,25 +17,27 @@ export default function BatteryChargingStationCounter() {
 
   if (!hasMounted) return null;
 
+  const formattedCount = typeof count === 'number' ? count.toLocaleString() : '...';
+  const title = t('batteryChargingStationSection.count_label');
+  const subtitle = t('batteryChargingStationSection.subtitle');
+
   return (
     <Link href="/battery-charging-stations" className="block group mt-6">
-      <section className="relative  w-full h-[320px] md:h-[400px] bg-black text-white cursor-pointer">
+      <section
+        aria-label="Battery Charging Station Counter Section"
+        className="relative w-full h-[320px] md:h-[400px] bg-black text-white cursor-pointer"
+      >
         <Image
-          src="https://drive.google.com/uc?export=view&id=1ynyQPMH1reiUhFPKAYc5y4J1wjQoXL1j" // 🔁 thay bằng hình nền trạm sạc
+          src="https://drive.google.com/uc?export=view&id=1ynyQPMH1reiUhFPKAYc5y4J1wjQoXL1j"
           alt="Battery Charging Station Background"
           fill
+          sizes="100vw"
           className="object-cover opacity-80"
         />
         <div className="absolute inset-0 flex flex-col justify-center items-center z-10 px-4 text-center transition-transform group-hover:scale-105">
-          <p className="text-5xl md:text-6xl font-bold tracking-tight">
-            {count !== null ? count.toLocaleString() : '...'}
-          </p>
-          <p className="text-xl md:text-2xl mt-2">
-            {t('batteryChargingStationSection.count_label')}
-          </p>
-          <p className="text-sm md:text-base mt-1 text-gray-200">
-            {t('batteryChargingStationSection.subtitle')}
-          </p>
+          <p className="text-5xl md:text-6xl font-bold tracking-tight">{formattedCount}</p>
+          <p className="text-xl md:text-2xl mt-2">{title}</p>
+          <p className="text-sm md:text-base mt-1 text-gray-200">{subtitle}</p>
         </div>
       </section>
     </Link>
