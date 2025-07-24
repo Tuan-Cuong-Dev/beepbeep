@@ -1,8 +1,11 @@
 // app/battery-charging-stations/page.tsx
-'use client';
+import dynamic from 'next/dynamic';
 
-import BatteryChargingStationsClientPage from '@/src/components/battery-charging-stations/BatteryChargingStationsClientPage';
+const BatteryChargingStationsClientPage = dynamic(
+  () => import('@/src/components/battery-charging-stations/BatteryChargingStationsClientPage'),
+  { ssr: false }
+);
 
-export default function ExplorePage() {
+export default function Page() {
   return <BatteryChargingStationsClientPage />;
 }
