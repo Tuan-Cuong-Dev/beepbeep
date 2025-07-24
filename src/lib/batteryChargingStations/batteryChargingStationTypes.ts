@@ -10,7 +10,8 @@ export interface BatteryChargingStation {
   // Thông tin địa điểm
   name: string;
   displayAddress: string;
-  mapAddress?: string;
+  mapAddress: string;
+  phone: string;
   coordinates?: {
     lat: number;
     lng: number;

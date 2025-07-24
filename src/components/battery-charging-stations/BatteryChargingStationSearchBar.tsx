@@ -1,43 +1,57 @@
 'use client';
 
-import { useState } from 'react';
 import { Input } from '@/src/components/ui/input';
-import { Button } from '@/src/components/ui/button';
+import { SimpleSelect } from '@/src/components/ui/select';
 
 interface Props {
-  onSearch: (term: string) => void;
-  onClear?: () => void;
+  searchTerm: string;
+  vehicleFilter: string;
+  statusFilter: string;
+  setSearchTerm: (value: string) => void;
+  setVehicleFilter: (value: string) => void;
+  setStatusFilter: (value: string) => void;
 }
 
-export default function BatteryChargingStationSearchBar({ onSearch, onClear }: Props) {
-  const [term, setTerm] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(term.trim());
-  };
-
+export default function BatteryChargingStationSearchBar({
+  searchTerm,
+  vehicleFilter,
+  statusFilter,
+  setSearchTerm,
+  setVehicleFilter,
+  setStatusFilter,
+}: Props) {
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 items-center">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-4 w-full">
       <Input
-        placeholder="Search by name or address"
-        value={term}
-        onChange={(e) => setTerm(e.target.value)}
-        className="flex-1"
+        placeholder="Search charging station..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full"
       />
-      <Button type="submit" variant="default">Search</Button>
-      {onClear && (
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => {
-            setTerm('');
-            onClear();
-          }}
-        >
-          Clear
-        </Button>
-      )}
-    </form>
+
+      <SimpleSelect
+        value={vehicleFilter}
+        onChange={setVehicleFilter}
+        placeholder="Vehicle Type"
+        options={[
+          { label: 'All', value: '' },
+          { label: 'Motorbike', value: 'motorbike' },
+          { label: 'Car', value: 'car' },
+        ]}
+        className="w-full"
+      />
+
+      <SimpleSelect
+        value={statusFilter}
+        onChange={setStatusFilter}
+        placeholder="Status"
+        options={[
+          { label: 'All', value: '' },
+          { label: 'Active', value: 'true' },
+          { label: 'Inactive', value: 'false' },
+        ]}
+        className="w-full"
+      />
+    </div>
   );
 }

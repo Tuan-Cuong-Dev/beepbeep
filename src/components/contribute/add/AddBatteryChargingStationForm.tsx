@@ -1,44 +1,47 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Timestamp, collection, addDoc } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
+import { useUser } from '@/src/context/AuthContext';
+import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
+import { useContributions } from '@/src/hooks/useContributions';
+import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
-import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
-import { useBatteryChargingStations } from '@/src/hooks/useBatteryChargingStations';
-import NotificationDialog from '@/src/components/ui/NotificationDialog';
-import { useUser } from '@/src/context/AuthContext';
-import { useContributions } from '@/src/hooks/useContributions';
-import { BatteryChargingStation } from '@/src/lib/batteryChargingStations/batteryChargingStationTypes';
 import { useTranslation } from 'react-i18next';
 
-const initialFormState: Omit<BatteryChargingStation, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'> = {
+const initialFormState = {
   name: '',
   displayAddress: '',
   mapAddress: '',
-  coordinates: undefined,
+  phone: '',
   vehicleType: 'motorbike',
   placeType: 'cafe',
   chargingPorts: undefined,
   chargingPowerKW: undefined,
   chargingStandard: '',
   openHours: '08:00 - 22:00',
-  isActive: false,
   pricingNotes: '',
   pricingOptions: {},
+  comboPackages: [] as string[],
   additionalFeePolicy: '',
-  comboPackages: [],
   offersPortableCharger: false,
   restAreaAvailable: false,
   freeDrinks: false,
-  foodMenu: [],
-  drinkMenu: [],
+  foodMenu: [] as string[],
+  drinkMenu: [] as string[],
+  geo: undefined as { lat: number; lng: number } | undefined,
+  location: '',
 };
 
+const arrayFields = ['comboPackages', 'foodMenu', 'drinkMenu'] as const;
+
 const fieldLabelMap = {
-  comboPackages: 'add_battery_charging_station_form.combo_packages',
-  foodMenu: 'add_battery_charging_station_form.food_menu',
-  drinkMenu: 'add_battery_charging_station_form.drink_menu',
+  comboPackages: 'add_battery_charging_station_form.comboPackages',
+  foodMenu: 'add_battery_charging_station_form.foodMenu',
+  drinkMenu: 'add_battery_charging_station_form.drinkMenu',
 } as const;
 
 const fieldPlaceholderMap = {
@@ -49,9 +52,8 @@ const fieldPlaceholderMap = {
 
 export default function AddBatteryChargingStationForm() {
   const { t } = useTranslation('common');
-  const { create, reload } = useBatteryChargingStations();
-  const { coords, geocode, loading: geocodeLoading } = useGeocodeAddress();
   const { user } = useUser();
+  const { coords, geocode } = useGeocodeAddress();
   const { submitContribution } = useContributions();
 
   const [form, setForm] = useState(initialFormState);
@@ -66,26 +68,25 @@ export default function AddBatteryChargingStationForm() {
     if (coords) {
       setForm((prev) => ({
         ...prev,
-        coordinates: coords,
-        location: `${coords.lat.toFixed(5)}° N, ${coords.lng.toFixed(5)}° E`,
+        geo: coords,
+        location: `${coords.lat.toFixed(6)}° N, ${coords.lng.toFixed(6)}° E`,
       }));
     }
   }, [coords]);
 
-  const handleChange = <K extends keyof typeof form>(field: K, value: typeof form[K]) => {
+  const handleChange = (field: keyof typeof form, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddToArray = (field: 'comboPackages' | 'foodMenu' | 'drinkMenu', value: string) => {
-    if (value) {
-      setForm((prev) => ({
-        ...prev,
-        [field]: [...(prev[field] as string[]), value],
-      }));
-    }
+  const handleArrayChange = (field: (typeof arrayFields)[number], value: string) => {
+    if (!value.trim()) return;
+    setForm((prev) => ({
+      ...prev,
+      [field]: [...(prev[field] as string[]), value.trim()],
+    }));
   };
 
-  const handleRemoveFromArray = (field: 'comboPackages' | 'foodMenu' | 'drinkMenu', index: number) => {
+  const handleArrayRemove = (field: (typeof arrayFields)[number], index: number) => {
     setForm((prev) => ({
       ...prev,
       [field]: (prev[field] as string[]).filter((_, i) => i !== index),
@@ -93,25 +94,25 @@ export default function AddBatteryChargingStationForm() {
   };
 
   const handleSubmit = async () => {
-    if (!user?.uid || !form.name || !form.displayAddress) return;
+    if (!user?.uid || !form.name || !form.displayAddress || !form.location || !form.phone) return;
+
     setSubmitting(true);
     try {
       const data = {
         ...form,
         isActive: false,
         createdBy: user.uid,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
       };
 
-      await create(data);
+      await addDoc(collection(db, 'batteryChargingStations'), data);
       await submitContribution('battery_charging_station', data);
 
       setForm(initialFormState);
       setShowDialog(true);
-      reload();
     } catch (err) {
-      console.error('Error creating charging station:', err);
+      console.error('Error adding charging station:', err);
     } finally {
       setSubmitting(false);
     }
@@ -122,25 +123,25 @@ export default function AddBatteryChargingStationForm() {
       <Input placeholder={t('add_battery_charging_station_form.station_name')} value={form.name} onChange={(e) => handleChange('name', e.target.value)} />
       <Textarea placeholder={t('add_battery_charging_station_form.display_address')} value={form.displayAddress} onChange={(e) => handleChange('displayAddress', e.target.value)} />
       <Textarea placeholder={t('add_battery_charging_station_form.map_address')} value={form.mapAddress} onChange={(e) => handleChange('mapAddress', e.target.value)} />
+      <Input placeholder={t('add_battery_charging_station_form.location')} value={form.location} readOnly />
+      <Input placeholder={t('add_battery_charging_station_form.phone')} value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} />
 
-      <div className="flex gap-2">
-        <select className="w-1/2 border rounded px-3 py-2 bg-white" value={form.vehicleType} onChange={(e) => handleChange('vehicleType', e.target.value as 'motorbike' | 'car')}>
-          <option value="motorbike">{t('add_battery_charging_station_form.vehicle_type.motorbike')}</option>
-          <option value="car">{t('add_battery_charging_station_form.vehicle_type.car')}</option>
-        </select>
-        <select className="w-1/2 border rounded px-3 py-2 bg-white" value={form.placeType} onChange={(e) => handleChange('placeType', e.target.value as any)}>
-          <option value="cafe">{t('add_battery_charging_station_form.place_type.cafe')}</option>
-          <option value="restaurant">{t('add_battery_charging_station_form.place_type.restaurant')}</option>
-          <option value="shop">{t('add_battery_charging_station_form.place_type.shop')}</option>
-          <option value="home">{t('add_battery_charging_station_form.place_type.home')}</option>
-        </select>
-      </div>
+      <select className="w-full border rounded px-3 py-2" value={form.vehicleType} onChange={(e) => handleChange('vehicleType', e.target.value)}>
+        <option value="motorbike">{t('add_battery_charging_station_form.vehicle_type.motorbike')}</option>
+        <option value="car">{t('add_battery_charging_station_form.vehicle_type.car')}</option>
+      </select>
+
+      <select className="w-full border rounded px-3 py-2" value={form.placeType} onChange={(e) => handleChange('placeType', e.target.value)}>
+        <option value="cafe">{t('add_battery_charging_station_form.place_type.cafe')}</option>
+        <option value="restaurant">{t('add_battery_charging_station_form.place_type.restaurant')}</option>
+        <option value="shop">{t('add_battery_charging_station_form.place_type.shop')}</option>
+        <option value="home">{t('add_battery_charging_station_form.place_type.home')}</option>
+      </select>
 
       <Input type="number" placeholder={t('add_battery_charging_station_form.charging_ports')} value={form.chargingPorts ?? ''} onChange={(e) => handleChange('chargingPorts', parseInt(e.target.value) || undefined)} />
       <Input type="number" placeholder={t('add_battery_charging_station_form.charging_power_kw')} value={form.chargingPowerKW ?? ''} onChange={(e) => handleChange('chargingPowerKW', parseFloat(e.target.value) || undefined)} />
       <Input placeholder={t('add_battery_charging_station_form.charging_standard')} value={form.chargingStandard} onChange={(e) => handleChange('chargingStandard', e.target.value)} />
       <Input placeholder={t('add_battery_charging_station_form.open_hours')} value={form.openHours} onChange={(e) => handleChange('openHours', e.target.value)} />
-
       <Textarea placeholder={t('add_battery_charging_station_form.pricing_notes')} value={form.pricingNotes} onChange={(e) => handleChange('pricingNotes', e.target.value)} />
       <Input placeholder={t('add_battery_charging_station_form.additional_fee_policy')} value={form.additionalFeePolicy} onChange={(e) => handleChange('additionalFeePolicy', e.target.value)} />
 
@@ -159,17 +160,13 @@ export default function AddBatteryChargingStationForm() {
         </label>
       </div>
 
-      {(['comboPackages', 'foodMenu', 'drinkMenu'] as const).map((field) => (
+      {arrayFields.map((field) => (
         <div key={field} className="space-y-1">
-          <label className="font-semibold text-sm">
-            {t(fieldLabelMap[field])}
-          </label>
+          <label className="font-semibold text-sm">{t(fieldLabelMap[field])}</label>
           {(form[field] as string[]).map((item, idx) => (
             <div key={idx} className="flex items-center gap-2">
               <Input value={item} readOnly />
-              <Button type="button" size="sm" variant="ghost" onClick={() => handleRemoveFromArray(field, idx)}>
-                ❌
-              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handleArrayRemove(field, idx)}>❌</Button>
             </div>
           ))}
           <Input
@@ -177,19 +174,19 @@ export default function AddBatteryChargingStationForm() {
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                const value = (e.target as HTMLInputElement).value.trim();
-                if (value) {
-                  handleAddToArray(field, value);
-                  (e.target as HTMLInputElement).value = '';
-                }
+                const value = (e.target as HTMLInputElement).value;
+                handleArrayChange(field, value);
+                (e.target as HTMLInputElement).value = '';
               }
             }}
           />
         </div>
       ))}
 
-      <Button onClick={handleSubmit} disabled={submitting || geocodeLoading}>
-        {submitting ? t('add_battery_charging_station_form.submitting') : t('add_battery_charging_station_form.submit')}
+      <Button onClick={handleSubmit} disabled={submitting}>
+        {submitting
+          ? t('add_battery_charging_station_form.submitting')
+          : t('add_battery_charging_station_form.submit')}
       </Button>
 
       <NotificationDialog
