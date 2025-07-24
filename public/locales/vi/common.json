@@ -1077,7 +1077,14 @@
   "count_label": "Trạm sạc pin đang hoạt động",
   "subtitle": "Mệt rồi thì dừng lại chút nhé – Bíp Bíp chờ bạn sạc pin và làm ngụm nước mát"
 
-}
+},
+
+"battery_charging_station_map": {
+    "you_are_here": "Bạn đang ở đây",
+    "car_station": "Trạm sạc dành cho ô tô",
+    "motorbike_station": "Trạm sạc dành cho xe máy",
+    "distance_away": "Cách {{distance}} km"
+  }
 
 
 

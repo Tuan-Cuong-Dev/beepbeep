@@ -98,7 +98,14 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
         )}
 
         {partners
-          .filter((p) => p.coordinates)
+          .filter(
+            (p) =>
+              p.coordinates &&
+              typeof p.coordinates.lat === 'number' &&
+              typeof p.coordinates.lng === 'number' &&
+              !isNaN(p.coordinates.lat) &&
+              !isNaN(p.coordinates.lng)
+          )
           .map((p) => (
             <Marker
               key={p.id}

@@ -1048,7 +1048,14 @@
 "batteryChargingStationSection": {
   "count_label": "稼働中の充電ステーション",
   "subtitle": "お疲れさま。ちょっと休んで、ビップビップと一緒に充電しながら一息つきましょう"
-}
+},
+
+ "battery_charging_station_map": {
+    "you_are_here": "現在地",
+    "car_station": "車用の充電ステーション",
+    "motorbike_station": "バイク用の充電ステーション",
+    "distance_away": "{{distance}} km 離れています"
+  }
 
 
 
