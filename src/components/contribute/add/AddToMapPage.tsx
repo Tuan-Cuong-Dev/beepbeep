@@ -9,10 +9,11 @@ import Footer from '@/src/components/landingpage/Footer';
 import AddRepairShopForm from './AddRepairShopForm';
 import AddRentalShopForm from './AddRentalShopForm';
 import AddBatteryStationForm from './AddBatteryStationForm';
+import AddBatteryChargingStationForm from './AddBatteryChargingStationForm'; // ✅ NEW
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
 
 export default function AddToMapPage() {
-  const [activeTab, setActiveTab] = useState<'repair' | 'rental' | 'battery'>('repair');
+  const [activeTab, setActiveTab] = useState<'repair' | 'rental' | 'battery' | 'charging'>('repair'); // ✅ Thêm charging
   const { t } = useTranslation('common');
 
   const renderActiveForm = () => {
@@ -23,6 +24,8 @@ export default function AddToMapPage() {
         return <AddRentalShopForm />;
       case 'battery':
         return <AddBatteryStationForm />;
+      case 'charging':
+        return <AddBatteryChargingStationForm />; // ✅ NEW
       default:
         return null;
     }
@@ -52,28 +55,21 @@ export default function AddToMapPage() {
           </Link>
         </div>
 
-
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <div className="w-full overflow-x-auto mb-4">
             <TabsList className="flex gap-2 bg-white rounded-lg px-2 py-2 min-w-max whitespace-nowrap justify-center">
-              <TabsTrigger
-                value="repair"
-                className="text-sm sm:text-base"
-              >
+              <TabsTrigger value="repair" className="text-sm sm:text-base">
                 🔧 {t('contribute.repair')}
               </TabsTrigger>
-              <TabsTrigger
-                value="rental"
-                className="text-sm sm:text-base"
-              >
+              <TabsTrigger value="rental" className="text-sm sm:text-base">
                 🏪 {t('contribute.rental')}
               </TabsTrigger>
-              <TabsTrigger
-                value="battery"
-                className="text-sm sm:text-base"
-              >
-                🔋 {t('contribute.battery')}
+              <TabsTrigger value="battery" className="text-sm sm:text-base">
+                ♻️ {t('contribute.battery')}
+              </TabsTrigger>
+              <TabsTrigger value="charging" className="text-sm sm:text-base">
+                🔌 {t('contribute.charging')} 
               </TabsTrigger>
             </TabsList>
           </div>

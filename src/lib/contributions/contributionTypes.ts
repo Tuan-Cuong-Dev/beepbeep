@@ -1,13 +1,10 @@
-// Ghi nhận các đóng góp của người dùng
-// Kích thích việc phát triển dữ liệu; Yếu tố sống còn của hệ thống
-
-
 import { Timestamp } from 'firebase/firestore';
 
 export type ContributionType =
   | 'repair_shop'
   | 'rental_shop'
   | 'battery_station'
+  | 'battery_charging_station' // ✅ NEW: Trạm sạc pin
   | 'map_location'
   | 'issue_proposal'; // dành cho kỹ thuật viên
 

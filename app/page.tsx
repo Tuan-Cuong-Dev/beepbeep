@@ -13,6 +13,7 @@ import ServicePricingSection from '@/src/components/landingpage/ServicePricingSe
 import Bipbip365Section from '@/src/components/landingpage/Bipbip365Section';
 import VehicleModelsSection from '@/src/components/landingpage/VehicleModelsSection';
 import BatteryStationCounter from '@/src/components/landingpage/BatteryStationCounter';
+import BatteryChargingStationCounter from '@/src/components/landingpage/BatteryChargingStationCounter';
 import WhyChooseUs from '@/src/components/landingpage/WhyChooseUs';
 import FAQ from '@/src/components/landingpage/FAQ';
 import Footer from '@/src/components/landingpage/Footer';
@@ -38,6 +39,7 @@ const Home: React.FC = () => {
       <Bipbip365Section />
       <VehicleModelsSection />
       <BatteryStationCounter />
+      <BatteryChargingStationCounter />
       <WhyChooseUs />
       <FAQ />
       <Footer />

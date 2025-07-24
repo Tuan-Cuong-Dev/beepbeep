@@ -240,6 +240,7 @@
     "repair": "Tiệm sửa xe",
     "rental": "Trạm cho thuê xe",
     "battery": "Trạm đổi pin",
+    "charging": "Trạm sạc pin",
     "coordinate_guide": "📍 Vui lòng nhập đúng tọa độ (vĩ độ, kinh độ) để địa điểm hiển thị chính xác trên bản đồ.",
     "coordinate_warning": "Nếu tọa độ sai, khách hàng sẽ không thể tìm thấy bạn.",
     "check_location_on_maps": "🔗 Hướng dẫn lấy tọa độ từ Google Maps"
@@ -1032,7 +1033,47 @@
     "title": "Hướng dẫn viên du lịch",
     "description": "Tổ chức tour xe hoặc hành trình tự lái."
   }
+},
+
+"add_battery_charging_station_form": {
+  "station_name": "Tên trạm sạc",
+  "display_address": "Địa chỉ hiển thị",
+  "map_address": "Địa chỉ Google Maps",
+  "vehicle_type": "Loại phương tiện",
+  "vehicle_type.motorbike": "Xe máy",
+  "vehicle_type.car": "Ô tô",
+  "place_type": "Loại địa điểm",
+  "place_type.cafe": "Quán cà phê",
+  "place_type.restaurant": "Nhà hàng",
+  "place_type.shop": "Cửa hàng",
+  "place_type.home": "Nhà riêng",
+  "charging_ports": "Số cổng sạc",
+  "charging_power_kw": "Công suất sạc (kW)",
+  "charging_standard": "Chuẩn sạc (Type2, CHAdeMO...)",
+  "open_hours": "Giờ mở cửa (VD: 08:00 - 22:00)",
+  "pricing_notes": "Ghi chú giá sạc (VD: trên 50% = 10k)",
+  "additional_fee_policy": "Chính sách phụ phí (VD: +10k nếu không sử dụng dịch vụ)",
+  "offers_portable_charger": "Có sạc di động",
+  "rest_area_available": "Có chỗ nghỉ",
+  "free_drinks": "Có trà đá/nước miễn phí",
+  "combo_packages": "Gói combo",
+  "food_menu": "Thực đơn món ăn",
+  "drink_menu": "Thực đơn nước uống",
+  "add_combo": "Thêm combo...",
+  "add_food_item": "Thêm món ăn...",
+  "add_drink_item": "Thêm thức uống...",
+  "submit": "Gửi thông tin trạm sạc",
+  "submitting": "Đang gửi...",
+  "success_title": "Cảm ơn!",
+  "success_description": "Trạm sạc của bạn đã được gửi và đang chờ phê duyệt."
+},
+
+"batteryChargingStationSection": {
+  "count_label": "Trạm sạc pin đang hoạt động",
+  "subtitle": "Sạc nhanh – thuận tiện mọi nơi"
 }
+
+
 
 
 
