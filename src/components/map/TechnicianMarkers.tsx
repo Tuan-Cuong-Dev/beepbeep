@@ -8,65 +8,79 @@ import { db } from '@/src/firebaseConfig';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 
 interface Props {
-  vehicleType?: 'car' | 'motorbike' | 'bike'; // vẫn giữ để phòng dùng sau
+  vehicleType?: 'car' | 'motorbike' | 'bike'; // Reserved for future use
+}
+
+const technicianIcon = L.icon({
+  iconUrl: '/assets/images/technician.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+function isValidLatLng(lat: any, lng: any): boolean {
+  return typeof lat === 'number' && !isNaN(lat) && typeof lng === 'number' && !isNaN(lng);
 }
 
 export default function TechnicianMarkers({ vehicleType }: Props) {
   const [technicians, setTechnicians] = useState<TechnicianPartner[]>([]);
 
   useEffect(() => {
-    const fetch = async () => {
-      const q = query(collection(db, 'technicianPartners'), where('isActive', '==', true));
-      const snap = await getDocs(q);
-      const data = snap.docs.map((doc) => {
-        const raw = doc.data();
+    let isMounted = true;
 
-        const coordinates = {
-          lat: raw.coordinates?.latitude ?? raw.coordinates?.lat ?? 0,
-          lng: raw.coordinates?.longitude ?? raw.coordinates?.lng ?? 0,
-        };
+    const fetchTechnicians = async () => {
+      try {
+        const q = query(collection(db, 'technicianPartners'), where('isActive', '==', true));
+        const snap = await getDocs(q);
 
-        return {
-          id: doc.id,
-          ...raw,
-          coordinates,
-        } as TechnicianPartner;
-      });
+        const data = snap.docs.map((doc) => {
+          const raw = doc.data();
+          const lat = raw.coordinates?.latitude ?? raw.coordinates?.lat;
+          const lng = raw.coordinates?.longitude ?? raw.coordinates?.lng;
 
-      setTechnicians(data);
+          return {
+            id: doc.id,
+            ...raw,
+            coordinates: { lat, lng },
+          } as TechnicianPartner;
+        });
+
+        if (isMounted) setTechnicians(data);
+      } catch (err) {
+        console.error('Error fetching technician partners:', err);
+      }
     };
 
-    fetch();
+    fetchTechnicians();
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  const icon = L.icon({
-    iconUrl: '/assets/images/technician.png',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
-  });
 
   return (
     <>
-      {technicians.map((tech) =>
-        tech.coordinates &&
-        typeof tech.coordinates.lat === 'number' &&
-        typeof tech.coordinates.lng === 'number' &&
-        tech.coordinates.lat !== 0 &&
-        tech.coordinates.lng !== 0 ? (
+      {technicians.map((tech) => {
+        const { coordinates, name, phone } = tech;
+        if (!coordinates || !isValidLatLng(coordinates.lat, coordinates.lng)) return null;
+
+        return (
           <Marker
             key={tech.id}
-            position={[tech.coordinates.lat, tech.coordinates.lng]}
-            icon={icon}
+            position={[coordinates.lat, coordinates.lng]}
+            icon={technicianIcon}
           >
             <Popup>
-              <strong>{tech.name}</strong>
-              <br />
-              {tech.phone || ''}
+              <strong>{name}</strong>
+              {phone && (
+                <>
+                  <br />
+                  📞 {phone}
+                </>
+              )}
             </Popup>
           </Marker>
-        ) : null
-      )}
+        );
+      })}
     </>
   );
 }

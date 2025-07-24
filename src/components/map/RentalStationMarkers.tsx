@@ -8,10 +8,18 @@ import { db } from '@/src/firebaseConfig';
 import { Station } from '@/src/lib/stations/stationTypes';
 
 interface Props {
-  vehicleType?: 'car' | 'motorbike' | 'bike'; // ✅ optional for 'all'
+  vehicleType?: 'car' | 'motorbike' | 'bike'; // Optional for 'all'
 }
 
-// ✅ Hàm parse từ chuỗi "15.8785655° N, 108.3258334° E" → [15.8785655, 108.3258334]
+// Icon for rental station marker
+const rentalStationIcon = L.icon({
+  iconUrl: '/assets/images/stationmarker.png',
+  iconSize: [25, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+// Parse "15.8785655° N, 108.3258334° E" to [15.8785655, 108.3258334]
 function parseLocationString(locationStr: string): [number, number] | null {
   try {
     const [latPart, lngPart] = locationStr.split(',');
@@ -19,48 +27,52 @@ function parseLocationString(locationStr: string): [number, number] | null {
     const lng = parseFloat(lngPart);
     if (isNaN(lat) || isNaN(lng)) return null;
     return [lat, lng];
-  } catch (e) {
+  } catch {
     console.warn('❌ Error parsing location string:', locationStr);
     return null;
   }
+}
+
+function isMatchingType(station: Station, vehicleType?: string) {
+  return !vehicleType || !station.vehicleType || station.vehicleType === vehicleType;
 }
 
 export default function RentalStationMarkers({ vehicleType }: Props) {
   const [stations, setStations] = useState<Station[]>([]);
 
   useEffect(() => {
-    const fetch = async () => {
-      const snap = await getDocs(collection(db, 'rentalStations'));
-      const data = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Station, 'id'>),
-      }));
-      setStations(data);
+    let isMounted = true;
+
+    const fetchStations = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'rentalStations'));
+        const data = snap.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<Station, 'id'>),
+        }));
+        if (isMounted) setStations(data);
+      } catch (err) {
+        console.error('Error loading rental stations:', err);
+      }
     };
-    fetch();
+
+    fetchStations();
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  const filtered = vehicleType
-    ? stations.filter((s) => !s.vehicleType || s.vehicleType === vehicleType)
-    : stations;
-
-  const icon = L.icon({
-    iconUrl: '/assets/images/stationmarker.png',
-    iconSize: [25, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
-  });
 
   return (
     <>
-      {filtered.map((station) => {
-        const parsed = typeof station.location === 'string' ? parseLocationString(station.location) : null;
-        if (!parsed) return null;
+      {stations.map((station) => {
+        if (!isMatchingType(station, vehicleType)) return null;
+        const coords = typeof station.location === 'string' ? parseLocationString(station.location) : null;
+        if (!coords) return null;
 
-        const [lat, lng] = parsed;
+        const [lat, lng] = coords;
 
         return (
-          <Marker key={station.id} position={[lat, lng]} icon={icon}>
+          <Marker key={station.id} position={[lat, lng]} icon={rentalStationIcon}>
             <Popup>
               <strong>{station.name}</strong>
               <br />
