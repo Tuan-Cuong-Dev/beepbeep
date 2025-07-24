@@ -18,7 +18,7 @@ export default function BatteryChargingStationCounter() {
   if (!hasMounted) return null;
 
   return (
-    <Link href="/battery-charging-stations" className="block group pt-6">
+    <Link href="/battery-charging-stations" className="block group mt-6">
       <section className="relative  w-full h-[320px] md:h-[400px] bg-black text-white cursor-pointer">
         <Image
           src="https://drive.google.com/uc?export=view&id=1ynyQPMH1reiUhFPKAYc5y4J1wjQoXL1j" // 🔁 thay bằng hình nền trạm sạc
