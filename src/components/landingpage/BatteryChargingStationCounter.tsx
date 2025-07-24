@@ -28,11 +28,10 @@ export default function BatteryChargingStationCounter() {
         className="relative w-full h-[320px] md:h-[400px] bg-black text-white cursor-pointer"
       >
         <Image
-          src="https://drive.google.com/uc?export=view&id=1Z4S1bjehO-LkojSXIG5aJIHBtqL0yxVe"
+          src="https://drive.google.com/uc?export=view&id=1bWWB0g2g45g188O29MPn2KFMIFv73j9v"
           alt="Battery Station Background"
           fill
-          className="object-cover"
-          unoptimized // 👉 bắt buộc phải thêm dòng này nếu ảnh từ Google Drive
+          className="object-cover opacity-80"
         />
         <div className="absolute inset-0 flex flex-col justify-center items-center z-10 px-4 text-center transition-transform group-hover:scale-105">
           <p className="text-5xl md:text-6xl font-bold tracking-tight">{formattedCount}</p>
