@@ -28,11 +28,12 @@ export default function BatteryChargingStationCounter() {
         className="relative w-full h-[320px] md:h-[400px] bg-black text-white cursor-pointer"
       >
         <Image
-          src="https://drive.google.com/uc?export=view&id=1M6eBwFcfGDxKV913PsZTmNklFGuGfiie"
-          alt="Battery Charging Station Background"
-          fill
-          className="object-cover opacity-80"
+        src="https://drive.google.com/uc?export=view&id=1M6eBwFcfGDxKV913PsZTmNklFGuGfiie"
+        alt="Battery Station Background"
+        fill
+        className="object-cover opacity-80"
         />
+        
         <div className="absolute inset-0 flex flex-col justify-center items-center z-10 px-4 text-center transition-transform group-hover:scale-105">
           <p className="text-5xl md:text-6xl font-bold tracking-tight">{formattedCount}</p>
           <p className="text-xl md:text-2xl mt-2">{title}</p>
