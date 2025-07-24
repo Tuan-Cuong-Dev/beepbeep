@@ -20,6 +20,9 @@ const RentalShopEditForm = dynamic(
 const BatteryStationEditForm = dynamic(
   () => import('@/src/components/contribute/edit/BatteryStationEditForm')
 );
+const BatteryChargingStationEditForm = dynamic(
+  () => import('@/src/components/contribute/edit/BatteryChargingStationEditForm')
+);
 
 interface EditContributionModalProps {
   open: boolean;
@@ -46,6 +49,8 @@ export default function EditContributionModal({
         return <RentalShopEditForm id={id} onClose={onClose} />;
       case 'battery_station':
         return <BatteryStationEditForm id={id} onClose={onClose} />;
+      case 'battery_charging_station':
+        return <BatteryChargingStationEditForm id={id} onClose={onClose} />;
       default:
         return (
           <p className="text-sm text-gray-500">

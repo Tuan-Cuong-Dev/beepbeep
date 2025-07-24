@@ -1063,7 +1063,11 @@
   "submit": "Submit charging station",
   "submitting": "Submitting...",
   "success_title": "Thank you!",
-  "success_description": "Your charging station has been submitted and is awaiting approval."
+  "success_description": "Your charging station has been submitted and is awaiting approval.",
+  "add_comboPackages": "Add combo package",
+  "add_foodMenu": "Add food item",
+  "add_drinkMenu": "Add drink item"
+
 },
 
 "batteryChargingStationSection": {

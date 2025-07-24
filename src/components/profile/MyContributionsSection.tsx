@@ -254,3 +254,9 @@ export default function MyContributionsSection() {
     </>
   );
 }
+
+export interface Contribution {
+  id: string;
+  type: 'repair_shop' | 'rental_shop' | 'battery_station' | 'battery_charging_station';
+  [key: string]: any;
+}

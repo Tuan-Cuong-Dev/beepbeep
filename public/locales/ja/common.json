@@ -1038,7 +1038,10 @@
   "submit": "充電ステーションを送信",
   "submitting": "送信中...",
   "success_title": "ありがとうございます！",
-  "success_description": "ご提供いただいた充電ステーションは送信され、承認待ちとなっています。"
+  "success_description": "ご提供いただいた充電ステーションは送信され、承認待ちとなっています。",
+  "add_comboPackages": "コンボパッケージを追加",
+  "add_foodMenu": "料理を追加",
+  "add_drinkMenu": "ドリンクを追加"
 }
 ,
 

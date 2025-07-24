@@ -12,43 +12,54 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
-const initialFormState = {
+type FormState = {
+  name: string;
+  displayAddress: string;
+  mapAddress: string;
+  phone: string;
+  vehicleType: 'motorbike' | 'car';
+  placeType: 'cafe' | 'restaurant' | 'shop' | 'home';
+  chargingPorts: number | null;
+  chargingPowerKW: number | null;
+  chargingStandard: string;
+  openHours: string;
+  pricingNotes: string;
+  pricingOptions: Record<string, any>;
+  comboPackages: string[];
+  additionalFeePolicy: string;
+  offersPortableCharger: boolean;
+  restAreaAvailable: boolean;
+  freeDrinks: boolean;
+  foodMenu: string[];
+  drinkMenu: string[];
+  geo?: { lat: number; lng: number };
+  location: string;
+};
+
+const defaultForm: FormState = {
   name: '',
   displayAddress: '',
   mapAddress: '',
   phone: '',
   vehicleType: 'motorbike',
   placeType: 'cafe',
-  chargingPorts: undefined,
-  chargingPowerKW: undefined,
+  chargingPorts: null,
+  chargingPowerKW: null,
   chargingStandard: '',
   openHours: '08:00 - 22:00',
   pricingNotes: '',
   pricingOptions: {},
-  comboPackages: [] as string[],
+  comboPackages: [],
   additionalFeePolicy: '',
   offersPortableCharger: false,
   restAreaAvailable: false,
   freeDrinks: false,
-  foodMenu: [] as string[],
-  drinkMenu: [] as string[],
-  geo: undefined as { lat: number; lng: number } | undefined,
+  foodMenu: [],
+  drinkMenu: [],
   location: '',
 };
 
 const arrayFields = ['comboPackages', 'foodMenu', 'drinkMenu'] as const;
-
-const fieldLabelMap = {
-  comboPackages: 'add_battery_charging_station_form.comboPackages',
-  foodMenu: 'add_battery_charging_station_form.foodMenu',
-  drinkMenu: 'add_battery_charging_station_form.drinkMenu',
-} as const;
-
-const fieldPlaceholderMap = {
-  comboPackages: 'add_battery_charging_station_form.add_combo',
-  foodMenu: 'add_battery_charging_station_form.add_food_item',
-  drinkMenu: 'add_battery_charging_station_form.add_drink_item',
-} as const;
 
 export default function AddBatteryChargingStationForm() {
   const { t } = useTranslation('common');
@@ -56,7 +67,7 @@ export default function AddBatteryChargingStationForm() {
   const { coords, geocode } = useGeocodeAddress();
   const { submitContribution } = useContributions();
 
-  const [form, setForm] = useState(initialFormState);
+  const [form, setForm] = useState<FormState>(defaultForm);
   const [submitting, setSubmitting] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -74,22 +85,22 @@ export default function AddBatteryChargingStationForm() {
     }
   }, [coords]);
 
-  const handleChange = (field: keyof typeof form, value: any) => {
+  const handleChange = (field: keyof FormState, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleArrayChange = (field: (typeof arrayFields)[number], value: string) => {
+  const handleArrayChange = (field: keyof Pick<FormState, 'comboPackages' | 'foodMenu' | 'drinkMenu'>, value: string) => {
     if (!value.trim()) return;
     setForm((prev) => ({
       ...prev,
-      [field]: [...(prev[field] as string[]), value.trim()],
+      [field]: [...prev[field], value.trim()],
     }));
   };
 
-  const handleArrayRemove = (field: (typeof arrayFields)[number], index: number) => {
+  const handleArrayRemove = (field: keyof Pick<FormState, 'comboPackages' | 'foodMenu' | 'drinkMenu'>, index: number) => {
     setForm((prev) => ({
       ...prev,
-      [field]: (prev[field] as string[]).filter((_, i) => i !== index),
+      [field]: prev[field].filter((_, i) => i !== index),
     }));
   };
 
@@ -100,6 +111,8 @@ export default function AddBatteryChargingStationForm() {
     try {
       const data = {
         ...form,
+        chargingPorts: form.chargingPorts ?? 0,
+        chargingPowerKW: form.chargingPowerKW ?? 0,
         isActive: false,
         createdBy: user.uid,
         createdAt: Timestamp.now(),
@@ -109,7 +122,7 @@ export default function AddBatteryChargingStationForm() {
       await addDoc(collection(db, 'batteryChargingStations'), data);
       await submitContribution('battery_charging_station', data);
 
-      setForm(initialFormState);
+      setForm(defaultForm);
       setShowDialog(true);
     } catch (err) {
       console.error('Error adding charging station:', err);
@@ -122,7 +135,7 @@ export default function AddBatteryChargingStationForm() {
     <div className="space-y-4">
       <Input placeholder={t('add_battery_charging_station_form.station_name')} value={form.name} onChange={(e) => handleChange('name', e.target.value)} />
       <Textarea placeholder={t('add_battery_charging_station_form.display_address')} value={form.displayAddress} onChange={(e) => handleChange('displayAddress', e.target.value)} />
-      <Textarea placeholder={t('add_battery_charging_station_form.map_address')} value={form.mapAddress} onChange={(e) => handleChange('mapAddress', e.target.value)} />
+      <Textarea className="min-h-[180px]" placeholder={t('add_battery_charging_station_form.map_address')} value={form.mapAddress} onChange={(e) => handleChange('mapAddress', e.target.value)} />
       <Input placeholder={t('add_battery_charging_station_form.location')} value={form.location} readOnly />
       <Input placeholder={t('add_battery_charging_station_form.phone')} value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} />
 
@@ -138,8 +151,18 @@ export default function AddBatteryChargingStationForm() {
         <option value="home">{t('add_battery_charging_station_form.place_type.home')}</option>
       </select>
 
-      <Input type="number" placeholder={t('add_battery_charging_station_form.charging_ports')} value={form.chargingPorts ?? ''} onChange={(e) => handleChange('chargingPorts', parseInt(e.target.value) || undefined)} />
-      <Input type="number" placeholder={t('add_battery_charging_station_form.charging_power_kw')} value={form.chargingPowerKW ?? ''} onChange={(e) => handleChange('chargingPowerKW', parseFloat(e.target.value) || undefined)} />
+      <Input
+        type="number"
+        placeholder={t('add_battery_charging_station_form.charging_ports')}
+        value={form.chargingPorts ?? ''}
+        onChange={(e) => handleChange('chargingPorts', e.target.value ? parseInt(e.target.value) : null)}
+      />
+      <Input
+        type="number"
+        placeholder={t('add_battery_charging_station_form.charging_power_kw')}
+        value={form.chargingPowerKW ?? ''}
+        onChange={(e) => handleChange('chargingPowerKW', e.target.value ? parseFloat(e.target.value) : null)}
+      />
       <Input placeholder={t('add_battery_charging_station_form.charging_standard')} value={form.chargingStandard} onChange={(e) => handleChange('chargingStandard', e.target.value)} />
       <Input placeholder={t('add_battery_charging_station_form.open_hours')} value={form.openHours} onChange={(e) => handleChange('openHours', e.target.value)} />
       <Textarea placeholder={t('add_battery_charging_station_form.pricing_notes')} value={form.pricingNotes} onChange={(e) => handleChange('pricingNotes', e.target.value)} />
@@ -162,15 +185,15 @@ export default function AddBatteryChargingStationForm() {
 
       {arrayFields.map((field) => (
         <div key={field} className="space-y-1">
-          <label className="font-semibold text-sm">{t(fieldLabelMap[field])}</label>
-          {(form[field] as string[]).map((item, idx) => (
+          <label className="font-semibold text-sm">{t(`add_battery_charging_station_form.${field}`)}</label>
+          {form[field].map((item, idx) => (
             <div key={idx} className="flex items-center gap-2">
               <Input value={item} readOnly />
               <Button size="sm" variant="ghost" onClick={() => handleArrayRemove(field, idx)}>❌</Button>
             </div>
           ))}
           <Input
-            placeholder={t(fieldPlaceholderMap[field])}
+            placeholder={t(`add_battery_charging_station_form.add_${field}`)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();

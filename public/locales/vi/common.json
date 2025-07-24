@@ -1067,7 +1067,10 @@
   "submit": "Gửi thông tin trạm sạc",
   "submitting": "Đang gửi...",
   "success_title": "Cảm ơn!",
-  "success_description": "Trạm sạc của bạn đã được gửi và đang chờ phê duyệt."
+  "success_description": "Trạm sạc của bạn đã được gửi và đang chờ phê duyệt.",
+  "add_comboPackages": "Thêm gói combo",
+  "add_foodMenu": "Thêm món ăn",
+  "add_drinkMenu": "Thêm thức uống"
 },
 
 "batteryChargingStationSection": {
