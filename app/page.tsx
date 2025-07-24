@@ -37,7 +37,7 @@ const Home: React.FC = () => {
       <TechnicianPartnerSection />
       <ServicePricingSection />
       <Bipbip365Section />
-      <VehicleModelsSection />
+      {/*<VehicleModelsSection /> - Xây dựng xong hãy đưa lên cho bài bản*/}
       <BatteryStationCounter />
       <BatteryChargingStationCounter />
       <WhyChooseUs />
