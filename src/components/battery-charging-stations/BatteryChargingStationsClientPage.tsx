@@ -100,7 +100,7 @@ export default function BatteryChargingStationsClientPage() {
           {/* Search bar over map */}
           <div className="absolute px-12 top-4 left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 z-[1000] w-[95%] md:w-1/3">
             <Input
-              placeholder="🔌 Search charging stations..."
+              placeholder="🔋 Search charging stations..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="shadow-lg"
