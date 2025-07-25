@@ -660,8 +660,9 @@
   "tabs": {
     "all": "🗺️ All",
     "rental": "🏪 Rental Stations",
-    "maintenance": "🔧 Maintenance",
-    "battery": "🔄 Battery Swap"
+    "maintenance": "🔧 Technicians",
+    "battery": "🔄 Battery Swap Stations",
+    "battery_charging": "🔋 Charging Stations"
   },
   "close_button": "Close"
 },

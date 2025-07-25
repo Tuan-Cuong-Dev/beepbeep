@@ -12,20 +12,20 @@ const MapWrapper = dynamic(() => import('./MapWrapper'), { ssr: false });
 const TechnicianMarkers = dynamic(() => import('./TechnicianMarkers'), { ssr: false });
 const RentalStationMarkers = dynamic(() => import('./RentalStationMarkers'), { ssr: false });
 const BatteryStationMarkers = dynamic(() => import('./BatteryStationMarkers'), { ssr: false });
+const BatteryChargingStationMarkers = dynamic(() => import('./BatteryChargingStationMarkers'), { ssr: false });
 
 interface MyMapViewProps {
   onClose?: () => void;
 }
 
 export default function MyMapView({ onClose }: MyMapViewProps) {
-  const [activeTab, setActiveTab] = useState<'all' | 'rental' | 'battery' | 'maintenance'>('all');
+  const [activeTab, setActiveTab] = useState<
+    'all' | 'rental' | 'battery' | 'battery_charging' | 'maintenance'
+  >('all');
   const [vehicleType, setVehicleType] = useState<'car' | 'motorbike' | 'bike'>('motorbike');
   const { t } = useTranslation('common');
 
   const showAll = activeTab === 'all';
-
-  const shouldShowBatteryStations =
-    showAll || (activeTab === 'battery' && vehicleType !== 'bike');
 
   return (
     <div className="h-full w-full relative flex flex-col">
@@ -48,8 +48,11 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
           {(showAll || activeTab === 'rental') && (
             <RentalStationMarkers vehicleType={showAll ? undefined : vehicleType} />
           )}
-          {shouldShowBatteryStations && (
+          {(showAll || activeTab === 'battery') && (
             <BatteryStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+          )}
+          {(showAll || activeTab === 'battery_charging') && (
+            <BatteryChargingStationMarkers vehicleType={showAll ? undefined : vehicleType} />
           )}
           {(showAll || activeTab === 'maintenance') && (
             <TechnicianMarkers vehicleType={showAll ? undefined : vehicleType} />
@@ -63,8 +66,11 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
             <TabsList className="flex gap-2 bg-white rounded-full px-4 py-2 min-w-max whitespace-nowrap">
               <TabsTrigger value="all">{t('my_map_view.tabs.all')}</TabsTrigger>
               <TabsTrigger value="rental">{t('my_map_view.tabs.rental')}</TabsTrigger>
-              <TabsTrigger value="maintenance">{t('my_map_view.tabs.maintenance')}</TabsTrigger>
               <TabsTrigger value="battery">{t('my_map_view.tabs.battery')}</TabsTrigger>
+              <TabsTrigger value="battery_charging">
+                {t('my_map_view.tabs.battery_charging')}
+              </TabsTrigger>
+              <TabsTrigger value="maintenance">{t('my_map_view.tabs.maintenance')}</TabsTrigger>
             </TabsList>
           </div>
         </Tabs>

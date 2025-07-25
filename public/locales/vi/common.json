@@ -669,7 +669,8 @@
     "all": "🗺️ Tất cả",
     "rental": "🏪 Trạm cho thuê",
     "maintenance": "🔧 Kỹ thuật viên",
-    "battery": "🔄 Trạm đổi pin"
+    "battery": "🔄 Trạm đổi pin",
+    "battery_charging": "🔋 Trạm sạc pin"
   },
   "close_button": "Đóng"
 },
