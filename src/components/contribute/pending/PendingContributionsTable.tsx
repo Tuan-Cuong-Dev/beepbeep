@@ -15,12 +15,14 @@ export default function PendingContributionsTable() {
     <div className="mt-6">
       <h2 className="text-xl font-bold mb-4">Pending Contributions</h2>
       <Tabs value={tab} onValueChange={setTab} className="w-full">
-        <TabsList className="bg-white border rounded mb-4 overflow-x-auto whitespace-nowrap">
+        <div className="w-full overflow-x-auto">
+        <TabsList className="flex gap-2 bg-white border rounded mb-4 px-4 py-2 min-w-max whitespace-nowrap">
           <TabsTrigger value="technicians">Technicians</TabsTrigger>
           <TabsTrigger value="rentalShops">Rental Shops</TabsTrigger>
           <TabsTrigger value="batteryStations">Battery Stations</TabsTrigger>
-          <TabsTrigger value="batteryChargingStations">Charging Stations</TabsTrigger> {/* 👈 Thêm tab */}
+          <TabsTrigger value="batteryChargingStations">Charging Stations</TabsTrigger>
         </TabsList>
+      </div>
 
         <TabsPrimitive.Content value="technicians">
           <PendingTechnicians />

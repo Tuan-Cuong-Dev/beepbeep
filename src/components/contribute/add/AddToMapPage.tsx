@@ -69,7 +69,7 @@ export default function AddToMapPage() {
                 ♻️ {t('contribute.battery')}
               </TabsTrigger>
               <TabsTrigger value="charging" className="text-sm sm:text-base">
-                🔌 {t('contribute.charging')} 
+                🔋 {t('contribute.charging')} 
               </TabsTrigger>
             </TabsList>
           </div>
