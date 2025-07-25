@@ -88,44 +88,49 @@ export default function AddBatteryChargingStationForm() {
     }
   };
 
-  return (
-    <div className="space-y-4">
-      <Input placeholder={t('add_battery_charging_station_form.station_name')} value={form.name} onChange={(e) => handleChange('name', e.target.value)} />
-      <Textarea placeholder={t('add_battery_charging_station_form.display_address')} value={form.displayAddress} onChange={(e) => handleChange('displayAddress', e.target.value)} />
-      <Textarea className="min-h-[180px]" placeholder={t('add_battery_charging_station_form.map_address')} value={form.mapAddress} onChange={(e) => handleChange('mapAddress', e.target.value)} />
-      <Input placeholder={t('add_battery_charging_station_form.location')} value={form.location} readOnly />
-      <Input placeholder={t('add_battery_charging_station_form.phone')} value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} />
+return (
+  <div className="space-y-4">
+    {/* THÔNG TIN CƠ BẢN */}
+    <h3 className="font-semibold text-lg">{t('add_battery_charging_station_form.section.basic_info')}</h3>
+    <Input placeholder={t('add_battery_charging_station_form.station_name')} value={form.name} onChange={(e) => handleChange('name', e.target.value)} />
+    <Textarea placeholder={t('add_battery_charging_station_form.display_address')} value={form.displayAddress} onChange={(e) => handleChange('displayAddress', e.target.value)} />
+    <Textarea className="min-h-[180px]" placeholder={t('add_battery_charging_station_form.map_address')} value={form.mapAddress} onChange={(e) => handleChange('mapAddress', e.target.value)} />
+    <Input placeholder={t('add_battery_charging_station_form.location')} value={form.location} readOnly />
+    <Input placeholder={t('add_battery_charging_station_form.phone')} value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} />
 
-      <select className="w-full border rounded px-3 py-2" value={form.vehicleType} onChange={(e) => handleChange('vehicleType', e.target.value as 'motorbike' | 'car')}>
-        <option value="motorbike">{t('add_battery_charging_station_form.vehicle_type.motorbike')}</option>
-        <option value="car">{t('add_battery_charging_station_form.vehicle_type.car')}</option>
-      </select>
+    {/* MÔ TẢ & PHÂN LOẠI */}
+    <h3 className="font-semibold text-lg mt-6">{t('add_battery_charging_station_form.section.details')}</h3>
+    <Textarea className="min-h-[180px]" placeholder={t('add_battery_charging_station_form.description')} value={form.description} onChange={(e) => handleChange('description', e.target.value)} />
+    <select className="w-full border rounded px-3 py-2" value={form.vehicleType} onChange={(e) => handleChange('vehicleType', e.target.value as 'motorbike' | 'car')}>
+      <option value="motorbike">{t('add_battery_charging_station_form.vehicle_type.motorbike')}</option>
+      <option value="car">{t('add_battery_charging_station_form.vehicle_type.car')}</option>
+    </select>
+    <select className="w-full border rounded px-3 py-2" value={form.placeType} onChange={(e) => handleChange('placeType', e.target.value as 'cafe' | 'restaurant' | 'shop' | 'home')}>
+      <option value="cafe">{t('add_battery_charging_station_form.place_type.cafe')}</option>
+      <option value="restaurant">{t('add_battery_charging_station_form.place_type.restaurant')}</option>
+      <option value="shop">{t('add_battery_charging_station_form.place_type.shop')}</option>
+      <option value="home">{t('add_battery_charging_station_form.place_type.home')}</option>
+    </select>
 
-      <select className="w-full border rounded px-3 py-2" value={form.placeType} onChange={(e) => handleChange('placeType', e.target.value as 'cafe' | 'restaurant' | 'shop' | 'home')}>
-        <option value="cafe">{t('add_battery_charging_station_form.place_type.cafe')}</option>
-        <option value="restaurant">{t('add_battery_charging_station_form.place_type.restaurant')}</option>
-        <option value="shop">{t('add_battery_charging_station_form.place_type.shop')}</option>
-        <option value="home">{t('add_battery_charging_station_form.place_type.home')}</option>
-      </select>
+    {/* THÔNG SỐ KỸ THUẬT */}
+    <h3 className="font-semibold text-lg mt-6">{t('add_battery_charging_station_form.section.technical')}</h3>
+    <Input type="number" placeholder={t('add_battery_charging_station_form.charging_ports')} value={form.chargingPorts ?? ''} onChange={(e) => handleChange('chargingPorts', parseInt(e.target.value) || 0)} />
+    <Input type="number" placeholder={t('add_battery_charging_station_form.charging_power_kw')} value={form.chargingPowerKW ?? ''} onChange={(e) => handleChange('chargingPowerKW', parseFloat(e.target.value) || 0)} /> 
+    <Input placeholder={t('add_battery_charging_station_form.charging_standard')} value={form.chargingStandard} onChange={(e) => handleChange('chargingStandard', e.target.value)} />
 
-      <Input type="number" placeholder={t('add_battery_charging_station_form.charging_ports')} value={form.chargingPorts ?? ''} onChange={(e) => handleChange('chargingPorts', parseInt(e.target.value) || 0)} />
-      <Input type="number" placeholder={t('add_battery_charging_station_form.charging_power_kw')} value={form.chargingPowerKW ?? ''} onChange={(e) => handleChange('chargingPowerKW', parseFloat(e.target.value) || 0)} />
-      <Input placeholder={t('add_battery_charging_station_form.charging_standard')} value={form.chargingStandard} onChange={(e) => handleChange('chargingStandard', e.target.value)} />
+    {/* NÚT GỬI */}
+    <Button onClick={handleSubmit} disabled={submitting}>
+      {submitting ? t('add_battery_charging_station_form.submitting') : t('add_battery_charging_station_form.submit')}
+    </Button>
 
-      {/* ✅ Mô tả dịch vụ */}
-      <Textarea placeholder={t('add_battery_charging_station_form.description')} value={form.description} onChange={(e) => handleChange('description', e.target.value)} />
+    <NotificationDialog
+      open={showDialog}
+      type="success"
+      title={t('add_battery_charging_station_form.success_title')}
+      description={t('add_battery_charging_station_form.success_description')}
+      onClose={() => setShowDialog(false)}
+    />
+  </div>
+);
 
-      <Button onClick={handleSubmit} disabled={submitting}>
-        {submitting ? t('add_battery_charging_station_form.submitting') : t('add_battery_charging_station_form.submit')}
-      </Button>
-
-      <NotificationDialog
-        open={showDialog}
-        type="success"
-        title={t('add_battery_charging_station_form.success_title')}
-        description={t('add_battery_charging_station_form.success_description')}
-        onClose={() => setShowDialog(false)}
-      />
-    </div>
-  );
 }

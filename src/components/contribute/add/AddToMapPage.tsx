@@ -48,7 +48,7 @@ export default function AddToMapPage() {
             {t('contribute.coordinate_warning') || '⚠️ Warning missing'}
           </p>
           <Link
-            href="https://www.google.com/maps"
+            href="https://youtu.be/z035c86gvsY"
             className="text-[#00d289] underline inline-block mt-2"
           >
             {t('contribute.check_location_on_maps') || 'How to get coordinates'}

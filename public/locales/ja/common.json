@@ -1042,7 +1042,12 @@
   "add_comboPackages": "コンボパッケージを追加",
   "add_foodMenu": "料理を追加",
   "add_drinkMenu": "ドリンクを追加",
-  "description": "サービスの説明"
+  "description": "サービスの説明",
+  "section": {
+  "basic_info": "基本情報",
+  "details": "説明と分類",
+  "technical": "技術仕様"
+}
 }
 ,
 

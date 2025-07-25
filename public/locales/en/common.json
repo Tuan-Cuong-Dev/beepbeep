@@ -1067,7 +1067,12 @@
   "add_comboPackages": "Add combo package",
   "add_foodMenu": "Add food item",
   "add_drinkMenu": "Add drink item",
-  "description": "Service description"
+  "description": "Service description",
+  "section": {
+  "basic_info": "Basic Information",
+  "details": "Description & Classification",
+  "technical": "Technical Specifications"
+}
 },
 
 "batteryChargingStationSection": {

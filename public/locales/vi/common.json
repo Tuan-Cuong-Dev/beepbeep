@@ -1070,7 +1070,13 @@
   "success_description": "Trạm sạc của bạn đã được gửi và đang chờ phê duyệt.",
   "add_comboPackages": "Thêm gói combo",
   "add_foodMenu": "Thêm món ăn",
-  "add_drinkMenu": "Thêm thức uống"
+  "add_drinkMenu": "Thêm thức uống",
+  "description": "Mô tả dịch vụ",
+  "section": {
+    "basic_info": "Thông tin cơ bản",
+    "details": "Thông tin mô tả & phân loại",
+    "technical": "Thông số kỹ thuật"
+  }
 },
 
 "batteryChargingStationSection": {
