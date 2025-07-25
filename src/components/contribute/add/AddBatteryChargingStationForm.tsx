@@ -34,6 +34,7 @@ type FormState = {
   drinkMenu: string[];
   geo?: { lat: number; lng: number };
   location: string;
+  description: string;
 };
 
 const defaultForm: FormState = {
@@ -57,6 +58,7 @@ const defaultForm: FormState = {
   foodMenu: [],
   drinkMenu: [],
   location: '',
+  description: '',
 };
 
 const arrayFields = ['comboPackages', 'foodMenu', 'drinkMenu'] as const;
@@ -89,7 +91,10 @@ export default function AddBatteryChargingStationForm() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleArrayChange = (field: keyof Pick<FormState, 'comboPackages' | 'foodMenu' | 'drinkMenu'>, value: string) => {
+  const handleArrayChange = (
+    field: keyof Pick<FormState, 'comboPackages' | 'foodMenu' | 'drinkMenu'>,
+    value: string
+  ) => {
     if (!value.trim()) return;
     setForm((prev) => ({
       ...prev,
@@ -97,7 +102,10 @@ export default function AddBatteryChargingStationForm() {
     }));
   };
 
-  const handleArrayRemove = (field: keyof Pick<FormState, 'comboPackages' | 'foodMenu' | 'drinkMenu'>, index: number) => {
+  const handleArrayRemove = (
+    field: keyof Pick<FormState, 'comboPackages' | 'foodMenu' | 'drinkMenu'>,
+    index: number
+  ) => {
     setForm((prev) => ({
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index),
@@ -151,21 +159,15 @@ export default function AddBatteryChargingStationForm() {
         <option value="home">{t('add_battery_charging_station_form.place_type.home')}</option>
       </select>
 
-      <Input
-        type="number"
-        placeholder={t('add_battery_charging_station_form.charging_ports')}
-        value={form.chargingPorts ?? ''}
-        onChange={(e) => handleChange('chargingPorts', e.target.value ? parseInt(e.target.value) : null)}
-      />
-      <Input
-        type="number"
-        placeholder={t('add_battery_charging_station_form.charging_power_kw')}
-        value={form.chargingPowerKW ?? ''}
-        onChange={(e) => handleChange('chargingPowerKW', e.target.value ? parseFloat(e.target.value) : null)}
-      />
+      <Input type="number" placeholder={t('add_battery_charging_station_form.charging_ports')} value={form.chargingPorts ?? ''} onChange={(e) => handleChange('chargingPorts', parseInt(e.target.value) || null)} />
+      <Input type="number" placeholder={t('add_battery_charging_station_form.charging_power_kw')} value={form.chargingPowerKW ?? ''} onChange={(e) => handleChange('chargingPowerKW', parseFloat(e.target.value) || null)} />
       <Input placeholder={t('add_battery_charging_station_form.charging_standard')} value={form.chargingStandard} onChange={(e) => handleChange('chargingStandard', e.target.value)} />
       <Input placeholder={t('add_battery_charging_station_form.open_hours')} value={form.openHours} onChange={(e) => handleChange('openHours', e.target.value)} />
       <Textarea placeholder={t('add_battery_charging_station_form.pricing_notes')} value={form.pricingNotes} onChange={(e) => handleChange('pricingNotes', e.target.value)} />
+
+      {/* ✅ Mô tả dịch vụ */}
+      <Textarea placeholder={t('add_battery_charging_station_form.description')} value={form.description} onChange={(e) => handleChange('description', e.target.value)} />
+
       <Input placeholder={t('add_battery_charging_station_form.additional_fee_policy')} value={form.additionalFeePolicy} onChange={(e) => handleChange('additionalFeePolicy', e.target.value)} />
 
       <div className="grid grid-cols-2 gap-2 text-sm">

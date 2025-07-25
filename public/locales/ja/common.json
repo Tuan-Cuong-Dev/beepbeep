@@ -1041,7 +1041,8 @@
   "success_description": "ご提供いただいた充電ステーションは送信され、承認待ちとなっています。",
   "add_comboPackages": "コンボパッケージを追加",
   "add_foodMenu": "料理を追加",
-  "add_drinkMenu": "ドリンクを追加"
+  "add_drinkMenu": "ドリンクを追加",
+  "description": "サービスの説明"
 }
 ,
 

@@ -3,23 +3,23 @@
 import { useEffect, useState } from 'react';
 import { doc, getDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { BatteryStation, VehicleType } from '@/src/lib/batteryStations/batteryStationTypes';
+import { BatteryChargingStation, VehicleType } from '@/src/lib/batteryChargingStations/batteryChargingStationTypes';
 import { useBatteryChargingStations } from '@/src/hooks/useBatteryChargingStations';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
 import { SimpleSelect } from '@/src/components/ui/select';
+import { Textarea } from '@/src/components/ui/textarea';
 
-export default function BatteryChargingStationEditForm({
-  id,
-  onClose,
-}: {
+interface Props {
   id: string;
   onClose: () => void;
-}) {
+}
+
+export default function BatteryChargingStationEditForm({ id, onClose }: Props) {
   const { update, reload } = useBatteryChargingStations();
-  const [station, setStation] = useState<Partial<BatteryStation> | null>(null);
+  const [station, setStation] = useState<Partial<BatteryChargingStation> | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -27,13 +27,13 @@ export default function BatteryChargingStationEditForm({
       const ref = doc(db, 'batteryChargingStations', id);
       const snap = await getDoc(ref);
       if (snap.exists()) {
-        setStation(snap.data() as BatteryStation);
+        setStation(snap.data() as BatteryChargingStation);
       }
     };
     fetch();
   }, [id]);
 
-  const handleChange = (field: keyof BatteryStation, value: any) => {
+  const handleChange = (field: keyof BatteryChargingStation, value: any) => {
     setStation((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -47,6 +47,7 @@ export default function BatteryChargingStationEditForm({
         mapAddress: station.mapAddress || '',
         coordinates: station.coordinates || undefined,
         vehicleType: station.vehicleType || 'motorbike',
+        description: station.description || '',
         isActive: station.isActive ?? true,
         updatedAt: Timestamp.now(),
       });
@@ -103,7 +104,17 @@ export default function BatteryChargingStationEditForm({
         />
       </div>
 
-      <div className="flex items-center justify-between mt-2">
+      <div>
+        <Label htmlFor="description">Miêu tả dịch vụ</Label>
+        <Textarea
+          id="description"
+          placeholder="Nhập thông tin mô tả dịch vụ"
+          value={station.description || ''}
+          onChange={(e) => handleChange('description', e.target.value)}
+        />
+      </div>
+
+      <div className="flex items-center justify-between">
         <Label htmlFor="isActive">Đang hoạt động</Label>
         <Switch
           id="isActive"

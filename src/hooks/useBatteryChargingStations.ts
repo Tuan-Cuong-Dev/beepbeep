@@ -43,24 +43,15 @@ export function useBatteryChargingStations() {
     name: '',
     displayAddress: '',
     mapAddress: '',
-    phone:'',
+    phone: '',
     coordinates: undefined,
     vehicleType: 'motorbike',
     placeType: 'cafe',
     chargingPorts: undefined,
     chargingPowerKW: undefined,
     chargingStandard: '',
-    openHours: '08:00 - 22:00',
+    description: '',
     isActive: false,
-    pricingNotes: '',
-    pricingOptions: {},
-    additionalFeePolicy: '',
-    comboPackages: [],
-    offersPortableCharger: false,
-    restAreaAvailable: false,
-    freeDrinks: false,
-    foodMenu: [],
-    drinkMenu: [],
   });
 
   return {
@@ -70,33 +61,6 @@ export function useBatteryChargingStations() {
     create,
     update: updateBatteryChargingStation,
     remove: deleteBatteryChargingStation,
-    getDefaultValues, // ✅ export mặc định để Form dùng
+    getDefaultValues,
   };
 }
-
-
-const getDefaultValues = (): Omit<BatteryChargingStation, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'> => ({
-  name: '',
-  displayAddress: '',
-  mapAddress: '',
-  phone:'',
-  coordinates: undefined,
-  vehicleType: 'motorbike',
-  placeType: 'cafe',
-  chargingPorts: undefined,
-  chargingPowerKW: undefined,
-  chargingStandard: '',
-  openHours: '08:00 - 22:00',
-  isActive: false,
-
-  pricingNotes: '',
-  pricingOptions: {},
-  additionalFeePolicy: '',
-  comboPackages: [],
-  offersPortableCharger: false,
-
-  restAreaAvailable: false,
-  freeDrinks: false,
-  foodMenu: [],
-  drinkMenu: [],
-});

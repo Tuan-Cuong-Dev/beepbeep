@@ -12,17 +12,18 @@ import { BatteryChargingStation } from './batteryChargingStationTypes';
 
 const colRef = collection(db, 'batteryChargingStations');
 
-export const fetchBatteryChargingStations = async () => {
+// 📌 Lấy danh sách tất cả trạm sạc
+export const fetchBatteryChargingStations = async (): Promise<BatteryChargingStation[]> => {
   const snap = await getDocs(colRef);
-  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as BatteryChargingStation));
+  return snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  } as BatteryChargingStation));
 };
 
-// ✅ Cập nhật kiểu dữ liệu đầy đủ cho các trường mở rộng
+// 📌 Tạo mới trạm sạc
 export const createBatteryChargingStation = async (
-  data: Omit<
-    BatteryChargingStation,
-    'id' | 'createdAt' | 'updatedAt' | 'createdBy'
-  >,
+  data: Omit<BatteryChargingStation, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>,
   createdBy: string
 ) => {
   const payload: Omit<BatteryChargingStation, 'id'> = {
@@ -34,17 +35,20 @@ export const createBatteryChargingStation = async (
   return await addDoc(colRef, payload);
 };
 
+// 📌 Cập nhật trạm sạc
 export const updateBatteryChargingStation = async (
   id: string,
   data: Partial<BatteryChargingStation>
 ) => {
   const ref = doc(db, 'batteryChargingStations', id);
-  return await updateDoc(ref, {
+  const payload = {
     ...data,
     updatedAt: Timestamp.now(),
-  });
+  };
+  return await updateDoc(ref, payload);
 };
 
+// 📌 Xoá trạm sạc
 export const deleteBatteryChargingStation = async (id: string) => {
   const ref = doc(db, 'batteryChargingStations', id);
   return await deleteDoc(ref);

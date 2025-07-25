@@ -1073,7 +1073,15 @@
 "batteryChargingStationSection": {
   "count_label": "Active Charging Stations",
   "subtitle": "Feeling tired? Take a break – Bíp Bíp is here while you recharge and enjoy a refreshing drink"
-}
+},
+
+"battery_charging_station_map": {
+    "you_are_here": "You are here",
+    "car_station": "Charging station for cars",
+    "motorbike_station": "Charging station for motorbikes",
+    "distance_away": "{{distance}} km away"
+  }
+  
 
 
 
