@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import useBatteryChargingStationStats from '@/src/hooks/useBatteryChargingStationStats';
-import Image from 'next/image';
+import { useBatteryChargingStationStats } from '@/src/hooks/useBatteryChargingStationStats';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 export default function BatteryChargingStationCounter() {
   const { t } = useTranslation();
-  const count = useBatteryChargingStationStats();
+  const { count, loading, error } = useBatteryChargingStationStats();
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
@@ -17,7 +16,8 @@ export default function BatteryChargingStationCounter() {
 
   if (!hasMounted) return null;
 
-  const formattedCount = typeof count === 'number' ? count.toLocaleString() : '...';
+  const formattedCount =
+    typeof count === 'number' ? count.toLocaleString() : loading ? '...' : '0';
   const title = t('batteryChargingStationSection.count_label');
   const subtitle = t('batteryChargingStationSection.subtitle');
 
@@ -27,13 +27,13 @@ export default function BatteryChargingStationCounter() {
         aria-label="Battery Charging Station Counter Section"
         className="relative w-full h-[320px] md:h-[400px] bg-black text-white cursor-pointer"
       >
-      <img
-        src="/assets/images/batterychargingstations.jpg"
-        alt="Battery Charging Station Background"
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-0 w-full h-full object-cover opacity-80"
-      />
+        <img
+          src="/assets/images/batterychargingstations.jpg"
+          alt="Battery Charging Station Background"
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover opacity-80"
+        />
 
         <div className="absolute inset-0 flex flex-col justify-center items-center z-10 px-4 text-center transition-transform group-hover:scale-105">
           <p className="text-5xl md:text-6xl font-bold tracking-tight">{formattedCount}</p>

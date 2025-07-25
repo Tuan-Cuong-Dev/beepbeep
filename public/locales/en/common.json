@@ -1066,8 +1066,8 @@
   "success_description": "Your charging station has been submitted and is awaiting approval.",
   "add_comboPackages": "Add combo package",
   "add_foodMenu": "Add food item",
-  "add_drinkMenu": "Add drink item"
-
+  "add_drinkMenu": "Add drink item",
+  "description": "Service description"
 },
 
 "batteryChargingStationSection": {
