@@ -23,10 +23,6 @@ const defaultForm: FormState = {
   mapAddress: '',
   phone: '',
   vehicleType: 'motorbike',
-  placeType: 'cafe',
-  chargingPorts: 0,
-  chargingPowerKW: 0,
-  chargingStandard: '',
   description: '',
   isActive: false,
   location: '',
@@ -68,8 +64,6 @@ export default function AddBatteryChargingStationForm() {
     try {
       const data = {
         ...form,
-        chargingPorts: form.chargingPorts ?? 0,
-        chargingPowerKW: form.chargingPowerKW ?? 0,
         isActive: false,
         createdBy: user.uid,
         createdAt: Timestamp.now(),
@@ -105,42 +99,6 @@ return (
       <option value="motorbike">{t('add_battery_charging_station_form.vehicle_type.motorbike')}</option>
       <option value="car">{t('add_battery_charging_station_form.vehicle_type.car')}</option>
     </select>
-    <select className="w-full border rounded px-3 py-2" value={form.placeType} onChange={(e) => handleChange('placeType', e.target.value as 'cafe' | 'restaurant' | 'shop' | 'home')}>
-      <option value="cafe">{t('add_battery_charging_station_form.place_type.cafe')}</option>
-      <option value="restaurant">{t('add_battery_charging_station_form.place_type.restaurant')}</option>
-      <option value="shop">{t('add_battery_charging_station_form.place_type.shop')}</option>
-      <option value="home">{t('add_battery_charging_station_form.place_type.home')}</option>
-    </select>
-
-    {/* THÔNG SỐ KỸ THUẬT */}
-    <h3 className="font-semibold text-lg mt-6">{t('add_battery_charging_station_form.section.technical')}</h3>
-    {/* 🔌 Số cổng sạc */}
-    <div>
-      <label className="block mb-1 text-sm font-medium text-gray-700">
-        {t('add_battery_charging_station_form.charging_ports')}
-      </label>
-      <Input
-        type="number"
-        placeholder={t('add_battery_charging_station_form.charging_ports')}
-        value={form.chargingPorts !== null && form.chargingPorts !== undefined ? form.chargingPorts : ''}
-        onChange={(e) => handleChange('chargingPorts', e.target.value === '' ? undefined : parseInt(e.target.value))}
-      />
-    </div>
-
-    {/* ⚡ Công suất sạc (kW) */}
-    <div>
-      <label className="block mb-1 text-sm font-medium text-gray-700">
-        {t('add_battery_charging_station_form.charging_power_kw')}
-      </label>
-      <Input
-        type="number"
-        placeholder={t('add_battery_charging_station_form.charging_power_kw')}
-        value={form.chargingPowerKW !== null && form.chargingPowerKW !== undefined ? form.chargingPowerKW : ''}
-        onChange={(e) => handleChange('chargingPowerKW', e.target.value === '' ? undefined : parseFloat(e.target.value))}
-      />
-    </div>
-
-    <Input placeholder={t('add_battery_charging_station_form.charging_standard')} value={form.chargingStandard} onChange={(e) => handleChange('chargingStandard', e.target.value)} />
 
     {/* NÚT GỬI */}
     <Button onClick={handleSubmit} disabled={submitting}>

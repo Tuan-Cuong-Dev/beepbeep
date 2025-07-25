@@ -46,10 +46,6 @@ export function useBatteryChargingStations() {
     phone: '',
     coordinates: undefined,
     vehicleType: 'motorbike',
-    placeType: 'cafe',
-    chargingPorts: undefined,
-    chargingPowerKW: undefined,
-    chargingStandard: '',
     description: '',
     isActive: false,
   });
