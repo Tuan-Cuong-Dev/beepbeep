@@ -9,6 +9,7 @@ import {
   FaTimes, FaPencilAlt, FaUser, FaCalendarAlt, FaEnvelope, FaBuilding,
   FaCog, FaUsers, FaDollarSign, FaMapMarkerAlt
 } from 'react-icons/fa';
+import { RiDashboardLine } from 'react-icons/ri';
 import { useUser } from '@/src/context/AuthContext';
 import { IconType } from 'react-icons';
 import { db } from '@/src/firebaseConfig';
@@ -103,7 +104,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
 
     items.push(
       { icon: FaEnvelope, label: t('user_sidebar.menu.messages'), path: '/messages' },
-      { icon: FaBuilding, label: t('user_sidebar.menu.dashboard'), path: '/dashboard' },
+      { icon: RiDashboardLine, label: t('user_sidebar.menu.dashboard'), path: '/dashboard' },
       { divider: true }
     );
 
