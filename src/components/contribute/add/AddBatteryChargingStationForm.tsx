@@ -114,8 +114,32 @@ return (
 
     {/* THÔNG SỐ KỸ THUẬT */}
     <h3 className="font-semibold text-lg mt-6">{t('add_battery_charging_station_form.section.technical')}</h3>
-    <Input type="number" placeholder={t('add_battery_charging_station_form.charging_ports')} value={form.chargingPorts ?? ''} onChange={(e) => handleChange('chargingPorts', parseInt(e.target.value) || 0)} />
-    <Input type="number" placeholder={t('add_battery_charging_station_form.charging_power_kw')} value={form.chargingPowerKW ?? ''} onChange={(e) => handleChange('chargingPowerKW', parseFloat(e.target.value) || 0)} /> 
+    {/* 🔌 Số cổng sạc */}
+    <div>
+      <label className="block mb-1 text-sm font-medium text-gray-700">
+        {t('add_battery_charging_station_form.charging_ports')}
+      </label>
+      <Input
+        type="number"
+        placeholder={t('add_battery_charging_station_form.charging_ports')}
+        value={form.chargingPorts !== null && form.chargingPorts !== undefined ? form.chargingPorts : ''}
+        onChange={(e) => handleChange('chargingPorts', e.target.value === '' ? undefined : parseInt(e.target.value))}
+      />
+    </div>
+
+    {/* ⚡ Công suất sạc (kW) */}
+    <div>
+      <label className="block mb-1 text-sm font-medium text-gray-700">
+        {t('add_battery_charging_station_form.charging_power_kw')}
+      </label>
+      <Input
+        type="number"
+        placeholder={t('add_battery_charging_station_form.charging_power_kw')}
+        value={form.chargingPowerKW !== null && form.chargingPowerKW !== undefined ? form.chargingPowerKW : ''}
+        onChange={(e) => handleChange('chargingPowerKW', e.target.value === '' ? undefined : parseFloat(e.target.value))}
+      />
+    </div>
+
     <Input placeholder={t('add_battery_charging_station_form.charging_standard')} value={form.chargingStandard} onChange={(e) => handleChange('chargingStandard', e.target.value)} />
 
     {/* NÚT GỬI */}
