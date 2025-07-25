@@ -396,7 +396,7 @@
   },     
 
 "profile_tabs": {
-  "activity_feed": "Activity Feed",
+  "activityFeed": "Activity Feed",
   "vehicles": "My Vehicles",
   "insurance": "Insurance Packages",
   "issues": "Reported Issues",
@@ -404,7 +404,7 @@
   "business": "Business"
 },
 
-  "activity_feed": {
+  "activityFeed": {
     "title": "Fill Out Your Profile",
     "description": "Add photos and info to your profile so people can find you easily and get to know you better!"
   },
@@ -1086,7 +1086,21 @@
     "car_station": "Charging station for cars",
     "motorbike_station": "Charging station for motorbikes",
     "distance_away": "{{distance}} km away"
-  }
+  },
+"tab_settings_modal": {
+  "title": "⚙️ Manage Visible Tabs",
+  "cancel": "Cancel",
+  "save": "Save"
+},
+
+"tab_labels": {
+    "activityFeed": "Activity Feed",
+    "vehicles": "My Vehicles",
+    "insurance": "Insurance",
+    "issues": "Issues",
+    "contributions": "Contributions",
+    "business": "Business"
+}
   
 
 

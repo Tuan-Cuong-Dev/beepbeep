@@ -389,7 +389,7 @@
 },
 
 "profile_tabs": {
-  "activity_feed": "アクティビティフィード",
+  "activityFeed": "アクティビティフィード",
   "vehicles": "自分の車両",
   "insurance": "保険パッケージ",
   "issues": "報告された問題",
@@ -397,7 +397,7 @@
   "business": "ビジネス"
 },
 
-"activity_feed": {
+"activityFeed": {
   "title": "プロフィールを完成させましょう",
   "description": "写真や情報を追加すると、他の人があなたを見つけやすくなり、より良く知ってもらえます！"
 },
@@ -1062,7 +1062,22 @@
     "car_station": "車用の充電ステーション",
     "motorbike_station": "バイク用の充電ステーション",
     "distance_away": "{{distance}} km 離れています"
-  }
+  },
+"tab_settings_modal": {
+  "title": "⚙️ 表示タブの管理",
+  "cancel": "キャンセル",
+  "save": "保存"
+},
+
+"tab_labels": {
+  "activityFeed": "アクティビティ履歴",
+  "vehicles": "マイビークル",
+  "insurance": "保険",
+  "issues": "問題報告",
+  "contributions": "投稿内容",
+  "business": "ビジネス"
+}
+
 
 
 

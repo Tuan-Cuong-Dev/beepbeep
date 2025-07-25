@@ -404,7 +404,7 @@
 },
 
 "profile_tabs": {
-  "activity_feed": "Bản tin hoạt động",
+  "activityFeed": "Bản tin hoạt động",
   "vehicles": "Xe của tôi",
   "insurance": "Gói bảo hiểm",
   "issues": "Sự cố đã báo",
@@ -413,7 +413,7 @@
 },
 
 
-"activity_feed": {
+"activityFeed": {
   "title": "Hoàn thiện hồ sơ của bạn",
   "description": "Hãy thêm ảnh và thông tin vào hồ sơ để mọi người dễ dàng tìm thấy và hiểu rõ hơn về bạn!"
 },
@@ -1091,7 +1091,22 @@
     "car_station": "Trạm sạc dành cho ô tô",
     "motorbike_station": "Trạm sạc dành cho xe máy",
     "distance_away": "Cách {{distance}} km"
-  }
+  },
+
+"tab_settings_modal": {
+  "title": "⚙️ Quản lý tab hiển thị",
+  "cancel": "Hủy",
+  "save": "Lưu"
+},
+
+"tab_labels": {
+  "activityFeed": "Hoạt động",
+  "vehicles": "Xe của tôi",
+  "insurance": "Bảo hiểm",
+  "issues": "Sự cố",
+  "contributions": "Đóng góp",
+  "business": "Doanh nghiệp"
+}
 
 
 

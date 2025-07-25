@@ -393,7 +393,7 @@
 },
 
 "profile_tabs": {
-  "activity_feed": "활동 피드",
+  "activityFeed": "활동 피드",
   "vehicles": "내 차량",
   "insurance": "보험 패키지",
   "issues": "신고된 문제",
@@ -401,7 +401,7 @@
   "business": "비즈니스"
 },
 
-"activity_feed": {
+"activityFeed": {
   "title": "프로필을 완성하세요",
   "description": "프로필에 사진과 정보를 추가하면 사람들이 당신을 더 쉽게 찾고 더 잘 알 수 있어요!"
 },

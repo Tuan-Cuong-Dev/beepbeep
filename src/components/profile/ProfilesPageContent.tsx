@@ -77,7 +77,7 @@ export default function ProfilesPageContent() {
 
       {/* Tabs */}
       <div className="bg-white border-t border-b sticky top-0 z-10">
-        <ProfileTabs activeTab={activeTab} setActiveTab={handleTabChange} />
+        <ProfileTabs activeTab={activeTab} setActiveTab={handleTabChange} userId={currentUser.uid} />
       </div>
 
       {/* Main layout */}
