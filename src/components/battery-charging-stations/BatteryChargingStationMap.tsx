@@ -137,6 +137,9 @@ export default function BatteryChargingStationMap({ stations, userLocation }: Pr
                         ? t('battery_charging_station_map.car_station')
                         : t('battery_charging_station_map.motorbike_station')}
                     </p>
+                    {station.phone && (
+                      <p className="text-xs text-blue-600">📞 {station.phone}</p>
+                    )}
                     {distanceText && (
                       <p className="text-xs text-green-700">📍 {distanceText}</p>
                     )}
