@@ -19,6 +19,7 @@ interface CategoryOption {
 interface Props {
   onSelect: (categoryKey: string) => void;
   selectedCategory?: string;
+  allowedCategories?: string[]; // ✅ NEW
 }
 
 const CATEGORY_OPTIONS: CategoryOption[] = [
@@ -51,12 +52,18 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
 export default function ServiceCategorySelector({
   onSelect,
   selectedCategory,
+  allowedCategories,
 }: Props) {
   const { t } = useTranslation('common');
 
+  // ✅ Lọc nếu có allowedCategories
+  const visibleOptions = allowedCategories?.length
+    ? CATEGORY_OPTIONS.filter((cat) => allowedCategories.includes(cat.key))
+    : CATEGORY_OPTIONS;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {CATEGORY_OPTIONS.map((cat) => (
+      {visibleOptions.map((cat) => (
         <button
           key={cat.key}
           onClick={() => onSelect(cat.key)}
@@ -69,10 +76,14 @@ export default function ServiceCategorySelector({
           <div>{cat.icon}</div>
           <div>
             <h3 className="text-base font-semibold text-gray-800">
-              {t(`service_category_selector.${cat.key}.label`)}
+              {t(`service_category_selector.${cat.key}.label`, {
+                defaultValue: cat.key,
+              })}
             </h3>
             <p className="text-sm text-gray-500">
-              {t(`service_category_selector.${cat.key}.description`)}
+              {t(`service_category_selector.${cat.key}.description`, {
+                defaultValue: '',
+              })}
             </p>
           </div>
         </button>

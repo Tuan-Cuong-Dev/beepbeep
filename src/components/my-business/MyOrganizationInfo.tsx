@@ -7,8 +7,12 @@ import OrganizationCreateChooser from './OrganizationCreateChooser';
 import OrganizationCard from './OrganizationCard';
 import { useTranslation } from 'react-i18next';
 
-export default function MyOrganizationInfo() {
-  const { t } = useTranslation('common'); // ⬅️ Không truyền namespace
+export default function MyOrganizationInfo({
+  onLoaded,
+}: {
+  onLoaded?: (orgs: OrgCardData[]) => void;
+}) {
+  const { t } = useTranslation('common');
   const { currentUser } = useAuth();
   const [organizations, setOrganizations] = useState<OrgCardData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +26,7 @@ export default function MyOrganizationInfo() {
     try {
       const data = await getUserOrganizations(uid);
       setOrganizations(data);
+      onLoaded?.(data); // ✅ Gửi dữ liệu về component cha
     } catch (error) {
       console.error('Error fetching organizations:', error);
     } finally {

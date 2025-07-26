@@ -1,5 +1,3 @@
-// Các dịch vụ của Account cung cấp
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -10,6 +8,7 @@ import { SupportedServiceType } from '@/src/lib/rentalCompanies/rentalCompaniesT
 import { useTranslation } from 'react-i18next';
 import ServiceCategorySelector from '@/src/components/vehicle-services/ServiceCategorySelector';
 import ServiceTypeSelector from '@/src/components/vehicle-services/ServiceTypeSelector';
+import { serviceCategoriesByOrgType } from '@/src/lib/organizations/serviceCategoryMapping';
 
 interface UserService {
   id: string;
@@ -21,15 +20,16 @@ interface UserService {
   description?: string;
 }
 
-export default function MyServiceList() {
+export default function MyServiceList({ orgType }: { orgType: string }) {
   const { currentUser } = useAuth();
   const { t } = useTranslation('common');
 
   const [services, setServices] = useState<UserService[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [category, setCategory] = useState<string>();
   const [serviceType, setServiceType] = useState<string>();
+
+  const allowedCategories = serviceCategoriesByOrgType[orgType] || [];
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -42,14 +42,15 @@ export default function MyServiceList() {
         ...doc.data(),
       })) as UserService[];
 
-      setServices(data);
+      // ✅ Lọc theo allowed categories
+      const filtered = data.filter((s) => allowedCategories.includes(s.category));
+      setServices(filtered);
       setLoading(false);
     };
 
     fetchServices();
-  }, [currentUser]);
+  }, [currentUser, orgType]);
 
-  // ✅ Reset serviceType khi đổi category
   const handleSelectCategory = (newCategory: string) => {
     setCategory(newCategory);
     setServiceType(undefined);
@@ -62,6 +63,7 @@ export default function MyServiceList() {
         onSelectCategory={handleSelectCategory}
         serviceType={serviceType}
         onSelectServiceType={setServiceType}
+        allowedCategories={allowedCategories}
       />
 
       <section>
@@ -90,11 +92,13 @@ function AddNewServiceCard({
   onSelectCategory,
   serviceType,
   onSelectServiceType,
+  allowedCategories,
 }: {
   category?: string;
   onSelectCategory: (val: string) => void;
   serviceType?: string;
   onSelectServiceType: (val: string) => void;
+  allowedCategories: string[];
 }) {
   const { t } = useTranslation('common');
 
@@ -102,7 +106,6 @@ function AddNewServiceCard({
     <div className="bg-white border rounded-xl p-4 shadow-sm space-y-6">
       <h3 className="text-base font-semibold">{t('my_service_list.add_new')}</h3>
 
-      {/* Step 1: Select Category */}
       <section className="border border-gray-200 rounded-lg p-4 bg-gray-50">
         <p className="text-sm font-medium text-gray-700 mb-3">
           {t('my_service_list.step1')}
@@ -110,10 +113,10 @@ function AddNewServiceCard({
         <ServiceCategorySelector
           selectedCategory={category}
           onSelect={onSelectCategory}
+          allowedCategories={allowedCategories} // ✅ Lọc trong dropdown
         />
       </section>
 
-      {/* Step 2: Select Specific Service */}
       {category && (
         <section className="border border-gray-200 rounded-lg p-4 bg-gray-50">
           <p className="text-sm font-medium text-gray-700 mb-3">
