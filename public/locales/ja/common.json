@@ -1087,7 +1087,7 @@
 },
 
 "create_business_form": {
-    "name_placeholder": "事業名",
+    "name_placeholder": "個人名 / 会社名 / 団体名",
     "email_placeholder": "メールアドレス",
     "phone_placeholder": "電話番号",
     "display_address_placeholder": "表示用住所",

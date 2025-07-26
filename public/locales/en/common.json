@@ -1111,7 +1111,7 @@
 },
 
 "create_business_form": {
-    "name_placeholder": "Business Name",
+    "name_placeholder": "Name of individual / business / organization",
     "email_placeholder": "Email",
     "phone_placeholder": "Phone Number",
     "display_address_placeholder": "Display Address",
