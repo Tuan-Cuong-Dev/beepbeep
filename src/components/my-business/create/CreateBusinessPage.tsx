@@ -13,7 +13,7 @@ import { useUser } from '@/src/context/AuthContext';
 import { db } from '@/src/firebaseConfig';
 import { BusinessType, BUSINESS_TYPE_LABELS } from '@/src/lib/my-business/businessTypes';
 
-// ✅ Danh sách loại hình hợp lệ
+// ✅ Danh sách hợp lệ
 const VALID_BUSINESS_TYPES: BusinessType[] = [
   'rental_company',
   'private_provider',
@@ -21,9 +21,11 @@ const VALID_BUSINESS_TYPES: BusinessType[] = [
   'intercity_bus',
   'vehicle_transport',
   'tour_guide',
+  'technician_mobile',
+  'technician_shop',
 ];
 
-// ✅ Xác định loại business từ query params
+// ✅ Hàm xác định loại business
 function resolveBusinessType(type: string | null, subtype: string | null): BusinessType | null {
   if (type === 'technician_partner') {
     if (subtype === 'mobile') return 'technician_mobile';
@@ -34,13 +36,10 @@ function resolveBusinessType(type: string | null, subtype: string | null): Busin
 }
 
 export default function CreateBusinessPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
   const { user, role } = useUser();
   const { t } = useTranslation('common');
-
-  const type = searchParams?.get('type') ?? null;
-  const subtype = searchParams?.get('subtype') ?? null;
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
   const [dialog, setDialog] = useState({
@@ -50,22 +49,30 @@ export default function CreateBusinessPage() {
     description: '',
   });
 
+  // ✅ Lấy query params
+  const type: string | null = searchParams?.get('type') ?? null;
+  const subtype: string | null = searchParams?.get('subtype') ?? null;
+
   useEffect(() => {
-    // Nếu là nhân sự → điều hướng sang trang riêng
+    if (!user) return;
+
+    // ✅ Nếu là nhân viên → chuyển hướng
     if (role === 'staff') {
       router.replace('/my-business/staff');
       return;
     }
 
-    const checkAgent = async () => {
-      if (!user) return;
-      const snap = await getDocs(query(collection(db, 'agents'), where('ownerId', '==', user.uid)));
+    // ✅ Nếu là agent đã tạo → chuyển hướng
+    const checkExistingAgent = async () => {
+      const snap = await getDocs(
+        query(collection(db, 'agents'), where('ownerId', '==', user.uid))
+      );
       if (!type && !snap.empty) {
         router.replace('/my-business/agent');
       }
     };
 
-    checkAgent();
+    checkExistingAgent();
   }, [user, role, type, router]);
 
   useEffect(() => {
