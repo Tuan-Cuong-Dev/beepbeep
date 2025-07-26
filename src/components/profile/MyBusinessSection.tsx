@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MyServiceList from '@/src/components/my-business/MyServiceList';
-import MyOrganizationInfo from '@/src/components/my-business/MyOrganizationInfo';
+import MyOrganizationInfo from '@/src/components/my-business/organizations/MyOrganizationInfo';
 import { OrgCardData } from '@/src/lib/organizations/getUserOrganizations';
 
 export default function MyBusinessSection() {

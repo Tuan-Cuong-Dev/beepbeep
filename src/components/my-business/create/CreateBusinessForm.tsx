@@ -1,4 +1,4 @@
-// Components được dùng để gọi từ page my-business.
+// ✅ Refactored CreateBusinessForm.tsx with full businessType + collection mapping
 
 'use client';
 
@@ -22,6 +22,54 @@ interface Props {
   businessType: BusinessType;
 }
 
+// 🔁 Central mapping
+const businessTypeConfig: Record<BusinessType, {
+  collection: string;
+  role: string;
+  redirect: string;
+}> = {
+  rental_company: {
+    collection: 'rentalCompanies',
+    role: 'company_owner',
+    redirect: '/my-business/stations',
+  },
+  private_provider: {
+    collection: 'privateProviders',
+    role: 'private_owner',
+    redirect: '/my-business',
+  },
+  agent: {
+    collection: 'agents',
+    role: 'agent',
+    redirect: '/my-business',
+  },
+  technician_mobile: {
+    collection: 'technicianPartners',
+    role: 'technician_partner',
+    redirect: '/technician-partners',
+  },
+  technician_shop: {
+    collection: 'technicianPartners',
+    role: 'technician_partner',
+    redirect: '/technician-partners',
+  },
+  intercity_bus: {
+    collection: 'intercityBusCompanies',
+    role: 'intercity_bus',
+    redirect: '/my-business',
+  },
+  vehicle_transport: {
+    collection: 'vehicleTransporters',
+    role: 'vehicle_transport',
+    redirect: '/my-business',
+  },
+  tour_guide: {
+    collection: 'tourGuides',
+    role: 'tour_guide',
+    redirect: '/my-business',
+  },
+};
+
 export default function CreateBusinessForm({ businessType }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -38,11 +86,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
     description: '',
   });
 
-  const showDialog = (
-    type: 'success' | 'error' | 'info',
-    title: string,
-    description = ''
-  ) => {
+  const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
     setDialog({ open: true, type, title, description });
   };
 
@@ -78,6 +122,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
     setLoading(true);
 
     try {
+      const config = businessTypeConfig[businessType];
       const data = {
         name,
         email,
@@ -90,28 +135,17 @@ export default function CreateBusinessForm({ businessType }: Props) {
         createdAt: serverTimestamp(),
       };
 
-      let collectionName = '';
-      let roleValue = '';
-
-      switch (businessType) {
-        case 'rental_company':
-          collectionName = 'rentalCompanies';
-          roleValue = 'company_owner';
-          break;
-        case 'private_provider':
-          collectionName = 'rentalCompanies'; // ✅ dùng chung collection
-          roleValue = 'private_owner';
-          break;
-        case 'agent':
-          collectionName = 'rentalCompanies'; // ✅ dùng chung collection
-          roleValue = 'agent';
-          break;
+      if (businessType === 'technician_mobile') {
+        (data as any).type = 'mobile';
+      }
+      if (businessType === 'technician_shop') {
+        (data as any).type = 'shop';
       }
 
-      const docRef = await addDoc(collection(db, collectionName), data);
+      const docRef = await addDoc(collection(db, config.collection), data);
 
       await updateDoc(doc(db, 'users', user.uid), {
-        role: roleValue,
+        role: config.role,
         companyId: docRef.id,
         updatedAt: serverTimestamp(),
       });
@@ -120,7 +154,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
         await fetch('/api/setCustomClaims', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: user.uid, role: 'company_owner' }),
+          body: JSON.stringify({ uid: user.uid, role: config.role }),
         });
 
         await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -129,11 +163,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
 
       showDialog('success', 'Company Created', '✅ Your company was added successfully.');
       setTimeout(() => {
-        router.push(
-          businessType === 'rental_company'
-            ? '/my-business/stations'
-            : '/my-business'
-        );
+        router.push(config.redirect);
       }, 1000);
     } catch (err) {
       console.error('❌ Error:', err);
@@ -143,51 +173,21 @@ export default function CreateBusinessForm({ businessType }: Props) {
     }
   };
 
-  const getPlaceholder = (key: string) => {
-    if (businessType === 'private_provider') {
-      if (key === 'name') return 'Your Name';
-      if (key === 'location') return 'Auto-detected coordinates';
-      return '';
-    }
-    if (businessType === 'agent') {
-      if (key === 'name') return 'Agent Name';
-      if (key === 'location') return 'Auto-detected coordinates';
-      return '';
-    }
-    return key === 'name' ? 'Company Name' : '';
-  };
-
   return (
     <>
       <div className="space-y-4">
-        <Input placeholder={getPlaceholder('name')} value={name} onChange={(e) => setName(e.target.value)} />
+        <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <Input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <Input
-          placeholder="Display Address (for users)"
-          value={displayAddress}
-          onChange={(e) => setDisplayAddress(e.target.value)}
-        />
-        <Input
-          placeholder="Map Address (Google Maps link)"
-          value={mapAddress}
-          onChange={(e) => setMapAddress(e.target.value)}
-          onBlur={handleBlur}
-        />
-        <Input
-          placeholder={getPlaceholder('location') || 'Location (lat,lng)'}
-          value={location}
-          readOnly={!!coords}
-          onChange={(e) => setLocation(e.target.value)}
-        />
+        <Input placeholder="Display Address" value={displayAddress} onChange={(e) => setDisplayAddress(e.target.value)} />
+        <Input placeholder="Map Address (Google Maps link)" value={mapAddress} onChange={(e) => setMapAddress(e.target.value)} onBlur={handleBlur} />
+        <Input placeholder="Location (lat,lng)" value={location} readOnly={!!coords} onChange={(e) => setLocation(e.target.value)} />
 
         {geoLoading && <p className="text-sm text-gray-500">📍 Detecting coordinates...</p>}
         {geoError && <p className="text-sm text-red-500">{geoError}</p>}
         {coords && (
           <>
-            <p className="text-sm text-gray-600">
-              📌 Detected: {coords.lat}° N, {coords.lng}° E
-            </p>
+            <p className="text-sm text-gray-600">📌 Detected: {coords.lat}° N, {coords.lng}° E</p>
             <iframe
               title="Map Preview"
               width="100%"
@@ -201,13 +201,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
         )}
 
         <Button onClick={handleSubmit} disabled={loading}>
-          {loading
-            ? 'Creating...'
-            : businessType === 'rental_company'
-            ? 'Add Company'
-            : businessType === 'private_provider'
-            ? 'Add Provider'
-            : 'Add Agent'}
+          {loading ? 'Creating...' : 'Create'}
         </Button>
       </div>
 
@@ -220,4 +214,4 @@ export default function CreateBusinessForm({ businessType }: Props) {
       />
     </>
   );
-} 
+}

@@ -1027,8 +1027,8 @@
     "description": "Quản lý tuyến đường và vận chuyển hành khách giữa các tỉnh."
   },
   "vehicle_transport": {
-    "title": "Dịch vụ vận chuyển xe",
-    "description": "Cung cấp kéo xe và giao xe đường dài."
+    "title": "Đơn vị vận chuyển",
+    "description": "Cung cấp dịch vụ vận chuyển hàng hóa và xe cộ trong và ngoài thành phố."
   },
   "tour_guide": {
     "title": "Hướng dẫn viên du lịch",

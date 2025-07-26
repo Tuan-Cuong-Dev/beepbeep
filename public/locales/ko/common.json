@@ -1016,8 +1016,8 @@
     "description": "노선을 관리하고 지역 간 승객을 운송"
   },
   "vehicle_transport": {
-    "title": "차량 운송 업체",
-    "description": "차량 견인 및 장거리 운송 제공"
+    "title": "운송업체",
+    "description": "화물과 차량을 도심 및 장거리로 운송하는 서비스를 제공합니다."
   },
   "tour_guide": {
     "title": "투어 가이드",

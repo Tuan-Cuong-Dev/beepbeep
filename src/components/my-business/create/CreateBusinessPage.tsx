@@ -1,5 +1,4 @@
-// Điều hướng đến các UI của từng account theo vai trò
-// Hiển thị giao diện theo logic của Account đăng nhập.
+// ✅ Updated CreateBusinessPage.tsx – hỗ trợ tất cả businessType
 
 'use client';
 
@@ -8,7 +7,6 @@ import { useEffect, useState } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import CreateBusinessForm from '@/src/components/my-business/create/CreateBusinessForm';
-import CreateAgentForm from '@/src/components/my-business/create/CreateAgentForm';
 import { BusinessType, BUSINESS_TYPE_LABELS } from '@/src/lib/my-business/businessTypes';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
@@ -18,7 +16,7 @@ import { db } from '@/src/firebaseConfig';
 export default function CreateBusinessPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, role } = useUser(); // ✅ lấy role từ context
+  const { user, role } = useUser();
   const typeParam = searchParams?.get('type');
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
   const [dialog, setDialog] = useState({
@@ -37,13 +35,11 @@ export default function CreateBusinessPage() {
   };
 
   useEffect(() => {
-    // ✅ Nếu role là 'staff' → chuyển hướng đến trang staff
     if (role === 'staff') {
       router.replace('/my-business/staff');
       return;
     }
 
-    // ✅ Nếu là agent đã tồn tại → chuyển hướng luôn
     const checkAgent = async () => {
       if (!user) return;
       const snap = await getDocs(
@@ -58,12 +54,19 @@ export default function CreateBusinessPage() {
   }, [user, role, router, typeParam]);
 
   useEffect(() => {
-    if (
-      typeParam === 'rental_company' ||
-      typeParam === 'private_provider' ||
-      typeParam === 'agent'
-    ) {
-      setBusinessType(typeParam);
+    const validTypes: BusinessType[] = [
+      'rental_company',
+      'private_provider',
+      'agent',
+      'technician_mobile',
+      'technician_shop',
+      'intercity_bus',
+      'vehicle_transport',
+      'tour_guide',
+    ];
+
+    if (typeParam && validTypes.includes(typeParam as BusinessType)) {
+      setBusinessType(typeParam as BusinessType);
     } else {
       setBusinessType(null);
       if (typeParam !== null) {
@@ -89,20 +92,14 @@ export default function CreateBusinessPage() {
             <>
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">
-                  {businessType === 'agent'
-                    ? 'Create an Agent'
-                    : `Create a ${BUSINESS_TYPE_LABELS[businessType]}`}
+                  {`Create a ${BUSINESS_TYPE_LABELS[businessType] || 'Business'}`}
                 </h1>
                 <div className="w-16 h-[3px] bg-[#00d289] mx-auto mt-3 mb-4 rounded-full" />
                 <p className="text-gray-600 text-sm md:text-base">
                   Please fill in the details below to get started.
                 </p>
               </div>
-              {businessType === 'agent' ? (
-                <CreateAgentForm />
-              ) : (
-                <CreateBusinessForm businessType={businessType} />
-              )}
+              <CreateBusinessForm businessType={businessType} />
             </>
           ) : (
             <div className="text-center text-red-600 font-semibold text-lg">

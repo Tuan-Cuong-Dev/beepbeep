@@ -998,8 +998,8 @@
     "description": "都道府県間のルートと乗客輸送を管理。"
   },
   "vehicle_transport": {
-    "title": "車両輸送業者",
-    "description": "けん引や長距離輸送サービスを提供。"
+    "title": "輸送業者",
+    "description": "貨物や車両を都市内外に輸送するサービスを提供します。"
   },
   "tour_guide": {
     "title": "ツアーガイド",
