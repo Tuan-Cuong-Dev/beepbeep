@@ -1,23 +1,47 @@
-// ✅ Updated CreateBusinessPage.tsx – hỗ trợ tất cả businessType
-
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { getDocs, query, where, collection } from 'firebase/firestore';
+
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import CreateBusinessForm from '@/src/components/my-business/create/CreateBusinessForm';
-import { BusinessType, BUSINESS_TYPE_LABELS } from '@/src/lib/my-business/businessTypes';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
-import { getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+import { BusinessType, BUSINESS_TYPE_LABELS } from '@/src/lib/my-business/businessTypes';
+
+// ✅ Danh sách loại hình hợp lệ
+const VALID_BUSINESS_TYPES: BusinessType[] = [
+  'rental_company',
+  'private_provider',
+  'agent',
+  'intercity_bus',
+  'vehicle_transport',
+  'tour_guide',
+];
+
+// ✅ Xác định loại business từ query params
+function resolveBusinessType(type: string | null, subtype: string | null): BusinessType | null {
+  if (type === 'technician_partner') {
+    if (subtype === 'mobile') return 'technician_mobile';
+    if (subtype === 'shop') return 'technician_shop';
+    return null;
+  }
+  return VALID_BUSINESS_TYPES.includes(type as BusinessType) ? (type as BusinessType) : null;
+}
 
 export default function CreateBusinessPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, role } = useUser();
-  const typeParam = searchParams?.get('type');
+  const { t } = useTranslation('common');
+
+  const type = searchParams?.get('type') ?? null;
+  const subtype = searchParams?.get('subtype') ?? null;
+
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
   const [dialog, setDialog] = useState({
     open: false,
@@ -26,15 +50,8 @@ export default function CreateBusinessPage() {
     description: '',
   });
 
-  const showDialog = (
-    type: 'success' | 'error' | 'info',
-    title: string,
-    description = ''
-  ) => {
-    setDialog({ open: true, type, title, description });
-  };
-
   useEffect(() => {
+    // Nếu là nhân sự → điều hướng sang trang riêng
     if (role === 'staff') {
       router.replace('/my-business/staff');
       return;
@@ -42,42 +59,28 @@ export default function CreateBusinessPage() {
 
     const checkAgent = async () => {
       if (!user) return;
-      const snap = await getDocs(
-        query(collection(db, 'agents'), where('ownerId', '==', user.uid))
-      );
-      if (!typeParam && !snap.empty) {
+      const snap = await getDocs(query(collection(db, 'agents'), where('ownerId', '==', user.uid)));
+      if (!type && !snap.empty) {
         router.replace('/my-business/agent');
       }
     };
 
     checkAgent();
-  }, [user, role, router, typeParam]);
+  }, [user, role, type, router]);
 
   useEffect(() => {
-    const validTypes: BusinessType[] = [
-      'rental_company',
-      'private_provider',
-      'agent',
-      'technician_mobile',
-      'technician_shop',
-      'intercity_bus',
-      'vehicle_transport',
-      'tour_guide',
-    ];
+    const resolved = resolveBusinessType(type, subtype);
+    setBusinessType(resolved);
 
-    if (typeParam && validTypes.includes(typeParam as BusinessType)) {
-      setBusinessType(typeParam as BusinessType);
-    } else {
-      setBusinessType(null);
-      if (typeParam !== null) {
-        showDialog(
-          'error',
-          'Invalid Business Type',
-          'Please go back and select a valid business type.'
-        );
-      }
+    if (!resolved && type !== null) {
+      setDialog({
+        open: true,
+        type: 'error',
+        title: t('create_business_page.error_title'),
+        description: t('create_business_page.error_description'),
+      });
     }
-  }, [typeParam]);
+  }, [type, subtype, t]);
 
   return (
     <div
@@ -92,18 +95,20 @@ export default function CreateBusinessPage() {
             <>
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">
-                  {`Create a ${BUSINESS_TYPE_LABELS[businessType] || 'Business'}`}
+                  {t('create_business_page.title', {
+                    business: BUSINESS_TYPE_LABELS[businessType] || 'Business',
+                  })}
                 </h1>
                 <div className="w-16 h-[3px] bg-[#00d289] mx-auto mt-3 mb-4 rounded-full" />
                 <p className="text-gray-600 text-sm md:text-base">
-                  Please fill in the details below to get started.
+                  {t('create_business_page.subtitle')}
                 </p>
               </div>
               <CreateBusinessForm businessType={businessType} />
             </>
           ) : (
             <div className="text-center text-red-600 font-semibold text-lg">
-              ❌ Invalid business type. Please go back and select a valid option.
+              {t('create_business_page.invalid_type')}
             </div>
           )}
         </div>
@@ -111,15 +116,13 @@ export default function CreateBusinessPage() {
 
       <Footer />
 
-      {dialog.open && (
-        <NotificationDialog
-          open={dialog.open}
-          type={dialog.type}
-          title={dialog.title}
-          description={dialog.description}
-          onClose={() => setDialog((prev) => ({ ...prev, open: false }))}
-        />
-      )}
+      <NotificationDialog
+        open={dialog.open}
+        type={dialog.type}
+        title={dialog.title}
+        description={dialog.description}
+        onClose={() => setDialog((prev) => ({ ...prev, open: false }))}
+      />
     </div>
   );
 }

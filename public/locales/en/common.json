@@ -1010,8 +1010,8 @@
     "title": "Rental Company",
     "description": "Manage fleet, stations, bookings, and staff."
   },
-  "private_owner": {
-    "title": "Private Owner",
+  "private_provider": {
+    "title": "Private Provider",
     "description": "Rent out your personal vehicle or offer services."
   },
   "agent": {
@@ -1100,8 +1100,39 @@
     "issues": "Issues",
     "contributions": "Contributions",
     "business": "Business"
-}
-  
+},
+
+"create_business_page": {
+  "title": "Create a {{business}}",
+  "subtitle": "Please fill in the details below to get started.",
+  "invalid_type": "❌ Invalid business type. Please go back and select a valid option.",
+  "error_title": "Invalid Business Type",
+  "error_description": "Please go back and select a valid business type."
+},
+
+"create_business_form": {
+    "name_placeholder": "Business Name",
+    "email_placeholder": "Email",
+    "phone_placeholder": "Phone Number",
+    "display_address_placeholder": "Display Address",
+    "map_address_placeholder": "Map Address (Google Maps link)",
+    "location_placeholder": "Location (lat,lng)",
+    "detecting_coordinates": "📍 Detecting coordinates...",
+    "invalid_coordinates": "❌ Invalid coordinates. Please use format: \"16.0514,108.2123\"",
+    "detected_coordinates": "📌 Detected:",
+    "create_button": "Create",
+    "creating_button": "Creating...",
+    "success_title": "Company Created",
+    "success_description": "✅ Your company was added successfully.",
+    "error_title": "Failed to Create Company",
+    "error_description": "❌ Please try again.",
+    "not_logged_in_title": "Not Logged In",
+    "not_logged_in_description": "You must be logged in to perform this action.",
+    "missing_fields_title": "Missing Fields",
+    "missing_fields_description": "Please fill in all fields."
+  }
+
+
 
 
 

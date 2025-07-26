@@ -41,10 +41,10 @@ export const ORG_OPTIONS: OrgOption[] = [
     path: '/my-business/create?type=rental_company',
   },
   {
-    key: 'private_owner',
-    type: 'private_owner',
+    key: 'private_provider',
+    type: 'private_provider',
     icon: () => <GiElectric className="text-2xl text-[#00d289]" />,
-    path: '/my-business/create?type=private_owner',
+    path: '/my-business/create?type=private_provider',
   },
   {
     key: 'agent',

@@ -1014,7 +1014,7 @@
     "title": "Công ty cho thuê xe",
     "description": "Quản lý đội xe, trạm, đơn đặt và nhân sự."
   },
-  "private_owner": {
+  "private_provider": {
     "title": "Chủ xe cá nhân",
     "description": "Cho thuê xe cá nhân hoặc cung cấp dịch vụ."
   },
@@ -1106,7 +1106,38 @@
   "issues": "Sự cố",
   "contributions": "Đóng góp",
   "business": "Doanh nghiệp"
-}
+},
+
+"create_business_page": {
+  "title": "Tạo {{business}}",
+  "subtitle": "Vui lòng điền thông tin bên dưới để bắt đầu.",
+  "invalid_type": "❌ Loại hình doanh nghiệp không hợp lệ. Vui lòng quay lại và chọn một loại hợp lệ.",
+  "error_title": "Loại hình không hợp lệ",
+  "error_description": "Vui lòng quay lại và chọn một loại hình doanh nghiệp hợp lệ."
+},
+
+"create_business_form": {
+    "name_placeholder": "Tên doanh nghiệp",
+    "email_placeholder": "Email",
+    "phone_placeholder": "Số điện thoại",
+    "display_address_placeholder": "Địa chỉ hiển thị",
+    "map_address_placeholder": "Địa chỉ bản đồ (liên kết Google Maps)",
+    "location_placeholder": "Tọa độ (lat,lng)",
+    "detecting_coordinates": "📍 Đang lấy tọa độ...",
+    "invalid_coordinates": "❌ Tọa độ không hợp lệ. Vui lòng nhập theo định dạng: \"16.0514,108.2123\"",
+    "detected_coordinates": "📌 Tọa độ phát hiện:",
+    "create_button": "Tạo",
+    "creating_button": "Đang tạo...",
+    "success_title": "Tạo doanh nghiệp thành công",
+    "success_description": "✅ Doanh nghiệp của bạn đã được thêm thành công.",
+    "error_title": "Tạo doanh nghiệp thất bại",
+    "error_description": "❌ Vui lòng thử lại.",
+    "not_logged_in_title": "Chưa đăng nhập",
+    "not_logged_in_description": "Bạn cần đăng nhập để thực hiện thao tác này.",
+    "missing_fields_title": "Thiếu thông tin",
+    "missing_fields_description": "Vui lòng điền đầy đủ tất cả các trường."
+  }
+
 
 
 

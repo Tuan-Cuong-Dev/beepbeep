@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { OrgCardData } from '@/src/lib/organizations/getUserOrganizations';
-import { ORGANIZATION_LABELS } from '@/src/lib/organizations/organizationLabels';
 import { useTranslation } from 'react-i18next';
 
 export default function OrganizationCard({ org }: { org: OrgCardData }) {
