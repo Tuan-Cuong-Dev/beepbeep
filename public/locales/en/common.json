@@ -1103,11 +1103,17 @@
 },
 
 "create_business_page": {
-  "title": "Create a {{business}}",
-  "subtitle": "Please fill in the details below to get started.",
-  "invalid_type": "❌ Invalid business type. Please go back and select a valid option.",
-  "error_title": "Invalid Business Type",
-  "error_description": "Please go back and select a valid business type."
+  "title": {
+    "rental_company": "Create Rental Company",
+    "private_provider": "Create Private Provider",
+    "agent": "Create Agent",
+    "technician_mobile": "Create Mobile Technician",
+    "technician_shop": "Create Repair Shop",
+    "intercity_bus": "Create Intercity Bus Provider",
+    "vehicle_transport": "Create Vehicle Transporter",
+    "tour_guide": "Create Tour Guide"
+  },
+  "subtitle": "Please fill in the information below to get started."
 },
 
 "create_business_form": {

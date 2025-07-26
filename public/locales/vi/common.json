@@ -1109,15 +1109,21 @@
 },
 
 "create_business_page": {
-  "title": "Tạo {{business}}",
-  "subtitle": "Vui lòng điền thông tin bên dưới để bắt đầu.",
-  "invalid_type": "❌ Loại hình doanh nghiệp không hợp lệ. Vui lòng quay lại và chọn một loại hợp lệ.",
-  "error_title": "Loại hình không hợp lệ",
-  "error_description": "Vui lòng quay lại và chọn một loại hình doanh nghiệp hợp lệ."
+  "title": {
+    "rental_company": "Tạo Công ty cho thuê xe",
+    "private_provider": "Tạo Nhà cung cấp cá nhân",
+    "agent": "Tạo Cộng tác viên",
+    "technician_mobile": "Tạo Kỹ thuật viên lưu động",
+    "technician_shop": "Tạo Cửa hàng sửa xe",
+    "intercity_bus": "Tạo Đơn vị xe liên tỉnh",
+    "vehicle_transport": "Tạo Đơn vị vận chuyển xe",
+    "tour_guide": "Tạo Hướng dẫn viên"
+  },
+  "subtitle": "Vui lòng điền thông tin bên dưới để bắt đầu."
 },
 
 "create_business_form": {
-    "name_placeholder": "Tên doanh nghiệp",
+    "name_placeholder": "Tên cá nhân / doanh nghiệp / tổ chức",
     "email_placeholder": "Email",
     "phone_placeholder": "Số điện thoại",
     "display_address_placeholder": "Địa chỉ hiển thị",

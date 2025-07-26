@@ -102,8 +102,8 @@ export default function CreateBusinessPage() {
             <>
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">
-                  {t('create_business_page.title', {
-                    business: BUSINESS_TYPE_LABELS[businessType] || 'Business',
+                  {t(`create_business_page.title.${businessType}`, {
+                    defaultValue: 'Create Business',
                   })}
                 </h1>
                 <div className="w-16 h-[3px] bg-[#00d289] mx-auto mt-3 mb-4 rounded-full" />
