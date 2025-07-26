@@ -6,7 +6,7 @@ import { ORGANIZATION_LABELS } from '@/src/lib/organizations/organizationLabels'
 import { useTranslation } from 'react-i18next';
 
 export default function OrganizationCard({ org }: { org: OrgCardData }) {
-  const href = `/dashboard/${org.type}/${org.id}`;
+  const href = `/dashboard`;
   const { t } = useTranslation('common');
 
   return (

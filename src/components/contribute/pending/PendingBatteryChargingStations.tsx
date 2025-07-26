@@ -94,7 +94,6 @@ export default function PendingBatteryChargingStations() {
                   📍 Lat: {s.coordinates.lat.toFixed(5)}, Lng: {s.coordinates.lng.toFixed(5)}
                 </p>
               )}
-              <p className="text-xs text-gray-400">Location: {s.location}</p>
             </div>
             <div className="flex gap-2">
               <Button onClick={() => handleApprove(s.id)} variant="default">
