@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getDocs, query, where, collection } from 'firebase/firestore';
@@ -13,7 +13,6 @@ import { useUser } from '@/src/context/AuthContext';
 import { db } from '@/src/firebaseConfig';
 import { BusinessType, BUSINESS_TYPE_LABELS } from '@/src/lib/my-business/businessTypes';
 
-// ✅ Danh sách hợp lệ
 const VALID_BUSINESS_TYPES: BusinessType[] = [
   'rental_company',
   'private_provider',
@@ -25,7 +24,6 @@ const VALID_BUSINESS_TYPES: BusinessType[] = [
   'technician_shop',
 ];
 
-// ✅ Hàm xác định loại business
 function resolveBusinessType(type: string | null, subtype: string | null): BusinessType | null {
   if (type === 'technician_partner') {
     if (subtype === 'mobile') return 'technician_mobile';
@@ -38,9 +36,10 @@ function resolveBusinessType(type: string | null, subtype: string | null): Busin
 export default function CreateBusinessPage() {
   const { user, role } = useUser();
   const { t } = useTranslation('common');
-  const searchParams = useSearchParams();
   const router = useRouter();
 
+  const [type, setType] = useState<string | null>(null);
+  const [subtype, setSubtype] = useState<string | null>(null);
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
   const [dialog, setDialog] = useState({
     open: false,
@@ -49,20 +48,22 @@ export default function CreateBusinessPage() {
     description: '',
   });
 
-  // ✅ Lấy query params
-  const type: string | null = searchParams?.get('type') ?? null;
-  const subtype: string | null = searchParams?.get('subtype') ?? null;
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setType(params.get('type'));
+      setSubtype(params.get('subtype'));
+    }
+  }, []);
 
   useEffect(() => {
     if (!user) return;
 
-    // ✅ Nếu là nhân viên → chuyển hướng
     if (role === 'staff') {
       router.replace('/my-business/staff');
       return;
     }
 
-    // ✅ Nếu là agent đã tạo → chuyển hướng
     const checkExistingAgent = async () => {
       const snap = await getDocs(
         query(collection(db, 'agents'), where('ownerId', '==', user.uid))
@@ -95,7 +96,6 @@ export default function CreateBusinessPage() {
       style={{ backgroundImage: "url('/assets/images/Cover_desktop.jpg')" }}
     >
       <Header />
-
       <main className="flex-grow flex justify-center items-center px-4 py-24">
         <div className="bg-white bg-opacity-90 shadow-2xl rounded-[32px] p-10 w-full max-w-3xl border border-gray-200">
           {businessType ? (
@@ -120,7 +120,6 @@ export default function CreateBusinessPage() {
           )}
         </div>
       </main>
-
       <Footer />
 
       <NotificationDialog
