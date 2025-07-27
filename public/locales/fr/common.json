@@ -1,20 +1,1128 @@
 {
-  "preferences": "Préférences",
-  "region_language": "Région et langue",
-  "currency": "Devise",
-  "select_region_language": "Sélectionnez la région | langue",
-  "select_currency": "Sélectionnez la devise",
-  "vietnam": "Viêt Nam",
-  "englishUK": "Anglais (Royaume-Uni)",
-  "japan": "Japon",
-  "china": "Chine",
-  "southKorea": "Corée du Sud",
-  "russia": "Russie",
-  "france": "France",
-  "germany": "Allemagne",
-  "italy": "Italie",
-  "spain": "Espagne",
-  "portugal": "Portugal",
-  "saudiArabia": "Arabie Saoudite",
-  "saved_notice": "Toutes les modifications de préférences seront enregistrées sur votre compte."
+  "preferences": {
+    "preferences": "Préférences",
+    "region_language": "Région et langue",
+    "currency": "Devise",
+    "select_region_language": "Sélectionner la région et la langue",
+    "select_currency": "Sélectionner la devise",
+    "englishUS": "Anglais (États-Unis)",
+    "englishUK": "Anglais (Royaume-Uni)",
+    "vietnam": "Vietnam",
+    "japan": "Japon",
+    "china": "Chine",
+    "southKorea": "Corée du Sud",
+    "russia": "Russie",
+    "france": "France",
+    "germany": "Allemagne",
+    "italy": "Italie",
+    "spain": "Espagne",
+    "portugal": "Portugal",
+    "saudiArabia": "Arabie Saoudite",
+    "saved_notice": "Toutes les modifications de préférences seront enregistrées dans votre compte."
+  },
+  "landing": {
+    "loading": "Chargement...",
+    "hero": {
+      "titleLine1": "Louez votre véhicule",
+      "titleLine2": "en un bip bip !",
+      "cta": "Explorer Bíp Bíp"
+    }
+  },
+  "stationSection": {
+    "stations_title": "{{count}} stations",
+    "stations_subtitle": "prêtes à vous servir !",
+    "view_all": "Voir tout",
+    "see_all_stations": "Voir toutes les stations de location"
+  },
+  "technicianSection": {
+    "vehicle_trouble": "Un problème avec votre véhicule ?",
+    "call_technician": "Appelez un technicien à proximité",
+    "view_all": "Voir tout",
+    "see_all_technicians": "Voir tous les techniciens disponibles",
+    "notification_title": "Contacter un technicien",
+    "notification_description": "Nous vous mettrons en relation avec un technicien partenaire sous peu.",
+    "call_technician_with_count": "{{count}} techniciens sont prêts à vous aider !"
+  },
+  "notificationTypes": {
+    "info": "Information",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "error": "Erreur"
+  },
+  "serviceSection": {
+    "title": "🛠️ Bíp Bíp 365",
+    "subtitle": "Votre sauveur de véhicules 24/7",
+    "view_all": "Voir tout",
+    "see_all_services": "Voir tous les services de réparation et de secours",
+    "notification_title": "📞 Réserver un service",
+    "notification_description": "Nous lançons bientôt la réservation de services ! Restez à l'écoute."
+  },
+  "vehicleModelSection": {
+    "title": "Choisissez votre véhicule électrique",
+    "rent_button": "🛵 Louer maintenant",
+    "view_all": "Voir tout",
+    "see_all_vehicles": "Voir tous les véhicules électriques",
+    "notification_title": "🚧 Bientôt disponible",
+    "notification_description": "Nous mettons actuellement en place nos stations de location. La fonction de location n’est pas encore disponible."
+  },
+  "batteryStationSection": {
+    "count_label": "Stations d'échange de batteries",
+    "subtitle": "Cliquez pour explorer les stations dans tout le pays"
+  },
+  "whyChooseUs": {
+    "title": "Pourquoi tout le monde profite de notre plateforme",
+    "roles": [
+      {
+        "title": "Clients",
+        "description": "Réservez facilement une location de véhicule, demandez une assistance routière et accédez à des services de réparation fiables, où que vous soyez."
+      },
+      {
+        "title": "Personnel",
+        "description": "Gérez les locations, aidez les clients, mettez à jour l'état des véhicules et coordonnez les demandes de service, le tout depuis une seule plateforme."
+      },
+      {
+        "title": "Responsables de station",
+        "description": "Supervisez les opérations, gérez l'inventaire et le personnel, et assurez le bon déroulement des départs et retours de véhicules chaque jour."
+      },
+      {
+        "title": "Propriétaires d'entreprise",
+        "description": "Surveillez l'utilisation de la flotte, les tendances des clients et la performance financière en temps réel. Développez votre entreprise en toute confiance."
+      },
+      {
+        "title": "Techniciens",
+        "description": "Recevez des tâches de réparation, suivez l’historique des problèmes et gérez les dossiers d’entretien des véhicules grâce à des outils numériques efficaces."
+      },
+      {
+        "title": "Propriétaires privés",
+        "description": "Mettez vos véhicules personnels en location ou en service sur notre plateforme et gagnez de l’argent tout en gardant le contrôle total de vos biens."
+      },
+      {
+        "title": "Investisseurs",
+        "description": "Suivez les performances de vos investissements, consultez les rapports par région ou entreprise et soutenez un réseau de services éco-responsables en pleine croissance."
+      },
+      {
+        "title": "Agents (Collaborateurs)",
+        "description": "Mettez en relation les clients avec les bons services de véhicules, gagnez des commissions en toute transparence et développez votre propre réseau de partenaires."
+      }
+    ]
+  },
+
+"faqSection": {
+    "title": "Que souhaitez-vous demander ?",
+    "faqs": [
+      {
+        "question": "Comment échanger une batterie à une station ?",
+        "answer": "Lorsque vous louez un véhicule électrique via Bíp Bíp, nous vous fournissons des instructions claires pour utiliser nos stations d’échange de batterie intelligentes. Vous pouvez échanger vous-même les batteries à n’importe quelle station compatible avec votre compte Bíp Bíp."
+      },
+      {
+        "question": "Quels accessoires sont fournis avec le véhicule de location ?",
+        "answer": "Chaque véhicule est fourni avec deux casques, deux imperméables et un chargeur (si nécessaire). Certains modèles peuvent aussi inclure un support de téléphone, un porte-bagages arrière ou un espace de rangement supplémentaire selon le modèle."
+      },
+      {
+        "question": "Quels types de véhicules sont disponibles sur Bíp Bíp ?",
+        "answer": "Nous proposons une large gamme de véhicules, notamment des motos électriques, des vélos, des voitures électriques, des fourgonnettes, etc. – adaptés aussi bien au tourisme qu’à la livraison."
+      },
+      {
+        "question": "Que faire si je rencontre un problème sur la route ?",
+        "answer": "En cas d’accident, de panne ou de tout autre souci, veuillez contacter notre hotline ou demander une assistance routière directement via l’application. Nos techniciens vous aideront rapidement."
+      }
+    ]
+  },
+
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "about": "À propos de nous",
+    "contact": "Contact",
+    "policy": "Politique"
+  },
+
+  "preferences_sidebar": {
+    "label": "États-Unis, FR | USD"
+  },
+
+  "navigation": {
+    "home": "Accueil",
+    "about": "À propos de nous",
+    "contact": "Contact",
+    "policy": "Politiques"
+  },
+
+  "user_sidebar": {
+    "points": "Points",
+    "welcome": "Bienvenue",
+    "account_disabled": "Compte désactivé",
+    "total_earnings": "Gains totaux",
+    "pending_payment": "Paiement en attente",
+    "referral_code": "Votre code de parrainage",
+    "menu": {
+      "write_review": "Écrire un avis",
+      "add_to_map": "Ajouter à la carte",
+      "profile": "Profil",
+      "bookings": "Réservations",
+      "messages": "Messages",
+      "dashboard": "Tableau de bord",
+      "account_info": "Infos du compte",
+      "agent_dashboard": "Tableau de bord Agent",
+      "earnings": "Gains",
+      "request_payment": "Demander un paiement",
+      "sign_out": "Déconnexion"
+    },
+    "coming_soon": {
+      "title": "🚧 Bientôt disponible",
+      "description": "Nous sommes en train de configurer nos stations de location. La fonctionnalité Écrire un avis n’est pas encore disponible."
+    }
+  },
+
+  "account": {
+    "title": "Informations du compte",
+    "first_name": "Prénom",
+    "last_name": "Nom de famille",
+    "full_name": "Nom complet",
+    "gender": "Genre",
+    "male": "Homme",
+    "female": "Femme",
+    "other": "Autre",
+    "date_of_birth": "Date de naissance",
+    "id_number": "Numéro d'identité",
+    "referral_code": "Code de parrainage",
+    "referral_hint": "Votre numéro d'identité sera utilisé comme code de parrainage dans le système Bíp Bíp. Veuillez le saisir s'il est manquant.",
+    "phone": "Téléphone",
+    "email": "E-mail",
+    "email_note": "* Cet e-mail est votre identifiant de connexion.",
+    "password": "Mot de passe",
+    "reset_password": "Réinitialiser votre mot de passe",
+    "address": "Adresse",
+    "city": "Ville",
+    "state": "État / Région",
+    "zip": "Code postal",
+    "country": "Pays",
+    "last_known_address": "Dernière adresse connue",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "language": "Langue",
+    "region": "Région",
+    "currency": "Devise",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "saving_success": "Profil mis à jour",
+    "saving_success_description": "Votre profil a été enregistré avec succès.",
+    "saving_error": "Échec de la mise à jour",
+    "reset_sent": "Réinitialisation du mot de passe",
+    "reset_sent_description": "Un e-mail de réinitialisation du mot de passe a été envoyé.",
+    "reset_failed": "Échec de la réinitialisation",
+    "login_email_note": "Ceci est l’e-mail que vous avez utilisé pour vous connecter. Pour le modifier, veuillez contacter l’assistance."
+  },
+
+  "contribute": {
+    "add_to_map": "Ajoutez votre lieu sur la carte",
+    "repair": "Atelier de réparation",
+    "rental": "Point de location",
+    "battery": "Station d'échange de batterie",
+    "charging": "Station de recharge",
+    "coordinate_guide": "📍 Veuillez entrer les coordonnées correctes (latitude, longitude) afin que votre lieu apparaisse correctement sur la carte.",
+    "coordinate_warning": "Si les coordonnées sont incorrectes, les clients ne pourront pas trouver votre emplacement.",
+    "check_location_on_maps": "🔗 Comment obtenir les coordonnées sur Google Maps"
+  },
+
+  "repair_shop_form": {
+    "technician_name": "Nom du technicien",
+    "phone_number": "Numéro de téléphone",
+    "shop_name_optional": "Nom de l'atelier (optionnel)",
+    "shop_address": "Adresse de l'atelier",
+    "map_address": "Adresse Google Maps (optionnelle)",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "select_vehicle_type": "Sélectionnez le type de véhicule",
+    "vehicle_bike": "Vélo",
+    "vehicle_motorbike": "Moto",
+    "vehicle_car": "Voiture",
+    "submit_repair_shop": "Soumettre l'atelier",
+    "submitting": "Envoi en cours...",
+    "thank_you": "Merci pour votre contribution !",
+    "submission_received": "Nous avons bien reçu votre soumission et allons la vérifier sous peu."
+  },
+
+
+  "rental_shop_form": {
+    "shop_name": "Nom du magasin",
+    "display_address": "Adresse affichée",
+    "map_address": "Adresse Google Maps (optionnelle)",
+    "location": "Coordonnées (ex. : 16.07° N, 108.22° E)",
+    "phone": "Numéro de téléphone (optionnel)",
+    "select_vehicle_type": "Sélectionner le type de véhicule",
+    "vehicle_bike": "Vélo",
+    "vehicle_motorbike": "Moto",
+    "vehicle_car": "Voiture",
+    "submit_rental_shop": "Soumettre le point de location",
+    "submitting": "Envoi en cours...",
+    "thank_you": "Merci pour votre contribution !",
+    "submission_received": "Nous avons bien reçu votre soumission et allons la vérifier sous peu."
+  },
+
+  "battery_station_form": {
+    "station_name": "Nom de la station",
+    "display_address": "Adresse affichée",
+    "map_address": "Adresse Google Maps (optionnelle)",
+    "location": "Coordonnées (ex. : 16.07° N, 108.22° E)",
+    "select_vehicle_type": "Sélectionner le type de véhicule",
+    "vehicle_motorbike": "Moto",
+    "vehicle_car": "Voiture",
+    "submit_battery_station": "Soumettre la station d'échange de batterie",
+    "submitting": "Envoi en cours...",
+    "thank_you": "Merci pour votre contribution !",
+    "submission_received": "Nous avons bien reçu votre soumission et allons la vérifier sous peu."
+  },
+
+  "auth": {
+    "signin_success": "Connexion réussie",
+    "signin_error": "Erreur lors de la connexion",
+    "signout_success": "Déconnexion réussie",
+    "signout_error": "Erreur lors de la déconnexion",
+    "popup_closed": "La fenêtre de connexion a été fermée avant la fin du processus"
+  },
+
+  "handle_email_login": {
+    "success": "Connexion réussie avec l'e-mail",
+    "error": "Une erreur est survenue lors de la connexion avec l'e-mail",
+    "email_not_found": "Adresse e-mail introuvable",
+    "wrong_password": "Mot de passe incorrect"
+  },
+
+  "login_popup": {
+    "title": "Connectez-vous pour profiter pleinement de Bíp Bíp.",
+    "continue_with_google": "Continuer avec Google",
+    "continue_with_email": "Continuer avec l'e-mail",
+    "agree_prefix": "En poursuivant, vous acceptez nos",
+    "terms_of_use": "Conditions d'utilisation",
+    "and_read": "et confirmez avoir lu notre",
+    "privacy_statement": "Politique de confidentialité et de cookies",
+    "recaptcha_note": "Ce site est protégé par reCAPTCHA et les",
+    "google_privacy": "règles de confidentialité de Google",
+    "and": "et",
+    "google_terms": "conditions d'utilisation de Google",
+    "apply": "s’appliquent"
+  },
+
+  "signin_popup": {
+    "welcome": "Bon retour parmi nous.",
+    "email_label": "Adresse e-mail",
+    "email_placeholder": "E-mail",
+    "password_label": "Mot de passe",
+    "password_placeholder": "Mot de passe",
+    "fill_all_fields": "Veuillez entrer l'e-mail et le mot de passe.",
+    "login_failed": "Échec de la connexion.",
+    "forgot_password": "Mot de passe oublié ?",
+    "signin": "Se connecter",
+    "not_a_member": "Pas encore membre ?",
+    "join": "S'inscrire",
+    "unlock_bipbip": "pour profiter pleinement de Bíp Bíp.",
+    "agree_prefix": "En poursuivant, vous acceptez nos",
+    "terms_of_use": "Conditions d'utilisation",
+    "and_read": "et confirmez avoir lu notre",
+    "privacy_statement": "Politique de confidentialité et de cookies",
+    "recaptcha_note": "Ce site est protégé par reCAPTCHA et les",
+    "google_privacy": "règles de confidentialité de Google",
+    "and": "et",
+    "google_terms": "conditions d'utilisation de Google",
+    "apply": "s’appliquent"
+  },
+
+  "signup_popup": {
+    "title": "Inscrivez-vous pour débloquer tout le potentiel de Bíp Bíp",
+    "first_name": "Prénom",
+    "last_name": "Nom de famille",
+    "email": "Adresse e-mail",
+    "password": "Créer un mot de passe",
+    "signup_failed": "Échec de l'inscription.",
+    "join_button": "S'inscrire",
+    "already_member": "Déjà membre ?",
+    "signin": "Se connecter",
+    "with_account": "avec votre compte Bíp Bíp.",
+    "agree_prefix": "En poursuivant, vous acceptez nos",
+    "terms_of_use": "Conditions d'utilisation",
+    "and_read": "et confirmez avoir lu notre",
+    "privacy_statement": "Politique de confidentialité et de cookies",
+    "recaptcha_note": "Ce site est protégé par reCAPTCHA et les",
+    "google_privacy": "règles de confidentialité de Google",
+    "and": "et",
+    "google_terms": "conditions d'utilisation de Google",
+    "apply": "s’appliquent"
+  },
+
+  "profiles_page_content": {
+    "loading": "Chargement du profil...",
+    "no_address": "Non mis à jour",
+    "no_contributions": "Vous n'avez encore fait aucune contribution."
+  },
+
+  "mobile_profile_overview": {
+    "loading": "Chargement du profil...",
+    "unknown_name": "Inconnu",
+    "default_address": "Da Nang",
+    "role": "Rôle",
+    "edit_profile": "Modifier le profil",
+    "referral_code": "Votre code de parrainage :",
+    "stats": {
+      "contributions": "Contributions",
+      "followers": "Abonnés",
+      "following": "Abonnements"
+    }
+  },
+
+  "desktop_profile_overview": {
+    "loading": "Chargement du profil...",
+    "unknown_name": "Inconnu",
+    "default_address": "Da Nang, Vietnam",
+    "role": "Rôle",
+    "helpful_votes": "votes utiles",
+    "edit_profile": "Modifier le profil",
+    "stats": {
+      "contributions": "Contributions",
+      "followers": "Abonnés",
+      "following": "Abonnements"
+    }
+  },
+
+  "profile_tabs": {
+    "activityFeed": "Fil d'activité",
+    "vehicles": "Mes véhicules",
+    "insurance": "Assurances",
+    "issues": "Problèmes signalés",
+    "contributions": "Contributions",
+    "business": "Entreprise"
+  },
+  "activityFeed": {
+    "title": "Complétez votre profil",
+    "description": "Ajoutez des photos et des informations pour que les autres puissent vous trouver facilement et mieux vous connaître !"
+  },
+
+  "my_vehicles_section": {
+    "title": "Mes véhicules",
+    "add": "+ Ajouter un véhicule",
+    "close": "Fermer",
+    "no_vehicle": "Vous n'avez ajouté aucun véhicule pour le moment.",
+    "delete_title": "❌ Supprimer ce véhicule ?",
+    "delete_description": "Cela supprimera définitivement « {{name}} » de votre liste.",
+    "delete_success": "✅ Véhicule supprimé avec succès !",
+    "delete_error": "❌ Échec de la suppression du véhicule."
+  },
+
+  "edit_personal_vehicle_form": {
+    "title": "Modifier le véhicule",
+    "name": "Nom du véhicule",
+    "license_plate": "Plaque d'immatriculation",
+    "year": "Année de fabrication",
+    "odo": "Kilométrage (km)",
+    "set_primary": "Définir comme véhicule principal",
+    "save": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "update_failed": "❌ Échec de la mise à jour du véhicule."
+  },
+
+  "personal_vehicle_card": {
+    "no_image": "Pas d’image",
+    "unknown": "Inconnu",
+    "plate": "Plaque",
+    "odo": "Kilométrage",
+    "year": "Année",
+    "type": "Type",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "primary": "Principal",
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+
+  "select_model_then_add_vehicle_form": {
+    "search_title": "Recherchez votre modèle de véhicule",
+    "search_placeholder": "ex : VinFast Feliz, Yamaha Sirius...",
+    "add_title": "Ajouter votre véhicule",
+    "selected": "Sélectionné",
+    "nickname": "Surnom (ex : moto de papa)",
+    "plate": "Plaque d'immatriculation (optionnel)",
+    "year": "Année de fabrication",
+    "odo": "Kilométrage (km)",
+    "set_primary": "Définir comme véhicule principal",
+    "save": "Enregistrer le véhicule",
+    "saving": "Enregistrement...",
+    "change_model": "Changer de modèle",
+    "no_image": "Pas d’image",
+    "error": "❌ Échec de l'enregistrement du véhicule. Veuillez réessayer."
+  },
+
+  "available_insurance_products_section": {
+    "loading": "Chargement des produits d'assurance...",
+    "no_products": "Aucun produit d'assurance disponible pour le moment.",
+    "title": "Produits d’assurance disponibles",
+    "no_image": "Pas d’image",
+    "duration": "Durée",
+    "days": "jours",
+    "price": "Prix",
+    "view_and_buy": "Voir et acheter"
+  },
+
+  "my_insurance_packages_section": {
+    "loading": "Chargement de vos forfaits d’assurance...",
+    "no_packages": "Vous n'avez encore acheté aucun forfait d’assurance.",
+    "title": "Mes forfaits d’assurance",
+    "no_image": "Pas d’image disponible",
+    "unnamed_product": "Produit sans nom",
+    "code": "Code",
+    "vehicle": "Véhicule",
+    "frame": "N° de châssis",
+    "engine": "N° du moteur",
+    "plate": "N° de plaque",
+    "expires": "Expire le",
+    "created": "Créé le",
+    "status": {
+      "pending": "⏳ En attente d'approbation",
+      "rejected": "❌ Rejeté",
+      "expired": "🗕️ Expiré",
+      "active": "✅ Actif",
+      "inactive": "⛔ Inactif"
+    },
+    "view": "Voir les détails",
+    "extend": "Prolonger l’assurance"
+  },
+
+    "my_insurance_products_list": {
+    "loading": "Chargement des produits d'assurance...",
+    "no_products": "Aucun produit d'assurance disponible.",
+    "no_image": "Pas d’image disponible",
+    "duration": "Durée",
+    "days": "jours",
+    "price": "Prix",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "created": "Créé"
+  },
+
+  "purchase_insurance_dialog": {
+    "title": "Sélectionnez votre moto",
+    "no_motorbike": "Aucune moto disponible dans vos véhicules personnels.",
+    "select_placeholder": "-- Choisissez votre moto --",
+    "no_plate": "Pas de plaque",
+    "name": "Nom",
+    "license_plate": "Plaque d'immatriculation",
+    "brand": "Marque",
+    "model": "Modèle",
+    "color": "Couleur",
+    "odo": "Kilométrage",
+    "confirm_button": "Confirmer l’achat"
+  },
+
+  "profile_main_content": {
+    "welcome_title": "Bienvenue sur votre profil",
+    "welcome_description": "Ici, vous pouvez consulter votre résumé d’activité et gérer vos services liés aux véhicules."
+  },
+
+  "settings_dropdown": {
+    "settings": "Paramètres",
+    "edit_profile": "Modifier votre profil",
+    "edit_photo": "Modifier la photo de profil",
+    "edit_cover": "Modifier la photo de couverture",
+    "account_info": "Informations du compte",
+    "account_settings": "Paramètres du compte",
+    "subscriptions": "Abonnements",
+    "payments": "Options de paiement",
+    "connect_drive": "Connecter Google Drive"
+  },
+
+  "profile_sidebar": {
+    "achievements": "Vos réussites",
+    "unlock_prompt": "Commencez à partager pour débloquer",
+    "write_first_review": "Rédigez votre première évaluation",
+    "review_milestone": "Débloquez les étapes de commentaires",
+    "upload_first_photo": "Téléchargez votre première photo",
+    "photo_milestone": "Débloquez les étapes photo",
+    "view_all": "Voir tout",
+    "intro": "Présentation",
+    "joined_in": "Inscrit en",
+    "helpful_votes": "votes utiles",
+    "feedback_prompt": "Aidez à améliorer Bíp Bíp avec vos retours",
+    "post_photos": "Publier des photos",
+    "write_review": "Rédiger une évaluation"
+  },
+
+  "my_issues_section": {
+    "title": "Mes signalements",
+    "no_issues": "Vous n'avez signalé aucun problème de véhicule pour le moment.",
+    "table": {
+      "title": "Titre",
+      "status": "Statut",
+      "location": "Emplacement",
+      "reported_at": "Signalé le"
+    },
+    "na": "N/A"
+  },
+
+  "about_page": {
+    "title": "À propos de nous",
+    "p1": "Chez Bíp Bíp, nous construisons une plateforme avancée qui transforme la gestion et l’expansion des locations de véhicules électriques. Notre système permet à plusieurs parties prenantes de participer à un écosystème de location transparent et efficace — des clients et du personnel aux investisseurs, techniciens et propriétaires d'entreprise.",
+    "p2": "Notre objectif est de simplifier toutes les opérations de location — des réservations à l’entretien, à la coordination du personnel, en passant par le suivi des performances — afin que chacun puisse facilement rejoindre le mouvement de l'e-mobilité.",
+    "p3": "Que vous soyez un client à la recherche d’un trajet fiable, un technicien en charge des réparations, un gestionnaire de flotte ou un investisseur suivant votre retour sur investissement — Bíp Bíp met à votre disposition les outils adaptés.",
+    "p4": "Notre plateforme prend en charge :",
+    "roles": {
+      "customers": "Clients – Locations pratiques, options de livraison flexibles, et accès à des vélos électriques de qualité à tout moment.",
+      "staff": "Personnel – Outils pour gérer les commandes, aider les utilisateurs, et traiter les véhicules en temps réel.",
+      "station_managers": "Gestionnaires de stations – Supervision opérationnelle, suivi des performances et gestion du personnel.",
+      "company_owners": "Propriétaires d'entreprises – Contrôle centralisé, analyses commerciales et expansion facilitée.",
+      "technicians": "Techniciens – Suivi de maintenance, historique de service et affectation des tâches.",
+      "private_owners": "Propriétaires privés – Revenus avec transparence complète grâce à la location de véhicules.",
+      "investors": "Investisseurs – Aperçu du ROI et performance commerciale durable.",
+      "agents": "Agents – Référencement à commission via des outils conviviaux."
+    },
+    "p5": "Nous nous engageons à façonner un avenir plus intelligent et plus écologique pour la mobilité au Vietnam et au-delà."
+  },
+
+  "contact_page": {
+    "title": "Contact",
+    "description": "Nous serions ravis d’avoir de vos nouvelles !",
+    "email_label": "E-mail",
+    "phone_label": "Téléphone",
+    "address_label": "Adresse"
+  },
+
+  "policy_page": {
+    "title": "Confidentialité et Politique",
+    "intro": "Chez Bíp Bíp, nous accordons une grande importance à votre vie privée et à la protection de vos données. Nous nous engageons à être transparents sur la manière dont nous traitons vos informations.",
+    "point1": "Nous ne vendons ni ne partageons vos informations personnelles.",
+    "point2": "Toutes les transactions et données sont sécurisées via un chiffrement conforme aux normes de l'industrie.",
+    "point3": {
+      "part1": "Vous pouvez demander la suppression de votre compte à tout moment en contactant",
+      "part2": "."
+    },
+    "footer_note": "Veuillez consulter notre politique de confidentialité complète pour plus de détails ou nous contacter directement pour toute préoccupation."
+  },
+
+  "services_page": {
+    "title": "Découvrez Nos Services",
+    "loading": "Chargement des services...",
+    "no_image": "Aucune image",
+    "price_unit": "VND",
+    "all": "Tous",
+    "uncategorized": "Non catégorisé",
+    "categories": {
+      "repair": "Réparation",
+      "insurance": "Assurance",
+      "parts_replacement": "Remplacement de pièces"
+    }
+  },
+
+  "user_top_menu": {
+    "bookings": "Réservations",
+    "rental_companies": "Sociétés de location",
+    "vehicle_management": "Gestion des véhicules",
+    "users_management": "Gestion des utilisateurs",
+    "customers_management": "Gestion des clients",
+    "staff_management": "Gestion du personnel",
+    "battery_management": "Gestion des batteries",
+    "accessories_management": "Gestion des accessoires",
+    "accessory_exports": "Exportation d'accessoires",
+    "subscription_packages": "Forfaits d'abonnement"
+  },
+
+  "messages_page": {
+    "title": "📩 Messages",
+    "invitations_title": "Invitations",
+    "loading_invitations": "Chargement des invitations...",
+    "no_invitations": "Vous n'avez aucune invitation pour le moment.",
+    "role_label": "Rôle",
+    "accept": "Accepter",
+    "reject": "Refuser",
+    "accepted_message": "Vous avez accepté cette invitation.",
+    "rejected_message": "Vous avez refusé cette invitation.",
+    "notifications_title": "Notifications système",
+    "loading_notifications": "Chargement des notifications...",
+    "no_notifications": "Aucune nouvelle notification.",
+    "types": {
+      "notification": "NOTIFICATION",
+      "system_alert": "ALERTE SYSTÈME",
+      "booking_update": "MISE À JOUR DE RÉSERVATION"
+    }
+  },
+
+  "my_map_view": {
+    "tabs": {
+      "all": "🗺️ Tous",
+      "rental": "🏪 Stations de location",
+      "maintenance": "🔧 Techniciens",
+      "battery": "🔄 Stations de changement de batterie",
+      "battery_charging": "🔋 Stations de recharge"
+    },
+    "close_button": "Fermer"
+  },
+
+  "technician_partner_card": {
+    "shop_technician": "Technicien en boutique",
+    "mobile_technician": "Technicien mobile",
+    "distance": "{{km}} km",
+    "address_not_available": "N/A",
+    "rating": "{{rating}} ({{count}})",
+    "call_now": "Appeler maintenant",
+    "contact": "Contacter"
+  },
+
+  "technician_map": {
+    "you_are_here": "🧍 Vous êtes ici",
+    "lat": "Lat : {{lat}}",
+    "lng": "Lng : {{lng}}",
+    "shop_technician": "Technicien en boutique",
+    "mobile_technician": "Technicien mobile",
+    "no_address": "Aucune adresse",
+    "no_phone": "Aucun numéro",
+    "call_now": "📞 Appeler maintenant",
+    "location_error": "⚠️ {{message}}"
+  },
+
+  "battery_station_card": {
+    "car_station": "Station voiture",
+    "motorbike_station": "Station moto",
+    "distance_away": "{{distance}} km",
+    "battery_station": "Station de batterie"
+  },
+
+  "battery_station_map": {
+    "you_are_here": "Vous êtes ici",
+    "car_station": "Station voiture",
+    "motorbike_station": "Station moto",
+    "distance_away": "{{distance}} km"
+  },
+
+    "station_card": {
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "maintenance": "En maintenance"
+    },
+    "distance_away": "{{distance}} km",
+    "view_on_map": "Voir sur la carte"
+  },
+
+  "station_map": {
+    "you_are_here": "Vous êtes ici",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "phone": "Numéro de téléphone",
+    "popup_title": "Infos de la station",
+    "getting_location_failed": "Impossible de récupérer votre position"
+  },
+
+  "my_contributions_section": {
+    "tabs": {
+      "contributions": "Mes contributions",
+      "points": "Points"
+    },
+    "status_label": "Statut :",
+    "status": {
+      "approved": "Approuvée",
+      "pending": "En attente"
+    },
+    "edit": "Modifier",
+    "types": {
+      "repair_shop": "Atelier de réparation",
+      "rental_shop": "Station de location",
+      "battery_station": "Station de batterie"
+    },
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page"
+  },
+
+  "repair_shop_edit_form": {
+    "technician_name": "Nom du technicien",
+    "phone_number": "Numéro de téléphone",
+    "shop_name_optional": "Nom de l'atelier (optionnel)",
+    "shop_address": "Adresse de l'atelier",
+    "map_address": "Adresse sur la carte",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "select_vehicle_type": "Sélectionner le type de véhicule pris en charge",
+    "vehicle_bike": "Vélo",
+    "vehicle_motorbike": "Moto",
+    "vehicle_car": "Voiture",
+    "update_error": "Échec de la mise à jour de l'atelier."
+  },
+
+  "common": {
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "loading": "Chargement..."
+  },
+
+  "edit_contribution_modal": {
+    "title": "Modifier {{typeLabel}}",
+    "not_found": "Aucun formulaire correspondant trouvé.",
+    "types": {
+      "repair_shop": "Atelier de réparation",
+      "rental_shop": "Station de location",
+      "battery_station": "Station de batterie"
+    }
+  },
+
+  "rental_shop_edit_form": {
+    "shop_name": "Nom de la station de location",
+    "display_address": "Adresse affichée",
+    "map_address": "Adresse de la carte (utilisée pour la géolocalisation)",
+    "location": "Coordonnées (mises à jour automatiquement)",
+    "phone": "Téléphone de contact",
+    "select_vehicle_type": "Sélectionner le type de véhicule pris en charge",
+    "vehicle_bike": "Vélo",
+    "vehicle_motorbike": "Moto",
+    "vehicle_car": "Voiture",
+    "update_error": "Échec de la mise à jour de la station de location."
+  },
+
+  "battery_station_edit_form": {
+    "title": "Modifier la station de batterie",
+    "name": "Nom de la station",
+    "display_address": "Adresse affichée",
+    "map_address": "Adresse Google Maps",
+    "vehicle_type": "Type de véhicule pris en charge",
+    "select_vehicle_type": "Sélectionner le type de véhicule",
+    "vehicle_motorbike": "Moto électrique",
+    "vehicle_car": "Voiture électrique",
+    "is_active": "Actif",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "loading": "Chargement des données...",
+    "update_error": "❌ Erreur lors de la mise à jour de la station de batterie."
+  },
+
+    "contribution_points_summary": {
+    "title": "🎖️ Résumé de vos contributions",
+    "points": "Points de contribution : <1>{{points}}</1>",
+    "total": "Total des contributions : <1>{{total}}</1>",
+    "level": "Niveau de contribution : <1>Niveau {{contributionLevel}}</1>"
+  },
+
+  "contribution_points_section": {
+    "title": "📋 Historique des points",
+    "loading": "Chargement de votre historique de points...",
+    "empty": "Aucun enregistrement de points trouvé.",
+    "status": "Statut : <1>{{status}}</1>",
+    "type": "📝 {{type}}",
+    "no_records": "Aucun enregistrement de points trouvé."
+  },
+
+  "my_business_section": {
+    "services_title": "🔧 Services que vous proposez",
+    "organization_title": "🏢 Votre entreprise ou organisation affiliée"
+  },
+
+  "my_service_list": {
+    "title": "Vos services",
+    "add_new": "Ajouter un nouveau service",
+    "step1": "Étape 1 : Sélectionner une catégorie de service",
+    "step2": "Étape 2 : Choisir un service spécifique",
+    "selected": "Service sélectionné",
+    "continue": "Continuer pour créer le service",
+    "loading": "Chargement de vos services...",
+    "no_services": "Vous n'avez publié aucun service pour le moment.",
+    "status": {
+      "active": "Actif",
+      "pending": "En attente",
+      "inactive": "Inactif"
+    }
+  },
+
+  "service_labels": {
+    "repair_basic": "Réparation de base",
+    "repair_advanced": "Réparation avancée",
+    "battery_replacement": "Remplacement de batterie",
+    "charging_issue": "Problème de charge",
+    "maintenance_routine": "Entretien régulier",
+    "brake_service": "Service de freins",
+
+    "rental_self_drive": "Location sans chauffeur",
+    "rental_with_driver": "Location avec chauffeur",
+    "tour_rental": "Tour en véhicule électrique",
+    "short_term_rental": "Location à court terme",
+    "long_term_rental": "Location à long terme",
+
+    "battery_swap": "Échange de batterie en station",
+    "mobile_swap": "Échange mobile de batterie",
+    "battery_health_check": "Contrôle de l'état de la batterie",
+
+    "towing": "Remorquage / Dépannage de véhicule",
+    "vehicle_delivery": "Livraison de véhicule",
+    "intercity_transport": "Transport interurbain",
+
+    "cleaning": "Nettoyage de véhicule",
+    "customization": "Personnalisation / Mise à niveau",
+    "accessory_sale": "Vente d'accessoires",
+
+    "license_support": "Assistance au permis de conduire",
+    "insurance_sale": "Assurance véhicule",
+    "registration_assist": "Assistance à l'immatriculation"
+  },
+
+  "service_category_selector": {
+    "repair": {
+      "label": "Réparation & Entretien",
+      "description": "Réparations de base, batterie, freins, diagnostics"
+    },
+    "rental": {
+      "label": "Location de véhicules",
+      "description": "Sans chauffeur, tours, court et long terme"
+    },
+    "battery": {
+      "label": "Services de batterie",
+      "description": "Échange de batterie, contrôle, livraison mobile"
+    },
+    "transport": {
+      "label": "Transport & Dépannage",
+      "description": "Remorquage, transport interurbain, récupération de véhicule"
+    },
+    "care": {
+      "label": "Accessoires & Entretien",
+      "description": "Nettoyage, personnalisation, vente d'accessoires"
+    },
+    "legal": {
+      "label": "Assurance & Documents",
+      "description": "Assistance permis, immatriculation, assurance"
+    }
+  },
+
+    "service_type_selector": {
+    "repair": {
+      "repair": {
+        "label": "Service de réparation",
+        "description": "Réparations générales et diagnostics"
+      },
+      "battery_check": {
+        "label": "Contrôle de la batterie",
+        "description": "Inspecter et tester l'état de la batterie"
+      }
+    },
+    "rental": {
+      "rental_self_drive": {
+        "label": "Location sans chauffeur",
+        "description": "Louez un véhicule et conduisez vous-même"
+      },
+      "rental_with_driver": {
+        "label": "Location avec chauffeur",
+        "description": "Louez un véhicule avec un chauffeur"
+      },
+      "tour": {
+        "label": "Service de visite",
+        "description": "Visites guidées et forfaits touristiques"
+      }
+    },
+    "battery": {
+      "battery_swap": {
+        "label": "Échange de batterie",
+        "description": "Service d'échange rapide de batterie"
+      },
+      "battery_delivery": {
+        "label": "Livraison de batterie",
+        "description": "Recevez des batteries livrées chez vous"
+      }
+    },
+    "transport": {
+      "vehicle_rescue": {
+        "label": "Dépannage de véhicule",
+        "description": "Service de remorquage et de secours"
+      },
+      "intercity_transport": {
+        "label": "Transport interurbain",
+        "description": "Transport entre villes ou provinces"
+      }
+    },
+    "care": {
+      "vehicle_cleaning": {
+        "label": "Nettoyage de véhicule",
+        "description": "Lavage et polissage"
+      },
+      "accessories_sales": {
+        "label": "Vente d'accessoires",
+        "description": "Achetez des accessoires pour véhicules"
+      }
+    },
+    "legal": {
+      "insurance": {
+        "label": "Assurance",
+        "description": "Plans d'assurance et assistance"
+      },
+      "registration_support": {
+        "label": "Assistance à l'immatriculation",
+        "description": "Aide pour les documents et licences"
+      }
+    }
+  },
+
+  "my_organization_info": {
+    "loading": "Chargement des informations de l'organisation..."
+  },
+
+  "organization_card": {
+    "your_role": "Votre rôle",
+    "manage": "Gérer",
+    "role": {
+      "owner": "Propriétaire",
+      "creator": "Créateur",
+      "staff": "Employé",
+      "member": "Membre"
+    },
+    "type": {
+      "rental_company": "Entreprise de location",
+      "technician_partner": "Partenaire technicien",
+      "agent": "Agent",
+      "private_owner": "Propriétaire privé",
+      "tour_guide": "Guide touristique",
+      "intercity_bus": "Bus interurbain",
+      "vehicle_transport": "Transport de véhicules"
+    }
+  },
+
+  "organization_create_chooser": {
+    "intro": "Vous n'avez pas encore rejoint ou créé d'organisation. Choisissez un rôle pour commencer :",
+    "technician_partner": {
+      "mobile": {
+        "title": "Technicien indépendant",
+        "description": "Technicien mobile offrant des réparations sur site."
+      },
+      "shop": {
+        "title": "Atelier de réparation",
+        "description": "Service basé en garage pour batteries, freins, réparations."
+      }
+    },
+    "rental_company": {
+      "title": "Entreprise de location",
+      "description": "Gérez une flotte, des stations, des réservations et du personnel."
+    },
+    "private_provider": {
+      "title": "Fournisseur privé",
+      "description": "Louez votre véhicule personnel ou proposez des services."
+    },
+    "agent": {
+      "title": "Agent / Référent",
+      "description": "Référez des clients et gagnez des commissions."
+    },
+    "intercity_bus": {
+      "title": "Opérateur de bus interurbain",
+      "description": "Gérez les itinéraires et transportez les passagers entre les provinces."
+    },
+    "vehicle_transport": {
+      "title": "Transporteur de véhicules",
+      "description": "Proposez des services de transport de marchandises et véhicules sur courtes et longues distances."
+    },
+    "tour_guide": {
+      "title": "Guide touristique",
+      "description": "Proposez des visites à vélo ou des expériences en autonomie."
+    }
+  },
+
+  "add_battery_charging_station_form": {
+    "station_name": "Nom de la station de charge",
+    "display_address": "Adresse affichée",
+    "map_address": "Adresse Google Maps",
+    "location": "Coordonnées",
+    "phone": "Numéro de téléphone",
+    "vehicle_type": "Type de véhicule",
+    "vehicle_type.motorbike": "Moto",
+    "vehicle_type.car": "Voiture",
+    "place_type": "Type de lieu",
+    "place_type.cafe": "Café",
+    "place_type.restaurant": "Restaurant",
+    "place_type.shop": "Magasin",
+    "place_type.home": "Maison privée",
+    "charging_ports": "Nombre de ports de charge",
+    "charging_power_kw": "Puissance de charge (kW)",
+    "charging_standard": "Standard de charge (Type2, CHAdeMO...)",
+    "open_hours": "Heures d'ouverture (ex : 08:00 - 22:00)",
+    "pricing_notes": "Notes tarifaires (ex : au-dessus de 50% = 10k)",
+    "additional_fee_policy": "Politique de frais supplémentaires (ex : +10k si aucun service utilisé)",
+    "offers_portable_charger": "Chargeur portable disponible",
+    "rest_area_available": "Zone de repos disponible",
+    "free_drinks": "Eau/thé gratuit disponible",
+    "comboPackages": "Forfaits combo",
+    "foodMenu": "Menu alimentaire",
+    "drinkMenu": "Menu des boissons",
+    "add_combo": "Ajouter un combo...",
+    "add_food_item": "Ajouter un article alimentaire...",
+    "add_drink_item": "Ajouter une boisson...",
+    "submit": "Soumettre la station de charge",
+    "submitting": "Soumission...",
+    "success_title": "Merci !",
+    "success_description": "Votre station a été soumise et est en attente d'approbation.",
+    "add_comboPackages": "Ajouter un forfait combo",
+    "add_foodMenu": "Ajouter un article alimentaire",
+    "add_drinkMenu": "Ajouter une boisson",
+    "description": "Description du service",
+    "section": {
+      "basic_info": "Informations de base",
+      "details": "Description & Classification",
+      "technical": "Spécifications techniques"
+    }
+  },
+
+  "batteryChargingStationSection": {
+    "count_label": "Stations de charge actives",
+    "subtitle": "Fatigué ? Faites une pause – Bíp Bíp est là pendant que vous rechargez et profitez d'une boisson rafraîchissante"
+  },
+
+  "battery_charging_station_map": {
+    "you_are_here": "Vous êtes ici",
+    "car_station": "Station de charge pour voitures",
+    "motorbike_station": "Station de charge pour motos",
+    "distance_away": "À {{distance}} km"
+  },
+
+  "tab_settings_modal": {
+    "title": "⚙️ Gérer les onglets visibles",
+    "cancel": "Annuler",
+    "save": "Enregistrer"
+  },
+
+  "tab_labels": {
+    "activityFeed": "Fil d'activité",
+    "vehicles": "Mes véhicules",
+    "insurance": "Assurance",
+    "issues": "Problèmes",
+    "contributions": "Contributions",
+    "business": "Entreprise"
+  },
+
+  "create_business_page": {
+    "title": {
+      "rental_company": "Créer une entreprise de location",
+      "private_provider": "Créer un fournisseur privé",
+      "agent": "Créer un agent",
+      "technician_mobile": "Créer un technicien mobile",
+      "technician_shop": "Créer un atelier de réparation",
+      "intercity_bus": "Créer un opérateur de bus interurbain",
+      "vehicle_transport": "Créer un transporteur de véhicules",
+      "tour_guide": "Créer un guide touristique"
+    },
+    "subtitle": "Veuillez remplir les informations ci-dessous pour commencer."
+  },
+
+  "create_business_form": {
+    "name_placeholder": "Nom de la personne / entreprise / organisation",
+    "email_placeholder": "Email",
+    "phone_placeholder": "Numéro de téléphone",
+    "display_address_placeholder": "Adresse affichée",
+    "map_address_placeholder": "Adresse Google Maps",
+    "location_placeholder": "Coordonnées (lat,lng)",
+    "detecting_coordinates": "📍 Détection des coordonnées...",
+    "invalid_coordinates": "❌ Coordonnées invalides. Veuillez utiliser le format : \"16.0514,108.2123\"",
+    "detected_coordinates": "📌 Détecté :",
+    "create_button": "Créer",
+    "creating_button": "Création...",
+    "success_title": "Entreprise créée",
+    "success_description": "✅ Votre entreprise a été ajoutée avec succès.",
+    "error_title": "Échec de la création de l'entreprise",
+    "error_description": "❌ Veuillez réessayer.",
+    "not_logged_in_title": "Non connecté",
+    "not_logged_in_description": "Vous devez être connecté pour effectuer cette action.",
+    "missing_fields_title": "Champs manquants",
+    "missing_fields_description": "Veuillez remplir tous les champs."
+  }
+
+  
 }
+

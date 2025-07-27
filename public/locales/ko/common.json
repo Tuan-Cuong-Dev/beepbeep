@@ -1079,7 +1079,58 @@
   "car_station": "자동차용 충전소",
   "motorbike_station": "오토바이용 충전소",
   "distance_away": "{{distance}} km 거리"
+},
+"tab_settings_modal": {
+  "title": "⚙️ 표시할 탭 관리",
+  "cancel": "취소",
+  "save": "저장"
+},
+
+"tab_labels": {
+  "activityFeed": "활동 피드",
+  "vehicles": "내 차량",
+  "insurance": "보험",
+  "issues": "문제",
+  "contributions": "기여",
+  "business": "비즈니스"
+},
+
+"create_business_page": {
+  "title": {
+    "rental_company": "렌탈 회사 등록",
+    "private_provider": "개인 제공자 등록",
+    "agent": "에이전트 등록",
+    "technician_mobile": "모바일 기술자 등록",
+    "technician_shop": "수리점 등록",
+    "intercity_bus": "시외버스 제공자 등록",
+    "vehicle_transport": "차량 운송업체 등록",
+    "tour_guide": "여행 가이드 등록"
+  },
+  "subtitle": "시작하려면 아래 정보를 입력하세요."
+},
+
+"create_business_form": {
+  "name_placeholder": "개인 / 업체 / 조직 이름",
+  "email_placeholder": "이메일",
+  "phone_placeholder": "전화번호",
+  "display_address_placeholder": "표시 주소",
+  "map_address_placeholder": "지도 주소 (Google Maps 링크)",
+  "location_placeholder": "위치 (위도,경도)",
+  "detecting_coordinates": "📍 좌표 탐지 중...",
+  "invalid_coordinates": "❌ 잘못된 좌표 형식입니다. 예: \"16.0514,108.2123\"",
+  "detected_coordinates": "📌 탐지됨:",
+  "create_button": "등록하기",
+  "creating_button": "등록 중...",
+  "success_title": "회사 등록 완료",
+  "success_description": "✅ 회사가 성공적으로 등록되었습니다.",
+  "error_title": "등록 실패",
+  "error_description": "❌ 다시 시도해주세요.",
+  "not_logged_in_title": "로그인되지 않음",
+  "not_logged_in_description": "이 작업을 하려면 로그인해야 합니다.",
+  "missing_fields_title": "누락된 항목",
+  "missing_fields_description": "모든 항목을 입력해주세요."
 }
+
 
 
 
