@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import MyServiceList from '@/src/components/my-business/MyServiceList';
 import MyOrganizationInfo from '@/src/components/my-business/organizations/MyOrganizationInfo';
 import { OrgCardData } from '@/src/lib/organizations/getUserOrganizations';
+import { TechnicianSubtype } from '@/src/lib/organizations/serviceCategoryMapping';
 
 export default function MyBusinessSection() {
   const { t } = useTranslation('common');
@@ -12,6 +13,12 @@ export default function MyBusinessSection() {
 
   // ✅ Tìm tổ chức mà user là chủ doanh nghiệp
   const ownerOrg = organizations.find((org) => org.userRoleInOrg === 'owner');
+
+  // ✅ Nếu là technician_partner thì lấy subtype
+  const technicianSubtype: TechnicianSubtype | undefined =
+    ownerOrg?.type === 'technician_partner' && ownerOrg.subtype
+      ? (ownerOrg.subtype as TechnicianSubtype)
+      : undefined;
 
   return (
     <div className="space-y-10">
@@ -29,7 +36,10 @@ export default function MyBusinessSection() {
           <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">
             {t('my_business_section.services_title')}
           </h2>
-          <MyServiceList orgType={ownerOrg.type} />
+          <MyServiceList
+            orgType={ownerOrg.type}
+            technicianSubtype={technicianSubtype}
+          />
         </section>
       )}
     </div>

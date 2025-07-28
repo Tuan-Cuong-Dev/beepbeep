@@ -1,5 +1,5 @@
 // lib/organizations/organizationLabels.ts
-import { OrganizationType } from './getUserOrganizations';
+import { OrganizationType } from './organizationTypes';
 
 export const ORGANIZATION_LABELS: Record<OrganizationType, string> = {
   rental_company: 'Rental Company',

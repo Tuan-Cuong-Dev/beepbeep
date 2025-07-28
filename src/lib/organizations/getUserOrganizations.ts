@@ -1,23 +1,21 @@
-// ✅ getUserOrganizations.ts – Lấy tất cả tổ chức mà user sở hữu, từ nhiều collections
-
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+import { OrganizationType } from './organizationTypes';
 
 export interface OrgCardData {
   id: string;
   name: string;
-  type: string; // businessType
+  type: OrganizationType; // e.g., 'technician_partner'
   displayAddress?: string;
   userRoleInOrg: 'owner';
   logoUrl?: string;
-  subtype?: string;
+  subtype?: 'mobile' | 'shop'; // phân biệt loại hình technician
 }
 
-const businessCollections: { collection: string; type: string }[] = [
+const businessCollections: { collection: string; type: OrganizationType }[] = [
   { collection: 'rentalCompanies', type: 'rental_company' },
   { collection: 'privateProviders', type: 'private_provider' },
   { collection: 'agents', type: 'agent' },
-  { collection: 'technicianPartners', type: 'technician_partner' },
   { collection: 'intercityBusCompanies', type: 'intercity_bus' },
   { collection: 'vehicleTransporters', type: 'vehicle_transport' },
   { collection: 'tourGuides', type: 'tour_guide' },
@@ -26,36 +24,46 @@ const businessCollections: { collection: string; type: string }[] = [
 export async function getUserOrganizations(uid: string): Promise<OrgCardData[]> {
   const results: OrgCardData[] = [];
 
+  // 🏢 Load các collection thông thường
   for (const { collection: colName, type } of businessCollections) {
     const q = query(collection(db, colName), where('ownerId', '==', uid));
     const snap = await getDocs(q);
 
-    const data = snap.docs.map((doc) => {
+    snap.forEach((doc) => {
       const d = doc.data();
-      return {
+      results.push({
         id: doc.id,
         name: d.name || 'Untitled',
-        type: d.businessType || type,
+        type,
         displayAddress: d.displayAddress || '',
         userRoleInOrg: 'owner',
         logoUrl: d.logoUrl || undefined,
-        subtype: d.type || undefined, // e.g. mobile/shop for technician
-      } satisfies OrgCardData;
+      });
     });
-
-    results.push(...data);
   }
+
+  // 🛠️ Load riêng collection technicianPartners
+  const techSnap = await getDocs(
+    query(collection(db, 'technicianPartners'), where('ownerId', '==', uid))
+  );
+
+  techSnap.forEach((doc) => {
+    const d = doc.data();
+    const subtype = (d.subtype || d.type || '').toLowerCase();
+
+    // Chỉ chấp nhận mobile/shop
+    if (subtype === 'mobile' || subtype === 'shop') {
+      results.push({
+        id: doc.id,
+        name: d.name || 'Untitled',
+        type: 'technician_partner',
+        subtype,
+        displayAddress: d.displayAddress || '',
+        userRoleInOrg: 'owner',
+        logoUrl: d.logoUrl || undefined,
+      });
+    }
+  });
 
   return results;
 }
-
-// 👉 Add this at the top of getUserOrganizations.ts
-
-export type OrganizationType =
-  | 'rental_company'
-  | 'private_provider'
-  | 'agent'
-  | 'technician_partner'
-  | 'intercity_bus'
-  | 'vehicle_transport'
-  | 'tour_guide';

@@ -10,16 +10,17 @@ import {
   FaSoap,
   FaFileAlt,
 } from 'react-icons/fa';
+import type { ServiceCategoryKey } from '@/src/lib/organizations/serviceCategoryMapping';
 
 interface CategoryOption {
-  key: string;
+  key: ServiceCategoryKey;
   icon: React.ReactNode;
 }
 
 interface Props {
-  onSelect: (categoryKey: string) => void;
-  selectedCategory?: string;
-  allowedCategories?: string[]; // ✅ NEW
+  onSelect: (categoryKey: ServiceCategoryKey) => void;
+  selectedCategory?: ServiceCategoryKey;
+  allowedCategories?: ServiceCategoryKey[];
 }
 
 const CATEGORY_OPTIONS: CategoryOption[] = [
@@ -56,7 +57,6 @@ export default function ServiceCategorySelector({
 }: Props) {
   const { t } = useTranslation('common');
 
-  // ✅ Lọc nếu có allowedCategories
   const visibleOptions = allowedCategories?.length
     ? CATEGORY_OPTIONS.filter((cat) => allowedCategories.includes(cat.key))
     : CATEGORY_OPTIONS;

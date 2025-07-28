@@ -1,14 +1,23 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { db } from '@/src/firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
 import { useAuth } from '@/src/hooks/useAuth';
 import { SupportedServiceType } from '@/src/lib/rentalCompanies/rentalCompaniesTypes_new';
 import { useTranslation } from 'react-i18next';
+
 import ServiceCategorySelector from '@/src/components/vehicle-services/ServiceCategorySelector';
 import ServiceTypeSelector from '@/src/components/vehicle-services/ServiceTypeSelector';
-import { serviceCategoriesByOrgType } from '@/src/lib/organizations/serviceCategoryMapping';
+import {
+  OrganizationType,
+  TechnicianSubtype,
+  ServiceCategoryKey,
+  serviceCategoriesByOrgType,
+  serviceCategoriesByTechnicianSubtype,
+} from '@/src/lib/organizations/serviceCategoryMapping';
+
+type ServiceStatus = 'active' | 'pending' | 'inactive';
 
 interface UserService {
   id: string;
@@ -16,20 +25,28 @@ interface UserService {
   category: SupportedServiceType;
   vehicleTypes: string[];
   location: string;
-  status: 'active' | 'pending' | 'inactive';
+  status: ServiceStatus;
   description?: string;
 }
 
-export default function MyServiceList({ orgType }: { orgType: string }) {
+interface MyServiceListProps {
+  orgType: OrganizationType;
+  technicianSubtype?: TechnicianSubtype; // 👈 thêm vào để lọc đúng nếu là technician_partner
+}
+
+export default function MyServiceList({ orgType, technicianSubtype }: MyServiceListProps) {
   const { currentUser } = useAuth();
   const { t } = useTranslation('common');
 
   const [services, setServices] = useState<UserService[]>([]);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState<string>();
+  const [category, setCategory] = useState<ServiceCategoryKey>();
   const [serviceType, setServiceType] = useState<string>();
 
-  const allowedCategories = serviceCategoriesByOrgType[orgType] || [];
+  const allowedCategories: ServiceCategoryKey[] =
+    orgType === 'technician_partner' && technicianSubtype
+      ? serviceCategoriesByTechnicianSubtype[technicianSubtype]
+      : serviceCategoriesByOrgType[orgType] || [];
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -42,25 +59,19 @@ export default function MyServiceList({ orgType }: { orgType: string }) {
         ...doc.data(),
       })) as UserService[];
 
-      // ✅ Lọc theo allowed categories
-      const filtered = data.filter((s) => allowedCategories.includes(s.category));
+      const filtered = data.filter((s) => allowedCategories.includes(s.category as ServiceCategoryKey));
       setServices(filtered);
       setLoading(false);
     };
 
     fetchServices();
-  }, [currentUser, orgType]);
-
-  const handleSelectCategory = (newCategory: string) => {
-    setCategory(newCategory);
-    setServiceType(undefined);
-  };
+  }, [currentUser, orgType, technicianSubtype]);
 
   return (
     <div className="grid gap-6">
       <AddNewServiceCard
         category={category}
-        onSelectCategory={handleSelectCategory}
+        onSelectCategory={setCategory}
         serviceType={serviceType}
         onSelectServiceType={setServiceType}
         allowedCategories={allowedCategories}
@@ -87,19 +98,21 @@ export default function MyServiceList({ orgType }: { orgType: string }) {
   );
 }
 
+interface AddNewServiceCardProps {
+  category?: ServiceCategoryKey;
+  onSelectCategory: (val: ServiceCategoryKey) => void;
+  serviceType?: string;
+  onSelectServiceType: (val: string) => void;
+  allowedCategories: ServiceCategoryKey[];
+}
+
 function AddNewServiceCard({
   category,
   onSelectCategory,
   serviceType,
   onSelectServiceType,
   allowedCategories,
-}: {
-  category?: string;
-  onSelectCategory: (val: string) => void;
-  serviceType?: string;
-  onSelectServiceType: (val: string) => void;
-  allowedCategories: string[];
-}) {
+}: AddNewServiceCardProps) {
   const { t } = useTranslation('common');
 
   return (
@@ -113,7 +126,7 @@ function AddNewServiceCard({
         <ServiceCategorySelector
           selectedCategory={category}
           onSelect={onSelectCategory}
-          allowedCategories={allowedCategories} // ✅ Lọc trong dropdown
+          allowedCategories={allowedCategories}
         />
       </section>
 
@@ -159,8 +172,10 @@ function ServiceListItem({ service }: { service: UserService }) {
         <div>
           <h4 className="text-base font-semibold text-gray-800">{service.name}</h4>
           <p className="text-sm text-gray-500 capitalize">
-            {t(`service_labels.${service.category}`, { defaultValue: service.category })} •{' '}
-            {service.vehicleTypes.join(', ')}
+            {t(`service_labels.${service.category}`, {
+              defaultValue: service.category,
+            })}{' '}
+            • {service.vehicleTypes.join(', ')}
           </p>
           <p className="text-sm text-gray-400">{service.location}</p>
           {service.description && (
