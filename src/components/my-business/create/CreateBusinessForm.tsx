@@ -29,42 +29,42 @@ const businessTypeConfig: Record<BusinessType, {
   rental_company: {
     collection: "rentalCompanies",
     role: "company_owner",
-    redirect: "/my-business/stations",
+    redirect: "/dashboard",
   },
   private_provider: {
     collection: "privateProviders",
     role: "private_owner",
-    redirect: "/my-business",
+    redirect: "/dashboard",
   },
   agent: {
     collection: "agents",
     role: "agent",
-    redirect: "/my-business",
+    redirect: "/dashboard",
   },
   technician_mobile: {
     collection: "technicianPartners",
     role: "technician_partner",
-    redirect: "/technician-partners",
+    redirect: "/dashboard",
   },
   technician_shop: {
     collection: "technicianPartners",
     role: "technician_partner",
-    redirect: "/technician-partners",
+    redirect: "/dashboard",
   },
   intercity_bus: {
     collection: "intercityBusCompanies",
     role: "intercity_bus",
-    redirect: "/my-business",
+    redirect: "/dashboard",
   },
   vehicle_transport: {
     collection: "vehicleTransporters",
     role: "vehicle_transport",
-    redirect: "/my-business",
+    redirect: "/dashboard",
   },
   tour_guide: {
     collection: "tourGuides",
     role: "tour_guide",
-    redirect: "/my-business",
+    redirect: "/dashboard",
   },
 };
 
