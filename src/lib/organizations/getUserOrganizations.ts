@@ -48,3 +48,14 @@ export async function getUserOrganizations(uid: string): Promise<OrgCardData[]> 
 
   return results;
 }
+
+// 👉 Add this at the top of getUserOrganizations.ts
+
+export type OrganizationType =
+  | 'rental_company'
+  | 'private_provider'
+  | 'agent'
+  | 'technician_partner'
+  | 'intercity_bus'
+  | 'vehicle_transport'
+  | 'tour_guide';
