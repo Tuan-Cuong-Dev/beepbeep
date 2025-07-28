@@ -78,6 +78,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
     mapAddress: "",
     location: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState({
     open: false,
@@ -86,18 +87,28 @@ export default function CreateBusinessForm({ businessType }: Props) {
     description: "",
   });
 
-  const showDialog = (type: "success" | "error" | "info", title: string, description = "") => {
-    setDialog({ open: true, type, title, description });
-  };
-
   const { geocode, coords, error: geoError, loading: geoLoading } = useGeocodeAddress();
   const router = useRouter();
 
+  // ✅ Tự động điền email từ currentUser nếu có
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user?.email) {
+      setForm((prev) => ({ ...prev, email: user.email ?? "" }));
+    }
+  }, []);
+
+
+  // ✅ Tự động cập nhật tọa độ khi có kết quả từ geocode
   useEffect(() => {
     if (coords) {
       setForm((prev) => ({ ...prev, location: `${coords.lat},${coords.lng}` }));
     }
   }, [coords]);
+
+  const showDialog = (type: "success" | "error" | "info", title: string, description = "") => {
+    setDialog({ open: true, type, title, description });
+  };
 
   const handleChange = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
@@ -175,7 +186,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
     <>
       <div className="space-y-4">
         <Input placeholder={t("create_business_form.name_placeholder")} value={form.name} onChange={handleChange("name")} />
-        <Input placeholder={t("create_business_form.email_placeholder")} value={form.email} onChange={handleChange("email")} />
+        <Input placeholder={t("create_business_form.email_placeholder")} value={form.email} readOnly className="bg-gray-100 cursor-not-allowed" />
         <Input placeholder={t("create_business_form.phone_placeholder")} value={form.phone} onChange={handleChange("phone")} />
         <Input placeholder={t("create_business_form.display_address_placeholder")} value={form.displayAddress} onChange={handleChange("displayAddress")} />
         <Input placeholder={t("create_business_form.map_address_placeholder")} value={form.mapAddress} onChange={handleChange("mapAddress")} onBlur={handleBlur} />
@@ -185,7 +196,9 @@ export default function CreateBusinessForm({ businessType }: Props) {
         {geoError && <p className="text-sm text-red-500">{geoError}</p>}
         {coords && (
           <>
-            <p className="text-sm text-gray-600">{t("create_business_form.detected_coordinates")} {coords.lat}, {coords.lng}</p>
+            <p className="text-sm text-gray-600">
+              {t("create_business_form.detected_coordinates")} {coords.lat}, {coords.lng}
+            </p>
             <iframe
               title="Map Preview"
               width="100%"
