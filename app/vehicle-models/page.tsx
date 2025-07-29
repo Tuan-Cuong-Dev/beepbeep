@@ -9,18 +9,22 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
-import { EbikeModel, VEHICLE_TYPES, VehicleType } from '@/src/lib/vehicle-models/vehicleModelTypes';
+import {
+  VehicleModel,
+  VehicleType,
+  VEHICLE_TYPE_LABELS,
+} from '@/src/lib/vehicle-models/vehicleModelTypes';
 
 export default function VehicleModelsPage() {
-  const [models, setModels] = useState<EbikeModel[]>([]);
+  const [models, setModels] = useState<VehicleModel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeType, setActiveType] = useState<string>('All');
+  const [activeType, setActiveType] = useState<string>('all');
   const router = useRouter();
 
   useEffect(() => {
     const fetchModels = async () => {
       try {
-        const snapshot = await getDocs(collection(db, 'ebikeModels'));
+        const snapshot = await getDocs(collection(db, 'vehicleModels'));
         const data = snapshot.docs.map((doc) => {
           const d = doc.data();
           return {
@@ -28,26 +32,31 @@ export default function VehicleModelsPage() {
             companyId: d.companyId || '',
             name: d.name || '',
             description: d.description || '',
-            batteryCapacity: d.batteryCapacity || '',
+            vehicleType: d.vehicleType || 'other',
+            vehicleSubType: d.vehicleSubType,
+            brand: d.brand,
+            modelCode: d.modelCode,
+            batteryCapacity: d.batteryCapacity,
             motorPower: d.motorPower,
+            fuelType: d.fuelType,
             topSpeed: d.topSpeed,
             range: d.range,
             weight: d.weight,
             maxLoad: d.maxLoad,
-            pricePerDay: d.pricePerDay || 0,
+            capacity: d.capacity,
+            pricePerDay: d.pricePerDay,
             pricePerHour: d.pricePerHour,
             pricePerWeek: d.pricePerWeek,
             pricePerMonth: d.pricePerMonth,
-            imageUrl: d.imageUrl || '',
+            imageUrl: d.imageUrl,
             available: d.available ?? true,
-            type: (d.type || 'other').toLowerCase() as VehicleType,
             createdAt: d.createdAt,
             updatedAt: d.updatedAt,
-          } as EbikeModel;
+          } as VehicleModel;
         });
         setModels(data);
       } catch (error) {
-        console.error('Error fetching ebike models:', error);
+        console.error('Error fetching vehicle models:', error);
       } finally {
         setLoading(false);
       }
@@ -56,9 +65,9 @@ export default function VehicleModelsPage() {
   }, []);
 
   const filteredModels =
-    activeType.toLowerCase() === 'all'
+    activeType === 'all'
       ? models
-      : models.filter((model) => model.type === activeType.toLowerCase());
+      : models.filter((model) => model.vehicleType === activeType);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -66,20 +75,26 @@ export default function VehicleModelsPage() {
 
       <main className="flex-1 container mx-auto px-4 py-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-gray-800">
-          🛵 Choose Your Electric Ride
+          🛵 Choose Your Vehicle
         </h1>
 
         {/* Tabs */}
         <div className="flex justify-center mb-6">
           <Tabs value={activeType} onValueChange={setActiveType}>
             <TabsList className="flex gap-2 overflow-x-auto whitespace-nowrap no-scrollbar bg-white rounded-full p-2 shadow min-w-full max-w-full">
-              {VEHICLE_TYPES.map((type) => (
+              <TabsTrigger
+                value="all"
+                className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 data-[state=active]:bg-[#00d289] data-[state=active]:text-white"
+              >
+                All
+              </TabsTrigger>
+              {Object.entries(VEHICLE_TYPE_LABELS).map(([key, label]) => (
                 <TabsTrigger
-                  key={type}
-                  value={type}
-                  className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 whitespace-nowrap data-[state=active]:bg-[#00d289] data-[state=active]:text-white"
+                  key={key}
+                  value={key}
+                  className="text-sm sm:text-base px-4 py-1 rounded-full border border-gray-300 data-[state=active]:bg-[#00d289] data-[state=active]:text-white"
                 >
-                  {type}
+                  {label}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -116,7 +131,7 @@ export default function VehicleModelsPage() {
                 <div className="px-4 pb-4 pt-2">
                   <h3 className="font-semibold text-gray-800 text-base mb-1">{model.name}</h3>
                   <p className="text-sm text-[#00d289] font-semibold mb-2">
-                    {formatCurrency(model.pricePerDay)} / day
+                    {formatCurrency(model.pricePerDay?? 0)} / day
                   </p>
 
                   <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
