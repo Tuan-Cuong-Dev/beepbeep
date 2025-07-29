@@ -2,12 +2,12 @@
 'use client';
 
 import { useState } from 'react';
-import { VehicleModel } from '@/src/lib/vehicleModels/vehicleModelTypes_new';
-import { VEHICLE_SUBTYPE_LABELS } from '@/src/lib/vehicleModels/vehicleModelTypes_new';
+import { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
+import { VEHICLE_SUBTYPE_LABELS } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import {
   VEHICLE_TYPE_LABELS,
   FUEL_TYPE_LABELS,
-} from '@/src/lib/vehicleModels/vehicleModelTypes_new';
+} from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { Button } from '@/src/components/ui/button';

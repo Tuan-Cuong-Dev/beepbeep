@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { VehicleIssue, VehicleIssueStatus } from "@/src/lib/vehicleIssues/vehicleIssueTypes";
+import { VehicleIssue, VehicleIssueStatus } from "@/src/lib/vehicle-issues/vehicleIssueTypes";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
 import { Button } from "@/src/components/ui/button";

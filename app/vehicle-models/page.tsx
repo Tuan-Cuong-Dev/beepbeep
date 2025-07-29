@@ -9,7 +9,7 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
-import { EbikeModel, VEHICLE_TYPES, VehicleType } from '@/src/lib/vehicleModels/vehicleModelTypes';
+import { EbikeModel, VEHICLE_TYPES, VehicleType } from '@/src/lib/vehicle-models/vehicleModelTypes';
 
 export default function VehicleModelsPage() {
   const [models, setModels] = useState<EbikeModel[]>([]);

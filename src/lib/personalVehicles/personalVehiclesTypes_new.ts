@@ -1,5 +1,5 @@
 import { Timestamp, FieldValue } from 'firebase/firestore';
-import { VehicleType } from '../vehicleModels/vehicleModelTypes_new';
+import { VehicleType } from '../vehicle-models/vehicleModelTypes';
 
 export interface PersonalVehicle_new {
   id: string;

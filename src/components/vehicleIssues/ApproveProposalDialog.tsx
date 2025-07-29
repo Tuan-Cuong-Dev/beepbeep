@@ -10,7 +10,7 @@ import {
 } from '@/src/components/ui/dialog';
 import { Button } from '@/src/components/ui/button';
 import { Textarea } from '@/src/components/ui/textarea';
-import { ExtendedVehicleIssue } from '@/src/lib/vehicleIssues/vehicleIssueTypes';
+import { ExtendedVehicleIssue } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Props {

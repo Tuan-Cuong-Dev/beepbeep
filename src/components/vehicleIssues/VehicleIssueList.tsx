@@ -1,6 +1,6 @@
 "use client";
 
-import { ExtendedVehicleIssue, VehicleIssueStatus } from "@/src/lib/vehicleIssues/vehicleIssueTypes";
+import { ExtendedVehicleIssue, VehicleIssueStatus } from "@/src/lib/vehicle-issues/vehicleIssueTypes";
 import { Button } from "@/src/components/ui/button";
 
 interface Props {

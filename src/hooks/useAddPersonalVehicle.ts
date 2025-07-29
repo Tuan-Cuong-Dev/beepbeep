@@ -2,7 +2,7 @@
 import { addDoc, collection, doc, getDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
-import { VehicleType } from '@/src/lib/vehicleModels/vehicleModelTypes_new';
+import { VehicleType } from '@/src/lib/vehicle-models/vehicleModelTypes';
 
 /**
  * Hàm thêm xe cá nhân, tự động lấy hình mẫu từ vehicleModels

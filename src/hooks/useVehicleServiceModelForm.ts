@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { VehicleServiceModel, VehicleType, ServiceType } from '@/src/lib/vehicleServices/vehicleServiceModelTypes';
+import { VehicleServiceModel, VehicleType, ServiceType } from '@/src/lib/vehicle-services/vehicleServiceModelTypes';
 
 export function useVehicleServiceModelForm(initial?: Partial<VehicleServiceModel>) {
   const [form, setForm] = useState<Partial<VehicleServiceModel>>(initial || {});

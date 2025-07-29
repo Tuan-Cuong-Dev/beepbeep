@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FaTools,
@@ -10,12 +11,7 @@ import {
   FaSoap,
   FaFileAlt,
 } from 'react-icons/fa';
-import type { ServiceCategoryKey } from '@/src/lib/organizations/serviceCategoryMapping';
-
-interface CategoryOption {
-  key: ServiceCategoryKey;
-  icon: React.ReactNode;
-}
+import type { ServiceCategoryKey } from '@/src/lib/vehicle-services/serviceTypes';
 
 interface Props {
   onSelect: (categoryKey: ServiceCategoryKey) => void;
@@ -23,32 +19,19 @@ interface Props {
   allowedCategories?: ServiceCategoryKey[];
 }
 
-const CATEGORY_OPTIONS: CategoryOption[] = [
-  {
-    key: 'repair',
-    icon: <FaTools className="text-xl text-[#00d289]" />,
-  },
-  {
-    key: 'rental',
-    icon: <FaCarAlt className="text-xl text-[#00d289]" />,
-  },
-  {
-    key: 'battery',
-    icon: <FaBatteryFull className="text-xl text-[#00d289]" />,
-  },
-  {
-    key: 'transport',
-    icon: <FaTruck className="text-xl text-[#00d289]" />,
-  },
-  {
-    key: 'care',
-    icon: <FaSoap className="text-xl text-[#00d289]" />,
-  },
-  {
-    key: 'legal',
-    icon: <FaFileAlt className="text-xl text-[#00d289]" />,
-  },
-];
+// 🎨 Style icon chuẩn thương hiệu
+const iconClass = 'text-xl';
+const iconStyle = { color: '#00d289' };
+
+// 🧩 Icon theo từng category
+const CATEGORY_ICONS: Record<ServiceCategoryKey, ReactElement> = {
+  repair: <FaTools className={iconClass} style={iconStyle} />,
+  rental: <FaCarAlt className={iconClass} style={iconStyle} />,
+  battery: <FaBatteryFull className={iconClass} style={iconStyle} />,
+  transport: <FaTruck className={iconClass} style={iconStyle} />,
+  care: <FaSoap className={iconClass} style={iconStyle} />,
+  legal: <FaFileAlt className={iconClass} style={iconStyle} />,
+};
 
 export default function ServiceCategorySelector({
   onSelect,
@@ -57,33 +40,29 @@ export default function ServiceCategorySelector({
 }: Props) {
   const { t } = useTranslation('common');
 
-  const visibleOptions = allowedCategories?.length
-    ? CATEGORY_OPTIONS.filter((cat) => allowedCategories.includes(cat.key))
-    : CATEGORY_OPTIONS;
+  const visibleKeys: ServiceCategoryKey[] = allowedCategories?.length
+    ? allowedCategories
+    : (Object.keys(CATEGORY_ICONS) as ServiceCategoryKey[]);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {visibleOptions.map((cat) => (
+      {visibleKeys.map((key) => (
         <button
-          key={cat.key}
-          onClick={() => onSelect(cat.key)}
+          key={key}
+          onClick={() => onSelect(key)}
           className={`flex items-start gap-4 p-4 rounded-xl border shadow-sm hover:shadow-md transition text-left ${
-            selectedCategory === cat.key
+            selectedCategory === key
               ? 'border-[#00d289] bg-[#f0fdfa]'
               : 'border-gray-200 bg-white'
           }`}
         >
-          <div>{cat.icon}</div>
+          <div>{CATEGORY_ICONS[key]}</div>
           <div>
             <h3 className="text-base font-semibold text-gray-800">
-              {t(`service_category_selector.${cat.key}.label`, {
-                defaultValue: cat.key,
-              })}
+              {t(`service_category_selector.${key}.label`, { defaultValue: key })}
             </h3>
             <p className="text-sm text-gray-500">
-              {t(`service_category_selector.${cat.key}.description`, {
-                defaultValue: '',
-              })}
+              {t(`service_category_selector.${key}.description`, { defaultValue: '' })}
             </p>
           </div>
         </button>

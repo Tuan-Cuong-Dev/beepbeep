@@ -1,6 +1,6 @@
 'use client';
 
-import { ExtendedVehicleIssue } from '@/src/lib/vehicleIssues/vehicleIssueTypes';
+import { ExtendedVehicleIssue } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Card, CardContent } from '@/src/components/ui/card';
 import {
   Bug,

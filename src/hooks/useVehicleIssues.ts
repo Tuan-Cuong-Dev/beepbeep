@@ -9,7 +9,7 @@ import {
   updateDoc,
   getDocs,
 } from "firebase/firestore";
-import { ExtendedVehicleIssue } from "@/src/lib/vehicleIssues/vehicleIssueTypes";
+import { ExtendedVehicleIssue } from "@/src/lib/vehicle-issues/vehicleIssueTypes";
 
 interface Options {
   role?: string;

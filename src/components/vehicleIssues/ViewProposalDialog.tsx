@@ -2,7 +2,7 @@
 'use client';
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
-import { ExtendedVehicleIssue } from '@/src/lib/vehicleIssues/vehicleIssueTypes';
+import { ExtendedVehicleIssue } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 
 interface Props {

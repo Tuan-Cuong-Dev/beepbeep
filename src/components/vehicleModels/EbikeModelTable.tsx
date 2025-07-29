@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { EbikeModel } from '@/src/lib/vehicleModels/vehicleModelTypes';
+import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';

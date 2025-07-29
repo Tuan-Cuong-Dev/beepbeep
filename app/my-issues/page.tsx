@@ -2,7 +2,7 @@
 
 import { useUser } from "@/src/context/AuthContext";
 import { useVehicleIssues } from "@/src/hooks/useVehicleIssues";
-import { VehicleIssue } from "@/src/lib/vehicleIssues/vehicleIssueTypes";
+import { VehicleIssue } from "@/src/lib/vehicle-issues/vehicleIssueTypes";
 import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";

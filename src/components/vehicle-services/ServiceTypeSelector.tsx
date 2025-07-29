@@ -1,66 +1,17 @@
-// Chi tiết từng dịch vụ có những gì ? 
-// Bắt đầu để xây chi tiết cho từng đối tượng.
-
-
 'use client';
 
 import React from 'react';
-import {
-  FaWrench,
-  FaBolt,
-  FaMapMarkerAlt,
-  FaCar,
-  FaUserTie,
-  FaTruck,
-  FaBus,
-  FaShieldAlt,
-  FaFileSignature,
-  FaBroom,
-  FaShoppingBag,
-  FaRoute,
-} from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
-
-interface ServiceTypeOption {
-  key: string;
-  icon: React.ReactNode;
-}
+import { SERVICE_TYPE_ICONS, SERVICE_TYPES_BY_CATEGORY } from '@/src/lib/vehicle-services/serviceTypes';
+import type { SupportedServiceType, ServiceCategoryKey } from '@/src/lib/vehicle-services/serviceTypes';
 
 interface Props {
-  selectedCategory: string;
-  onSelect: (serviceType: string) => void;
-  selectedService?: string;
+  selectedCategory: ServiceCategoryKey;
+  onSelect: (serviceType: SupportedServiceType) => void;
+  selectedService?: SupportedServiceType;
 }
 
 const iconClass = 'text-xl text-[#00d289]';
-
-const SERVICE_TYPE_MAP: Record<string, ServiceTypeOption[]> = {
-  repair: [
-    { key: 'repair', icon: <FaWrench className={iconClass} /> },
-    { key: 'battery_check', icon: <FaBolt className={iconClass} /> },
-  ],
-  rental: [
-    { key: 'rental_self_drive', icon: <FaCar className={iconClass} /> },
-    { key: 'rental_with_driver', icon: <FaUserTie className={iconClass} /> },
-    { key: 'tour', icon: <FaMapMarkerAlt className={iconClass} /> },
-  ],
-  battery: [
-    { key: 'battery_swap', icon: <FaBolt className={iconClass} /> },
-    { key: 'battery_delivery', icon: <FaTruck className={iconClass} /> },
-  ],
-  transport: [
-    { key: 'vehicle_rescue', icon: <FaBus className={iconClass} /> },
-    { key: 'intercity_transport', icon: <FaRoute className={iconClass} /> },
-  ],
-  care: [
-    { key: 'vehicle_cleaning', icon: <FaBroom className={iconClass} /> },
-    { key: 'accessories_sales', icon: <FaShoppingBag className={iconClass} /> },
-  ],
-  legal: [
-    { key: 'insurance', icon: <FaShieldAlt className={iconClass} /> },
-    { key: 'registration_support', icon: <FaFileSignature className={iconClass} /> },
-  ],
-};
 
 export default function ServiceTypeSelector({
   selectedCategory,
@@ -68,13 +19,14 @@ export default function ServiceTypeSelector({
   selectedService,
 }: Props) {
   const { t } = useTranslation('common');
-  const options = SERVICE_TYPE_MAP[selectedCategory] || [];
+  const serviceKeys = SERVICE_TYPES_BY_CATEGORY[selectedCategory] || [];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {options.map(({ key, icon }) => {
+      {serviceKeys.map((key) => {
         const labelKey = `service_type_selector.${selectedCategory}.${key}.label`;
         const descKey = `service_type_selector.${selectedCategory}.${key}.description`;
+        const icon = SERVICE_TYPE_ICONS[key];
 
         return (
           <button

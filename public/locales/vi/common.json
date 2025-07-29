@@ -909,7 +909,7 @@
 
 "service_type_selector": {
   "repair": {
-    "repair": {
+    "repair_basic": {
       "label": "Sửa chữa tổng quát",
       "description": "Dịch vụ sửa chữa tại chỗ và tại cửa hàng"
     },
@@ -927,7 +927,7 @@
       "label": "Thuê xe có tài xế",
       "description": "Bao gồm tài xế chuyên nghiệp"
     },
-    "tour": {
+    "tour_rental": {
       "label": "Tour tham quan",
       "description": "Tham quan thành phố và tour hướng dẫn"
     }
@@ -957,17 +957,17 @@
       "label": "Rửa xe",
       "description": "Dịch vụ rửa trong và ngoài xe"
     },
-    "accessories_sales": {
+    "accessory_sale": {
       "label": "Bán phụ kiện",
       "description": "Bán mũ bảo hiểm, giá đỡ điện thoại, dụng cụ..."
     }
   },
   "legal": {
-    "insurance": {
+    "insurance_sale": {
       "label": "Hỗ trợ bảo hiểm",
       "description": "Cung cấp hoặc tư vấn bảo hiểm"
     },
-    "registration_support": {
+    "registration_assist": {
       "label": "Đăng ký & cấp phép",
       "description": "Hỗ trợ giấy tờ pháp lý"
     }

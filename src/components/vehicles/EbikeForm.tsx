@@ -6,7 +6,7 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { SimpleSelect } from '@/src/components/ui/select';
 import { EbikeStatus, Ebike } from '@/src/lib/vehicles/vehicleTypes';
-import { EbikeModel } from '@/src/lib/vehicleModels/vehicleModelTypes';
+import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { useUser } from '@/src/context/AuthContext';
 import { formatCurrency } from '@/src/utils/formatCurrency';

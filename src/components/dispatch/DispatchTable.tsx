@@ -1,6 +1,6 @@
 'use client';
 
-import { ExtendedVehicleIssue } from '@/src/lib/vehicleIssues/vehicleIssueTypes';
+import { ExtendedVehicleIssue } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Staff } from '@/src/lib/staff/staffTypes';
 import { useUser } from '@/src/context/AuthContext';
 import { useState } from 'react';

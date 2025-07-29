@@ -5,7 +5,7 @@ import {
   VehicleModel,
   VehicleType,
   FuelType,
-} from '@/src/lib/vehicleModels/vehicleModelTypes_new';
+} from '@/src/lib/vehicle-models/vehicleModelTypes';
 
 /**
  * Hook quản lý state và logic xử lý form VehicleModel

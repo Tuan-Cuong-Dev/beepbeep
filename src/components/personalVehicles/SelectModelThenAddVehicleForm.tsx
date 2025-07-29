@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { VehicleModel } from '@/src/lib/vehicleModels/vehicleModelTypes_new';
+import { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { useAuth } from '@/src/hooks/useAuth';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';

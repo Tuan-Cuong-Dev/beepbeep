@@ -904,68 +904,67 @@
 
 "service_type_selector": {
   "repair": {
-    "repair": {
-      "label": "Repair Service",
-      "description": "General repairs and diagnostics"
+    "repair_basic": {
+      "label": "General Repair",
+      "description": "On-site and in-shop repair services"
     },
     "battery_check": {
       "label": "Battery Check",
-      "description": "Inspect and test battery condition"
+      "description": "Assess battery condition and performance"
     }
   },
   "rental": {
     "rental_self_drive": {
       "label": "Self-drive Rental",
-      "description": "Rent a vehicle and drive yourself"
+      "description": "Customer drives the vehicle themselves"
     },
     "rental_with_driver": {
       "label": "Rental with Driver",
-      "description": "Hire a vehicle with a driver"
+      "description": "Includes a professional driver"
     },
-    "tour": {
-      "label": "Tour Service",
-      "description": "Guided tours and travel packages"
+    "tour_rental": {
+      "label": "Guided Tour",
+      "description": "City tours and guided travel services"
     }
   },
   "battery": {
     "battery_swap": {
       "label": "Battery Swap",
-      "description": "Quick swap service for batteries"
+      "description": "Instantly replace old batteries"
     },
     "battery_delivery": {
       "label": "Battery Delivery",
-      "description": "Get batteries delivered to you"
+      "description": "Deliver batteries to your location"
     }
   },
   "transport": {
     "vehicle_rescue": {
       "label": "Vehicle Rescue",
-      "description": "Breakdown and rescue service"
+      "description": "Towing or emergency assistance"
     },
     "intercity_transport": {
       "label": "Intercity Transport",
-      "description": "Transportation between cities or provinces"
+      "description": "Transport between provinces"
     }
-
   },
   "care": {
     "vehicle_cleaning": {
       "label": "Vehicle Cleaning",
-      "description": "Washing and polishing"
+      "description": "Interior and exterior cleaning service"
     },
-    "accessories_sales": {
-      "label": "Accessories Sales",
-      "description": "Buy vehicle accessories"
+    "accessory_sale": {
+      "label": "Accessory Sale",
+      "description": "Selling helmets, phone holders, tools, etc."
     }
   },
   "legal": {
-    "insurance": {
-      "label": "Insurance",
-      "description": "Insurance plans and support"
+    "insurance_sale": {
+      "label": "Insurance Support",
+      "description": "Provide or consult on insurance"
     },
-    "registration_support": {
-      "label": "Registration Support",
-      "description": "Help with paperwork and licensing"
+    "registration_assist": {
+      "label": "Registration & Licensing",
+      "description": "Support with legal documentation"
     }
   }
 },

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { collection, addDoc, updateDoc, doc, getDocs, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { VehicleModel } from '@/src/lib/vehicleModels/vehicleModelTypes_new';
+import { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { useVehicleModelForm } from '@/src/hooks/useVehicleModelForm';
 import VehicleModelForm from './VehicleModelForm';
 import VehicleModelTable from './VehicleModelTable';

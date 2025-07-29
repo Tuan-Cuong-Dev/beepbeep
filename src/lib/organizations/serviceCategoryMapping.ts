@@ -7,7 +7,7 @@ export type ServiceCategoryKey =
   | 'care'
   | 'legal';
 
-  // Phần legal sau này có thể khai thác riêng cho team bảo hiểm sau. Ko bỏ vào đây
+  // Chú ý Phần legal sau này có thể khai thác riêng cho team bảo hiểm sau. Ko bỏ vào đây
 
 // ✅ Các loại hình tổ chức / doanh nghiệp (đơn giản hóa kỹ thuật viên)
 export type OrganizationType =
@@ -24,7 +24,7 @@ export type TechnicianSubtype = 'mobile' | 'shop';
 
 // ✅ Bản ánh xạ dịch vụ chính
 export const serviceCategoriesByOrgType: Record<OrganizationType, ServiceCategoryKey[]> = {
-  rental_company: ['rental', 'battery', 'legal'],
+  rental_company: ['rental', 'battery'],
   private_provider: ['rental'],
   agent: ['rental'],
   intercity_bus: ['rental'],

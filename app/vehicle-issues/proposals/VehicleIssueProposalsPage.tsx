@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getDocs, query, where, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useUser } from '@/src/context/AuthContext';
-import { ExtendedVehicleIssue } from '@/src/lib/vehicleIssues/vehicleIssueTypes';
+import { ExtendedVehicleIssue } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import VehicleIssueTable from '@/src/components/vehicleIssues/VehicleIssueTable';
 import ApproveProposalDialog from '@/src/components/vehicleIssues/ApproveProposalDialog';
 import ViewProposalDialog from '@/src/components/vehicleIssues/ViewProposalDialog';

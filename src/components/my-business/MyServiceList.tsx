@@ -4,18 +4,25 @@ import React, { useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useAuth } from '@/src/hooks/useAuth';
-import { SupportedServiceType } from '@/src/lib/rentalCompanies/rentalCompaniesTypes_new';
 import { useTranslation } from 'react-i18next';
 
+import {
+  SupportedServiceType,
+  ServiceCategoryKey,
+} from '@/src/lib/vehicle-services/serviceTypes';
 import ServiceCategorySelector from '@/src/components/vehicle-services/ServiceCategorySelector';
 import ServiceTypeSelector from '@/src/components/vehicle-services/ServiceTypeSelector';
+
 import {
   OrganizationType,
   TechnicianSubtype,
-  ServiceCategoryKey,
   serviceCategoriesByOrgType,
   serviceCategoriesByTechnicianSubtype,
 } from '@/src/lib/organizations/serviceCategoryMapping';
+
+// ----------------------
+// 🔑 Types
+// ----------------------
 
 type ServiceStatus = 'active' | 'pending' | 'inactive';
 
@@ -31,8 +38,12 @@ interface UserService {
 
 interface MyServiceListProps {
   orgType: OrganizationType;
-  technicianSubtype?: TechnicianSubtype; // 👈 thêm vào để lọc đúng nếu là technician_partner
+  technicianSubtype?: TechnicianSubtype;
 }
+
+// ----------------------
+// 🚀 Component
+// ----------------------
 
 export default function MyServiceList({ orgType, technicianSubtype }: MyServiceListProps) {
   const { currentUser } = useAuth();
@@ -41,7 +52,7 @@ export default function MyServiceList({ orgType, technicianSubtype }: MyServiceL
   const [services, setServices] = useState<UserService[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<ServiceCategoryKey>();
-  const [serviceType, setServiceType] = useState<string>();
+  const [serviceType, setServiceType] = useState<SupportedServiceType>();
 
   const allowedCategories: ServiceCategoryKey[] =
     orgType === 'technician_partner' && technicianSubtype
@@ -59,7 +70,9 @@ export default function MyServiceList({ orgType, technicianSubtype }: MyServiceL
         ...doc.data(),
       })) as UserService[];
 
-      const filtered = data.filter((s) => allowedCategories.includes(s.category as ServiceCategoryKey));
+      const filtered = data.filter((s) =>
+        allowedCategories.includes(s.category as ServiceCategoryKey)
+      );
       setServices(filtered);
       setLoading(false);
     };
@@ -98,11 +111,15 @@ export default function MyServiceList({ orgType, technicianSubtype }: MyServiceL
   );
 }
 
+// ----------------------
+// ➕ AddNewServiceCard
+// ----------------------
+
 interface AddNewServiceCardProps {
   category?: ServiceCategoryKey;
   onSelectCategory: (val: ServiceCategoryKey) => void;
-  serviceType?: string;
-  onSelectServiceType: (val: string) => void;
+  serviceType?: SupportedServiceType;
+  onSelectServiceType: (val: SupportedServiceType) => void;
   allowedCategories: ServiceCategoryKey[];
 }
 
@@ -162,6 +179,10 @@ function AddNewServiceCard({
     </div>
   );
 }
+
+// ----------------------
+// 🧾 ServiceListItem
+// ----------------------
 
 function ServiceListItem({ service }: { service: UserService }) {
   const { t } = useTranslation('common');

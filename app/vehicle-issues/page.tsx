@@ -9,7 +9,7 @@ import Pagination from "@/src/components/ui/pagination";
 import { useUser } from "@/src/context/AuthContext";
 import { useVehicleIssues } from "@/src/hooks/useVehicleIssues";
 import { useTechnicianMap } from "@/src/hooks/useTechnicianMap";
-import { ExtendedVehicleIssue, VehicleIssueStatus } from "@/src/lib/vehicleIssues/vehicleIssueTypes";
+import { ExtendedVehicleIssue, VehicleIssueStatus } from "@/src/lib/vehicle-issues/vehicleIssueTypes";
 import { Button } from "@/src/components/ui/button";
 import AssignTechnicianForm from "@/src/components/vehicleIssues/AssignTechnicianForm";
 import VehicleIssuesSummaryCard from "@/src/components/vehicleIssues/VehicleIssuesSummaryCard";

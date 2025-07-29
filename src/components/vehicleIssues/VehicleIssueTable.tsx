@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicleIssues/vehicleIssueTypes';
+import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 import ViewProposalDialog from '@/src/components/vehicleIssues/ViewProposalDialog';
 import ApproveProposalDialog from '@/src/components/vehicleIssues/ApproveProposalDialog';

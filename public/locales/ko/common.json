@@ -899,70 +899,71 @@
 
 "service_type_selector": {
   "repair": {
-    "repair": {
-      "label": "수리 서비스",
-      "description": "일반 수리 및 차량 진단"
+    "repair_basic": {
+      "label": "일반 수리",
+      "description": "현장 및 매장 수리 서비스"
     },
     "battery_check": {
       "label": "배터리 점검",
-      "description": "배터리 상태 검사 및 테스트"
+      "description": "배터리 상태 및 성능 평가"
     }
   },
   "rental": {
     "rental_self_drive": {
-      "label": "자가 운전 렌탈",
-      "description": "직접 운전할 차량 대여"
+      "label": "자가 운전 렌트",
+      "description": "고객이 직접 운전"
     },
     "rental_with_driver": {
-      "label": "운전기사 포함 렌탈",
-      "description": "운전사 포함 차량 렌탈"
+      "label": "운전기사 포함 렌트",
+      "description": "전문 운전기사 포함"
     },
-    "tour": {
-      "label": "투어 서비스",
-      "description": "가이드 투어 및 여행 패키지"
+    "tour_rental": {
+      "label": "가이드 투어",
+      "description": "도시 및 여행 가이드 투어"
     }
   },
   "battery": {
     "battery_swap": {
-      "label": "배터리 교환",
-      "description": "빠른 배터리 교환 서비스"
+      "label": "배터리 교체",
+      "description": "즉시 배터리 교체"
     },
     "battery_delivery": {
       "label": "배터리 배달",
-      "description": "배터리를 고객 위치로 배달"
+      "description": "지정 장소로 배터리 배달"
     }
   },
   "transport": {
     "vehicle_rescue": {
       "label": "차량 구조",
-      "description": "고장 시 구조 및 출동 서비스"
+      "description": "견인 또는 긴급 지원"
     },
     "intercity_transport": {
-      "label": "도시간 운송",
-      "description": "도시 또는 지역 간 운송 서비스"
+      "label": "도시 간 운송",
+      "description": "도시간 차량 운송"
     }
   },
   "care": {
     "vehicle_cleaning": {
-      "label": "차량 세차",
-      "description": "세차 및 광택 서비스"
+      "label": "세차 서비스",
+      "description": "차량 내외부 세척 서비스"
     },
-    "accessories_sales": {
+    "accessory_sale": {
       "label": "액세서리 판매",
-      "description": "차량 액세서리 구매"
+      "description": "헬멧, 거치대, 도구 등 판매"
     }
   },
   "legal": {
-    "insurance": {
-      "label": "보험",
-      "description": "보험 상품 및 지원"
+    "insurance_sale": {
+      "label": "보험 지원",
+      "description": "보험 제공 또는 상담"
     },
-    "registration_support": {
-      "label": "등록 지원",
-      "description": "등록 및 면허 관련 서류 지원"
+    "registration_assist": {
+      "label": "등록 및 인허가",
+      "description": "법적 서류 지원"
     }
   }
 },
+
 "my_organization_info": {
   "loading": "조직 정보 불러오는 중..."
 },

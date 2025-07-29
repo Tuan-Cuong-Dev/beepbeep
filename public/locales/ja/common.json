@@ -880,27 +880,27 @@
 
 "service_type_selector": {
   "repair": {
-    "repair": {
+    "repair_basic": {
       "label": "一般修理",
-      "description": "出張および店舗での修理サービス"
+      "description": "現地および店舗での修理サービス"
     },
     "battery_check": {
-      "label": "バッテリ診断",
-      "description": "バッテリーの健康状態と性能をチェック"
+      "label": "バッテリーチェック",
+      "description": "バッテリーの状態と性能を評価"
     }
   },
   "rental": {
     "rental_self_drive": {
       "label": "セルフドライブレンタル",
-      "description": "お客様自身が運転するレンタルサービス"
+      "description": "お客様自身が運転します"
     },
     "rental_with_driver": {
-      "label": "運転手付きレンタル",
-      "description": "プロのドライバーが同行するレンタル"
+      "label": "ドライバー付きレンタル",
+      "description": "プロのドライバーを含む"
     },
-    "tour": {
-      "label": "市内観光ツアー",
-      "description": "観光およびガイド付きツアー"
+    "tour_rental": {
+      "label": "ガイドツアー",
+      "description": "市内観光とガイド付きツアー"
     }
   },
   "battery": {
@@ -910,36 +910,36 @@
     },
     "battery_delivery": {
       "label": "バッテリー配達",
-      "description": "ご指定場所へのバッテリー配達"
+      "description": "指定場所へのバッテリー配送"
     }
   },
   "transport": {
     "vehicle_rescue": {
-      "label": "車両救助",
-      "description": "けん引や緊急車両サポート"
+      "label": "車両レスキュー",
+      "description": "けん引または緊急支援"
     },
     "intercity_transport": {
       "label": "都市間輸送",
-      "description": "都道府県間の輸送サービス"
+      "description": "都市間の車両移動"
     }
   },
   "care": {
     "vehicle_cleaning": {
       "label": "車両洗浄",
-      "description": "外装・内装の洗車サービス"
+      "description": "車内外の洗浄サービス"
     },
-    "accessories_sales": {
+    "accessory_sale": {
       "label": "アクセサリー販売",
-      "description": "ヘルメット、スマホホルダー、工具などを販売"
+      "description": "ヘルメット、スマホホルダー、ツールなどの販売"
     }
   },
   "legal": {
-    "insurance": {
+    "insurance_sale": {
       "label": "保険サポート",
       "description": "保険の提供または相談"
     },
-    "registration_support": {
-      "label": "登録・ライセンス",
+    "registration_assist": {
+      "label": "登録・許可支援",
       "description": "法的書類のサポート"
     }
   }

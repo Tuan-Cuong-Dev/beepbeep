@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
-import { EbikeModel } from '@/src/lib/vehicleModels/vehicleModelTypes';
+import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { Button } from '@/src/components/ui/button';
 import { getDocs, collection } from 'firebase/firestore';

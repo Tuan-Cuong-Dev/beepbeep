@@ -9,7 +9,7 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
 import { useVehicleIssues } from '@/src/hooks/useVehicleIssues';
 import { useTechnicianMap } from '@/src/hooks/useTechnicianMap';
-import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicleIssues/vehicleIssueTypes';
+import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import ProposalPopup from '@/src/components/vehicleIssues/ProposalPopup';

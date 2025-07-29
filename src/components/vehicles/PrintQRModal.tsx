@@ -4,7 +4,7 @@
 
 import { useRef } from "react";
 import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
-import { EbikeModel } from '@/src/lib/vehicleModels/vehicleModelTypes';
+import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 
 interface Props {
   open: boolean;
