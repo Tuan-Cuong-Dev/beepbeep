@@ -1130,7 +1130,154 @@
   "not_logged_in_description": "이 작업을 하려면 로그인해야 합니다.",
   "missing_fields_title": "누락된 항목",
   "missing_fields_description": "모든 항목을 입력해주세요."
-}
+},
+
+
+  "dynamic_service_form": {
+    "submit": "정보 제출",
+    "missing_required_fields": "필수 항목을 모두 입력해 주세요.",
+    "unsupported_field_type": "지원되지 않는 필드 유형: {{type}}"
+  },
+  "fields": {
+    "location": {
+      "label": "서비스 지역",
+      "placeholder": "제공하는 지역을 입력하세요"
+    },
+    "specialties": {
+      "label": "수리 전문 분야",
+      "placeholder": "예: 브레이크, 조명, 타이어"
+    },
+    "workingHours": {
+      "label": "영업 시간",
+      "placeholder": "예: 08:00 - 17:00"
+    },
+    "storeLocation": {
+      "label": "매장 주소",
+      "placeholder": "매장 주소를 입력하세요"
+    },
+    "equipment": {
+      "label": "사용 가능한 장비",
+      "placeholder": "예: 공구, 진단 기기"
+    },
+    "vehicleTypes": {
+      "label": "차량 종류"
+    },
+    "pickupLocation": {
+      "label": "픽업 위치",
+      "placeholder": "픽업 위치를 입력하세요"
+    },
+    "rentalTerms": {
+      "label": "대여 조건",
+      "placeholder": "대여 조건이나 유의사항을 입력하세요"
+    },
+    "driverExperience": {
+      "label": "운전 경험",
+      "placeholder": "예: 운전 경력 5년"
+    },
+    "languages": {
+      "label": "지원 언어"
+    },
+    "region": {
+      "label": "투어 지역",
+      "placeholder": "예: 하노이, 호이안"
+    },
+    "duration": {
+      "label": "투어 기간",
+      "placeholder": "예: 3일 2박"
+    },
+    "price": {
+      "label": "투어 가격 (USD)"
+    },
+    "swapLocation": {
+      "label": "배터리 교체 위치",
+      "placeholder": "교체 위치를 입력하세요"
+    },
+    "supportedModels": {
+      "label": "지원 모델",
+      "placeholder": "지원되는 차량 또는 배터리 모델을 입력하세요"
+    },
+    "availableBatteries": {
+      "label": "사용 가능한 배터리 수"
+    },
+    "deliveryArea": {
+      "label": "배송 지역",
+      "placeholder": "예: 1구, 3구"
+    },
+    "deliveryTime": {
+      "label": "예상 배송 시간",
+      "placeholder": "예: 30~60분"
+    },
+    "rescueArea": {
+      "label": "구조 서비스 지역",
+      "placeholder": "예: 하노이 도심"
+    },
+    "maxWeight": {
+      "label": "최대 하중 (kg)"
+    },
+    "routes": {
+      "label": "지원 노선",
+      "placeholder": "예: 하노이 – 다낭 – 호치민"
+    },
+    "pricePerKm": {
+      "label": "km당 요금 (VND)"
+    },
+    "cleaningPackages": {
+      "label": "세차 패키지",
+      "placeholder": "예: 기본, 프리미엄, 딥클린"
+    },
+    "priceRange": {
+      "label": "가격 범위 (VND)",
+      "placeholder": "예: 50,000 – 150,000"
+    },
+    "accessoryTypes": {
+      "label": "액세서리 종류",
+      "placeholder": "예: 헬멧, 휴대폰 거치대"
+    },
+    "deliveryAvailable": {
+      "label": "배송 가능 여부",
+      "placeholder": "배송을 지원하나요?"
+    },
+    "insuranceTypes": {
+      "label": "보험 종류"
+    },
+    "supportedVehicles": {
+      "label": "지원 차량"
+    },
+    "policyTerms": {
+      "label": "보험 약관",
+      "placeholder": "조건 및 보장 내용을 입력하세요"
+    },
+    "registrationArea": {
+      "label": "등록 지역",
+      "placeholder": "예: 다낭, 하노이"
+    },
+    "processingTime": {
+      "label": "처리 시간",
+      "placeholder": "예: 1~3 영업일"
+    }
+  },
+  "options": {
+    "vehicleType": {
+      "motorbike": "오토바이",
+      "car": "자동차",
+      "van": "밴",
+      "bus": "버스"
+    },
+    "insuranceType": {
+      "accident": "사고",
+      "liability": "책임",
+      "theft": "도난",
+      "comprehensive": "종합"
+    },
+    "language": {
+      "en": "영어",
+      "vi": "베트남어",
+      "ko": "한국어",
+      "ja": "일본어"
+    }
+  }
+
+
 
 
 

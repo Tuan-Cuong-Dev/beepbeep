@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import MyServiceList from '@/src/components/my-business/MyServiceList';
+import MyServiceList from '@/src/components/my-business/services/MyServiceList';
 import MyOrganizationInfo from '@/src/components/my-business/organizations/MyOrganizationInfo';
 import { OrgCardData } from '@/src/lib/organizations/getUserOrganizations';
 import { TechnicianSubtype } from '@/src/lib/organizations/serviceCategoryMapping';

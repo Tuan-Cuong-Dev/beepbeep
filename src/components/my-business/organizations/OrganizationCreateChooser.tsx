@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { ORG_OPTIONS } from './organizationOptions';
+import { ORG_OPTIONS } from './organizationOptions'
 
 export default function OrganizationCreateChooser() {
   const { t } = useTranslation('common');

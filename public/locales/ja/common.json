@@ -1112,7 +1112,154 @@
     "not_logged_in_description": "この操作を行うにはログインが必要です。",
     "missing_fields_title": "未入力の項目があります",
     "missing_fields_description": "すべての項目を入力してください。"
+  },
+
+
+  "dynamic_service_form": {
+    "submit": "送信する",
+    "missing_required_fields": "必須項目をすべて入力してください。",
+    "unsupported_field_type": "未対応のフィールドタイプです: {{type}}"
+  },
+  "fields": {
+    "location": {
+      "label": "サービスエリア",
+      "placeholder": "対応エリアを入力してください"
+    },
+    "specialties": {
+      "label": "修理の専門分野",
+      "placeholder": "例: ブレーキ、ライト、タイヤ"
+    },
+    "workingHours": {
+      "label": "営業時間",
+      "placeholder": "例: 08:00 ～ 17:00"
+    },
+    "storeLocation": {
+      "label": "店舗住所",
+      "placeholder": "店舗の住所を入力してください"
+    },
+    "equipment": {
+      "label": "使用可能な機材",
+      "placeholder": "例: 工具、診断機器"
+    },
+    "vehicleTypes": {
+      "label": "車両タイプ"
+    },
+    "pickupLocation": {
+      "label": "受取場所",
+      "placeholder": "受取場所を入力してください"
+    },
+    "rentalTerms": {
+      "label": "レンタル条件",
+      "placeholder": "条件や注意事項を入力してください"
+    },
+    "driverExperience": {
+      "label": "運転経験",
+      "placeholder": "例: 運転歴5年"
+    },
+    "languages": {
+      "label": "対応言語"
+    },
+    "region": {
+      "label": "ツアー地域",
+      "placeholder": "例: ハノイ、ホイアン"
+    },
+    "duration": {
+      "label": "ツアー期間",
+      "placeholder": "例: 3日2泊"
+    },
+    "price": {
+      "label": "ツアー料金（USD）"
+    },
+    "swapLocation": {
+      "label": "バッテリー交換場所",
+      "placeholder": "交換場所を入力してください"
+    },
+    "supportedModels": {
+      "label": "対応モデル",
+      "placeholder": "対応する車種やバッテリーモデルを記載"
+    },
+    "availableBatteries": {
+      "label": "利用可能なバッテリー数"
+    },
+    "deliveryArea": {
+      "label": "配達エリア",
+      "placeholder": "例: 第1区、第3区"
+    },
+    "deliveryTime": {
+      "label": "配達予定時間",
+      "placeholder": "例: 30～60分"
+    },
+    "rescueArea": {
+      "label": "救援対応エリア",
+      "placeholder": "例: ハノイ市内"
+    },
+    "maxWeight": {
+      "label": "最大積載量（kg）"
+    },
+    "routes": {
+      "label": "対応ルート",
+      "placeholder": "例: ハノイ～ダナン～ホーチミン"
+    },
+    "pricePerKm": {
+      "label": "1kmあたりの料金（VND）"
+    },
+    "cleaningPackages": {
+      "label": "清掃パッケージ",
+      "placeholder": "例: ベーシック、プレミアム、徹底清掃"
+    },
+    "priceRange": {
+      "label": "価格帯（VND）",
+      "placeholder": "例: 50,000～150,000"
+    },
+    "accessoryTypes": {
+      "label": "アクセサリーの種類",
+      "placeholder": "例: ヘルメット、スマホホルダー"
+    },
+    "deliveryAvailable": {
+      "label": "配達可能",
+      "placeholder": "配達は可能ですか？"
+    },
+    "insuranceTypes": {
+      "label": "保険の種類"
+    },
+    "supportedVehicles": {
+      "label": "対応車両"
+    },
+    "policyTerms": {
+      "label": "保険条件",
+      "placeholder": "条件や補償内容を入力してください"
+    },
+    "registrationArea": {
+      "label": "登録エリア",
+      "placeholder": "例: ダナン、ハノイ"
+    },
+    "processingTime": {
+      "label": "処理時間",
+      "placeholder": "例: 営業日で1～3日"
+    }
+  },
+  "options": {
+    "vehicleType": {
+      "motorbike": "バイク",
+      "car": "車",
+      "van": "バン",
+      "bus": "バス"
+    },
+    "insuranceType": {
+      "accident": "事故",
+      "liability": "賠償責任",
+      "theft": "盗難",
+      "comprehensive": "包括"
+    },
+    "language": {
+      "en": "英語",
+      "vi": "ベトナム語",
+      "ko": "韓国語",
+      "ja": "日本語"
+    }
   }
+
+
 
 
 

@@ -1,9 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 import { getDocs, query, where, collection } from 'firebase/firestore';
+import { useTranslation } from 'react-i18next';
 
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
@@ -11,25 +11,16 @@ import CreateBusinessForm from '@/src/components/my-business/create/CreateBusine
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
 import { db } from '@/src/firebaseConfig';
-import { BusinessType, BUSINESS_TYPE_LABELS } from '@/src/lib/my-business/businessTypes';
+import {
+  BusinessType,
+  BUSINESS_TYPE_LABELS,
+} from '@/src/lib/my-business/businessTypes';
 
-const VALID_BUSINESS_TYPES: BusinessType[] = [
-  'rental_company',
-  'private_provider',
-  'agent',
-  'intercity_bus',
-  'vehicle_transport',
-  'tour_guide',
-  'technician_mobile',
-  'technician_shop',
-];
+// 🎯 Các loại hình doanh nghiệp hợp lệ
+const VALID_BUSINESS_TYPES: BusinessType[] = Object.keys(BUSINESS_TYPE_LABELS) as BusinessType[];
 
-function resolveBusinessType(type: string | null, subtype: string | null): BusinessType | null {
-  if (type === 'technician_partner') {
-    if (subtype === 'mobile') return 'technician_mobile';
-    if (subtype === 'shop') return 'technician_shop';
-    return null;
-  }
+// ✅ Chuyển từ query param → BusinessType
+function resolveBusinessType(type: string | null): BusinessType | null {
   return VALID_BUSINESS_TYPES.includes(type as BusinessType) ? (type as BusinessType) : null;
 }
 
@@ -39,7 +30,6 @@ export default function CreateBusinessPage() {
   const router = useRouter();
 
   const [type, setType] = useState<string | null>(null);
-  const [subtype, setSubtype] = useState<string | null>(null);
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
   const [dialog, setDialog] = useState({
     open: false,
@@ -48,14 +38,15 @@ export default function CreateBusinessPage() {
     description: '',
   });
 
+  // 🧭 Lấy type từ URL
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       setType(params.get('type'));
-      setSubtype(params.get('subtype'));
     }
   }, []);
 
+  // ✅ Điều hướng nếu đã tồn tại agent
   useEffect(() => {
     if (!user) return;
 
@@ -76,8 +67,9 @@ export default function CreateBusinessPage() {
     checkExistingAgent();
   }, [user, role, type, router]);
 
+  // ✅ Xác định loại hình doanh nghiệp từ type
   useEffect(() => {
-    const resolved = resolveBusinessType(type, subtype);
+    const resolved = resolveBusinessType(type);
     setBusinessType(resolved);
 
     if (!resolved && type !== null) {
@@ -88,7 +80,7 @@ export default function CreateBusinessPage() {
         description: t('create_business_page.error_description'),
       });
     }
-  }, [type, subtype, t]);
+  }, [type, t]);
 
   return (
     <div
@@ -111,7 +103,7 @@ export default function CreateBusinessPage() {
                   {t('create_business_page.subtitle')}
                 </p>
               </div>
-              <CreateBusinessForm businessType={businessType} />
+              <CreateBusinessForm BusinessType ={businessType} />
             </>
           ) : (
             <div className="text-center text-red-600 font-semibold text-lg">
