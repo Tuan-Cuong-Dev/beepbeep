@@ -828,13 +828,15 @@
   "add_new": "새 서비스 추가",
   "step1": "1단계: 서비스 카테고리 선택",
   "step2": "2단계: 세부 서비스 선택",
-  "selected": "선택된 서비스",
-  "continue": "서비스 등록으로 계속하기",
-  "loading": "서비스 불러오는 중...",
-  "no_services": "아직 게시한 서비스가 없습니다.",
+  "selected": "선택한 서비스",
+  "continue": "서비스 작성 계속하기",
+  "success_title": "서비스 생성 완료",
+  "success_description": "✅ {{name}} 서비스가 내 목록에 추가되었습니다.",
+  "loading": "서비스 목록을 불러오는 중...",
+  "no_services": "등록된 서비스가 없습니다.",
   "status": {
-    "active": "운영 중",
-    "pending": "검토 중",
+    "active": "활성",
+    "pending": "승인 대기",
     "inactive": "비활성"
   }
 },

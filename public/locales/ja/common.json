@@ -806,19 +806,20 @@
 "my_service_list": {
   "title": "あなたのサービス",
   "add_new": "新しいサービスを追加",
-  "step1": "ステップ1：サービスカテゴリを選択",
-  "step2": "ステップ2：具体的なサービスを選択",
-  "selected": "選択されたサービス",
+  "step1": "ステップ1: サービスカテゴリを選択",
+  "step2": "ステップ2: 詳細サービスを選択",
+  "selected": "選択したサービス",
   "continue": "サービス作成を続ける",
-  "loading": "サービスを読み込み中...",
-  "no_services": "まだサービスを公開していません。",
+  "success_title": "サービスの作成に成功しました",
+  "success_description": "✅ サービス「{{name}}」があなたのリストに追加されました。",
+  "loading": "サービス一覧を読み込み中...",
+  "no_services": "まだサービスを登録していません。",
   "status": {
-    "active": "アクティブ",
-    "pending": "審査中",
-    "inactive": "非アクティブ"
+    "active": "有効",
+    "pending": "承認待ち",
+    "inactive": "無効"
   }
-}
-,
+},
 
 "service_labels": {
   "repair_basic": "基本修理",
@@ -1114,12 +1115,12 @@
     "missing_fields_description": "すべての項目を入力してください。"
   },
 
-
-  "dynamic_service_form": {
-    "submit": "送信する",
+"dynamic_service_form": {
+    "submit": "情報を送信",
     "missing_required_fields": "必須項目をすべて入力してください。",
-    "unsupported_field_type": "未対応のフィールドタイプです: {{type}}"
+    "unsupported_field_type": "サポートされていないフィールドタイプ：{{type}}"
   },
+
   "fields": {
     "location": {
       "label": "サービスエリア",
@@ -1238,6 +1239,7 @@
       "placeholder": "例: 営業日で1～3日"
     }
   },
+
   "options": {
     "vehicleType": {
       "motorbike": "バイク",
@@ -1249,7 +1251,7 @@
       "accident": "事故",
       "liability": "賠償責任",
       "theft": "盗難",
-      "comprehensive": "包括"
+      "comprehensive": "包括的"
     },
     "language": {
       "en": "英語",

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   serviceFieldConfig,
@@ -18,6 +18,23 @@ interface Props {
   onSubmit: (data: Record<string, any>) => void;
 }
 
+const defaultFields: ServiceFieldConfig[] = [
+  { name: 'name', label: 'fields.name.label', placeholder: 'fields.name.placeholder', type: 'text', required: true },
+  { name: 'description', label: 'fields.description.label', placeholder: 'fields.description.placeholder', type: 'textarea' },
+  { name: 'location', label: 'fields.location.label', placeholder: 'fields.location.placeholder', type: 'text', required: true },
+  { name: 'workingHours', label: 'fields.workingHours.label', placeholder: 'fields.workingHours.placeholder', type: 'text' },
+  {
+    name: 'vehicleTypes',
+    label: 'fields.vehicleTypes.label',
+    type: 'multi-select',
+    options: [
+      'options.vehicleType.motorbike',
+      'options.vehicleType.car',
+      'options.vehicleType.van',
+    ],
+  },
+];
+
 export default function DynamicServiceForm({
   category,
   serviceType,
@@ -26,23 +43,31 @@ export default function DynamicServiceForm({
 }: Props) {
   const { t } = useTranslation('common');
 
-  // 🔹 Lấy cấu hình fields theo category + serviceType + partnerType
+  // 📌 Lấy cấu hình từ serviceFieldConfig
   const config = serviceFieldConfig[category]?.[serviceType];
-  const fields: ServiceFieldConfig[] = Array.isArray(config)
+  const userDefinedFields: ServiceFieldConfig[] = Array.isArray(config)
     ? config
     : config?.[partnerType] ?? [];
 
-  // 🔹 Khởi tạo form state từ fields
+  // 📌 Gộp defaultFields với userFields (tránh duplicate)
+  const allFieldsMap = new Map<string, ServiceFieldConfig>();
+  [...defaultFields, ...userDefinedFields].forEach((field) =>
+    allFieldsMap.set(field.name, field)
+  );
+  const fields = Array.from(allFieldsMap.values());
+
+  // 📌 Khởi tạo state
   const initialFormState = fields.reduce((acc, field) => {
-    acc[field.name] = field.type === 'multi-select'
-      ? []
-      : field.type === 'checkbox'
-        ? false
-        : '';
+    acc[field.name] =
+      field.type === 'multi-select' ? [] : field.type === 'checkbox' ? false : '';
     return acc;
   }, {} as Record<string, any>);
 
   const [formData, setFormData] = useState<Record<string, any>>(initialFormState);
+
+  useEffect(() => {
+    setFormData(initialFormState);
+  }, [category, serviceType, partnerType]);
 
   const handleChange = (name: string, value: any) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -66,6 +91,8 @@ export default function DynamicServiceForm({
 
   const renderField = (field: ServiceFieldConfig) => {
     const value = formData[field.name];
+    const label = field.label ? t(field.label) : field.name;
+    const placeholder = field.placeholder ? t(field.placeholder) : '';
 
     switch (field.type) {
       case 'text':
@@ -73,8 +100,8 @@ export default function DynamicServiceForm({
         return (
           <input
             type={field.type}
-            className="w-full border rounded p-2"
-            placeholder={field.placeholder ? t(field.placeholder) : ''}
+            className="w-full border rounded px-3 py-2"
+            placeholder={placeholder}
             value={value}
             onChange={(e) =>
               handleChange(
@@ -88,9 +115,9 @@ export default function DynamicServiceForm({
       case 'textarea':
         return (
           <textarea
-            className="w-full border rounded p-2"
+            className="w-full border rounded px-3 py-2"
             rows={3}
-            placeholder={field.placeholder ? t(field.placeholder) : ''}
+            placeholder={placeholder}
             value={value}
             onChange={(e) => handleChange(field.name, e.target.value)}
           />
@@ -104,7 +131,7 @@ export default function DynamicServiceForm({
               checked={value}
               onChange={(e) => handleChange(field.name, e.target.checked)}
             />
-            <span>{field.placeholder}</span>
+            <span>{placeholder}</span>
           </label>
         );
 
@@ -112,28 +139,28 @@ export default function DynamicServiceForm({
         return (
           <div className="flex flex-wrap gap-2">
             {field.options?.map((opt) => {
-            const selected = (value ?? []).includes(opt);
-            return (
-              <button
-                key={opt} // ✅ key dùng key kỹ thuật ổn định
-                type="button"
-                className={`px-3 py-1 border rounded ${
-                  selected ? 'bg-[#00d289] text-white border-[#00d289]' : ''
-                }`}
-                onClick={() => {
-                  const updated = selected
-                    ? value.filter((v: string) => v !== opt)
-                    : [...(value ?? []), opt];
-                  handleChange(field.name, updated);
-                }}
-              >
-                {t(opt)}  {/* ✅ Dịch nội dung hiển thị */}
-              </button>
-            );
-          })}
-
+              const selected = (value ?? []).includes(opt);
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  className={`px-3 py-1 border rounded ${
+                    selected ? 'bg-[#00d289] text-white border-[#00d289]' : ''
+                  }`}
+                  onClick={() => {
+                    const updated = selected
+                      ? value.filter((v: string) => v !== opt)
+                      : [...(value ?? []), opt];
+                    handleChange(field.name, updated);
+                  }}
+                >
+                  {t(opt)}
+                </button>
+              );
+            })}
           </div>
         );
+
       default:
         return <p className="text-red-500">Unsupported field type: {field.type}</p>;
     }

@@ -826,18 +826,20 @@
   "organization_title": "🏢 Your Business or Affiliated Organization"
   },
 
-  "my_service_list": {
+"my_service_list": {
   "title": "Your Services",
-  "add_new": "Add a New Service",
-  "step1": "Step 1: Select a Service Category",
-  "step2": "Step 2: Choose a Specific Service",
+  "add_new": "Add New Service",
+  "step1": "Step 1: Select Service Category",
+  "step2": "Step 2: Select Specific Service",
   "selected": "Selected Service",
-  "continue": "Continue to Create Service",
+  "continue": "Continue Creating Service",
+  "success_title": "Service Created Successfully",
+  "success_description": "✅ The service {{name}} has been added to your list.",
   "loading": "Loading your services...",
-  "no_services": "You haven't published any services yet.",
+  "no_services": "You haven't posted any services yet.",
   "status": {
     "active": "Active",
-    "pending": "Pending",
+    "pending": "Pending Approval",
     "inactive": "Inactive"
   }
 },
@@ -1138,149 +1140,160 @@
     "missing_fields_description": "Please fill in all fields."
   },
 
-  "dynamic_service_form": {
-    "submit": "Submit",
-    "missing_required_fields": "Please fill in all required fields.",
-    "unsupported_field_type": "Unsupported field type: {{type}}"
+ "dynamic_service_form": {
+  "submit": "Submit",
+  "missing_required_fields": "Please fill in all required fields.",
+  "unsupported_field_type": "Unsupported field type: {{type}}"
+},
+
+"fields": {
+  "name": {
+    "label": "Service Name",
+    "placeholder": "Enter service name"
   },
-  "fields": {
-    "location": {
-      "label": "Service Area",
-      "placeholder": "Enter the area you serve"
-    },
-    "specialties": {
-      "label": "Repair Specialties",
-      "placeholder": "E.g. Brakes, lights, tires"
-    },
-    "workingHours": {
-      "label": "Working Hours",
-      "placeholder": "E.g. 08:00 - 17:00"
-    },
-    "storeLocation": {
-      "label": "Store Address",
-      "placeholder": "Enter store address"
-    },
-    "equipment": {
-      "label": "Available Equipment",
-      "placeholder": "E.g. Tools, diagnostic machines"
-    },
-    "vehicleTypes": {
-      "label": "Vehicle Types"
-    },
-    "pickupLocation": {
-      "label": "Pickup Location",
-      "placeholder": "Enter pickup location"
-    },
-    "rentalTerms": {
-      "label": "Rental Terms",
-      "placeholder": "Enter rental terms or notes"
-    },
-    "driverExperience": {
-      "label": "Driver Experience",
-      "placeholder": "E.g. 5 years experience"
-    },
-    "languages": {
-      "label": "Supported Languages"
-    },
-    "region": {
-      "label": "Tour Region",
-      "placeholder": "E.g. Hanoi, Hoi An"
-    },
-    "duration": {
-      "label": "Tour Duration",
-      "placeholder": "E.g. 3 days 2 nights"
-    },
-    "price": {
-      "label": "Tour Price (USD)"
-    },
-    "swapLocation": {
-      "label": "Battery Swap Location",
-      "placeholder": "Enter swap location"
-    },
-    "supportedModels": {
-      "label": "Supported Models",
-      "placeholder": "List supported vehicle or battery models"
-    },
-    "availableBatteries": {
-      "label": "Available Batteries"
-    },
-    "deliveryArea": {
-      "label": "Delivery Area",
-      "placeholder": "E.g. District 1, District 3"
-    },
-    "deliveryTime": {
-      "label": "Estimated Delivery Time",
-      "placeholder": "E.g. 30–60 minutes"
-    },
-    "rescueArea": {
-      "label": "Rescue Coverage Area",
-      "placeholder": "E.g. Hanoi inner city"
-    },
-    "maxWeight": {
-      "label": "Maximum Load (kg)"
-    },
-    "routes": {
-      "label": "Supported Routes",
-      "placeholder": "E.g. Hanoi – Da Nang – HCM"
-    },
-    "pricePerKm": {
-      "label": "Price per Km (VND)"
-    },
-    "cleaningPackages": {
-      "label": "Cleaning Packages",
-      "placeholder": "E.g. Basic, Premium, Deep Clean"
-    },
-    "priceRange": {
-      "label": "Price Range (VND)",
-      "placeholder": "E.g. 50,000 – 150,000"
-    },
-    "accessoryTypes": {
-      "label": "Accessory Types",
-      "placeholder": "E.g. Helmet, Phone holder"
-    },
-    "deliveryAvailable": {
-      "label": "Delivery Available",
-      "placeholder": "Is delivery supported?"
-    },
-    "insuranceTypes": {
-      "label": "Insurance Types"
-    },
-    "supportedVehicles": {
-      "label": "Supported Vehicles"
-    },
-    "policyTerms": {
-      "label": "Policy Terms",
-      "placeholder": "Enter terms and conditions"
-    },
-    "registrationArea": {
-      "label": "Registration Area",
-      "placeholder": "E.g. Da Nang, Hanoi"
-    },
-    "processingTime": {
-      "label": "Processing Time",
-      "placeholder": "E.g. 1–3 business days"
-    }
+  "description": {
+    "label": "Service Description",
+    "placeholder": "e.g., On-site mobile repair"
   },
-  "options": {
-    "vehicleType": {
-      "motorbike": "Motorbike",
-      "car": "Car",
-      "van": "Van",
-      "bus": "Bus"
-    },
-    "insuranceType": {
-      "accident": "Accident",
-      "liability": "Liability",
-      "theft": "Theft",
-      "comprehensive": "Comprehensive"
-    },
-    "language": {
-      "en": "English",
-      "vi": "Vietnamese",
-      "ko": "Korean",
-      "ja": "Japanese"
-    }
+  "location": {
+    "label": "Service Area",
+    "placeholder": "Enter the area you serve"
+  },
+  "specialties": {
+    "label": "Repair Specialties",
+    "placeholder": "e.g., Brakes, lights, tires"
+  },
+  "workingHours": {
+    "label": "Working Hours",
+    "placeholder": "e.g., 08:00 - 17:00"
+  },
+  "storeLocation": {
+    "label": "Store Address",
+    "placeholder": "Enter the store address"
+  },
+  "equipment": {
+    "label": "Available Equipment",
+    "placeholder": "e.g., Repair tools, diagnostic machine"
+  },
+  "vehicleTypes": {
+    "label": "Vehicle Types"
+  },
+  "pickupLocation": {
+    "label": "Pickup Location",
+    "placeholder": "Enter pickup location"
+  },
+  "rentalTerms": {
+    "label": "Rental Terms",
+    "placeholder": "Enter terms or notes"
+  },
+  "driverExperience": {
+    "label": "Driving Experience",
+    "placeholder": "e.g., 5 years of experience"
+  },
+  "languages": {
+    "label": "Supported Languages"
+  },
+  "region": {
+    "label": "Tour Area",
+    "placeholder": "e.g., Hanoi, Hoi An"
+  },
+  "duration": {
+    "label": "Tour Duration",
+    "placeholder": "e.g., 3 days 2 nights"
+  },
+  "price": {
+    "label": "Tour Price (USD)"
+  },
+  "swapLocation": {
+    "label": "Battery Swap Location",
+    "placeholder": "Enter battery swap location"
+  },
+  "supportedModels": {
+    "label": "Supported Vehicle/Battery Models",
+    "placeholder": "List supported vehicles or batteries"
+  },
+  "availableBatteries": {
+    "label": "Available Batteries"
+  },
+  "deliveryArea": {
+    "label": "Delivery Area",
+    "placeholder": "e.g., District 1, District 3"
+  },
+  "deliveryTime": {
+    "label": "Estimated Delivery Time",
+    "placeholder": "e.g., 30 – 60 minutes"
+  },
+  "rescueArea": {
+    "label": "Rescue Area",
+    "placeholder": "e.g., Hanoi City Center"
+  },
+  "maxWeight": {
+    "label": "Maximum Load (kg)"
+  },
+  "routes": {
+    "label": "Supported Routes",
+    "placeholder": "e.g., Hanoi – Danang – HCMC"
+  },
+  "pricePerKm": {
+    "label": "Price per km (VND)"
+  },
+  "cleaningPackages": {
+    "label": "Cleaning Packages",
+    "placeholder": "e.g., Basic, Premium, Deep Clean"
+  },
+  "priceRange": {
+    "label": "Price Range (VND)",
+    "placeholder": "e.g., 50,000 – 150,000"
+  },
+  "accessoryTypes": {
+    "label": "Accessory Types",
+    "placeholder": "e.g., Helmet, Phone Holder"
+  },
+  "deliveryAvailable": {
+    "label": "Delivery Support",
+    "placeholder": "Is delivery supported?"
+  },
+  "insuranceTypes": {
+    "label": "Insurance Types"
+  },
+  "supportedVehicles": {
+    "label": "Supported Vehicles"
+  },
+  "policyTerms": {
+    "label": "Insurance Policy Terms",
+    "placeholder": "Enter conditions and benefits"
+  },
+  "registrationArea": {
+    "label": "Registration Area",
+    "placeholder": "e.g., Da Nang, Hanoi"
+  },
+  "processingTime": {
+    "label": "Processing Time",
+    "placeholder": "e.g., 1–3 business days"
   }
+},
+
+"options": {
+  "vehicleType": {
+    "motorbike": "Motorbike",
+    "car": "Car",
+    "van": "Van",
+    "bus": "Bus"
+  },
+  "insuranceType": {
+    "accident": "Accident",
+    "liability": "Liability",
+    "theft": "Theft",
+    "comprehensive": "Comprehensive"
+  },
+  "language": {
+    "en": "English",
+    "vi": "Vietnamese",
+    "ko": "Korean",
+    "ja": "Japanese"
+  }
+}
+
 
 
 

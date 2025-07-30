@@ -2,90 +2,128 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { serviceFieldConfig } from '@/src/lib/vehicle-services/serviceFieldConfig';
+import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 
 interface CreateServiceFormProps {
+  category: string;
+  serviceType: string;
+  technicianType?: TechnicianPartner; // object full
   defaultName: string;
-  onSubmit: (data: {
-    name: string;
-    description: string;
-    vehicleTypes: string[];
-    location: string;
-  }) => void;
+  onSubmit: (data: Record<string, any>) => void;
 }
 
-export default function CreateServiceForm({ defaultName, onSubmit }: CreateServiceFormProps) {
+export default function CreateServiceForm({
+  category,
+  serviceType,
+  technicianType,
+  defaultName,
+  onSubmit,
+}: CreateServiceFormProps) {
   const { t } = useTranslation('common');
-  const [name, setName] = useState(defaultName);
-  const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [vehicleTypes, setVehicleTypes] = useState<string[]>([]);
 
-  const vehicleOptions = ['bike', 'motorbike', 'car', 'van', 'bus'];
+  // 👉 Chỉ lấy 'mobile' | 'shop'
+  const technicianFormType = technicianType?.type;
 
-  const toggleVehicle = (type: string) => {
-    setVehicleTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    );
+  const fields = serviceFieldConfig?.[category]?.[serviceType] ?? [];
+
+  const resolvedFields = Array.isArray(fields)
+    ? fields
+    : technicianFormType && fields?.[technicianFormType]
+    ? fields[technicianFormType] ?? []
+    : [];
+
+  const [formData, setFormData] = useState<Record<string, any>>({
+    name: defaultName,
+    vehicleTypes: [],
+  });
+
+  const handleChange = (fieldName: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [fieldName]: value }));
+  };
+
+  const toggleVehicleType = (type: string) => {
+    setFormData((prev) => {
+      const current = prev.vehicleTypes || [];
+      return {
+        ...prev,
+        vehicleTypes: current.includes(type)
+          ? current.filter((v: string) => v !== type)
+          : [...current, type],
+      };
+    });
   };
 
   return (
     <div className="space-y-4 border border-gray-200 rounded-lg p-4 bg-gray-50">
-      <div>
-        <label className="block text-sm font-medium">{t('service_form.name')}</label>
-        <input
-          className="w-full border rounded p-2 mt-1"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
+      {resolvedFields.map((field) => (
+        <div key={field.name}>
+          <label className="block text-sm font-medium mb-1">{t(field.label)}</label>
 
-      <div>
-        <label className="block text-sm font-medium">{t('service_form.description')}</label>
-        <textarea
-          className="w-full border rounded p-2 mt-1"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          placeholder={t('my_service_list.description_placeholder', {
-            defaultValue:
-              'Optional description about your service (e.g. pricing, specialties, working hours...)',
-          })}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">{t('service_form.vehicle_types')}</label>
-        <div className="flex gap-2 flex-wrap mt-1">
-          {vehicleOptions.map((type) => (
-            <button
-              key={type}
-              onClick={() => toggleVehicle(type)}
-              className={`px-3 py-1 text-sm rounded border ${
-                vehicleTypes.includes(type)
-                  ? 'bg-[#00d289] text-white border-[#00d289]'
-                  : 'bg-white text-gray-700'
-              }`}
-              type="button"
-            >
-              {type}
-            </button>
-          ))}
+          {field.type === 'text' || field.type === 'number' ? (
+            <input
+              type={field.type === 'number' ? 'number' : 'text'}
+              className="w-full border rounded p-2"
+              required={field.required}
+              placeholder={field.placeholder ? t(field.placeholder) : ''}
+              value={formData[field.name] || ''}
+              onChange={(e) => handleChange(field.name, e.target.value)}
+            />
+          ) : field.type === 'textarea' ? (
+            <textarea
+              className="w-full border rounded p-2"
+              rows={3}
+              placeholder={field.placeholder ? t(field.placeholder) : ''}
+              value={formData[field.name] || ''}
+              onChange={(e) => handleChange(field.name, e.target.value)}
+            />
+          ) : field.type === 'multi-select' && field.options ? (
+            <div className="flex gap-2 flex-wrap">
+              {field.options.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  className={`px-3 py-1 text-sm rounded border ${
+                    (formData[field.name] || []).includes(opt)
+                      ? 'bg-[#00d289] text-white border-[#00d289]'
+                      : 'bg-white text-gray-700'
+                  }`}
+                  onClick={() =>
+                    handleChange(
+                      field.name,
+                      (formData[field.name] || []).includes(opt)
+                        ? formData[field.name].filter((v: string) => v !== opt)
+                        : [...(formData[field.name] || []), opt]
+                    )
+                  }
+                >
+                  {t(opt)}
+                </button>
+              ))}
+            </div>
+          ) : field.type === 'checkbox' ? (
+            <input
+              type="checkbox"
+              className="w-4 h-4"
+              checked={!!formData[field.name]}
+              onChange={(e) => handleChange(field.name, e.target.checked)}
+            />
+          ) : null}
         </div>
-      </div>
+      ))}
 
-      <div>
-        <label className="block text-sm font-medium">{t('service_form.location')}</label>
-        <input
-          className="w-full border rounded p-2 mt-1"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
-      </div>
-
-      <div className="text-right">
+      <div className="text-right pt-2">
         <button
+          type="button"
           className="px-4 py-2 bg-[#00d289] text-white rounded shadow text-sm"
-          onClick={() => onSubmit({ name, description, vehicleTypes, location })}
+          onClick={() =>
+            onSubmit({
+              ...formData,
+              category,
+              serviceType,
+              technicianType: technicianFormType,
+            })
+          }
         >
           {t('service_form.submit')}
         </button>

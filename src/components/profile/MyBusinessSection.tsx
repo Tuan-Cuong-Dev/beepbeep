@@ -37,6 +37,7 @@ export default function MyBusinessSection() {
             {t('my_business_section.services_title')}
           </h2>
           <MyServiceList
+            userId={ownerOrg.ownerId}
             orgType={ownerOrg.type}
             technicianSubtype={technicianSubtype}
           />

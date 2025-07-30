@@ -10,6 +10,7 @@ export interface OrgCardData {
   userRoleInOrg: 'owner';
   logoUrl?: string;
   subtype?: 'mobile' | 'shop'; // phân biệt loại hình technician
+  ownerId: string; // 👈 THÊM DÒNG NÀY
 }
 
 const businessCollections: { collection: string; type: OrganizationType }[] = [
@@ -38,6 +39,7 @@ export async function getUserOrganizations(uid: string): Promise<OrgCardData[]> 
         displayAddress: d.displayAddress || '',
         userRoleInOrg: 'owner',
         logoUrl: d.logoUrl || undefined,
+        ownerId: d.ownerId, // 👈 THÊM DÒNG NÀY
       });
     });
   }
@@ -61,6 +63,7 @@ export async function getUserOrganizations(uid: string): Promise<OrgCardData[]> 
         displayAddress: d.displayAddress || '',
         userRoleInOrg: 'owner',
         logoUrl: d.logoUrl || undefined,
+        ownerId: d.ownerId, // 👈 THÊM DÒNG NÀY
       });
     }
   });

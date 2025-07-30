@@ -1,41 +1,35 @@
-// 📁 components/my-business/MyServiceList.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  addDoc,
   collection,
   getDocs,
   query,
   where,
-  addDoc,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { useAuth } from '@/src/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
-import {
-  SupportedServiceType,
-  ServiceCategoryKey,
-} from '@/src/lib/vehicle-services/serviceTypes';
+
+import { SupportedServiceType, ServiceCategoryKey } from '@/src/lib/vehicle-services/serviceTypes';
 import {
   OrganizationType,
   TechnicianSubtype,
   serviceCategoriesByOrgType,
   serviceCategoriesByTechnicianSubtype,
 } from '@/src/lib/organizations/serviceCategoryMapping';
+
 import AddNewServiceCard from './AddNewServiceCard';
 import ServiceListItem from './ServiceListItem';
 
-// ----------------------
-// 🔑 Types
-// ----------------------
-
 type ServiceStatus = 'active' | 'pending' | 'inactive';
 
-export interface UserService {
+interface UserService {
   id: string;
   name: string;
-  category: SupportedServiceType;
+  category: ServiceCategoryKey;
+  serviceType: SupportedServiceType;
   vehicleTypes: string[];
   location: string;
   status: ServiceStatus;
@@ -43,17 +37,17 @@ export interface UserService {
 }
 
 interface MyServiceListProps {
+  userId: string;
   orgType: OrganizationType;
   technicianSubtype?: TechnicianSubtype;
 }
 
 export default function MyServiceList({
+  userId,
   orgType,
   technicianSubtype,
 }: MyServiceListProps) {
-  const { currentUser } = useAuth();
   const { t } = useTranslation('common');
-
   const [services, setServices] = useState<UserService[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -63,12 +57,9 @@ export default function MyServiceList({
       : serviceCategoriesByOrgType[orgType] || [];
 
   const fetchServices = async () => {
-    if (!currentUser) return;
+    if (!userId) return;
 
-    const q = query(
-      collection(db, 'services'),
-      where('userId', '==', currentUser.uid)
-    );
+    const q = query(collection(db, 'services'), where('userId', '==', userId));
     const snap = await getDocs(q);
     const data = snap.docs.map((doc) => ({
       id: doc.id,
@@ -78,15 +69,16 @@ export default function MyServiceList({
     const filtered = data.filter((s) =>
       allowedCategories.includes(s.category as ServiceCategoryKey)
     );
+
     setServices(filtered);
     setLoading(false);
   };
 
   useEffect(() => {
     fetchServices();
-  }, [currentUser, orgType, technicianSubtype]);
+  }, [userId, orgType, technicianSubtype]);
 
-  const handleCreateService = async (
+  const handleCreateNewService = async (
     category: ServiceCategoryKey,
     serviceType: SupportedServiceType,
     data: {
@@ -96,49 +88,43 @@ export default function MyServiceList({
       location: string;
     }
   ) => {
-    if (!currentUser) return;
+    try {
+      await addDoc(collection(db, 'services'), {
+        name: data.name,
+        description: data.description,
+        vehicleTypes: data.vehicleTypes,
+        location: data.location,
+        category,
+        serviceType,
+        status: 'pending',
+        userId,
+        createdAt: serverTimestamp(),
+      });
 
-    const newService: Omit<UserService, 'id'> = {
-      name: data.name,
-      category: serviceType,
-      vehicleTypes: data.vehicleTypes,
-      location: data.location,
-      status: 'pending',
-      description: data.description,
-    };
-
-    await addDoc(collection(db, 'services'), {
-      ...newService,
-      userId: currentUser.uid,
-      createdAt: serverTimestamp(),
-    });
-
-    setLoading(true);
-    fetchServices();
+      console.log('✅ Service added to Firestore');
+      await fetchServices(); // 🔁 refresh list ngay sau khi thêm mới
+    } catch (error) {
+      console.error('❌ Failed to create service:', error);
+    }
   };
 
   return (
     <div className="grid gap-6">
-      {allowedCategories.length > 0 && (
-        <AddNewServiceCard
-          orgType={orgType}
-          technicianSubtype={technicianSubtype}
-          onCreateNewService={handleCreateService}
-        />
-      )}
+      {/* Add New Service */}
+      <AddNewServiceCard
+        orgType={orgType}
+        technicianSubtype={technicianSubtype}
+        onCreateNewService={handleCreateNewService}
+      />
 
+      {/* Existing Services */}
       <section>
-        <h3 className="text-base font-semibold mb-2">
-          {t('my_service_list.title')}
-        </h3>
+        <h3 className="text-base font-semibold mb-2">{t('my_service_list.title')}</h3>
+
         {loading ? (
-          <p className="text-sm text-gray-500">
-            {t('my_service_list.loading')}
-          </p>
+          <p className="text-sm text-gray-500">{t('my_service_list.loading')}</p>
         ) : services.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            {t('my_service_list.no_services')}
-          </p>
+          <p className="text-sm text-gray-500">{t('my_service_list.no_services')}</p>
         ) : (
           <div className="grid gap-4">
             {services.map((service) => (
