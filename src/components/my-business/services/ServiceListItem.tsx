@@ -63,8 +63,8 @@ export default function ServiceListItem({ service }: Props) {
             {t(`service_labels.${service.serviceType}`, { defaultValue: service.serviceType })}{' '}
             •{' '}
             {service.vehicleTypes
-              .map((v) => t(`options.vehicleType.${v}`, { defaultValue: v }))
-              .join(', ')}
+            .map((v) => t(v, { defaultValue: v.split('.').pop() }))
+            .join(', ')}
           </p>
 
           {/* Mô tả */}
