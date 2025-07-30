@@ -769,7 +769,9 @@
   "cancel": "Hủy",
   "save": "Lưu",
   "saving": "Đang lưu...",
-  "loading": "Đang tải..."
+  "loading": "Đang tải...",
+  "edit": "Chỉnh sửa",
+  "delete": "Xóa"
 },
 "edit_contribution_modal": {
   "title": "Chỉnh sửa {{typeLabel}}",
@@ -833,9 +835,13 @@
 },
 
 "my_service_list": {
+  "confirm_delete_title": "Xóa dịch vụ này?",
+  "confirm_delete_description": "Bạn có chắc chắn muốn xóa dịch vụ này? Hành động này không thể hoàn tác.",
+  "confirm": "Xác nhận",
+  "cancel": "Hủy",
   "update_success_title": "Cập nhật thành công",
   "update_success_description": "Dịch vụ của bạn đã được cập nhật.",
-   "edit_service": "Chỉnh sửa dịch vụ",
+  "edit_service": "Chỉnh sửa dịch vụ",
   "title": "Dịch vụ của bạn",
   "add_new": "Thêm dịch vụ mới",
   "step1": "Bước 1: Chọn danh mục dịch vụ",
@@ -1301,7 +1307,14 @@
     "ko": "Tiếng Hàn",
     "ja": "Tiếng Nhật"
   }
+},
+
+"notification_dialog": {
+  "ok": "Đồng ý",
+  "cancel": "Hủy",
+  "confirm": "Xác nhận"
 }
+
 
 
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { serviceFieldConfig } from '@/src/lib/vehicle-services/serviceFieldConfig';
 import { SupportedServiceType, SERVICE_TYPE_ICONS } from '@/src/lib/vehicle-services/serviceTypes';
 import { UserService } from '@/src/lib/vehicle-services/userServiceTypes';
+import { Button } from '@/src/components/ui/button'; // ✅ Button bạn đã tạo
 
 interface Props {
   service: UserService;
@@ -99,18 +100,20 @@ export default function ServiceListItem({ service, onEdit, onDelete }: Props) {
 
           {/* Actions */}
           <div className="flex gap-3 pt-3">
-            <button
+            <Button
+              size="sm"
+              variant="outline"
               onClick={() => onEdit(service)}
-              className="px-3 py-1 text-sm text-blue-600"
             >
               {t('common.edit')}
-            </button>
-            <button
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
               onClick={() => onDelete(service.id)}
-              className="px-3 py-1 text-sm text-red-600"
             >
               {t('common.delete')}
-            </button>
+            </Button>
           </div>
         </div>
 

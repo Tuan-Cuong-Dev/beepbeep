@@ -22,7 +22,7 @@ export interface NotificationDialogProps {
   description?: string;
   onClose: () => void;
   onConfirm?: () => void;
-  children?: React.ReactNode; 
+  children?: React.ReactNode;
 }
 
 export default function NotificationDialog({
@@ -32,9 +32,9 @@ export default function NotificationDialog({
   description,
   onClose,
   onConfirm,
-  children, 
+  children,
 }: NotificationDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
   const renderIcon = () => {
     const baseClass = 'w-8 h-8 animate-pop shrink-0';
@@ -52,42 +52,47 @@ export default function NotificationDialog({
     }
   };
 
-return (
-  <Dialog open={open} onOpenChange={onClose}>
-    <DialogContent
-      className={cn(
-        'w-full max-w-md p-6 rounded-2xl space-y-5 pb-8',
-        'transition-none duration-0 animate-none data-[state=open]:animate-none'
-      )}
-    >
-      <DialogHeader className="flex items-center gap-3">
-        {type !== 'custom' && renderIcon()}
-        <DialogTitle className="text-lg sm:text-xl">{title}</DialogTitle>
-      </DialogHeader>
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent
+        className={cn(
+          'w-full max-w-md rounded-2xl px-6 py-8',
+          'space-y-6 transition-none duration-0 data-[state=open]:animate-none'
+        )}
+      >
+        <DialogHeader className="flex flex-col items-center text-center gap-3 mb-2">
+          {type !== 'custom' && renderIcon()}
+          <DialogTitle className="text-lg sm:text-xl font-semibold">{title}</DialogTitle>
+        </DialogHeader>
 
-      {type === 'custom' ? (
-        children // 👈 Nếu custom thì render children
-      ) : (
-        <>
-          {description && <DialogDescription>{description}</DialogDescription>}
 
-          <DialogFooter className="flex justify-end gap-3 mt-6">
-            {type === 'confirm' ? (
-              <>
-                <Button variant="ghost" onClick={onClose}>
-                  {t('cancel')}
-                </Button>
-                <Button variant="destructive" onClick={onConfirm}>
-                  {t('confirm')}
-                </Button>
-              </>
-            ) : (
-              <Button onClick={onClose}>{t('ok')}</Button>
+        {type === 'custom' ? (
+          <div className="space-y-4 text-sm text-gray-700">{children}</div>
+        ) : (
+          <>
+            {description && (
+              <DialogDescription className="text-gray-600">
+                {description}
+              </DialogDescription>
             )}
-          </DialogFooter>
-        </>
-      )}
-    </DialogContent>
-  </Dialog>
-);
+
+            <DialogFooter className="flex justify-end gap-3 mt-6">
+              {type === 'confirm' ? (
+                <>
+                  <Button variant="ghost" onClick={onClose}>
+                    {t('notification_dialog.cancel')}
+                  </Button>
+                  <Button variant="destructive" onClick={onConfirm}>
+                    {t('notification_dialog.confirm')}
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={onClose}>{t('notification_dialog.ok')}</Button>
+              )}
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }

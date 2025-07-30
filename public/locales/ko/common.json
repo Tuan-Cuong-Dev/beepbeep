@@ -759,7 +759,9 @@
   "cancel": "취소",
   "save": "저장",
   "saving": "저장 중...",
-  "loading": "로딩 중..."
+  "loading": "로딩 중...",
+  "edit": "편집",
+  "delete": "삭제"
 },
 
 "edit_contribution_modal": {
@@ -824,6 +826,10 @@
 },
 
 "my_service_list": {
+  "confirm_delete_title": "이 서비스를 삭제하시겠습니까?",
+  "confirm_delete_description": "정말로 이 서비스를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+  "confirm": "확인",
+  "cancel": "취소",
   "update_success_title": "업데이트 완료",
   "update_success_description": "서비스가 성공적으로 업데이트되었습니다.",
   "edit_service": "서비스 수정",
@@ -1280,7 +1286,14 @@
       "ko": "한국어",
       "ja": "일본어"
     }
-  }
+  },
+
+  "notification_dialog": {
+  "ok": "확인",
+  "cancel": "취소",
+  "confirm": "확정"
+}
+
 
 
 

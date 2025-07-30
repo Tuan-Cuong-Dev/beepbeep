@@ -739,7 +739,9 @@
   "cancel": "キャンセル",
   "save": "保存",
   "saving": "保存中...",
-  "loading": "読み込み中..."
+  "loading": "読み込み中...",
+  "edit": "編集",
+  "delete": "削除"
 },
 
 "edit_contribution_modal": {
@@ -804,6 +806,13 @@
 },
 
 "my_service_list": {
+  "confirm_delete_title": "このサービスを削除しますか？",
+  "confirm_delete_description": "本当にこのサービスを削除しますか？この操作は元に戻せません。",
+  "confirm": "確認",
+  "cancel": "キャンセル",
+  "update_success_title": "更新が成功しました",
+  "update_success_description": "サービスが更新されました。",
+  "edit_service": "サービスを編集",
   "title": "あなたのサービス",
   "add_new": "新しいサービスを追加",
   "step1": "ステップ1: サービスカテゴリを選択",
@@ -1259,7 +1268,14 @@
       "ko": "韓国語",
       "ja": "日本語"
     }
-  }
+  },
+
+  "notification_dialog": {
+  "ok": "確認",
+  "cancel": "キャンセル",
+  "confirm": "確定"
+}
+
 
 
 
