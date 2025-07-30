@@ -824,6 +824,9 @@
 },
 
 "my_service_list": {
+  "update_success_title": "업데이트 완료",
+  "update_success_description": "서비스가 성공적으로 업데이트되었습니다.",
+  "edit_service": "서비스 수정",
   "title": "내 서비스",
   "add_new": "새 서비스 추가",
   "step1": "1단계: 서비스 카테고리 선택",

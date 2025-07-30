@@ -3,47 +3,32 @@
 import { useTranslation } from 'react-i18next';
 import { serviceFieldConfig } from '@/src/lib/vehicle-services/serviceFieldConfig';
 import { SupportedServiceType, SERVICE_TYPE_ICONS } from '@/src/lib/vehicle-services/serviceTypes';
-
-export interface UserService {
-  id: string;
-  name: string;
-  description?: string;
-  category: string;
-  serviceType: string;
-  technicianType?: 'mobile' | 'shop';
-  vehicleTypes: string[];
-  status: 'active' | 'pending' | 'inactive';
-  creatorName?: string;
-  creatorPhotoURL?: string;
-  [key: string]: any;
-}
+import { UserService } from '@/src/lib/vehicle-services/userServiceTypes';
 
 interface Props {
   service: UserService;
+  onEdit: (service: UserService) => void;
+  onDelete: (id: string) => void;
 }
 
-export default function ServiceListItem({ service }: Props) {
+export default function ServiceListItem({ service, onEdit, onDelete }: Props) {
   const { t } = useTranslation('common');
 
-  // 🟩 Badge màu theo trạng thái
   const statusStyle = {
     active: 'bg-green-100 text-green-700',
     pending: 'bg-yellow-100 text-yellow-700',
     inactive: 'bg-gray-200 text-gray-600',
   }[service.status];
 
-  // ✅ Lấy cấu hình field đúng theo serviceType và technicianType
   const rawConfig = serviceFieldConfig?.[service.category]?.[service.serviceType];
-  const resolvedFields =
-    Array.isArray(rawConfig)
-      ? rawConfig
-      : service.technicianType && rawConfig?.[service.technicianType]
-      ? rawConfig[service.technicianType] ?? []
-      : [];
+  const resolvedFields = Array.isArray(rawConfig)
+    ? rawConfig
+    : service.technicianType && rawConfig?.[service.technicianType]
+    ? rawConfig[service.technicianType] ?? []
+    : [];
 
-  // 🔍 Dịch giá trị nếu có dạng "options.xxx.yyy"
-  const translateOption = (value: string) =>
-    value?.startsWith('options.')
+  const translateValue = (value: string) =>
+    value.startsWith('options.')
       ? t(value, { defaultValue: value.split('.').pop() })
       : t(value, { defaultValue: value });
 
@@ -52,7 +37,7 @@ export default function ServiceListItem({ service }: Props) {
       <div className="flex justify-between items-start">
         {/* LEFT */}
         <div className="flex-1 space-y-2">
-          {/* Icon + Tiêu đề */}
+          {/* Icon + Title */}
           <div className="flex items-center gap-2">
             {SERVICE_TYPE_ICONS[service.serviceType as SupportedServiceType]}
             <h4 className="text-base font-semibold text-gray-800">{service.name}</h4>
@@ -60,14 +45,16 @@ export default function ServiceListItem({ service }: Props) {
 
           {/* Subtitle */}
           <p className="text-sm text-gray-500">
-            {t(`service_labels.${service.serviceType}`, { defaultValue: service.serviceType })}{' '}
+            {t(`service_labels.${service.serviceType}`, {
+              defaultValue: service.serviceType,
+            })}{' '}
             •{' '}
             {service.vehicleTypes
-            .map((v) => t(v, { defaultValue: v.split('.').pop() }))
-            .join(', ')}
+              .map((v) => t(v, { defaultValue: v.split('.').pop() }))
+              .join(', ')}
           </p>
 
-          {/* Mô tả */}
+          {/* Description */}
           <p className="text-sm text-gray-600">
             {service.description?.trim()
               ? service.description
@@ -83,10 +70,9 @@ export default function ServiceListItem({ service }: Props) {
             if (value === undefined || value === '') return null;
 
             const label = t(field.label, { defaultValue: field.name });
-
             const displayValue = Array.isArray(value)
-              ? value.map((item) => translateOption(String(item))).join(', ')
-              : translateOption(String(value));
+              ? value.map((v: string) => translateValue(v)).join(', ')
+              : translateValue(String(value));
 
             return (
               <div key={field.name} className="text-sm text-gray-600">
@@ -95,7 +81,7 @@ export default function ServiceListItem({ service }: Props) {
             );
           })}
 
-          {/* Người tạo */}
+          {/* Creator */}
           {service.creatorName && (
             <div className="flex items-center gap-2 pt-2">
               {service.creatorPhotoURL ? (
@@ -110,9 +96,25 @@ export default function ServiceListItem({ service }: Props) {
               <span className="text-sm text-gray-500">{service.creatorName}</span>
             </div>
           )}
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-3">
+            <button
+              onClick={() => onEdit(service)}
+              className="px-3 py-1 text-sm text-blue-600"
+            >
+              {t('common.edit')}
+            </button>
+            <button
+              onClick={() => onDelete(service.id)}
+              className="px-3 py-1 text-sm text-red-600"
+            >
+              {t('common.delete')}
+            </button>
+          </div>
         </div>
 
-        {/* RIGHT: Trạng thái */}
+        {/* RIGHT: Status */}
         <span
           className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ml-4 ${statusStyle}`}
         >

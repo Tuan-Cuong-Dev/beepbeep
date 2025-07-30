@@ -13,7 +13,7 @@ import { CheckCircle, AlertCircle, Info, Trash2 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useTranslation } from 'react-i18next';
 
-export type NotificationType = 'success' | 'error' | 'info' | 'confirm';
+export type NotificationType = 'success' | 'error' | 'info' | 'confirm' | 'custom';
 
 export interface NotificationDialogProps {
   open: boolean;
@@ -22,6 +22,7 @@ export interface NotificationDialogProps {
   description?: string;
   onClose: () => void;
   onConfirm?: () => void;
+  children?: React.ReactNode; 
 }
 
 export default function NotificationDialog({
@@ -31,6 +32,7 @@ export default function NotificationDialog({
   description,
   onClose,
   onConfirm,
+  children, 
 }: NotificationDialogProps) {
   const { t } = useTranslation();
 
@@ -50,55 +52,42 @@ export default function NotificationDialog({
     }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent
-        className={cn(
-          'w-full max-w-md p-6 rounded-2xl space-y-5 pb-8',
-          'transition-none duration-0 animate-none data-[state=open]:animate-none'
-        )}
-      >
-        <DialogHeader className="flex items-center gap-3">
-          {renderIcon()}
-          <DialogTitle className="text-lg sm:text-xl">
-            {title}
-          </DialogTitle>
-        </DialogHeader>
+return (
+  <Dialog open={open} onOpenChange={onClose}>
+    <DialogContent
+      className={cn(
+        'w-full max-w-md p-6 rounded-2xl space-y-5 pb-8',
+        'transition-none duration-0 animate-none data-[state=open]:animate-none'
+      )}
+    >
+      <DialogHeader className="flex items-center gap-3">
+        {type !== 'custom' && renderIcon()}
+        <DialogTitle className="text-lg sm:text-xl">{title}</DialogTitle>
+      </DialogHeader>
 
-        {description && (
-          <DialogDescription>
-            {description}
-          </DialogDescription>
-        )}
+      {type === 'custom' ? (
+        children // 👈 Nếu custom thì render children
+      ) : (
+        <>
+          {description && <DialogDescription>{description}</DialogDescription>}
 
-        <DialogFooter className="flex justify-end gap-3 mt-6">
-          {type === 'confirm' ? (
-            <>
-              <Button
-                variant="ghost"
-                className="w-full sm:w-auto"
-                onClick={onClose}
-              >
-                {t('cancel')}
-              </Button>
-              <Button
-                variant="destructive"
-                className="w-full sm:w-auto"
-                onClick={onConfirm}
-              >
-                {t('confirm')}
-              </Button>
-            </>
-          ) : (
-            <Button
-              className="w-full sm:w-auto"
-              onClick={onClose}
-            >
-              {t('ok')}
-            </Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
+          <DialogFooter className="flex justify-end gap-3 mt-6">
+            {type === 'confirm' ? (
+              <>
+                <Button variant="ghost" onClick={onClose}>
+                  {t('cancel')}
+                </Button>
+                <Button variant="destructive" onClick={onConfirm}>
+                  {t('confirm')}
+                </Button>
+              </>
+            ) : (
+              <Button onClick={onClose}>{t('ok')}</Button>
+            )}
+          </DialogFooter>
+        </>
+      )}
+    </DialogContent>
+  </Dialog>
+);
 }

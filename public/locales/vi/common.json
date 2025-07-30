@@ -833,6 +833,9 @@
 },
 
 "my_service_list": {
+  "update_success_title": "Cập nhật thành công",
+  "update_success_description": "Dịch vụ của bạn đã được cập nhật.",
+   "edit_service": "Chỉnh sửa dịch vụ",
   "title": "Dịch vụ của bạn",
   "add_new": "Thêm dịch vụ mới",
   "step1": "Bước 1: Chọn danh mục dịch vụ",
