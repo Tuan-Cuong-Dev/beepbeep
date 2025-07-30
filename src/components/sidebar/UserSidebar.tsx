@@ -84,9 +84,9 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
   };
 
   const agentItems: MenuItem[] = [
-    { icon: FaUsers, label: t('user_sidebar.menu.agent_dashboard'), path: '/my-business/agent' },
-    { icon: FaDollarSign, label: t('user_sidebar.menu.earnings'), path: '/my-business/earnings' },
-    { icon: faFileContract, label: t('user_sidebar.menu.request_payment'), path: '/my-business/request-payment' },
+    { icon: FaUsers, label: t('user_sidebar.menu.agent_dashboard'), path: '/dashboard/agent' },
+    { icon: FaDollarSign, label: t('user_sidebar.menu.earnings'), path: '/dashboard/earnings' },
+    { icon: faFileContract, label: t('user_sidebar.menu.request_payment'), path: '/dashboard/request-payment' },
   ];
 
   const getCommonItems = (): MenuItem[] => {

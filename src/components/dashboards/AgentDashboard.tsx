@@ -91,8 +91,8 @@ export default function AgentDashboard() {
           <DashboardCard title="Total Commission" value={`$${data.totalCommission.toLocaleString()}`} href="#" icon={<DollarSign className="w-6 h-6" />} />
           <DashboardCard title="Paid Commission" value={`$${data.paidCommission.toLocaleString()}`} href="#" icon={<DollarSign className="w-6 h-6" />} />
           <DashboardCard title="Pending Commission" value={`$${data.pendingCommission.toLocaleString()}`} href="#" icon={<DollarSign className="w-6 h-6" />} />
-          <DashboardCard title="Join New Program" value="Available" href="/my-business/programs" icon={<Handshake className="w-6 h-6" />} />
-          <DashboardCard title="Payment Requests" value={`${data.paymentRequests} times`} href="/my-business/earnings" icon={<BarChart2 className="w-6 h-6" />} />
+          <DashboardCard title="Join New Program" value="Available" href="/dashboard/programs" icon={<Handshake className="w-6 h-6" />} />
+          <DashboardCard title="Payment Requests" value={`${data.paymentRequests} times`} href="/dashboard/earnings" icon={<BarChart2 className="w-6 h-6" />} />
         </DashboardGrid>
 
         <section className="bg-white rounded-2xl p-6 border shadow">
@@ -118,9 +118,9 @@ export default function AgentDashboard() {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <QuickAction label="Refer a Customer" href="/rent" />
-            <QuickAction label="View Commission History" href="/my-business/earnings" />
-            <QuickAction label="Join New Program" href="/my-business/programs" />
-            {data.pendingCommission > 0 && <QuickAction label="Request Payment" href="/my-business/request-payment" />}
+            <QuickAction label="View Commission History" href="/dashboard/earnings" />
+            <QuickAction label="Join New Program" href="/dashboard/programs" />
+            {data.pendingCommission > 0 && <QuickAction label="Request Payment" href="/dashboard/request-payment" />}
           </div>
         </section>
       </main>

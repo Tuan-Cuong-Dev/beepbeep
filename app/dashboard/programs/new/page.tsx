@@ -90,7 +90,7 @@ export default function ProgramsFormPage() {
       });
 
       setNotification({ type: 'success', message: 'Program created successfully!' });
-      setTimeout(() => router.push('/my-business/programs'), 1000);
+      setTimeout(() => router.push('/dashboard/programs'), 1000);
     } catch (err) {
       console.error(err);
       setNotification({ type: 'error', message: 'Error saving program.' });

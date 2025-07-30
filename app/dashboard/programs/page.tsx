@@ -110,7 +110,7 @@ export default function ProgramsPage() {
 
         {(isCompanyOwner || isAdmin) && (
           <Link
-            href="/my-business/programs/new"
+            href="/dashboard/programs/new"
             className="inline-block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition"
           >
             ➕ Create New Program
@@ -125,7 +125,7 @@ export default function ProgramsPage() {
               <div key={program.id} className="bg-white rounded-xl shadow p-6 border space-y-4 flex flex-col justify-between">
                 <div className="space-y-2">
                   <h2 className="text-xl font-semibold text-gray-800">
-                    <Link href={`/my-business/programs/${program.id}`} className="text-[#00d289] hover:underline">
+                    <Link href={`/dashboard/programs/${program.id}`} className="text-[#00d289] hover:underline">
                       {program.title}
                     </Link>
                   </h2>
@@ -145,7 +145,7 @@ export default function ProgramsPage() {
                   {(isCompanyOwner || isAdmin) && (
                     <div className="flex gap-2">
                       <Link 
-                        href={`/my-business/programs/${program.id}/participants`} 
+                        href={`/dashboard/programs/${program.id}/participants`} 
                         className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md text-center transition"
                       >
                         View Participants

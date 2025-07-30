@@ -115,7 +115,7 @@ export default function PrivateProviderDashboard() {
             icon={<ClipboardList className="w-6 h-6" />}
             title="Programs"
             value="Manage"
-            href="/my-business/programs"
+            href="/dashboard/programs"
           />
         </DashboardGrid>
 
@@ -124,7 +124,7 @@ export default function PrivateProviderDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <QuickAction label="Add New Vehicle" href="/ebikes" />
             <QuickAction label="Check Reviews" href="/reviews" />
-            <QuickAction label="Form Builder" href="/my-business/form-builder" />
+            <QuickAction label="Form Builder" href="/dashboard/form-builder" />
             <QuickAction label="Manage Vehicle Issues" href="/vehicle-issues" />
             <QuickAction label="Manage Packages" href="/subscriptionPackages" />
             <QuickAction label="Rent a Ride" href="/rent" />

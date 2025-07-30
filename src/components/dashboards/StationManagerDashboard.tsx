@@ -71,7 +71,7 @@ export default function StationManagerDashboard() {
           <DashboardCard icon={<Wrench />} title="Vehicle Issues" value={issueCount} href="/vehicle-issues" />
           <DashboardCard icon={<PackagePlus />} title="Accessories" value={accessoryCount} href="/accessories" />
           <DashboardCard icon={<Boxes />} title="Subscription Packages" value={subscriptionCount} href="/subscriptionPackages" />
-          <DashboardCard icon={<ClipboardList />} title="Programs" value="Manage" href="/my-business/programs" />
+          <DashboardCard icon={<ClipboardList />} title="Programs" value="Manage" href="/dashboard/programs" />
         </section>
 
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">

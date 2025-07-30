@@ -69,7 +69,7 @@ export default function ProgramForm() {
         await setDoc(newDocRef, programData);
       }
 
-      router.push('/my-business/programs');
+      router.push('/dashboard/programs');
     }
 
     setLoading(false);

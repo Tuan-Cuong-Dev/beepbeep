@@ -61,7 +61,7 @@ export default function ProgramList() {
       <main className="flex-1 px-6 py-10 space-y-6 max-w-5xl mx-auto">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-800">📋 Programs</h1>
-          <Link href="/my-business/programs/new">
+          <Link href="/dashboard/programs/new">
             <Button className="flex items-center gap-2">
               <Plus size={16} />
               New Program
@@ -80,7 +80,7 @@ export default function ProgramList() {
                 <p className="text-sm text-gray-500 mt-2">
                   {program.startDate} - {program.endDate}
                 </p>
-                <Link href={`/my-business/programs/${program.id}`}>
+                <Link href={`/dashboard/programs/${program.id}`}>
                   <Button variant="outline" className="mt-4">View Details</Button>
                 </Link>
               </div>
