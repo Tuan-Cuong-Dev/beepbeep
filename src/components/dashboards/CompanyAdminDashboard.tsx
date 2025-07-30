@@ -116,11 +116,11 @@ export default function CompanyAdminDashboard() {
           <DashboardCard icon={<MapPin />} title="Stations" value={stats.stations} href="/my-business/stations" />
           <DashboardCard icon={<Bike />} title="Vehicles" value={stats.ebikes} href="/vehicles" />
           <DashboardCard icon={<DollarSign />} title="Revenue (This Month)" value={formatCurrency(stats.revenue)} href="/bookings" />
-          <DashboardCard icon={<Users />} title="Staff" value={stats.staffs} href="/my-business/staff" />
+          <DashboardCard icon={<Users />} title="Staff" value={stats.staffs} href="/dashboard/staff" />
           <DashboardCard icon={<FileText />} title="Bookings" value={stats.bookings} href="/bookings" />
           <DashboardCard icon={<PackagePlus />} title="Accessories" value={stats.accessories} href="/accessories" />
           <DashboardCard icon={<BatteryCharging />} title="Batteries" value={stats.batteries} href="/battery" />
-          <DashboardCard icon={<ClipboardList />} title="Programs" value="Manage" href="/my-business/programs" />
+          <DashboardCard icon={<ClipboardList />} title="Programs" value="Manage" href="/dashboard/programs" />
           <DashboardCard icon={<Boxes />} title="Subscription Packages" value={stats.subscriptionPackages} href="/subscriptionPackages" />
           <DashboardCard icon={<Wrench />} title="Vehicle Issues" value={stats.vehicleIssues} href="/vehicle-issues" />
         </section>
@@ -128,10 +128,10 @@ export default function CompanyAdminDashboard() {
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <QuickAction label="Add New Station" href="/my-business/stations" />
+            <QuickAction label="Add New Station" href="/dashboard/stations" />
             <QuickAction label="Create Vehicle Model" href="/vehicles" />
-            <QuickAction label="Assign Staff" href="/my-business/staff" />
-            <QuickAction label="Form Builder" href="/my-business/form-builder" />
+            <QuickAction label="Assign Staff" href="/dashboard/staff" />
+            <QuickAction label="Form Builder" href="/dashboard/form-builder" />
             <QuickAction label="Rent a Ride" href="/rent" />
             <QuickAction label="Return Vehicle" href="/return" />
             <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />

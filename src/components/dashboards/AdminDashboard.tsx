@@ -49,7 +49,7 @@ export default function AdminDashboard() {
           icon: <FaUserCog className="w-6 h-6 text-[#00d289]" />,
           title: 'Staff Management',
           description: 'Manage all staff members in the system',
-          route: '/my-business/staff',
+          route: '/dashboard/staff',
         },
         {
           icon: <FaUserCog className="w-6 h-6 text-[#00d289]" />,

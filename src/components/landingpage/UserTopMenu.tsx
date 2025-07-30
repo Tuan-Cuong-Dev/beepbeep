@@ -56,7 +56,7 @@ const menuItems: MenuItem[] = [
   },
   {
     key: 'staff_management',
-    path: '/my-business/staff',
+    path: '/dashboard/staff',
     icon: FaUserCog,
     roles: ['admin', 'company_owner', 'company_admin'],
   },

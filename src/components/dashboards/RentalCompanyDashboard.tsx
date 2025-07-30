@@ -111,12 +111,12 @@ export default function RentalCompanyDashboard() {
       <main className="flex-1 px-6 py-10 space-y-10">
         <h1 className="text-3xl font-bold text-center text-gray-800">🏢 Rental Company Dashboard</h1>
         <DashboardGrid1>
-          <DashboardCard title="Stations" value={stats.stations.toString()} href="/my-business/stations" icon={<MapPin className="w-6 h-6" />} />
+          <DashboardCard title="Stations" value={stats.stations.toString()} href="/dashboard/stations" icon={<MapPin className="w-6 h-6" />} />
           <DashboardCard title="Vehicles" value={stats.ebikes.toString()} href="/vehicles" icon={<Bike className="w-6 h-6" />} />
           <DashboardCard title="Bookings (This Month)" value={stats.bookings.toString()} href="/bookings" icon={<FileTextIcon className="w-6 h-6" />} />
-          <DashboardCard title="Revenue (This Month)" value={formatCurrency(stats.revenue)} href="/my-business/revenue" icon={<DollarSign className="w-6 h-6" />} />
-          <DashboardCard icon={<ClipboardList className="w-6 h-6" />} title="Programs" value="Manage" href="/my-business/programs" />
-          <DashboardCard title="Staff" value={stats.staffs.toString()} href="/my-business/staff" icon={<Users className="w-6 h-6" />} />
+          <DashboardCard title="Revenue (This Month)" value={formatCurrency(stats.revenue)} href="/dashboard/revenue" icon={<DollarSign className="w-6 h-6" />} />
+          <DashboardCard icon={<ClipboardList className="w-6 h-6" />} title="Programs" value="Manage" href="/dashboard/programs" />
+          <DashboardCard title="Staff" value={stats.staffs.toString()} href="/dashboard/staff" icon={<Users className="w-6 h-6" />} />
           <DashboardCard title="Vehicle Issues" value={stats.issues.toString()} href="/vehicle-issues" icon={<Wrench className="w-6 h-6" />} />
           <DashboardCard title="Batteries" value={stats.batteries.toString()} href="/battery" icon={<BatteryCharging className="w-6 h-6" />} />
           <DashboardCard title="Accessories" value={stats.accessories.toString()} href="/accessories" icon={<Package className="w-6 h-6" />} />
@@ -126,10 +126,10 @@ export default function RentalCompanyDashboard() {
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            <QuickAction label="Add New Station" href="/my-business/stations" />
+            <QuickAction label="Add New Station" href="/dashboard/stations" />
             <QuickAction label="Create Vehicle Model" href="/vehicles" />
-            <QuickAction label="Assign Staff" href="/my-business/staff" />
-            <QuickAction label="Form Builder" href="/my-business/form-builder" />
+            <QuickAction label="Assign Staff" href="/dashboard/staff" />
+            <QuickAction label="Form Builder" href="/dashboard/form-builder" />
             <QuickAction label="Rent a Ride" href="/rent" />
             <QuickAction label="Return Vehicle" href="/return" />
             <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />

@@ -51,7 +51,7 @@ export default function CreateBusinessPage() {
     if (!user) return;
 
     if (role === 'staff') {
-      router.replace('/my-business/staff');
+      router.replace('/dashboard/staff');
       return;
     }
 
@@ -60,7 +60,7 @@ export default function CreateBusinessPage() {
         query(collection(db, 'agents'), where('ownerId', '==', user.uid))
       );
       if (!type && !snap.empty) {
-        router.replace('/my-business/agent');
+        router.replace('/dashboard/agent');
       }
     };
 
