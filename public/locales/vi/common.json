@@ -1320,7 +1320,6 @@
   "description": "Mô tả",
   "status": "Trạng thái",
   "reported": "Thời gian báo cáo",
-  "action": "Hành động",
   "submit_proposal": "Gửi đề xuất",
   "mark_in_progress": "Đang xử lý",
   "submit_actual": "Gửi kết quả",

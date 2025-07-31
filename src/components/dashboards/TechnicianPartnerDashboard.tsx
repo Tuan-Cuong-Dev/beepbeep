@@ -142,13 +142,13 @@ export default function TechnicianPartnerDashboard() {
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-gray-100 text-left">
-                  <th className="p-2">VIN</th>
-                  <th className="p-2">Plate</th>
-                  <th className="p-2">{t('technician_partner_dashboard.issue_type')}</th>
-                  <th className="p-2">{t('technician_partner_dashboard.description')}</th>
-                  <th className="p-2">{t('technician_partner_dashboard.status')}</th>
-                  <th className="p-2">{t('technician_partner_dashboard.reported')}</th>
-                  <th className="p-2">{t('technician_partner_dashboard.action')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.vin')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.plate')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.issue_type')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.description')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.status')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.reported')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.actions')}</th>
                 </tr>
               </thead>
               <tbody>
