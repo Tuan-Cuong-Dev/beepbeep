@@ -34,14 +34,9 @@ export default function ErrorCodeForm({
   const [technicianReferences, setTechnicianReferences] = useState<{ name?: string; phone?: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [notification, setNotification] = useState<{
-    open: boolean;
-    type: 'success' | 'error';
-    title: string;
-    description?: string;
-  }>({
+  const [notification, setNotification] = useState({
     open: false,
-    type: 'success',
+    type: 'success' as 'success' | 'error',
     title: '',
     description: '',
   });
@@ -72,7 +67,7 @@ export default function ErrorCodeForm({
     if (!user?.uid) return;
     const suggestion: TechnicianSuggestion = {
       userId: user.uid,
-      name: user.displayName || 'Unknown',
+      name: user.name || 'Unknown',
       comment,
       timestamp: Timestamp.now(),
     };
@@ -121,7 +116,6 @@ export default function ErrorCodeForm({
           description: `New error code "${code}" has been added.`,
         });
 
-        // Reset form
         setCode('');
         setDescription('');
         setRecommendedSolution('');

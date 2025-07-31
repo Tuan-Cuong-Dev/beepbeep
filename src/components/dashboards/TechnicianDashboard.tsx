@@ -12,11 +12,12 @@ import { useTechnicianMap } from '@/src/hooks/useTechnicianMap';
 import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import ProposalPopup from '@/src/components/vehicleIssues/ProposalPopup';
-import ActualResultPopup from '@/src/components/vehicleIssues/ActualResultPopup';
+import ProposalPopup from '@/src/components/vehicle-issues/ProposalPopup';
+import ActualResultPopup from '@/src/components/vehicle-issues/ActualResultPopup';
 import Link from 'next/link';
 import { Wrench, ClipboardList, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
+import { JSX } from 'react/jsx-runtime';
 
 function formatCurrency(value: number) {
   return value.toLocaleString('vi-VN', {
@@ -127,7 +128,7 @@ export default function TechnicianDashboard() {
         <QuickAction label="Proposal History" href="/vehicle-issues/proposals" />
         <QuickAction label="Error Codes" href="/assistant/error-codes" />
         <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
-        <QuickAction label="Suggest Error Fix" href="/suggest-error" />
+        <QuickAction label="Suggest Error Fix" href="/vehicle-issues/suggest-error" />
       </div>
 
 

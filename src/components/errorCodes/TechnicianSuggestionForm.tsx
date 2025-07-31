@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/src/components/ui/button';
 import { Textarea } from '@/src/components/ui/textarea';
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function TechnicianSuggestionForm({ onSubmit, disabled = false, loading = false }: Props) {
+  const { t } = useTranslation('common');
   const [comment, setComment] = useState('');
 
   const handleSubmit = () => {
@@ -22,13 +24,13 @@ export default function TechnicianSuggestionForm({ onSubmit, disabled = false, l
   return (
     <div className="space-y-2">
       <Textarea
-        placeholder="Enter your suggestion to improve the solution..."
+        placeholder={t('technician_suggestion_form.placeholder')}
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         disabled={disabled || loading}
       />
       <Button onClick={handleSubmit} disabled={disabled || loading || !comment.trim()}>
-        {loading ? 'Submitting...' : 'Submit Suggestion'}
+        {loading ? t('technician_suggestion_form.submitting') : t('technician_suggestion_form.submit')}
       </Button>
     </div>
   );

@@ -8,8 +8,8 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
 import { useVehicleIssues } from '@/src/hooks/useVehicleIssues';
 import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
-import ProposalPopup from '@/src/components/vehicleIssues/ProposalPopup';
-import ActualResultPopup from '@/src/components/vehicleIssues/ActualResultPopup';
+import ProposalPopup from '@/src/components/vehicle-issues/ProposalPopup';
+import ActualResultPopup from '@/src/components/vehicle-issues/ActualResultPopup';
 import { Wrench, ClipboardList, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import Link from 'next/link';
@@ -108,9 +108,9 @@ export default function TechnicianPartnerDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/vehicle-issues" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.proposal_history')} href="/vehicle-issues/proposals" />
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/suggest-error" />
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.error_codes')} href="/assistant/error-codes" />
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.service_pricing')} href="/assistant/service-pricing" />
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/vehicle-issues/suggest-error" />
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.error_codes')} href="/vehicle-issues/error-codes" />
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.service_pricing')} href="/vehicle-issues/service-pricing" />
         </div>
 
         <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">

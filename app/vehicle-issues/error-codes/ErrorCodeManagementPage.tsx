@@ -7,30 +7,40 @@ import ErrorCodeTable from '@/src/components/errorCodes/ErrorCodeTable';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { ErrorCode } from '@/src/lib/errorCodes/errorCodeTypes';
+import { useTranslation } from 'react-i18next';
 
 export default function ErrorCodeManagementPage() {
+  const { t } = useTranslation('common');
   const { errorCodes, loading, deleteErrorCode, refetch } = useErrorCodes();
   const [selected, setSelected] = useState<ErrorCode | null>(null);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
 
-      <main className="flex-1 px-4 py-6 sm:py-10 sm:px-6 md:px-8 max-w-6xl mx-auto space-y-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800">
-          📋 Error Code Management
-        </h1>
+      <main className="flex-1 p-6 space-y-6 max-w-6xl mx-auto">
+        {/* Title + subtitle */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            📋 {t('error_code_management_page.title')}
+          </h1>
+          <p className="text-sm text-gray-600">{t('error_code_management_page.subtitle')}</p>
+        </div>
 
+        {/* Existing list */}
         <section className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow border border-gray-200">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-700">📑 Existing Error Codes</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-700">
+            📁 {t('error_code_management_page.existing')}
+          </h2>
+
           {loading ? (
-            <p className="text-gray-500">Loading error codes...</p>
+            <p className="text-gray-500">{t('error_code_management_page.loading')}</p>
           ) : (
             <ErrorCodeTable
               errorCodes={errorCodes}
               onEdit={(item) => setSelected(item)}
               onDelete={(item) => {
-                if (confirm(`Are you sure you want to delete error code ${item.code}?`)) {
+                if (confirm(t('error_code_management_page.confirm_delete', { code: item.code }))) {
                   deleteErrorCode(item.id);
                 }
               }}
@@ -38,8 +48,12 @@ export default function ErrorCodeManagementPage() {
           )}
         </section>
 
+        {/* Add / Edit form */}
         <section className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow border border-gray-200">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-700">➕ Add / Edit Error Code</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-700">
+            ➕ {t('error_code_management_page.add_edit')}
+          </h2>
+
           <ErrorCodeForm
             key={selected?.id || 'new'}
             existing={selected}

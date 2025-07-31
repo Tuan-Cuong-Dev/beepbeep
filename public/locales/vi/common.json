@@ -1366,6 +1366,7 @@
 
 "vehicle_issues_management_page": {
     "title": "🛠️ Quản lý Sự cố Phương tiện",
+    "subtitle": "Xem, phân công và xử lý các sự cố kỹ thuật một cách nhanh chóng và chính xác.",
     "loading": "⏳ Đang tải dữ liệu sự cố và kỹ thuật viên...",
     "no_permission": "🚫 Bạn không có quyền truy cập trang này.",
     "assign_technician": "Phân công Kỹ thuật viên",
@@ -1423,7 +1424,148 @@
   "view_proposal": "Xem đề xuất",
   "approve_or_reject": "Duyệt / Từ chối",
   "close": "Đóng"
+},
+
+"vehicle_issue_proposals_page": {
+  "title": "Đề xuất xử lý sự cố",
+  "subtitle": "Xem xét và phê duyệt các đề xuất từ kỹ thuật viên.",
+  "loading": "⏳ Đang tải danh sách đề xuất...",
+  "empty": "Không có đề xuất nào."
+},
+
+"technician_suggest_error_code": {
+  "title": "Gợi ý cách xử lý mã lỗi",
+  "subtitle": "Các đóng góp về mặt kỹ thuật sẽ được hệ thống tính điểm.",
+  "search_placeholder": "🔍 Tìm mã lỗi hoặc mô tả...",
+  "all_brands": "Tất cả hãng",
+  "brand": "Hãng",
+  "code": "Mã lỗi",
+  "description": "Mô tả",
+  "recommended": "Khuyến nghị",
+  "no_results": "Không tìm thấy mã lỗi phù hợp.",
+  "select_prompt": "Vui lòng chọn mã lỗi để gợi ý giải pháp.",
+  "only_technician": "🚫 Chỉ dành cho kỹ thuật viên.",
+  "success_message": "✅ Gợi ý đã được gửi thành công!"
+},
+
+"technician_suggestion_form": {
+  "placeholder": "Nhập gợi ý để cải thiện giải pháp...",
+  "submit": "Gửi gợi ý",
+  "submitting": "Đang gửi..."
+},
+
+"technician_suggestion_list": {
+  "no_suggestions": "Chưa có gợi ý nào."
+},
+
+"error_code_management_page": {
+  "title": "Quản lý mã lỗi",
+  "subtitle": "Hệ thống mã lỗi dùng để kỹ thuật viên tham chiếu trong quá trình sửa xe.",
+  "existing": "Danh sách mã lỗi hiện có",
+  "add_edit": "Thêm / Chỉnh sửa mã lỗi",
+  "loading": "Đang tải danh sách mã lỗi...",
+  "confirm_delete": "Bạn có chắc muốn xoá mã lỗi \"{{code}}\"?"
+},
+
+"error_code_table": {
+  "brand_all": "Tất cả Hãng",
+  "model_all": "Tất cả Mẫu",
+  "search_placeholder": "Tìm mã lỗi, mô tả hoặc giải pháp",
+  "code": "Mã lỗi",
+  "description": "Mô tả",
+  "solution": "Giải pháp",
+  "brand": "Hãng",
+  "model": "Mẫu",
+  "video": "Video",
+  "suggestions": "Gợi ý",
+  "reference": "Tham chiếu",
+  "created_at": "Thời gian tạo",
+  "actions": "Hành động",
+  "no_link": "Không có liên kết",
+  "view_suggestions": "Xem góp ý",
+  "page": "Trang",
+  "of": "trên tổng số",
+  "prev": "Trước",
+  "next": "Sau",
+  "suggestions_title": "💬 Gợi ý cho mã lỗi {{code}}"
+},
+
+"error_code_form": {
+    "search_placeholder": "Tìm kiếm mã lỗi...",
+    "code": "Mã lỗi",
+    "description": "Mô tả",
+    "solution": "Giải pháp đề xuất",
+    "brand": "Thương hiệu",
+    "model": "Dòng xe",
+    "video": "Video hướng dẫn",
+    "no_link": "Không có liên kết",
+    "suggestions": "Đề xuất kỹ thuật",
+    "reference": "Tham khảo kỹ thuật viên",
+    "created_at": "Thời gian tạo",
+    "actions": "Thao tác",
+    "prev": "Trước",
+    "next": "Sau",
+    "page": "Trang",
+    "suggestions_title": "Đề xuất kỹ thuật cho mã {{code}}"
+  },
+
+  "service_pricing_management_page": {
+  "title": "🧾 Quản lý bảng giá dịch vụ",
+  "all_pricings": "📋 Tất cả bảng giá dịch vụ",
+  "add_edit_title": "➕ Thêm / Chỉnh sửa bảng giá dịch vụ",
+  "loading": "Đang tải..."
+},
+
+"service_pricing_table" : {
+  "search_placeholder": "Tìm theo tiêu đề...",
+  "all_categories": "Tất cả danh mục",
+  "all_status": "Tất cả trạng thái",
+  "active_only": "Chỉ đang hoạt động",
+  "inactive_only": "Chỉ không hoạt động",
+  "export_excel": "Xuất Excel",
+  "category": "Danh mục",
+  "duration": "Thời gian dự kiến",
+  "price": "Giá",
+  "active": "Hoạt động",
+  "inactive": "Không hoạt động",
+  "features": "Tính năng",
+  "actions": "Thao tác",
+  "edit": "Chỉnh sửa",
+  "delete": "Xoá",
+  "title": "Tiêu đề"
+},
+
+"service_pricing_form": {
+  "edit_title": "Chỉnh sửa gói dịch vụ",
+  "add_title": "Thêm gói dịch vụ",
+  "title_placeholder": "Tiêu đề dịch vụ (VD: Bảo dưỡng cơ bản)",
+  "description_placeholder": "Mô tả ngắn gọn về gói dịch vụ, mục đích và lợi ích cho khách hàng.",
+  "features_placeholder": "Các bước công việc hoặc hạng mục dịch vụ, mỗi dòng một mục.\nVD:\n- Kiểm tra hệ thống điện\n- Tra dầu phanh",
+  "price_placeholder": "Giá dịch vụ (VND)",
+  "category_label": "Danh mục",
+  "category_placeholder": "Chọn danh mục",
+  "duration_placeholder": "Thời gian dự kiến (VD: 30 phút, 1 giờ)",
+  "image_placeholder": "URL hình ảnh (tuỳ chọn)",
+  "active_label": "Hiển thị dịch vụ",
+  "saving": "Đang lưu...",
+  "update_button": "Cập nhật gói",
+  "add_button": "Thêm gói",
+  "categories": {
+    "Repair": "Sửa chữa",
+    "Maintenance": "Bảo dưỡng",
+    "Cleaning": "Vệ sinh",
+    "Parts Replacement": "Thay thế linh kiện",
+    "Insurance": "Bảo hiểm"
+  }
 }
+
+
+
+
+
+
+
+
 
 
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUser } from '@/src/context/AuthContext';
 import { ServicePricing } from '@/src/lib/servicePricing/servicePricingTypes';
 import { Button } from '@/src/components/ui/button';
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function ServicePricingTable({ servicePricings, onEdit, onDelete }: Props) {
+  const { t } = useTranslation('common');
   const { role } = useUser();
   const isTechnician = role === 'technician';
   const isTechnicianPartner = role === 'technician_partner';
@@ -40,12 +42,12 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
 
   const handleExport = () => {
     const exportData = filtered.map((item) => ({
-      Title: item.title,
-      Category: item.category,
-      Duration: item.durationEstimate,
-      Price: item.price,
-      Active: item.isActive ? 'Yes' : 'No',
-      Features: item.features.join(', '),
+      [t('service_pricing_table.title')]: item.title,
+      [t('service_pricing_table.category')]: item.category,
+      [t('service_pricing_table.duration')]: item.durationEstimate,
+      [t('service_pricing_table.price')]: item.price,
+      [t('service_pricing_table.active')]: item.isActive ? t('service_pricing_table.active') : t('service_pricing_table.inactive'),
+      [t('service_pricing_table.features')]: item.features.join(', '),
     }));
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
@@ -58,7 +60,7 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
       {/* Bộ lọc + tìm kiếm */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <Input
-          placeholder="Search by title..."
+          placeholder={t('service_pricing_table.search_placeholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="sm:w-64"
@@ -69,7 +71,7 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
           onChange={(e) => setCategoryFilter(e.target.value)}
           className="border px-3 py-2 rounded w-full sm:w-auto"
         >
-          <option value="">All Categories</option>
+          <option value="">{t('service_pricing_table.all_categories')}</option>
           {uniqueCategories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
@@ -82,14 +84,14 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
           onChange={(e) => setActiveFilter(e.target.value as 'all' | 'active' | 'inactive')}
           className="border px-3 py-2 rounded w-full sm:w-auto"
         >
-          <option value="all">All Status</option>
-          <option value="active">Active Only</option>
-          <option value="inactive">Inactive Only</option>
+          <option value="all">{t('service_pricing_table.all_status')}</option>
+          <option value="active">{t('service_pricing_table.active_only')}</option>
+          <option value="inactive">{t('service_pricing_table.inactive_only')}</option>
         </select>
 
         {!(isTechnician || isTechnicianPartner) && (
           <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto">
-            Export to Excel
+            {t('service_pricing_table.export_excel')}
           </Button>
         )}
       </div>
@@ -99,31 +101,31 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
         {filtered.map((item) => (
           <div key={item.id} className="border rounded-lg p-4 bg-white shadow">
             <div className="font-semibold text-base mb-1">{item.title}</div>
-            <div className="text-sm text-gray-600">Category: {item.category || '-'}</div>
-            <div className="text-sm text-gray-600">Duration: {item.durationEstimate || '-'}</div>
+            <div className="text-sm text-gray-600">{t('service_pricing_table.category')}: {item.category || '-'}</div>
+            <div className="text-sm text-gray-600">{t('service_pricing_table.duration')}: {item.durationEstimate || '-'}</div>
             <div className="text-sm text-gray-600">
-              Price: {item.price.toLocaleString('vi-VN')} VND
+              {t('service_pricing_table.price')}: {item.price.toLocaleString('vi-VN')} VND
             </div>
             <div className="text-sm text-gray-600">
-              Active:{' '}
+              {t('service_pricing_table.active')}:{' '}
               <span
                 className={`px-2 py-0.5 rounded text-xs font-medium inline-block mt-1 ${
                   item.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
                 }`}
               >
-                {item.isActive ? 'Active' : 'Inactive'}
+                {item.isActive ? t('service_pricing_table.active') : t('service_pricing_table.inactive')}
               </span>
             </div>
             <div className="text-sm text-gray-600 mt-2">
-              Features: {item.features?.join(', ') || '-'}
+              {t('service_pricing_table.features')}: {item.features?.join(', ') || '-'}
             </div>
             {!(isTechnician || isTechnicianPartner) && (
               <div className="mt-3 flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
-                  Edit
+                  {t('service_pricing_table.edit')}
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
-                  Delete
+                  {t('service_pricing_table.delete')}
                 </Button>
               </div>
             )}
@@ -136,13 +138,15 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
         <table className="min-w-full text-sm">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
-              <th className="p-2 text-left">Title</th>
-              <th className="p-2 text-left">Category</th>
-              <th className="p-2 text-left">Duration</th>
-              <th className="p-2 text-left">Price</th>
-              <th className="p-2 text-left">Active</th>
-              <th className="p-2 text-left">Features</th>
-              {!(isTechnician || isTechnicianPartner) && <th className="p-2 text-right">Actions</th>}
+              <th className="p-2 text-left">{t('service_pricing_table.title')}</th>
+              <th className="p-2 text-left">{t('service_pricing_table.category')}</th>
+              <th className="p-2 text-left">{t('service_pricing_table.duration')}</th>
+              <th className="p-2 text-left">{t('service_pricing_table.price')}</th>
+              <th className="p-2 text-left">{t('service_pricing_table.active')}</th>
+              <th className="p-2 text-left">{t('service_pricing_table.features')}</th>
+              {!(isTechnician || isTechnicianPartner) && (
+                <th className="p-2 text-right">{t('service_pricing_table.actions')}</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -158,17 +162,17 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
                       item.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
                     }`}
                   >
-                    {item.isActive ? 'Active' : 'Inactive'}
+                    {item.isActive ? t('service_pricing_table.active') : t('service_pricing_table.inactive')}
                   </span>
                 </td>
                 <td className="p-2">{item.features?.join(', ') || '-'}</td>
                 {!(isTechnician || isTechnicianPartner) && (
                   <td className="p-2 text-right space-x-2 whitespace-nowrap">
                     <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
-                      Edit
+                      {t('service_pricing_table.edit')}
                     </Button>
                     <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
-                      Delete
+                      {t('service_pricing_table.delete')}
                     </Button>
                   </td>
                 )}

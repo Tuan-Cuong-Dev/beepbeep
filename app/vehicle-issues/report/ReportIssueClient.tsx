@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Header from "@/src/components/landingpage/Header";
 import Footer from "@/src/components/landingpage/Footer";
-import ReportIssueForm from "@/src/components/vehicleIssues/ReportIssueForm";
+import ReportIssueForm from "@/src/components/vehicle-issues/ReportIssueForm";
 import { useCompanyAndStation } from "@/src/hooks/useCompanyAndStation";
 import NotificationDialog from "@/src/components/ui/NotificationDialog";
 import { useUser } from "@/src/context/AuthContext";

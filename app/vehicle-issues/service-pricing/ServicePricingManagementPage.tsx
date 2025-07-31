@@ -8,6 +8,7 @@ import ServicePricingForm from '@/src/components/servicePricing/ServicePricingFo
 import ServicePricingTable from '@/src/components/servicePricing/ServicePricingTable';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
+import { useTranslation } from 'react-i18next';
 
 function canEditServicePricing(role?: string): boolean {
   return [
@@ -19,6 +20,7 @@ function canEditServicePricing(role?: string): boolean {
 }
 
 export default function ServicePricingManagementPage() {
+  const { t } = useTranslation('common');
   const { user, role } = useUser();
   const {
     servicePricings,
@@ -59,13 +61,15 @@ export default function ServicePricingManagementPage() {
 
       <main className="flex-1 px-4 py-10 max-w-6xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-center text-gray-800">
-          🧾 Service Pricing Management
+          {t('service_pricing_management_page.title')}
         </h1>
 
         <section className="bg-white p-6 rounded-2xl shadow border border-gray-200">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">📋 All Service Pricings</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+            {t('service_pricing_management_page.all_pricings')}
+          </h2>
           {loading ? (
-            <p>Loading...</p>
+            <p>{t('service_pricing_management_page.loading')}</p>
           ) : (
             <ServicePricingTable
               servicePricings={servicePricings}
@@ -77,7 +81,9 @@ export default function ServicePricingManagementPage() {
 
         {canEditServicePricing(role) && (
           <section className="bg-white p-6 rounded-2xl shadow border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">➕ Add / Edit Service Pricing</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">
+              {t('service_pricing_management_page.add_edit_pricing')}
+            </h2>
             <ServicePricingForm
               key={selected?.id || 'new'}
               existing={selected}

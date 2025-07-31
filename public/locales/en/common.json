@@ -1360,6 +1360,7 @@
 
 "vehicle_issues_management_page": {
   "title": "🛠️ Vehicle Issues Management",
+  "subtitle": "View, assign, and handle technical issues quickly and accurately.",
   "loading": "⏳ Loading issues and technician data...",
   "no_permission": "🚫 You do not have permission to view this page.",
   "assign_technician": "Assign Technician",
@@ -1417,7 +1418,155 @@
   "view_proposal": "View Proposal",
   "approve_or_reject": "Approve / Reject",
   "close": "Close"
+},
+
+"vehicle_issue_proposals_page": {
+  "title": "Vehicle Issue Proposals",
+  "subtitle": "Review and approve proposed solutions by technicians.",
+  "loading": "⏳ Loading proposals...",
+  "empty": "No proposals found."
+},
+
+"technician_suggest_error_code": {
+  "title": "Suggest a Solution for Error Code",
+  "subtitle": "Technical contributions will be rewarded with points by the system.",
+  "search_placeholder": "🔍 Search code or description...",
+  "all_brands": "All Brands",
+  "brand": "Brand",
+  "code": "Code",
+  "description": "Description",
+  "recommended": "Recommended",
+  "no_results": "No matching codes found.",
+  "select_prompt": "Please select an error code to suggest a solution.",
+  "only_technician": "🚫 Technician only.",
+  "success_message": "✅ Suggestion added successfully!"
+},
+"technician_suggestion_form": {
+  "placeholder": "Enter your suggestion to improve the solution...",
+  "submit": "Submit Suggestion",
+  "submitting": "Submitting..."
+},
+
+"technician_suggestion_list": {
+  "no_suggestions": "No suggestions yet."
+},
+
+"error_code_management_page": {
+  "title": "Error Code Management",
+  "subtitle": "The error code system is used by technicians as a reference during vehicle repairs.",
+  "existing": "Existing Error Codes",
+  "add_edit": "Add / Edit Error Code",
+  "loading": "Loading error codes...",
+  "confirm_delete": "Are you sure you want to delete error code \"{{code}}\"?"
+},
+
+"error_code_table": {
+  "brand_all": "All Brands",
+  "model_all": "All Models",
+  "search_placeholder": "Search by code, description or solution",
+  "code": "Code",
+  "description": "Description",
+  "solution": "Solution",
+  "brand": "Brand",
+  "model": "Model",
+  "video": "Video",
+  "suggestions": "Suggestions",
+  "reference": "Reference",
+  "created_at": "Created At",
+  "actions": "Actions",
+  "no_link": "No link",
+  "view_suggestions": "View Suggestions",
+  "page": "Page",
+  "of": "of",
+  "prev": "Previous",
+  "next": "Next",
+  "suggestions_title": "💬 Suggestions for {{code}}"
+},
+
+"error_code_form": {
+  "search_placeholder": "Search error code...",
+  "code": "Error Code",
+  "description": "Description",
+  "solution": "Recommended Solution",
+  "brand": "Brand",
+  "model": "Model",
+  "video": "Tutorial Video",
+  "no_link": "No link available",
+  "suggestions": "Technician Suggestions",
+  "reference": "Technician Reference",
+  "created_at": "Created At",
+  "actions": "Actions",
+  "prev": "Previous",
+  "next": "Next",
+  "page": "Page",
+  "suggestions_title": "Technician Suggestions for Code {{code}}"
+},
+
+"service_pricing_management_page": {
+  "title": "🧾 Service Pricing Management",
+  "all_pricings": "📋 All Service Pricings",
+  "add_edit_title": "➕ Add / Edit Service Pricing",
+  "loading": "Loading..."
+},
+
+"service_pricing_table": {
+  "search_placeholder": "Search by title...",
+  "all_categories": "All Categories",
+  "all_status": "All Statuses",
+  "active_only": "Active Only",
+  "inactive_only": "Inactive Only",
+  "export_excel": "Export to Excel",
+  "category": "Category",
+  "duration": "Estimated Duration",
+  "price": "Price",
+  "active": "Active",
+  "inactive": "Inactive",
+  "features": "Features",
+  "actions": "Actions",
+  "edit": "Edit",
+  "delete": "Delete",
+  "title": "Title"
+},
+
+"service_pricing_form": {
+  "edit_title": "Edit Service Package",
+  "add_title": "Add Service Package",
+  "title_placeholder": "Service title (e.g. Basic Maintenance)",
+  "description_placeholder": "Brief description of the service package, its purpose, and customer benefits.",
+  "features_placeholder": "Work steps or service items, one per line.\nE.g.:\n- Check electrical system\n- Apply brake oil",
+  "price_placeholder": "Service price (VND)",
+  "category_label": "Category",
+  "category_placeholder": "Select category",
+  "duration_placeholder": "Estimated time (e.g. 30 mins, 1 hour)",
+  "image_placeholder": "Image URL (optional)",
+  "active_label": "Show service",
+  "saving": "Saving...",
+  "update_button": "Update Package",
+  "add_button": "Add Package",
+  "categories": {
+    "Repair": "Repair",
+    "Maintenance": "Maintenance",
+    "Cleaning": "Cleaning",
+    "Parts Replacement": "Parts Replacement",
+    "Insurance": "Insurance"
+  }
+},
+
+"service_card": {
+  "price_unit": "{{price}} ₫",
+  "no_description": "No description available",
+  "no_features": "No features to display"
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

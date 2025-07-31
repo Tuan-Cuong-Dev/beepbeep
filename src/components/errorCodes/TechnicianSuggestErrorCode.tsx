@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUser } from '@/src/context/AuthContext';
-import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { ErrorCode, TechnicianSuggestion } from '@/src/lib/errorCodes/errorCodeTypes';
-import { Timestamp } from 'firebase/firestore';
 import TechnicianSuggestionForm from './TechnicianSuggestionForm';
 import TechnicianSuggestionList from './TechnicianSuggestionList';
 import { Input } from '@/src/components/ui/input';
 
 export default function TechnicianSuggestErrorCode() {
+  const { t } = useTranslation('common');
   const { user, role } = useUser();
   const isTechnician = role === 'technician' || role === 'technician_partner';
 
@@ -57,7 +58,7 @@ export default function TechnicianSuggestErrorCode() {
 
     const suggestion: TechnicianSuggestion = {
       userId: user.uid,
-      name: user.displayName || 'Unknown',
+      name: user.name || 'Unknown',
       comment,
       timestamp: Timestamp.now(),
     };
@@ -82,21 +83,18 @@ export default function TechnicianSuggestErrorCode() {
   };
 
   if (!isTechnician) {
-    return <p className="text-center text-red-500 py-10">🚫 Technician only.</p>;
+    return <p className="text-center text-red-500 py-10">🚫 {t('technician_suggest_error_code.only_technician')}</p>;
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow max-w-6xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">🛠 Suggest a Solution for Error Code</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* LEFT: Filter + List */}
-        <div className="space-y-3">
-          {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-3">
+    <div className="bg-white p-4 md:p-6 rounded-xl shadow max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Danh sách mã lỗi */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Input
               type="text"
-              placeholder="🔍 Search code or description..."
+              placeholder={t('technician_suggest_error_code.search_placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full"
@@ -105,56 +103,63 @@ export default function TechnicianSuggestErrorCode() {
             <select
               value={brandFilter}
               onChange={(e) => setBrandFilter(e.target.value)}
-              className="border rounded px-3 py-2"
+              className="border rounded px-3 py-2 min-w-[160px]"
             >
-              <option value="all">All Brands</option>
+              <option value="all">{t('technician_suggest_error_code.all_brands')}</option>
               {brandOptions.map((brand) => (
-                <option key={brand} value={brand}>
-                  {brand}
-                </option>
+                <option key={brand} value={brand}>{brand}</option>
               ))}
             </select>
           </div>
 
-          {/* List */}
-          <div className="max-h-[400px] overflow-auto border rounded-md p-2 bg-gray-50">
+          <div className="h-[400px] overflow-y-auto border rounded-md bg-gray-50">
             {filteredCodes.length > 0 ? (
               filteredCodes.map((code) => (
                 <div
                   key={code.id}
-                  className={`p-3 rounded cursor-pointer hover:bg-green-100 ${
+                  className={`p-3 border-b cursor-pointer hover:bg-green-100 ${
                     selectedId === code.id ? 'bg-green-200 font-semibold' : ''
                   }`}
                   onClick={() => setSelectedId(code.id)}
                 >
-                  <p>{code.code} — {code.description}</p>
-                  <p className="text-sm text-gray-500 italic">Brand: {code.brand}</p>
+                  <p className="truncate">{code.code} — {code.description}</p>
+                  <p className="text-xs text-gray-500 italic">
+                    {t('technician_suggest_error_code.brand')}: {code.brand}
+                  </p>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-sm">No matching codes found.</p>
+              <p className="text-gray-500 text-sm p-3">{t('technician_suggest_error_code.no_results')}</p>
             )}
           </div>
         </div>
 
-        {/* RIGHT: Detail + Form */}
+        {/* Chi tiết và gợi ý */}
         <div className="space-y-4">
           {selectedCode ? (
             <>
-              <div className="p-4 border rounded bg-gray-50">
-                <p><strong>Code:</strong> {selectedCode.code}</p>
-                <p><strong>Description:</strong> {selectedCode.description}</p>
-                <p><strong>Recommended:</strong> {selectedCode.recommendedSolution}</p>
-                <p><strong>Brand:</strong> {selectedCode.brand}</p>
+              <div className="p-4 border rounded-lg bg-gray-50 space-y-2 text-sm">
+                <div>
+                  <span className="font-medium">{t('technician_suggest_error_code.code')}:</span> {selectedCode.code}
+                </div>
+                <div>
+                  <span className="font-medium">{t('technician_suggest_error_code.description')}:</span> {selectedCode.description}
+                </div>
+                <div>
+                  <span className="font-medium">{t('technician_suggest_error_code.recommended')}:</span> {selectedCode.recommendedSolution}
+                </div>
+                <div>
+                  <span className="font-medium">{t('technician_suggest_error_code.brand')}:</span> {selectedCode.brand}
+                </div>
               </div>
 
               <TechnicianSuggestionForm onSubmit={handleSubmit} loading={loading} />
               <TechnicianSuggestionList suggestions={selectedCode.technicianSuggestions || []} />
 
-              {success && <p className="text-green-600 text-sm">✅ Suggestion added successfully!</p>}
+              {success && <p className="text-green-600 text-sm">✅ {t('technician_suggest_error_code.success_message')}</p>}
             </>
           ) : (
-            <p className="text-gray-500 italic">Please select an error code to suggest a solution.</p>
+            <p className="text-gray-500 italic">{t('technician_suggest_error_code.select_prompt')}</p>
           )}
         </div>
       </div>

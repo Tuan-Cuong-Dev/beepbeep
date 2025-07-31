@@ -1345,6 +1345,7 @@
 
 "vehicle_issues_management_page": {
   "title": "🛠️ 차량 문제 관리",
+  "subtitle": "기술 문제를 빠르고 정확하게 확인하고, 배정하고, 처리하세요.",
   "loading": "⏳ 문제 및 기술자 데이터를 불러오는 중...",
   "no_permission": "🚫 이 페이지를 볼 수 있는 권한이 없습니다.",
   "assign_technician": "기술자 배정",
@@ -1402,7 +1403,149 @@
   "view_proposal": "제안 보기",
   "approve_or_reject": "승인 / 거절",
   "close": "종료"
+},
+
+"vehicle_issue_proposals_page": {
+  "title": "차량 문제 제안",
+  "subtitle": "기술자의 제안을 검토하고 승인하세요.",
+  "loading": "⏳ 제안 불러오는 중...",
+  "empty": "제안이 없습니다."
+},
+
+"technician_suggest_error_code": {
+  "title": "오류 코드에 대한 해결책 제안",
+  "subtitle": "기술적인 기여는 시스템에서 점수로 반영됩니다.",
+  "search_placeholder": "🔍 코드 또는 설명 검색...",
+  "all_brands": "모든 브랜드",
+  "brand": "브랜드",
+  "code": "코드",
+  "description": "설명",
+  "recommended": "추천 해결책",
+  "no_results": "일치하는 코드를 찾을 수 없습니다.",
+  "select_prompt": "해결책을 제안할 오류 코드를 선택하세요.",
+  "only_technician": "🚫 기술자 전용입니다.",
+  "success_message": "✅ 제안이 성공적으로 추가되었습니다!"
+},
+
+"technician_suggestion_form": {
+  "placeholder": "해결책을 개선할 제안을 입력하세요...",
+  "submit": "제안 제출",
+  "submitting": "제출 중..."
+},
+
+"technician_suggestion_list": {
+  "no_suggestions": "아직 제안이 없습니다."
+},
+
+"error_code_management_page": {
+  "title": "오류 코드 관리",
+  "subtitle": "오류 코드는 기술자가 차량 수리 중에 참고하기 위한 시스템입니다.",
+  "existing": "기존 오류 코드 목록",
+  "add_edit": "오류 코드 추가 / 수정",
+  "loading": "오류 코드를 불러오는 중...",
+  "confirm_delete": "\"{{code}}\" 오류 코드를 삭제하시겠습니까?"
+},
+
+"error_code_table": {
+  "brand_all": "모든 브랜드",
+  "model_all": "모든 모델",
+  "search_placeholder": "코드, 설명 또는 해결책 검색",
+  "code": "코드",
+  "description": "설명",
+  "solution": "해결책",
+  "brand": "브랜드",
+  "model": "모델",
+  "video": "비디오",
+  "suggestions": "제안",
+  "reference": "참고",
+  "created_at": "생성일",
+  "actions": "작업",
+  "no_link": "링크 없음",
+  "view_suggestions": "제안 보기",
+  "page": "페이지",
+  "of": "중",
+  "prev": "이전",
+  "next": "다음",
+  "suggestions_title": "💬 {{code}}에 대한 제안"
+},
+
+"error_code_form": {
+  "search_placeholder": "오류 코드를 검색하세요...",
+  "code": "오류 코드",
+  "description": "설명",
+  "solution": "추천 해결 방법",
+  "brand": "브랜드",
+  "model": "모델",
+  "video": "튜토리얼 영상",
+  "no_link": "링크 없음",
+  "suggestions": "기술자 제안",
+  "reference": "기술자 참고",
+  "created_at": "생성 시간",
+  "actions": "작업",
+  "prev": "이전",
+  "next": "다음",
+  "page": "페이지",
+  "suggestions_title": "{{code}} 코드에 대한 기술자 제안"
+},
+
+"service_pricing_management_page": {
+  "title": "🧾 서비스 요금 관리",
+  "all_pricings": "📋 모든 서비스 요금",
+  "add_edit_title": "➕ 서비스 요금 추가 / 편집",
+  "loading": "불러오는 중..."
+},
+
+"service_pricing_table": {
+  "search_placeholder": "제목으로 검색...",
+  "all_categories": "모든 카테고리",
+  "all_status": "모든 상태",
+  "active_only": "활성 상태만",
+  "inactive_only": "비활성 상태만",
+  "export_excel": "엑셀로 내보내기",
+  "category": "카테고리",
+  "duration": "예상 소요 시간",
+  "price": "가격",
+  "active": "활성",
+  "inactive": "비활성",
+  "features": "기능",
+  "actions": "작업",
+  "edit": "수정",
+  "delete": "삭제",
+  "title": "제목"
+},
+
+"service_pricing_form": {
+  "edit_title": "서비스 패키지 수정",
+  "add_title": "서비스 패키지 추가",
+  "title_placeholder": "서비스 제목 (예: 기본 점검)",
+  "description_placeholder": "서비스의 간단한 설명과 목적, 고객 혜택 등을 입력하세요.",
+  "features_placeholder": "작업 항목을 한 줄씩 입력하세요.\n예:\n- 전기 시스템 점검\n- 브레이크 오일 보충",
+  "price_placeholder": "서비스 가격 (VND)",
+  "category_label": "카테고리",
+  "category_placeholder": "카테고리 선택",
+  "duration_placeholder": "예상 시간 (예: 30분, 1시간)",
+  "image_placeholder": "이미지 URL (선택 사항)",
+  "active_label": "서비스 표시",
+  "saving": "저장 중...",
+  "update_button": "패키지 업데이트",
+  "add_button": "패키지 추가",
+  "categories": {
+    "Repair": "수리",
+    "Maintenance": "정비",
+    "Cleaning": "세척",
+    "Parts Replacement": "부품 교체",
+    "Insurance": "보험"
+  }
 }
+
+
+
+
+
+
+
+
+
 
 
 

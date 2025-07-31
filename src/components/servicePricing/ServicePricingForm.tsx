@@ -9,6 +9,7 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { ServicePricing } from '@/src/lib/servicePricing/servicePricingTypes';
 import { SimpleSelect } from '@/src/components/ui/select';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   existing?: ServicePricing | null;
@@ -16,10 +17,12 @@ interface Props {
   onRefresh?: () => void;
 }
 
-const categories = ['Repair', 'Maintenance', 'Cleaning', 'Parts Replacement', 'Insurance'];
+const rawCategories = ['Repair', 'Maintenance', 'Cleaning', 'Parts Replacement', 'Insurance'];
 
 export default function ServicePricingForm({ existing, onSaved, onRefresh }: Props) {
+  const { t } = useTranslation('common');
   const { user } = useUser();
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [featuresText, setFeaturesText] = useState('');
@@ -75,6 +78,7 @@ export default function ServicePricingForm({ existing, onSaved, onRefresh }: Pro
       });
     }
 
+    // Reset form
     setTitle('');
     setDescription('');
     setFeaturesText('');
@@ -84,66 +88,82 @@ export default function ServicePricingForm({ existing, onSaved, onRefresh }: Pro
     setImageUrl('');
     setIsActive(true);
     setLoading(false);
-    if (onSaved) onSaved();
-    if (onRefresh) onRefresh();
+
+    onSaved?.();
+    onRefresh?.();
   };
 
   return (
     <div className="space-y-4 max-w-xl">
       <h2 className="text-xl font-semibold">
-        {existing ? 'Edit Service Package' : 'Add Service Package'}
+        {existing ? t('service_pricing_form.edit_title') : t('service_pricing_form.add_title')}
       </h2>
+
       <Input
-        placeholder="Service title (e.g. Basic Maintenance)"
+        placeholder={t('service_pricing_form.title_placeholder')}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
+
       <Textarea
-        placeholder="Brief description of the service package, its purpose, and customer benefits."
+        placeholder={t('service_pricing_form.description_placeholder')}
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
+
       <Textarea
-        placeholder="Work steps or service items, one per line.\nE.g.:\n- Check electrical system\n- Apply brake oil"
+        placeholder={t('service_pricing_form.features_placeholder')}
         value={featuresText}
         onChange={(e) => setFeaturesText(e.target.value)}
       />
+
       <Input
         type="number"
-        placeholder="Service price (VND)"
+        placeholder={t('service_pricing_form.price_placeholder')}
         value={price}
         onChange={(e) => setPrice(e.target.value)}
       />
+
       <div className="space-y-1">
-        <label className="text-sm font-medium">Category</label>
+        <label className="text-sm font-medium">{t('service_pricing_form.category_label')}</label>
         <SimpleSelect
-          placeholder="Select category"
+          placeholder={t('service_pricing_form.category_placeholder')}
           value={category}
           onChange={(val) => setCategory(val)}
-          options={categories.map((cat) => ({ label: cat, value: cat }))}
+          options={rawCategories.map((cat) => ({
+            label: t(`service_pricing_form.categories.${cat}`),
+            value: cat,
+          }))}
         />
       </div>
 
       <Input
-        placeholder="Estimated time (e.g. 30 mins, 1 hour)"
+        placeholder={t('service_pricing_form.duration_placeholder')}
         value={durationEstimate}
         onChange={(e) => setDurationEstimate(e.target.value)}
       />
+
       <Input
-        placeholder="Image URL (optional)"
+        placeholder={t('service_pricing_form.image_placeholder')}
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
       />
+
       <div className="flex items-center gap-2">
-        <label className="text-sm">Show service</label>
+        <label className="text-sm">{t('service_pricing_form.active_label')}</label>
         <input
           type="checkbox"
           checked={isActive}
           onChange={(e) => setIsActive(e.target.checked)}
         />
       </div>
+
       <Button onClick={handleSave} disabled={loading} className="w-full sm:w-auto">
-        {loading ? 'Saving...' : existing ? 'Update Package' : 'Add Package'}
+        {loading
+          ? t('service_pricing_form.saving')
+          : existing
+          ? t('service_pricing_form.update_button')
+          : t('service_pricing_form.add_button')}
       </Button>
     </div>
   );

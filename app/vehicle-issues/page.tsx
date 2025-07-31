@@ -11,14 +11,14 @@ import { useVehicleIssues } from '@/src/hooks/useVehicleIssues';
 import { useTechnicianMap } from '@/src/hooks/useTechnicianMap';
 import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
-import AssignTechnicianForm from '@/src/components/vehicleIssues/AssignTechnicianForm';
-import VehicleIssuesSummaryCard from '@/src/components/vehicleIssues/VehicleIssuesSummaryCard';
-import VehicleIssuesSearchFilter from '@/src/components/vehicleIssues/VehicleIssuesSearchFilter';
+import AssignTechnicianForm from '@/src/components/vehicle-issues/AssignTechnicianForm';
+import VehicleIssuesSummaryCard from '@/src/components/vehicle-issues/VehicleIssuesSummaryCard';
+import VehicleIssuesSearchFilter from '@/src/components/vehicle-issues/VehicleIssuesSearchFilter';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@/src/components/ui/dialog';
 import { Timestamp } from 'firebase/firestore';
-import VehicleIssueTable from '@/src/components/vehicleIssues/VehicleIssueTable';
-import ProposalPopup from '@/src/components/vehicleIssues/ProposalPopup';
-import ActualResultPopup from '@/src/components/vehicleIssues/ActualResultPopup';
+import VehicleIssueTable from '@/src/components/vehicle-issues/VehicleIssueTable';
+import ProposalPopup from '@/src/components/vehicle-issues/ProposalPopup';
+import ActualResultPopup from '@/src/components/vehicle-issues/ActualResultPopup';
 import { useTranslation } from 'react-i18next';
 
 export default function VehicleIssuesManagementPage() {
@@ -159,11 +159,17 @@ export default function VehicleIssuesManagementPage() {
     return <div className="text-center py-10 text-red-500">{t('vehicle_issues_management_page.no_permission')}</div>;
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       <UserTopMenu />
       <main className="flex-1 p-6 space-y-6">
-        <h1 className="text-2xl font-bold">{t('vehicle_issues_management_page.title')}</h1>
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+            {t('vehicle_issues_management_page.title')}
+          </h1>
+          <p className="text-sm text-gray-600">{t('vehicle_issues_management_page.subtitle')}</p>
+        </div>
+
         <VehicleIssuesSummaryCard issues={issues} />
         <VehicleIssuesSearchFilter
           searchTerm={searchTerm}
@@ -174,7 +180,8 @@ export default function VehicleIssuesManagementPage() {
           setStationFilter={setStationFilter}
           stationOptions={stationOptions}
         />
-        <div className="overflow-auto border rounded-xl">
+
+        <div className="overflow-auto border rounded-xl bg-white">
           <VehicleIssueTable
             issues={paginatedIssues}
             technicianMap={technicianMap}
@@ -233,9 +240,7 @@ export default function VehicleIssuesManagementPage() {
       <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
         <DialogContent>
           <DialogTitle>{t('vehicle_issues_management_page.close_issue')}</DialogTitle>
-          <p className="text-sm text-gray-600 mb-2">
-            {t('vehicle_issues_management_page.close_reason')}
-          </p>
+          <p className="text-sm text-gray-600 mb-2">{t('vehicle_issues_management_page.close_reason')}</p>
           <textarea
             className="w-full border rounded p-2 text-sm"
             rows={3}

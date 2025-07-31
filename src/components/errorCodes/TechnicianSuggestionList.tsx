@@ -1,13 +1,16 @@
 'use client';
 
 import { TechnicianSuggestion } from '@/src/lib/errorCodes/errorCodeTypes';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   suggestions: TechnicianSuggestion[];
 }
 
 export default function TechnicianSuggestionList({ suggestions }: Props) {
-  if (!suggestions?.length) return <p>No suggestions yet.</p>;
+  const { t } = useTranslation('common');
+
+  if (!suggestions?.length) return <p>{t('technician_suggestion_list.no_suggestions')}</p>;
 
   return (
     <ul className="space-y-3">

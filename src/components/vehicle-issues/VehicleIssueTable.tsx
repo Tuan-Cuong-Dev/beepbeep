@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
-import ViewProposalDialog from '@/src/components/vehicleIssues/ViewProposalDialog';
-import ApproveProposalDialog from '@/src/components/vehicleIssues/ApproveProposalDialog';
+import ViewProposalDialog from '@/src/components/vehicle-issues/ViewProposalDialog';
+import ApproveProposalDialog from '@/src/components/vehicle-issues/ApproveProposalDialog';
 
 interface Props {
   issues: ExtendedVehicleIssue[];
