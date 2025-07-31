@@ -1362,7 +1362,70 @@
     "waiting_approval": "Chờ phê duyệt",
     "no_actions": "Không có hành động"
   }
+},
+
+"vehicle_issues_management_page": {
+    "title": "🛠️ Quản lý Sự cố Phương tiện",
+    "loading": "⏳ Đang tải dữ liệu sự cố và kỹ thuật viên...",
+    "no_permission": "🚫 Bạn không có quyền truy cập trang này.",
+    "assign_technician": "Phân công Kỹ thuật viên",
+    "cancel": "Hủy",
+    "assign_success": "Đã phân công kỹ thuật viên thành công",
+    "assign_fail": "Phân công kỹ thuật viên thất bại",
+    "close_issue": "Đóng Sự cố",
+    "close_reason": "Vui lòng nhập lý do đóng sự cố:",
+    "close_placeholder": "Lý do đóng...",
+    "close_success": "Đã đóng sự cố thành công",
+    "proposal_success": "Đã gửi đề xuất chờ phê duyệt",
+    "actual_success": "Đã gửi kết quả thực tế",
+    "pagination_prev": "Trang trước",
+    "pagination_next": "Trang sau"
+  },
+
+  "vehicle_issues_summary_card": {
+  "total": "Tổng Sự Cố",
+  "pending": "Chờ xử lý",
+  "assigned": "Đã phân công",
+  "proposed": "Đề xuất",
+  "confirmed": "Đã xác nhận",
+  "rejected": "Bị từ chối",
+  "in_progress": "Đang xử lý",
+  "resolved": "Đã xử lý",
+  "closed": "Đã đóng"
+},
+
+"vehicle_issues_search_filter": {
+  "search": "Tìm kiếm",
+  "status": "Trạng thái",
+  "station": "Trạm",
+  "all": "Tất cả"
+},
+
+"vehicle_issue_table": {
+  "vin": "Số VIN",
+  "plate": "Biển số",
+  "station": "Trạm",
+  "type": "Loại sự cố",
+  "description": "Mô tả",
+  "status": "Trạng thái",
+  "assigned_to": "Người xử lý",
+  "proposal": "Đề xuất",
+  "actual": "Thực tế",
+  "approved": "Duyệt",
+  "closed_by": "Đóng bởi",
+  "comment": "Ghi chú",
+  "reported": "Thời gian báo cáo",
+  "actions": "Hành động",
+  "submit_proposal": "Gửi đề xuất",
+  "mark_in_progress": "Đang xử lý",
+  "submit_actual": "Gửi kết quả",
+  "assign": "Phân công",
+  "view_proposal": "Xem đề xuất",
+  "approve_or_reject": "Duyệt / Từ chối",
+  "close": "Đóng"
 }
+
+
 
 
 

@@ -1341,7 +1341,72 @@
     "waiting_approval": "승인 대기 중",
     "no_actions": "사용 가능한 작업 없음"
   }
+},
+
+"vehicle_issues_management_page": {
+  "title": "🛠️ 차량 문제 관리",
+  "loading": "⏳ 문제 및 기술자 데이터를 불러오는 중...",
+  "no_permission": "🚫 이 페이지를 볼 수 있는 권한이 없습니다.",
+  "assign_technician": "기술자 배정",
+  "cancel": "취소",
+  "assign_success": "기술자가 성공적으로 배정되었습니다",
+  "assign_fail": "기술자 배정에 실패했습니다",
+  "close_issue": "문제 종료",
+  "close_reason": "이 문제를 종료하는 사유를 입력해주세요:",
+  "close_placeholder": "종료 사유...",
+  "close_success": "문제가 성공적으로 종료되었습니다",
+  "proposal_success": "제안이 승인 대기 중으로 제출되었습니다",
+  "actual_success": "실제 결과가 제출되었습니다",
+  "pagination_prev": "이전 페이지",
+  "pagination_next": "다음 페이지"
+},
+
+"vehicle_issues_summary_card": {
+  "total": "총 문제 건수",
+  "pending": "대기 중",
+  "assigned": "배정됨",
+  "proposed": "제안됨",
+  "confirmed": "확인됨",
+  "rejected": "거절됨",
+  "in_progress": "진행 중",
+  "resolved": "해결됨",
+  "closed": "종료됨"
+},
+
+"vehicle_issues_search_filter": {
+  "search": "검색",
+  "status": "상태",
+  "station": "스테이션",
+  "all": "전체"
+},
+
+"vehicle_issue_table": {
+  "vin": "VIN",
+  "plate": "번호판",
+  "station": "스테이션",
+  "type": "문제 유형",
+  "description": "설명",
+  "status": "상태",
+  "assigned_to": "담당자",
+  "proposal": "제안",
+  "actual": "실제 내용",
+  "approved": "승인됨",
+  "closed_by": "종료한 사람",
+  "comment": "비고",
+  "reported": "신고 시간",
+  "actions": "작업",
+  "submit_proposal": "제안 제출",
+  "mark_in_progress": "진행 중 표시",
+  "submit_actual": "실제 제출",
+  "assign": "배정",
+  "view_proposal": "제안 보기",
+  "approve_or_reject": "승인 / 거절",
+  "close": "종료"
 }
+
+
+
+
 
 
 

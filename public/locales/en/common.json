@@ -1356,7 +1356,71 @@
     "waiting_approval": "Waiting for Approval",
     "no_actions": "No actions available"
   }
+},
+
+"vehicle_issues_management_page": {
+  "title": "🛠️ Vehicle Issues Management",
+  "loading": "⏳ Loading issues and technician data...",
+  "no_permission": "🚫 You do not have permission to view this page.",
+  "assign_technician": "Assign Technician",
+  "cancel": "Cancel",
+  "assign_success": "Technician assigned successfully",
+  "assign_fail": "Failed to assign technician",
+  "close_issue": "Close Issue",
+  "close_reason": "Please enter a comment or reason for closing this issue:",
+  "close_placeholder": "Reason for closing...",
+  "close_success": "Issue closed successfully",
+  "proposal_success": "Proposal submitted for approval",
+  "actual_success": "Actual result submitted",
+  "pagination_prev": "Previous page",
+  "pagination_next": "Next page"
+},
+
+"vehicle_issues_summary_card": {
+  "total": "Total Issues",
+  "pending": "Pending",
+  "assigned": "Assigned",
+  "proposed": "Proposed",
+  "confirmed": "Confirmed",
+  "rejected": "Rejected",
+  "in_progress": "In Progress",
+  "resolved": "Resolved",
+  "closed": "Closed"
+},
+
+"vehicle_issues_search_filter": {
+  "search": "Search",
+  "status": "Status",
+  "station": "Station",
+  "all": "All"
+},
+
+"vehicle_issue_table": {
+  "vin": "VIN",
+  "plate": "Plate",
+  "station": "Station",
+  "type": "Issue Type",
+  "description": "Description",
+  "status": "Status",
+  "assigned_to": "Assigned To",
+  "proposal": "Proposal",
+  "actual": "Actual",
+  "approved": "Approved",
+  "closed_by": "Closed By",
+  "comment": "Comment",
+  "reported": "Reported",
+  "actions": "Actions",
+  "submit_proposal": "Submit Proposal",
+  "mark_in_progress": "Mark In Progress",
+  "submit_actual": "Submit Actual",
+  "assign": "Assign",
+  "view_proposal": "View Proposal",
+  "approve_or_reject": "Approve / Reject",
+  "close": "Close"
 }
+
+
+
 
 
 

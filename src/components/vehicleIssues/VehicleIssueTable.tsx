@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 import ViewProposalDialog from '@/src/components/vehicleIssues/ViewProposalDialog';
@@ -23,8 +24,7 @@ interface Props {
   searchTerm: string;
   statusFilter: string;
   stationFilter: string;
-  refetchIssues: () => Promise<void>; // 👈 thêm dòng này
-   // 👇 THÊM DÒNG NÀY
+  refetchIssues: () => Promise<void>;
   setViewingProposal: (issue: ExtendedVehicleIssue | null) => void;
   setApprovingProposal: (issue: ExtendedVehicleIssue | null) => void;
 }
@@ -32,20 +32,20 @@ interface Props {
 export default function VehicleIssueTable({
   issues,
   technicianMap,
-  onEdit,
   updateIssue,
   setClosingIssue,
   setCloseDialogOpen,
   setEditingIssue,
   setShowForm,
-  normalizedRole,
-  isAdmin,
   isTechnician,
   setProposingIssue,
   setUpdatingActualIssue,
+  setViewingProposal,
+  setApprovingProposal,
 }: Props) {
-  const [viewingProposal, setViewingProposal] = useState<ExtendedVehicleIssue | null>(null);
-  const [approvingProposal, setApprovingProposal] = useState<ExtendedVehicleIssue | null>(null);
+  const { t } = useTranslation('common');
+  const [viewingProposal, setViewingProposalState] = useState<ExtendedVehicleIssue | null>(null);
+  const [approvingProposal, setApprovingProposalState] = useState<ExtendedVehicleIssue | null>(null);
 
   const renderStatusBadge = (status: VehicleIssueStatus) => {
     const colorMap: Record<VehicleIssueStatus, string> = {
@@ -63,36 +63,35 @@ export default function VehicleIssueTable({
 
   return (
     <>
-      {/* Mobile View */}
       <div className="grid gap-4 sm:hidden">
         {issues.map((issue) => (
           <div key={issue.id} className="border rounded-lg p-4 bg-white shadow space-y-2">
             <div className="font-semibold text-base text-blue-600">{issue.vin}</div>
-            <div className="text-sm text-gray-600">Plate: {issue.plateNumber}</div>
-            <div className="text-sm text-gray-600">Station: {issue.stationName}</div>
-            <div className="text-sm text-gray-600">Type: {issue.issueType}</div>
-            <td className="text-sm text-blue-600 ">Descriptions: {issue.description || '-'}</td>
-            <div className="text-sm text-gray-600">Status: {renderStatusBadge(issue.status)}</div>
-            <div className="text-sm text-gray-600">Assigned To: {issue.assignedToName || '-'}</div>
-            <div className="text-sm text-gray-600">Proposal: {issue.proposedSolution || '-'}</div>
-            <div className="text-sm text-gray-600">Actual: {issue.actualSolution || '-'}</div>
-            <div className="text-sm text-gray-600">Reported: {issue.reportedAt?.toDate().toLocaleString()}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.plate')}: {issue.plateNumber}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.station')}: {issue.stationName}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.type')}: {issue.issueType}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.description')}: {issue.description || '-'}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.status')}: {renderStatusBadge(issue.status)}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.assigned_to')}: {issue.assignedToName || '-'}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.proposal')}: {issue.proposedSolution || '-'}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.actual')}: {issue.actualSolution || '-'}</div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.reported')}: {issue.reportedAt?.toDate().toLocaleString()}</div>
             <div className="flex flex-wrap gap-2 pt-2">
               {isTechnician ? (
-                <> 
+                <>
                   {issue.status === 'assigned' && (
                     <Button size="sm" onClick={() => setProposingIssue?.(issue)}>
-                      Submit Proposal
+                      {t('vehicle_issue_table.submit_proposal')}
                     </Button>
                   )}
                   {issue.status === 'confirmed' && (
                     <Button size="sm" onClick={() => updateIssue(issue.id, { status: 'in_progress' })}>
-                      Mark In Progress
+                      {t('vehicle_issue_table.mark_in_progress')}
                     </Button>
                   )}
                   {issue.status === 'in_progress' && (
                     <Button size="sm" onClick={() => setUpdatingActualIssue?.(issue)}>
-                      Submit Actual
+                      {t('vehicle_issue_table.submit_actual')}
                     </Button>
                   )}
                 </>
@@ -100,22 +99,22 @@ export default function VehicleIssueTable({
                 <>
                   {(issue.status === 'pending' || issue.status === 'assigned') && (
                     <Button size="sm" variant="outline" onClick={() => { setEditingIssue(issue); setShowForm(true); }}>
-                      Assign
+                      {t('vehicle_issue_table.assign')}
                     </Button>
                   )}
                   {issue.status === 'proposed' && (
                     <>
                       <Button size="sm" variant="outline" onClick={() => setViewingProposal(issue)}>
-                        View Proposal
+                        {t('vehicle_issue_table.view_proposal')}
                       </Button>
                       <Button size="sm" variant="success" onClick={() => setApprovingProposal(issue)}>
-                        Approve / Reject
+                        {t('vehicle_issue_table.approve_or_reject')}
                       </Button>
                     </>
                   )}
                   {issue.status === 'resolved' && (
                     <Button size="sm" variant="outline" onClick={() => { setClosingIssue(issue); setCloseDialogOpen(true); }}>
-                      Close
+                      {t('vehicle_issue_table.close')}
                     </Button>
                   )}
                 </>
@@ -125,25 +124,24 @@ export default function VehicleIssueTable({
         ))}
       </div>
 
-      {/* Desktop Table */}
       <div className="hidden sm:block">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-100 text-left">
             <tr>
-              <th className="p-2">VIN</th>
-              <th className="p-2">Plate</th>
-              <th className="p-2">Station</th>
-              <th className="p-2">Type</th>
-              <th className="p-2">Descriptions</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Assigned To</th>
-              <th className="p-2">Proposal</th>
-              <th className="p-2">Actual</th>
-              <th className="p-2">Approved</th>
-              <th className="p-2">Closed By</th>
-              <th className="p-2">Comment</th>
-              <th className="p-2">Reported</th>
-              <th className="p-2 text-right">Actions</th>
+              <th className="p-2">{t('vehicle_issue_table.vin')}</th>
+              <th className="p-2">{t('vehicle_issue_table.plate')}</th>
+              <th className="p-2">{t('vehicle_issue_table.station')}</th>
+              <th className="p-2">{t('vehicle_issue_table.type')}</th>
+              <th className="p-2">{t('vehicle_issue_table.description')}</th>
+              <th className="p-2">{t('vehicle_issue_table.status')}</th>
+              <th className="p-2">{t('vehicle_issue_table.assigned_to')}</th>
+              <th className="p-2">{t('vehicle_issue_table.proposal')}</th>
+              <th className="p-2">{t('vehicle_issue_table.actual')}</th>
+              <th className="p-2">{t('vehicle_issue_table.approved')}</th>
+              <th className="p-2">{t('vehicle_issue_table.closed_by')}</th>
+              <th className="p-2">{t('vehicle_issue_table.comment')}</th>
+              <th className="p-2">{t('vehicle_issue_table.reported')}</th>
+              <th className="p-2 text-right">{t('vehicle_issue_table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -182,17 +180,17 @@ export default function VehicleIssueTable({
                       <>
                         {issue.status === 'assigned' && (
                           <Button size="sm" onClick={() => setProposingIssue?.(issue)}>
-                            Submit Proposal
+                            {t('vehicle_issue_table.submit_proposal')}
                           </Button>
                         )}
                         {issue.status === 'confirmed' && (
                           <Button size="sm" onClick={() => updateIssue(issue.id, { status: 'in_progress' })}>
-                            Mark In Progress
+                            {t('vehicle_issue_table.mark_in_progress')}
                           </Button>
                         )}
                         {issue.status === 'in_progress' && (
                           <Button size="sm" onClick={() => setUpdatingActualIssue?.(issue)}>
-                            Submit Actual
+                            {t('vehicle_issue_table.submit_actual')}
                           </Button>
                         )}
                       </>
@@ -200,22 +198,22 @@ export default function VehicleIssueTable({
                       <>
                         {(issue.status === 'pending' || issue.status === 'assigned') && (
                           <Button size="sm" variant="outline" onClick={() => { setEditingIssue(issue); setShowForm(true); }}>
-                            Assign
+                            {t('vehicle_issue_table.assign')}
                           </Button>
                         )}
                         {issue.status === 'proposed' && (
                           <>
                             <Button size="sm" variant="outline" onClick={() => setViewingProposal(issue)}>
-                              View Proposal
+                              {t('vehicle_issue_table.view_proposal')}
                             </Button>
                             <Button size="sm" variant="success" onClick={() => setApprovingProposal(issue)}>
-                              Approve / Reject
+                              {t('vehicle_issue_table.approve_or_reject')}
                             </Button>
                           </>
                         )}
                         {issue.status === 'resolved' && (
                           <Button size="sm" variant="outline" onClick={() => { setClosingIssue(issue); setCloseDialogOpen(true); }}>
-                            Close
+                            {t('vehicle_issue_table.close')}
                           </Button>
                         )}
                       </>
@@ -228,22 +226,20 @@ export default function VehicleIssueTable({
         </table>
       </div>
 
-      {/* View Proposal Dialog */}
       <ViewProposalDialog
         open={!!viewingProposal}
         issue={viewingProposal}
-        onClose={() => setViewingProposal(null)}
+        onClose={() => setViewingProposalState(null)}
       />
 
-      {/* Approve / Reject Dialog */}
       <ApproveProposalDialog
         open={!!approvingProposal}
         issue={approvingProposal}
-        onClose={() => setApprovingProposal(null)}
+        onClose={() => setApprovingProposalState(null)}
         onApprove={async () => {
           if (approvingProposal) {
             await updateIssue(approvingProposal.id, { status: 'confirmed' });
-            setApprovingProposal(null);
+            setApprovingProposalState(null);
           }
         }}
         onReject={async (reason) => {
@@ -252,7 +248,7 @@ export default function VehicleIssueTable({
               status: 'rejected',
               closeComment: reason,
             });
-            setApprovingProposal(null);
+            setApprovingProposalState(null);
           }
         }}
       />
