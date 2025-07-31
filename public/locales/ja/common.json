@@ -1274,6 +1274,55 @@
   "ok": "確認",
   "cancel": "キャンセル",
   "confirm": "確定"
+},
+"technician_partner_dashboard": {
+  "issue_type": "問題の種類",
+  "description": "説明",
+  "status": "ステータス",
+  "reported": "報告時間",
+  "action": "操作",
+  "submit_proposal": "提案を送信",
+  "mark_in_progress": "進行中にする",
+  "submit_actual": "結果を送信",
+  "waiting_approval": "承認待ち",
+  "no_actions": "操作なし",
+  "title": "技術パートナーダッシュボード",
+  "checking_permission": "🔎 権限を確認中...",
+  "not_partner": "🚫 技術パートナー専用です。",
+  "loading_issues": "⏳ 問題を読み込み中...",
+  "status_updated": "ステータスが「{{status}}」に更新されました。",
+  "proposal_submitted": "提案が承認のために送信されました。",
+  "actual_result_submitted": "実際の結果が送信され、問題が解決済みにマークされました。",
+  "summary": {
+    "assigned": "割り当て済み",
+    "proposed": "提案済み",
+    "in_progress": "進行中",
+    "resolved": "解決済み"
+  },
+  "quick_actions": {
+    "my_issues": "自分の問題",
+    "proposal_history": "提案履歴",
+    "suggest_error_fix": "エラー修正を提案",
+    "error_codes": "エラーコード",
+    "service_pricing": "サービス料金表"
+  },
+  "assigned_issues": "🚧 割り当てられた問題",
+  "table_headers": {
+    "vin": "車台番号（VIN）",
+    "plate": "ナンバープレート",
+    "issue_type": "問題の種類",
+    "description": "説明",
+    "status": "ステータス",
+    "reported": "報告時間",
+    "actions": "操作"
+  },
+  "actions": {
+    "submit_proposal": "提案を送信",
+    "mark_in_progress": "進行中にする",
+    "submit_actual": "結果を送信",
+    "waiting_approval": "承認待ち",
+    "no_actions": "操作なし"
+  }
 }
 
 

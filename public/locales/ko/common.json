@@ -1292,7 +1292,58 @@
   "ok": "확인",
   "cancel": "취소",
   "confirm": "확정"
+},
+"technician_partner_dashboard": {
+  "issue_type": "문제 유형",
+  "description": "설명",
+  "status": "상태",
+  "reported": "보고 시간",
+  "action": "작업",
+  "submit_proposal": "제안 제출",
+  "mark_in_progress": "처리 중으로 표시",
+  "submit_actual": "결과 제출",
+  "waiting_approval": "승인 대기 중",
+  "no_actions": "사용 가능한 작업 없음",
+  "title": "기술 파트너 대시보드",
+  "checking_permission": "🔎 권한 확인 중...",
+  "not_partner": "🚫 기술 파트너 전용입니다.",
+  "loading_issues": "⏳ 문제 로딩 중...",
+  "status_updated": "상태가 \"{{status}}\"(으)로 업데이트되었습니다.",
+  "proposal_submitted": "제안이 승인 요청으로 제출되었습니다.",
+  "actual_result_submitted": "실제 결과가 제출되었으며, 문제가 해결됨으로 표시되었습니다.",
+  "summary": {
+    "assigned": "할당됨",
+    "proposed": "제안됨",
+    "in_progress": "처리 중",
+    "resolved": "해결됨"
+  },
+  "quick_actions": {
+    "my_issues": "내 문제",
+    "proposal_history": "제안 내역",
+    "suggest_error_fix": "오류 수정 제안",
+    "error_codes": "오류 코드",
+    "service_pricing": "서비스 요금표"
+  },
+  "assigned_issues": "🚧 할당된 문제",
+  "table_headers": {
+    "vin": "차대번호 (VIN)",
+    "plate": "번호판",
+    "issue_type": "문제 유형",
+    "description": "설명",
+    "status": "상태",
+    "reported": "보고 시간",
+    "actions": "작업"
+  },
+  "actions": {
+    "submit_proposal": "제안 제출",
+    "mark_in_progress": "처리 중으로 표시",
+    "submit_actual": "결과 제출",
+    "waiting_approval": "승인 대기 중",
+    "no_actions": "사용 가능한 작업 없음"
+  }
 }
+
+
 
 
 

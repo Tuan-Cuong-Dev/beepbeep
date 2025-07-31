@@ -1313,7 +1313,58 @@
   "ok": "Đồng ý",
   "cancel": "Hủy",
   "confirm": "Xác nhận"
+},
+
+"technician_partner_dashboard": {
+  "issue_type": "Loại sự cố",
+  "description": "Mô tả",
+  "status": "Trạng thái",
+  "reported": "Thời gian báo cáo",
+  "action": "Hành động",
+  "submit_proposal": "Gửi đề xuất",
+  "mark_in_progress": "Đang xử lý",
+  "submit_actual": "Gửi kết quả",
+  "waiting_approval": "Chờ duyệt",
+  "no_actions": "Không có hành động",
+  "title": "Bảng điều khiển Đối tác Kỹ thuật",
+  "checking_permission": "🔎 Đang kiểm tra quyền...",
+  "not_partner": "🚫 Chỉ dành cho Đối tác Kỹ thuật.",
+  "loading_issues": "⏳ Đang tải các sự cố...",
+  "status_updated": "Trạng thái đã được cập nhật thành \"{{status}}\".",
+  "proposal_submitted": "Đề xuất đã được gửi để phê duyệt.",
+  "actual_result_submitted": "Kết quả thực tế đã được gửi và sự cố đã được đánh dấu là đã giải quyết.",
+  "summary": {
+    "assigned": "Đã giao",
+    "proposed": "Đã đề xuất",
+    "in_progress": "Đang xử lý",
+    "resolved": "Đã xử lý"
+  },
+  "quick_actions": {
+    "my_issues": "Sự cố của tôi",
+    "proposal_history": "Lịch sử đề xuất",
+    "suggest_error_fix": "Gợi ý sửa lỗi",
+    "error_codes": "Mã lỗi",
+    "service_pricing": "Bảng giá dịch vụ"
+  },
+  "assigned_issues": "🚧 Sự cố đã giao",
+  "table_headers": {
+    "vin": "Số khung (VIN)",
+    "plate": "Biển số",
+    "issue_type": "Loại sự cố",
+    "description": "Mô tả",
+    "status": "Trạng thái",
+    "reported": "Báo cáo lúc",
+    "actions": "Hành động"
+  },
+  "actions": {
+    "submit_proposal": "Gửi đề xuất",
+    "mark_in_progress": "Đánh dấu đang xử lý",
+    "submit_actual": "Gửi kết quả",
+    "waiting_approval": "Chờ phê duyệt",
+    "no_actions": "Không có hành động"
+  }
 }
+
 
 
 

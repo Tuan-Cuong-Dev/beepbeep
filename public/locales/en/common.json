@@ -1307,8 +1307,56 @@
   "ok": "OK",
   "cancel": "Cancel",
   "confirm": "Confirm"
+},
+"technician_partner_dashboard": {
+  "issue_type": "Issue Type",
+  "description": "Description",
+  "status": "Status",
+  "reported": "Reported At",
+  "action": "Action",
+  "submit_proposal": "Submit Proposal",
+  "mark_in_progress": "Mark In Progress",
+  "submit_actual": "Submit Result",
+  "waiting_approval": "Waiting for Approval",
+  "no_actions": "No actions available",
+  "title": "Technician Partner Dashboard",
+  "checking_permission": "🔎 Checking permission...",
+  "not_partner": "🚫 Technician Partner only.",
+  "loading_issues": "⏳ Loading issues...",
+  "status_updated": "Status updated to \"{{status}}\".",
+  "proposal_submitted": "Proposal has been submitted for approval.",
+  "actual_result_submitted": "Actual result submitted and issue marked as resolved.",
+  "summary": {
+    "assigned": "Assigned",
+    "proposed": "Proposed",
+    "in_progress": "In Progress",
+    "resolved": "Resolved"
+  },
+  "quick_actions": {
+    "my_issues": "My Issues",
+    "proposal_history": "Proposal History",
+    "suggest_error_fix": "Suggest Error Fix",
+    "error_codes": "Error Codes",
+    "service_pricing": "Service Pricing"
+  },
+  "assigned_issues": "🚧 Assigned Issues",
+  "table_headers": {
+    "vin": "VIN",
+    "plate": "Plate Number",
+    "issue_type": "Issue Type",
+    "description": "Description",
+    "status": "Status",
+    "reported": "Reported At",
+    "actions": "Actions"
+  },
+  "actions": {
+    "submit_proposal": "Submit Proposal",
+    "mark_in_progress": "Mark In Progress",
+    "submit_actual": "Submit Result",
+    "waiting_approval": "Waiting for Approval",
+    "no_actions": "No actions available"
+  }
 }
-
 
 
 
