@@ -1542,7 +1542,19 @@
   "price_unit": "{{price}} ₫",
   "no_description": "설명이 없습니다",
   "no_features": "표시할 기능이 없습니다"
+},
+
+"status": {
+  "pending": "처리 대기 중",
+  "assigned": "접수됨",
+  "proposed": "제안 완료",
+  "confirmed": "확인됨",
+  "rejected": "거절됨",
+  "in_progress": "진행 중",
+  "resolved": "해결됨",
+  "closed": "종료됨"
 }
+
 
 
 

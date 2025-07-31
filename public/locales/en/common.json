@@ -1556,7 +1556,19 @@
   "price_unit": "{{price}} ₫",
   "no_description": "No description available",
   "no_features": "No features to display"
+},
+
+"status": {
+  "pending": "Pending",
+  "assigned": "Assigned",
+  "proposed": "Proposed",
+  "confirmed": "Confirmed",
+  "rejected": "Rejected",
+  "in_progress": "In Progress",
+  "resolved": "Resolved",
+  "closed": "Closed"
 }
+
 
 
 

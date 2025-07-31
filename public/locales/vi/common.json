@@ -1563,7 +1563,19 @@
   "price_unit": "{{price}} ₫",
   "no_description": "Không có mô tả",
   "no_features": "Không có tính năng hiển thị"
+},
+
+"status": {
+  "pending": "Chờ xử lý",
+  "assigned": "Đã tiếp nhận",
+  "proposed": "Đã đề xuất",
+  "confirmed": "Đã xác nhận",
+  "rejected": "Bị từ chối",
+  "in_progress": "Đang xử lý",
+  "resolved": "Đã xử lý",
+  "closed": "Đã đóng"
 }
+
 
 
 
