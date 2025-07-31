@@ -98,20 +98,20 @@ export default function TechnicianPartnerDashboard() {
           🛠️ {t('technician_partner_dashboard.title')}
         </h1>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <DashboardCard icon={<ClipboardList />} title={t('technician_partner_dashboard.summary.assigned')} value={issues.length.toString()} />
           <DashboardCard icon={<AlertTriangle />} title={t('technician_partner_dashboard.summary.proposed')} value={issues.filter(i => i.status === 'proposed').length.toString()} />
           <DashboardCard icon={<Wrench />} title={t('technician_partner_dashboard.summary.in_progress')} value={issues.filter(i => i.status === 'in_progress').length.toString()} />
           <DashboardCard icon={<CheckCircle />} title={t('technician_partner_dashboard.summary.resolved')} value={issues.filter(i => i.status === 'resolved').length.toString()} />
         </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/vehicle-issues" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.proposal_history')} href="/vehicle-issues/proposals" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/vehicle-issues/suggest-error" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.error_codes')} href="/vehicle-issues/error-codes" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.service_pricing')} href="/vehicle-issues/service-pricing" />
-        </div>
+        </section>
 
         <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">🚧 {t('technician_partner_dashboard.assigned_issues')}</h2>

@@ -98,25 +98,46 @@ export default function TechnicianDashboard() {
           🛠️ {t('technician_partner_dashboard.title')}
         </h1>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <DashboardCard icon={<ClipboardList />} title={t('technician_partner_dashboard.summary.assigned')} value={issues.length.toString()} />
           <DashboardCard icon={<AlertTriangle />} title={t('technician_partner_dashboard.summary.proposed')} value={issues.filter(i => i.status === 'proposed').length.toString()} />
           <DashboardCard icon={<Wrench />} title={t('technician_partner_dashboard.summary.in_progress')} value={issues.filter(i => i.status === 'in_progress').length.toString()} />
           <DashboardCard icon={<CheckCircle />} title={t('technician_partner_dashboard.summary.resolved')} value={issues.filter(i => i.status === 'resolved').length.toString()} />
         </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/vehicle-issues" />
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.proposal_history')} href="/vehicle-issues/proposals" />
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/vehicle-issues/suggest-error" />
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.error_codes')} href="/vehicle-issues/error-codes" />
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.service_pricing')} href="/vehicle-issues/service-pricing" />
-        </div>
+        <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/vehicle-issues" />
+            <QuickAction label={t('technician_partner_dashboard.quick_actions.proposal_history')} href="/vehicle-issues/proposals" />
+            <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/vehicle-issues/suggest-error" />
+            <QuickAction label={t('technician_partner_dashboard.quick_actions.error_codes')} href="/vehicle-issues/error-codes" />
+            <QuickAction label={t('technician_partner_dashboard.quick_actions.service_pricing')} href="/vehicle-issues/service-pricing" />
+        </section>
 
         <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">🚧 {t('technician_partner_dashboard.assigned_issues')}</h2>
 
-          <div className="overflow-auto border rounded-xl">
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
+            {issues.map(issue => (
+              <div key={issue.id} className="border rounded-xl p-4 bg-white shadow">
+                <div className="text-sm font-semibold mb-2">{issue.issueType} – {renderStatusBadge(issue.status, t)}</div>
+                <p className="text-sm text-gray-600"><strong>VIN:</strong> {issue.vin}</p>
+                <p className="text-sm text-gray-600"><strong>{t('technician_partner_dashboard.table_headers.plate')}:</strong> {issue.plateNumber}</p>
+                <p className="text-sm text-gray-600"><strong>{t('technician_partner_dashboard.table_headers.description')}:</strong> {issue.description}</p>
+                <p className="text-sm text-gray-600"><strong>{t('technician_partner_dashboard.table_headers.reported')}:</strong> {issue.reportedAt?.toDate().toLocaleString()}</p>
+                <div className="mt-3 space-y-2">
+                  {issue.status === 'assigned' && <Button className="w-full" onClick={() => setProposingIssue(issue)}>{t('technician_partner_dashboard.submit_proposal')}</Button>}
+                  {issue.status === 'confirmed' && <Button className="w-full" onClick={() => handleUpdateStatus(issue, 'in_progress')}>{t('technician_partner_dashboard.mark_in_progress')}</Button>}
+                  {issue.status === 'in_progress' && <Button className="w-full" onClick={() => setUpdatingActualIssue(issue)}>{t('technician_partner_dashboard.submit_actual')}</Button>}
+                  {issue.status === 'proposed' && <span className="text-green-600 block text-center">{t('technician_partner_dashboard.waiting_approval')}</span>}
+                  {issue.status === 'rejected' && <span className="text-gray-400 italic block text-center">{t('technician_partner_dashboard.no_actions')}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-auto border rounded-xl">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-gray-100 text-left">
@@ -174,7 +195,7 @@ function DashboardCard({ icon, title, value }: { icon: JSX.Element; title: strin
 
 function QuickAction({ label, href }: { label: string; href: string }) {
   return (
-    <Link href={href} className="block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition">
+    <Link href={href} className="min-w-[160px] text-sm block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition">
       {label}
     </Link>
   );
