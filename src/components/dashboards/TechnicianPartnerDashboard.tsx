@@ -8,8 +8,6 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
 import { useVehicleIssues } from '@/src/hooks/useVehicleIssues';
 import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/src/firebaseConfig';
 import ProposalPopup from '@/src/components/vehicleIssues/ProposalPopup';
 import ActualResultPopup from '@/src/components/vehicleIssues/ActualResultPopup';
 import { Wrench, ClipboardList, CheckCircle, AlertTriangle } from 'lucide-react';
@@ -41,27 +39,14 @@ function renderStatusBadge(status: VehicleIssueStatus) {
 export default function TechnicianPartnerDashboard() {
   const { user, role, loading: userLoading } = useUser();
   const [notification, setNotification] = useState<string | null>(null);
-  const [checkingRole, setCheckingRole] = useState(true);
-  const [isPartner, setIsPartner] = useState(false);
   const [proposingIssue, setProposingIssue] = useState<ExtendedVehicleIssue | null>(null);
   const [updatingActualIssue, setUpdatingActualIssue] = useState<ExtendedVehicleIssue | null>(null);
 
-  const { issues, updateIssue, loading: issuesLoading } = useVehicleIssues(
-    checkingRole || !isPartner
-      ? { disabled: true } as any
-      : { technicianUserId: user?.uid, role: 'technician_partner' }
-  );
+  const isPartner = role === 'technician_partner';
 
-  useEffect(() => {
-    if (!user) return;
-    const checkRole = async () => {
-      const q = query(collection(db, 'technicianPartners'), where('userId', '==', user.uid));
-      const snap = await getDocs(q);
-      if (!snap.empty) setIsPartner(true);
-      setCheckingRole(false);
-    };
-    checkRole();
-  }, [user]);
+  const { issues, updateIssue, loading: issuesLoading } = useVehicleIssues(
+    !isPartner ? { disabled: true } as any : { technicianUserId: user?.uid, role: 'technician_partner' }
+  );
 
   useEffect(() => {
     if (notification) {
@@ -70,7 +55,7 @@ export default function TechnicianPartnerDashboard() {
     }
   }, [notification]);
 
-  if (!user || userLoading || checkingRole) return <div className="text-center py-10">🔎 Checking permission...</div>;
+  if (!user || userLoading) return <div className="text-center py-10">🔎 Checking permission...</div>;
   if (!isPartner) return <div className="text-center py-10 text-red-500">🚫 Technician Partner only.</div>;
   if (issuesLoading) return <div className="text-center py-10">⏳ Loading issues...</div>;
 
