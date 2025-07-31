@@ -1557,7 +1557,14 @@
     "Parts Replacement": "Thay thế linh kiện",
     "Insurance": "Bảo hiểm"
   }
+},
+
+"service_card": {
+  "price_unit": "{{price}} ₫",
+  "no_description": "Không có mô tả",
+  "no_features": "Không có tính năng hiển thị"
 }
+
 
 
 

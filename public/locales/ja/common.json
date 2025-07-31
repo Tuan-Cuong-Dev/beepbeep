@@ -1518,7 +1518,14 @@
     "Parts Replacement": "部品交換",
     "Insurance": "保険"
   }
+},
+
+"service_card": {
+  "price_unit": "{{price}} ₫",
+  "no_description": "説明がありません",
+  "no_features": "表示できる機能がありません"
 }
+
 
 
 

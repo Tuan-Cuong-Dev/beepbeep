@@ -1,4 +1,3 @@
-// 📄 TechnicianDashboard.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,16 +7,14 @@ import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
 import { useVehicleIssues } from '@/src/hooks/useVehicleIssues';
-import { useTechnicianMap } from '@/src/hooks/useTechnicianMap';
 import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/src/firebaseConfig';
 import ProposalPopup from '@/src/components/vehicle-issues/ProposalPopup';
 import ActualResultPopup from '@/src/components/vehicle-issues/ActualResultPopup';
-import Link from 'next/link';
 import { Wrench, ClipboardList, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
+import Link from 'next/link';
 import { JSX } from 'react/jsx-runtime';
+import { useTranslation } from 'react-i18next';
 
 function formatCurrency(value: number) {
   return value.toLocaleString('vi-VN', {
@@ -27,7 +24,7 @@ function formatCurrency(value: number) {
   });
 }
 
-function renderStatusBadge(status: VehicleIssueStatus) {
+function renderStatusBadge(status: VehicleIssueStatus, t: any) {
   const colorMap: Record<VehicleIssueStatus, string> = {
     pending: 'bg-gray-400',
     assigned: 'bg-blue-500',
@@ -38,37 +35,21 @@ function renderStatusBadge(status: VehicleIssueStatus) {
     resolved: 'bg-purple-500',
     closed: 'bg-black',
   };
-  return <span className={`px-2 py-1 text-white rounded ${colorMap[status]}`}>{status.replace('_', ' ')}</span>;
+  return <span className={`px-2 py-1 text-white rounded ${colorMap[status]}`}>{t(`status.${status}`)}</span>;
 }
 
 export default function TechnicianDashboard() {
-  const { user, role, companyId, loading: userLoading } = useUser();
+  const { t } = useTranslation('common');
+  const { user, role, loading: userLoading } = useUser();
   const [notification, setNotification] = useState<string | null>(null);
-  const [checkingRole, setCheckingRole] = useState(true);
-  const [isTechnician, setIsTechnician] = useState(false);
   const [proposingIssue, setProposingIssue] = useState<ExtendedVehicleIssue | null>(null);
   const [updatingActualIssue, setUpdatingActualIssue] = useState<ExtendedVehicleIssue | null>(null);
 
-  const { technicianMap, loading: technicianMapLoading } = useTechnicianMap(companyId ?? undefined);
-  const { issues, updateIssue, loading: issuesLoading } = useVehicleIssues(
-    checkingRole || !isTechnician
-      ? { disabled: true } as any
-      : { companyId: companyId ?? undefined, role: role ?? undefined, technicianUserId: user?.uid }
-  );
+  const isTechnician = role === 'technician';
 
-  useEffect(() => {
-    if (!user) return;
-    const checkRole = async () => {
-      const q = query(collection(db, 'staffs'), where('userId', '==', user.uid));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const staff = snap.docs[0].data();
-        setIsTechnician((staff.role || '').toLowerCase() === 'technician');
-      }
-      setCheckingRole(false);
-    };
-    checkRole();
-  }, [user]);
+  const { issues, updateIssue, loading: issuesLoading } = useVehicleIssues(
+    !isTechnician ? { disabled: true } as any : { technicianUserId: user?.uid, role: 'technician' }
+  );
 
   useEffect(() => {
     if (notification) {
@@ -77,13 +58,13 @@ export default function TechnicianDashboard() {
     }
   }, [notification]);
 
-  if (!user || userLoading || checkingRole) return <div className="text-center py-10">🔎 Checking permission...</div>;
-  if (!isTechnician) return <div className="text-center py-10 text-red-500">🚫 Technician only.</div>;
-  if (issuesLoading || technicianMapLoading) return <div className="text-center py-10">⏳ Loading issues...</div>;
+  if (!user || userLoading) return <div className="text-center py-10">🔎 {t('technician_partner_dashboard.checking_permission')}</div>;
+  if (!isTechnician) return <div className="text-center py-10 text-red-500">🚫 {t('technician_partner_dashboard.only_for_technician_partner')}</div>;
+  if (issuesLoading) return <div className="text-center py-10">⏳ {t('technician_partner_dashboard.loading_issues')}</div>;
 
   const handleUpdateStatus = async (issue: ExtendedVehicleIssue, newStatus: VehicleIssueStatus) => {
     await updateIssue(issue.id, { status: newStatus });
-    setNotification(`Status updated to "${newStatus}".`);
+    setNotification(t('technician_partner_dashboard.status_updated', { status: t(`status.${newStatus}`) }));
   };
 
   const handlePropose = async (solution: string, cost: number) => {
@@ -93,7 +74,7 @@ export default function TechnicianDashboard() {
       proposedSolution: solution,
       proposedCost: cost,
     });
-    setNotification('Proposal submitted for approval.');
+    setNotification(t('technician_partner_dashboard.proposal_submitted'));
     setProposingIssue(null);
   };
 
@@ -104,7 +85,7 @@ export default function TechnicianDashboard() {
       actualSolution: solution,
       actualCost: cost,
     });
-    setNotification('Actual result submitted and issue marked resolved.');
+    setNotification(t('technician_partner_dashboard.actual_result_submitted'));
     setUpdatingActualIssue(null);
   };
 
@@ -112,59 +93,40 @@ export default function TechnicianDashboard() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       <UserTopMenu />
-
       <main className="flex-1 px-4 sm:px-6 py-6 sm:py-10 space-y-10 max-w-7xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800">🛠️ Technician Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800">
+          🛠️ {t('technician_partner_dashboard.title')}
+        </h1>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <DashboardCard icon={<ClipboardList />} title="Assigned" value={issues.length.toString()} />
-          <DashboardCard icon={<AlertTriangle />} title="Proposed" value={issues.filter(i => i.status === 'proposed').length.toString()} />
-          <DashboardCard icon={<Wrench />} title="In Progress" value={issues.filter(i => i.status === 'in_progress').length.toString()} />
-          <DashboardCard icon={<CheckCircle />} title="Resolved" value={issues.filter(i => i.status === 'resolved').length.toString()} />
+          <DashboardCard icon={<ClipboardList />} title={t('technician_partner_dashboard.summary.assigned')} value={issues.length.toString()} />
+          <DashboardCard icon={<AlertTriangle />} title={t('technician_partner_dashboard.summary.proposed')} value={issues.filter(i => i.status === 'proposed').length.toString()} />
+          <DashboardCard icon={<Wrench />} title={t('technician_partner_dashboard.summary.in_progress')} value={issues.filter(i => i.status === 'in_progress').length.toString()} />
+          <DashboardCard icon={<CheckCircle />} title={t('technician_partner_dashboard.summary.resolved')} value={issues.filter(i => i.status === 'resolved').length.toString()} />
         </section>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-        <QuickAction label="View My Issues" href="/vehicle-issues" />
-        <QuickAction label="Proposal History" href="/vehicle-issues/proposals" />
-        <QuickAction label="Error Codes" href="/assistant/error-codes" />
-        <QuickAction label="Service Pricing" href="/assistant/service-pricing" />
-        <QuickAction label="Suggest Error Fix" href="/vehicle-issues/suggest-error" />
-      </div>
-
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/vehicle-issues" />
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.proposal_history')} href="/vehicle-issues/proposals" />
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/vehicle-issues/suggest-error" />
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.error_codes')} href="/vehicle-issues/error-codes" />
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.service_pricing')} href="/vehicle-issues/service-pricing" />
+        </div>
 
         <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">🚧 Assigned Issues</h2>
-          <div className="md:hidden space-y-4">
-            {issues.map(issue => (
-              <div key={issue.id} className="border rounded-xl p-4 bg-white shadow">
-                <div className="text-sm font-semibold mb-2">{issue.issueType} – {renderStatusBadge(issue.status)}</div>
-                <p className="text-sm text-gray-600"><strong>VIN:</strong> {issue.vin}</p>
-                <p className="text-sm text-gray-600"><strong>Plate:</strong> {issue.plateNumber}</p>
-                <p className="text-sm text-gray-600"><strong>Description:</strong> {issue.description}</p>
-                <p className="text-sm text-gray-600"><strong>Reported:</strong> {issue.reportedAt?.toDate().toLocaleString()}</p>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">🚧 {t('technician_partner_dashboard.assigned_issues')}</h2>
 
-                <div className="mt-3 space-y-2">
-                  {issue.status === 'assigned' && <Button className="w-full" onClick={() => setProposingIssue(issue)}>Submit Proposal</Button>}
-                  {issue.status === 'confirmed' && <Button className="w-full" onClick={() => handleUpdateStatus(issue, 'in_progress')}>Mark In Progress</Button>}
-                  {issue.status === 'in_progress' && <Button className="w-full" onClick={() => setUpdatingActualIssue(issue)}>Complete & Submit Actual Result</Button>}
-                  {issue.status === 'proposed' && <p className="text-green-600 text-center">Waiting Approval</p>}
-                  {issue.status === 'rejected' && <p className="text-gray-400 italic text-center">No actions</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="hidden md:block overflow-auto border rounded-xl">
+          <div className="overflow-auto border rounded-xl">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-gray-100 text-left">
                   <th className="p-2">VIN</th>
-                  <th className="p-2">Plate</th>
-                  <th className="p-2">Issue Type</th>
-                  <th className="p-2">Description</th>
-                  <th className="p-2">Status</th>
-                  <th className="p-2">Reported</th>
-                  <th className="p-2">Actions</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.plate')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.issue_type')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.description')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.status')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.reported')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -174,14 +136,14 @@ export default function TechnicianDashboard() {
                     <td className="p-2">{issue.plateNumber}</td>
                     <td className="p-2">{issue.issueType}</td>
                     <td className="p-2">{issue.description}</td>
-                    <td className="p-2">{renderStatusBadge(issue.status)}</td>
+                    <td className="p-2">{renderStatusBadge(issue.status, t)}</td>
                     <td className="p-2">{issue.reportedAt?.toDate().toLocaleString()}</td>
                     <td className="p-2 space-y-1">
-                      {issue.status === 'assigned' && <Button onClick={() => setProposingIssue(issue)}>Submit Proposal</Button>}
-                      {issue.status === 'confirmed' && <Button onClick={() => handleUpdateStatus(issue, 'in_progress')}>Mark In Progress</Button>}
-                      {issue.status === 'in_progress' && <Button onClick={() => setUpdatingActualIssue(issue)}>Submit Actual</Button>}
-                      {issue.status === 'proposed' && <span className="text-green-600">Waiting Approval</span>}
-                      {issue.status === 'rejected' && <span className="text-gray-400 italic">No actions</span>}
+                      {issue.status === 'assigned' && <Button onClick={() => setProposingIssue(issue)}>{t('technician_partner_dashboard.submit_proposal')}</Button>}
+                      {issue.status === 'confirmed' && <Button onClick={() => handleUpdateStatus(issue, 'in_progress')}>{t('technician_partner_dashboard.mark_in_progress')}</Button>}
+                      {issue.status === 'in_progress' && <Button onClick={() => setUpdatingActualIssue(issue)}>{t('technician_partner_dashboard.submit_actual')}</Button>}
+                      {issue.status === 'proposed' && <span className="text-green-600">{t('technician_partner_dashboard.waiting_approval')}</span>}
+                      {issue.status === 'rejected' && <span className="text-gray-400 italic">{t('technician_partner_dashboard.no_actions')}</span>}
                     </td>
                   </tr>
                 ))}
@@ -190,11 +152,8 @@ export default function TechnicianDashboard() {
           </div>
         </section>
       </main>
-
       <Footer />
-
-      <NotificationDialog open={!!notification} type="success" title="Success" description={notification || undefined} onClose={() => setNotification(null)} />
-
+      <NotificationDialog open={!!notification} type="success" title={t('notification.success')} description={notification || undefined} onClose={() => setNotification(null)} />
       <ProposalPopup open={!!proposingIssue} onClose={() => setProposingIssue(null)} onSubmit={handlePropose} />
       <ActualResultPopup open={!!updatingActualIssue} onClose={() => setUpdatingActualIssue(null)} onSubmit={handleActualSubmit} />
     </div>

@@ -1536,7 +1536,14 @@
     "Parts Replacement": "부품 교체",
     "Insurance": "보험"
   }
+},
+
+"service_card": {
+  "price_unit": "{{price}} ₫",
+  "no_description": "설명이 없습니다",
+  "no_features": "표시할 기능이 없습니다"
 }
+
 
 
 
