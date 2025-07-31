@@ -405,7 +405,7 @@
 
 "profile_tabs": {
   "activityFeed": "Bản tin hoạt động",
-  "vehicles": "Xe của tôi",
+  "vehicles": "Xe cá nhân",
   "insurance": "Gói bảo hiểm",
   "issues": "Sự cố đã báo",
   "contributions": "Đóng góp",
@@ -1402,7 +1402,7 @@
 },
 
 "vehicle_issue_table": {
-  "vin": "Số VIN",
+  "vin": "Số Khung",
   "plate": "Biển số",
   "station": "Trạm",
   "type": "Loại sự cố",
