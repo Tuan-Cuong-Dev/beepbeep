@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import QRCode from 'react-qr-code';
 import { printSingleBatteryQR } from './printSingleBatteryQR';
 import { Button } from '@/src/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   batteries: Battery[];
@@ -19,6 +20,8 @@ export default function BatteryTableMobile({
   onEdit,
   onDelete,
 }: Props) {
+  const { t } = useTranslation('common');
+
   const formatDate = (timestamp?: any) => {
     if (!timestamp?.toDate) return '—';
     return format(timestamp.toDate(), 'dd/MM/yyyy');
@@ -39,25 +42,13 @@ export default function BatteryTableMobile({
     }
   };
 
-  const getStatusLabel = (status: Battery['status']) => {
-    switch (status) {
-      case 'in_stock':
-        return 'In Stock';
-      case 'in_use':
-        return 'In Use';
-      case 'returned':
-        return 'Returned';
-      case 'maintenance':
-        return 'Maintenance';
-      default:
-        return 'Unknown';
-    }
-  };
+  const getStatusLabel = (status: Battery['status']) =>
+    t(`status.${status}`, { defaultValue: status });
 
   if (batteries.length === 0) {
     return (
       <div className="text-center text-gray-500 p-6">
-        No batteries found.
+        {t('battery_table.no_batteries')}
       </div>
     );
   }
@@ -92,13 +83,18 @@ export default function BatteryTableMobile({
           </div>
 
           <div className="text-xs text-gray-700">
-            <strong>Import Date:</strong> {formatDate(battery.importDate)}
+            <strong>{t('battery_table.import_date')}:</strong>{' '}
+            {formatDate(battery.importDate)}
             <br />
-            <strong>Export Date:</strong> {formatDate(battery.exportDate)}
+            <strong>{t('battery_table.export_date')}:</strong>{' '}
+            {formatDate(battery.exportDate)}
           </div>
 
           <div className="text-xs text-gray-700">
-            <strong>Notes:</strong> {battery.notes || <span className="italic text-gray-400">None</span>}
+            <strong>{t('battery_table.notes')}:</strong>{' '}
+            {battery.notes || (
+              <span className="italic text-gray-400">{t('common.none')}</span>
+            )}
           </div>
 
           <div className="flex gap-2 pt-2">
@@ -109,7 +105,7 @@ export default function BatteryTableMobile({
                 className="w-full"
                 onClick={() => onDelete(battery.id)}
               >
-                Delete
+                {t('actions.delete')}
               </Button>
             )}
 
@@ -119,7 +115,7 @@ export default function BatteryTableMobile({
                 className="w-full bg-[#00d289] hover:bg-green-600 text-white"
                 onClick={() => onEdit(battery)}
               >
-                Edit
+                {t('actions.edit')}
               </Button>
             )}
 
@@ -129,7 +125,7 @@ export default function BatteryTableMobile({
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={() => printSingleBatteryQR(battery)}
               >
-                Print
+                {t('actions.print')}
               </Button>
             )}
           </div>

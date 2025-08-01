@@ -1333,11 +1333,11 @@
     "resolved": "Resolved"
   },
   "quick_actions": {
-    "my_issues": "My Issues",
+    "my_issues": "Assigned Issues",
     "proposal_history": "Proposal History",
     "suggest_error_fix": "Suggest Error Fix",
-    "error_codes": "Error Codes",
-    "service_pricing": "Service Pricing"
+    "error_codes": "Error Code Reference",
+    "service_pricing": "Standard Service Pricing"
   },
   "assigned_issues": "🚧 Assigned Issues",
   "table_headers": {
@@ -1567,7 +1567,88 @@
   "in_progress": "In Progress",
   "resolved": "Resolved",
   "closed": "Closed"
+},
+
+"pagination": {
+  "previous": "Previous",
+  "next": "Next",
+  "page_info": "Page {{current}} of {{total}}"
+},
+"vehicle_issue_type": {
+  "flat_tire": "Flat Tire",
+  "motor_problem": "Motor Problem",
+  "brake_issue": "Brake Issue",
+  "battery_problem": "Battery Problem",
+  "light_issue": "Light Issue",
+  "electrical": "Electrical Issue",
+  "software": "Software Issue",
+  "other": "Other"
+},
+
+"battery_management_page": {
+  "title": "Battery Management",
+  "technician_notice": "👀 You have view-only access as a Technician. You cannot add, edit, or delete batteries.",
+  "filter_by_status": "Filter by status:",
+  "all_statuses": "All Statuses",
+  "in_stock": "In Stock",
+  "in_use": "In Use",
+  "returned": "Returned",
+  "maintenance": "Maintenance",
+  "delete_title": "Delete battery {{code}}?",
+  "delete_confirm": "This action cannot be undone.",
+  "delete_success": "Battery deleted successfully",
+  "delete_failed": "Failed to delete battery"
+},
+
+"battery_summary_card": {
+  "total": "Total Batteries",
+  "in_stock": "In Stock",
+  "in_use": "In Use",
+  "returned": "Returned",
+  "maintenance": "Maintenance"
+},
+
+"battery_table": {
+  "battery_code": "Battery Code",
+  "qr_code": "QR (Physical Code)",
+  "import_date": "Import Date",
+  "export_date": "Export Date",
+  "status_label": "Status",
+  "notes": "Notes",
+  "actions": "Actions",
+  "edit": "Edit",
+  "delete": "Delete",
+  "print": "Print QR",
+  "no_batteries": "No batteries found.",
+  "status": {
+    "in_stock": "In Stock",
+    "in_use": "In Use",
+    "returned": "Returned",
+    "maintenance": "Maintenance"
+  }
+},
+
+"battery_search_import_export": {
+  "search_placeholder": "Search by battery code, physical code, or status",
+  "import": "Import",
+  "export": "Export",
+  "print_qr": "Print QR Labels",
+  "delete_all": "Delete All",
+  "missing_company_id": "Missing companyId",
+  "import_restriction": "Only staff or company owner can import batteries.",
+  "import_success": "✅ Imported {{count}} batteries.",
+  "import_failed": "❌ Failed to import batteries. Please check your file format.",
+  "export_success": "✅ Exported {{count}} batteries to Excel.",
+  "confirm_delete_all": "⚠️ Are you sure you want to delete ALL batteries?",
+  "delete_success": "✅ All batteries deleted.",
+  "delete_failed": "❌ Failed to delete batteries."
 }
+
+
+
+
+
+
 
 
 

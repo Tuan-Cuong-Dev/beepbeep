@@ -1,6 +1,6 @@
 'use client';
 
-import BatteryTable from './BatteryTable';
+import BatteryTable from './BatteryTableDesktop';
 import BatteryTableMobile from './BatteryTableMobile';
 import { Battery } from '@/src/lib/batteries/batteryTypes';
 

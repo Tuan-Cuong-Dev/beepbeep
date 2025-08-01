@@ -19,10 +19,11 @@ import { db } from '@/src/firebaseConfig';
 import PrintBatteryQRModal from '@/src/components/batteries/PrintBatteryQRModal';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   batteries: Battery[];
-  setBatteries?: (batteries: Battery[]) => void; // ✅ optional
+  setBatteries?: (batteries: Battery[]) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
 }
@@ -34,6 +35,7 @@ export default function BatterySearchImportExport({
   setSearchTerm,
 }: Props) {
   const { user } = useUser();
+  const { t } = useTranslation('common');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [openPrintModal, setOpenPrintModal] = useState(false);
   const [companyId, setCompanyId] = useState<string>('');
@@ -93,12 +95,12 @@ export default function BatterySearchImportExport({
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Batteries');
     XLSX.writeFile(workbook, 'batteries.xlsx');
 
-    showDialog('success', `✅ Exported ${data.length} batteries to Excel.`);
+    showDialog('success', t('battery_search_import_export.export_success', { count: data.length }));
   };
 
   const handleImport = () => {
     if (!companyId) {
-      showDialog('error', 'Missing companyId', 'Only staff or company owner can import batteries.');
+      showDialog('error', t('battery_search_import_export.missing_company_id'), t('battery_search_import_export.only_staff_or_owner'));
       return;
     }
     fileInputRef.current?.click();
@@ -152,14 +154,10 @@ export default function BatterySearchImportExport({
           setBatteries(importedBatteries);
         }
 
-        showDialog('success', `✅ Imported ${importedBatteries.length} batteries.`);
+        showDialog('success', t('battery_search_import_export.import_success', { count: importedBatteries.length }));
       } catch (error) {
         console.error('❌ Import failed:', error);
-        showDialog(
-          'error',
-          'Failed to import batteries.',
-          'Please check your file format and try again.'
-        );
+        showDialog('error', t('battery_search_import_export.import_failed'), t('battery_search_import_export.check_file_format'));
       }
     };
 
@@ -167,34 +165,29 @@ export default function BatterySearchImportExport({
   };
 
   const handleDeleteAll = () => {
-    showDialog(
-      'confirm',
-      '⚠️ Confirm Delete',
-      'Are you sure you want to delete ALL batteries?',
-      async () => {
-        try {
-          const snapshot = await getDocs(collection(db, 'batteries'));
-          const deletePromises = snapshot.docs.map((docSnap) =>
-            deleteDoc(doc(db, 'batteries', docSnap.id))
-          );
-          await Promise.all(deletePromises);
-          if (setBatteries) {
-            setBatteries([]);
-          }
-          showDialog('success', '✅ All batteries deleted.');
-        } catch (err) {
-          console.error(err);
-          showDialog('error', '❌ Failed to delete batteries.');
+    showDialog('confirm', t('battery_search_import_export.confirm_delete_title'), t('battery_search_import_export.confirm_delete_message'), async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'batteries'));
+        const deletePromises = snapshot.docs.map((docSnap) =>
+          deleteDoc(doc(db, 'batteries', docSnap.id))
+        );
+        await Promise.all(deletePromises);
+        if (setBatteries) {
+          setBatteries([]);
         }
+        showDialog('success', t('battery_search_import_export.all_deleted'));
+      } catch (err) {
+        console.error(err);
+        showDialog('error', t('battery_search_import_export.delete_failed'));
       }
-    );
+    });
   };
 
   return (
     <>
       <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-4">
         <Input
-          placeholder="Search by battery code, physical code, or status"
+          placeholder={t('battery_search_import_export.search_placeholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full max-w-md"
@@ -203,7 +196,7 @@ export default function BatterySearchImportExport({
         {setBatteries && (
           <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
             <Button variant="outline" onClick={handleImport} className="w-full sm:w-auto">
-              Import
+              {t('battery_search_import_export.import')}
             </Button>
             <input
               type="file"
@@ -213,13 +206,13 @@ export default function BatterySearchImportExport({
               onChange={handleFileChange}
             />
             <Button onClick={handleExport} className="w-full sm:w-auto">
-              Export
+              {t('battery_search_import_export.export')}
             </Button>
             <Button variant="default" onClick={() => setOpenPrintModal(true)} className="w-full sm:w-auto">
-              Print QR Labels
+              {t('battery_search_import_export.print_qr')}
             </Button>
             <Button variant="destructive" onClick={handleDeleteAll} className="w-full sm:w-auto">
-              Delete All
+              {t('battery_search_import_export.delete_all')}
             </Button>
           </div>
         )}

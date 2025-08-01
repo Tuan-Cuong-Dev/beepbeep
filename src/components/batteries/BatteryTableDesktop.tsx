@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import QRCode from 'react-qr-code';
 import { printSingleBatteryQR } from './printSingleBatteryQR';
 import { Button } from '@/src/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   batteries: Battery[];
@@ -13,7 +14,9 @@ interface Props {
   onDelete?: (id: string) => void;
 }
 
-export default function BatteryTable({ batteries, onEdit, onDelete, setBatteries }: Props) {
+export default function BatteryTableDesktop({ batteries, onEdit, onDelete, setBatteries }: Props) {
+  const { t } = useTranslation('common');
+
   const formatDate = (timestamp?: any) => {
     if (!timestamp?.toDate) return '—';
     return format(timestamp.toDate(), 'dd/MM/yyyy');
@@ -34,33 +37,21 @@ export default function BatteryTable({ batteries, onEdit, onDelete, setBatteries
     }
   };
 
-  const getStatusLabel = (status: Battery['status']) => {
-    switch (status) {
-      case 'in_stock':
-        return 'In Stock';
-      case 'in_use':
-        return 'In Use';
-      case 'returned':
-        return 'Returned';
-      case 'maintenance':
-        return 'Maintenance';
-      default:
-        return 'Unknown';
-    }
-  };
+  const getStatusLabel = (status: Battery['status']) =>
+    t(`status.${status}`, { defaultValue: status });
 
   return (
     <div className="overflow-x-auto bg-white shadow rounded-xl">
       <table className="min-w-full text-sm">
         <thead className="bg-gray-100 text-left">
           <tr>
-            <th className="px-4 py-2 border">Battery Code</th>
-            <th className="px-4 py-2 border">QR (Physical Code)</th>
-            <th className="px-4 py-2 border">Import Date</th>
-            <th className="px-4 py-2 border">Export Date</th>
-            <th className="px-4 py-2 border">Status</th>
-            <th className="px-4 py-2 border">Notes</th>
-            <th className="px-4 py-2 border">Actions</th>
+            <th className="px-4 py-2 border">{t('battery_table.battery_code')}</th>
+            <th className="px-4 py-2 border">{t('battery_table.qr_code')}</th>
+            <th className="px-4 py-2 border">{t('battery_table.import_date')}</th>
+            <th className="px-4 py-2 border">{t('battery_table.export_date')}</th>
+            <th className="px-4 py-2 border">{t('battery_table.status_label')}</th>
+            <th className="px-4 py-2 border">{t('battery_table.notes')}</th>
+            <th className="px-4 py-2 border">{t('battery_table.actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -104,27 +95,25 @@ export default function BatteryTable({ batteries, onEdit, onDelete, setBatteries
                     variant="destructive"
                     onClick={() => onDelete(battery.id)}
                   >
-                    Delete
+                    {t('actions.delete')}
                   </Button>
                 )}
-
                 {onEdit && (
                   <Button
                     size="sm"
                     className="bg-[#00d289] hover:bg-green-600 text-white"
                     onClick={() => onEdit(battery)}
                   >
-                    Edit
+                    {t('actions.edit')}
                   </Button>
                 )}
-
                 {setBatteries && (
                   <Button
                     size="sm"
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                     onClick={() => printSingleBatteryQR(battery)}
                   >
-                    Print
+                    {t('actions.print')}
                   </Button>
                 )}
               </td>
@@ -133,7 +122,7 @@ export default function BatteryTable({ batteries, onEdit, onDelete, setBatteries
           {batteries.length === 0 && (
             <tr>
               <td colSpan={7} className="text-center py-4 text-gray-500">
-                No batteries found.
+                {t('battery_table.no_batteries')}
               </td>
             </tr>
           )}

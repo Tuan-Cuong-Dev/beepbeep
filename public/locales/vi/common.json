@@ -1591,7 +1591,68 @@
   "electrical": "Lỗi điện",
   "software": "Lỗi phần mềm",
   "other": "Khác"
+},
+
+"battery_management_page": {
+  "title": "Quản lý Pin",
+  "technician_notice": "👀 Bạn chỉ có quyền xem với vai trò Kỹ thuật viên. Không thể thêm, sửa hoặc xoá pin.",
+  "filter_by_status": "Lọc theo trạng thái:",
+  "all_statuses": "Tất cả trạng thái",
+  "in_stock": "Trong kho",
+  "in_use": "Đang sử dụng",
+  "returned": "Đã hoàn trả",
+  "maintenance": "Bảo trì",
+  "delete_title": "Xoá pin {{code}}?",
+  "delete_confirm": "Hành động này không thể hoàn tác.",
+  "delete_success": "Đã xoá pin thành công",
+  "delete_failed": "Xoá pin thất bại"
+},
+
+"battery_summary_card": {
+  "total": "Tổng số pin",
+  "in_stock": "Còn trong kho",
+  "in_use": "Đang sử dụng",
+  "returned": "Đã hoàn trả nhà máy",
+  "maintenance": "Đang bảo trì"
+},
+
+"battery_table": {
+  "battery_code": "Mã pin",
+  "qr_code": "QR (Mã vật lý)",
+  "import_date": "Ngày nhập kho",
+  "export_date": "Ngày xuất kho",
+  "status_label": "Trạng thái",
+  "notes": "Ghi chú",
+  "actions": "Thao tác",
+  "edit": "Chỉnh sửa",
+  "delete": "Xoá",
+  "print": "In mã QR",
+  "no_batteries": "Không có pin nào được tìm thấy.",
+  "status": {
+    "in_stock": "Trong kho",
+    "in_use": "Đang hoạt động",
+    "returned": "Đã trả",
+    "maintenance": "Bảo trì"
+  }
+},
+
+"battery_search_import_export": {
+  "search_placeholder": "Tìm theo mã pin, mã vật lý hoặc trạng thái",
+  "import": "Nhập",
+  "export": "Xuất",
+  "print_qr": "In nhãn QR",
+  "delete_all": "Xoá tất cả",
+  "missing_company_id": "Thiếu companyId",
+  "import_restriction": "Chỉ nhân viên hoặc chủ công ty mới được nhập pin.",
+  "import_success": "✅ Đã nhập {{count}} pin.",
+  "import_failed": "❌ Lỗi khi nhập pin. Vui lòng kiểm tra định dạng file.",
+  "export_success": "✅ Đã xuất {{count}} pin ra Excel.",
+  "confirm_delete_all": "⚠️ Bạn có chắc chắn muốn xoá toàn bộ pin không?",
+  "delete_success": "✅ Đã xoá toàn bộ pin.",
+  "delete_failed": "❌ Không thể xoá pin."
 }
+
+
 
 
 

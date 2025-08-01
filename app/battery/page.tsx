@@ -1,8 +1,8 @@
-// 📄 BatteryManagementPage.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { deleteDoc, doc, collection, getDocs, query, where } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+import { deleteDoc, doc, collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { useTranslation } from 'react-i18next';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
@@ -12,16 +12,11 @@ import BatterySearchImportExport from '@/src/components/batteries/BatterySearchI
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import Pagination from '@/src/components/ui/pagination';
 import BatterySummaryCard from '@/src/components/batteries/BatterySummaryCard';
+import PrintBatteryQRModal from '@/src/components/batteries/PrintBatteryQRModal';
 import { Battery } from '@/src/lib/batteries/batteryTypes';
 import { useBatteryData } from '@/src/hooks/useBatteryData';
-import { Timestamp } from 'firebase/firestore';
-import PrintBatteryQRModal from '@/src/components/batteries/PrintBatteryQRModal';
 import { useUser } from '@/src/context/AuthContext';
-import * as XLSX from 'xlsx';
-import { Input } from '@/src/components/ui/input';
-import { Button } from '@/src/components/ui/button';
 import { db } from '@/src/firebaseConfig';
-
 
 const emptyBattery: Battery = {
   id: '',
@@ -35,6 +30,7 @@ const emptyBattery: Battery = {
 };
 
 export default function BatteryManagementPage() {
+  const { t } = useTranslation('common');
   const { user, role, companyId: contextCompanyId } = useUser();
   const [companyId, setCompanyId] = useState<string | null>(contextCompanyId ?? null);
   const isTechnician = role?.toLowerCase() === 'technician';
@@ -112,18 +108,18 @@ export default function BatteryManagementPage() {
     setDialog({
       open: true,
       type: 'confirm',
-      title: `Delete battery ${battery.batteryCode}?`,
-      description: 'This action cannot be undone.',
+      title: t('battery_management_page.delete_title', { code: battery.batteryCode }),
+      description: t('battery_management_page.delete_confirm'),
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'batteries', id));
           const updatedList = batteries.filter((b) => b.id !== id);
           setBatteries(updatedList);
           setDialog((prev) => ({ ...prev, open: false }));
-          showDialog('success', 'Battery deleted successfully');
+          showDialog('success', t('battery_management_page.delete_success'));
         } catch (error) {
           console.error('Failed to delete battery:', error);
-          showDialog('error', 'Failed to delete battery');
+          showDialog('error', t('battery_management_page.delete_failed'));
         }
       }
     });
@@ -136,44 +132,49 @@ export default function BatteryManagementPage() {
       <div className="p-6 mt-1">
         {isTechnician && (
           <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-md border border-yellow-300">
-            👀 You have <strong>view-only access</strong> as a Technician. You cannot add, edit, or delete batteries.
+            {t('battery_management_page.technician_notice')}
           </div>
         )}
 
-        <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">Battery Management</h1>
+        <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">
+          {t('battery_management_page.title')}
+        </h1>
 
         <BatterySummaryCard batteries={batteries} />
 
         <BatterySearchImportExport
           batteries={batteries}
-          setBatteries={!isTechnician ? setBatteries : undefined} // ✅ tốt hơn
+          setBatteries={!isTechnician ? setBatteries : undefined}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
 
-
         <div className="flex gap-4 items-center mb-4">
-          <label className="text-sm font-medium">Filter by status:</label>
+          <label className="text-sm font-medium">{t('battery_management_page.filter_by_status')}</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="border px-3 py-2 rounded"
           >
-            <option value="">All Statuses</option>
-            <option value="in_stock">In Stock</option>
-            <option value="in_use">In Use</option>
-            <option value="returned">Returned</option>
-            <option value="maintenance">Maintenance</option>
+            <option value="">{t('battery_management_page.all_statuses')}</option>
+            <option value="in_stock">{t('battery_management_page.in_stock')}</option>
+            <option value="in_use">{t('battery_management_page.in_use')}</option>
+            <option value="returned">{t('battery_management_page.returned')}</option>
+            <option value="maintenance">{t('battery_management_page.maintenance')}</option>
           </select>
         </div>
 
         <ResponsiveBatteryTable
           batteries={paginatedBatteries}
           setBatteries={!isTechnician ? setBatteries : undefined}
-          onEdit={!isTechnician ? (battery) => {
-            setNewBattery(battery);
-            setIsUpdateMode(true);
-          } : undefined}
+          onEdit={
+            !isTechnician
+              ? (battery) => {
+                  setNewBattery(battery);
+                  setIsUpdateMode(true);
+                }
+              : undefined
+          }
           onDelete={!isTechnician ? confirmDelete : undefined}
         />
 
