@@ -1680,7 +1680,32 @@
   "export": "내보내기",
   "import_failed": "액세서리를 가져오지 못했습니다.",
   "not_array_warning": "가져온 데이터가 배열이 아닙니다"
+},
+
+"accessory_management_page": {
+  "view_only_warning": "👀 기술자 계정으로 보기 전용 권한만 있습니다. 액세서리를 추가, 수정 또는 삭제할 수 없습니다.",
+  "title": "액세서리 관리",
+  "filter_label": "상태별 필터:",
+  "all_statuses": "모든 상태",
+  "status": {
+    "in_stock": "재고 있음",
+    "in_use": "사용 중",
+    "damaged": "손상됨",
+    "lost": "분실",
+    "retired": "사용 중지됨"
+  },
+  "delete_title": "액세서리 {{name}} 을(를) 삭제하시겠습니까?",
+  "delete_description": "이 작업은 되돌릴 수 없습니다.",
+  "delete_success": "액세서리가 성공적으로 삭제되었습니다.",
+  "delete_failed": "액세서리 삭제에 실패했습니다.",
+  "options": {
+    "accessory_type": {
+      "tracked": "추적 가능",
+      "bulk": "수량 기반"
+    }
+  }
 }
+
 
 
 

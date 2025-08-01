@@ -1665,7 +1665,33 @@
   "export": "エクスポート",
   "import_failed": "アクセサリのインポートに失敗しました。",
   "not_array_warning": "インポートされたデータは配列ではありません"
+},
+
+"accessory_management_page": {
+  "view_only_warning": "👀 あなたは技術者のため、閲覧のみ可能です。アクセサリの追加、編集、削除はできません。",
+  "title": "アクセサリ管理",
+  "filter_label": "ステータスで絞り込み:",
+  "all_statuses": "すべてのステータス",
+  "status": {
+    "in_stock": "在庫あり",
+    "in_use": "使用中",
+    "damaged": "破損",
+    "lost": "紛失",
+    "retired": "廃止済み"
+  },
+  "delete_title": "アクセサリ {{name}} を削除しますか？",
+  "delete_description": "この操作は元に戻せません。",
+  "delete_success": "アクセサリの削除に成功しました。",
+  "delete_failed": "アクセサリの削除に失敗しました。",
+  "options": {
+    "accessory_type": {
+      "tracked": "トラッキング付き",
+      "bulk": "数量管理"
+    }
+  }
 }
+
+
 
 
 

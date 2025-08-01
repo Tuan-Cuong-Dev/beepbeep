@@ -1695,7 +1695,32 @@
   "export": "Export",
   "import_failed": "Failed to import accessories.",
   "not_array_warning": "Imported data is not an array"
+},
+
+"accessory_management_page": {
+  "view_only_warning": "👀 You have view-only permission as a Technician. You cannot add, edit, or delete accessories.",
+  "title": "Accessory Management",
+  "filter_label": "Filter by status:",
+  "all_statuses": "All statuses",
+  "status": {
+    "in_stock": "In Stock",
+    "in_use": "In Use",
+    "damaged": "Damaged",
+    "lost": "Lost",
+    "retired": "Retired"
+  },
+  "delete_title": "Delete accessory {{name}}?",
+  "delete_description": "This action cannot be undone.",
+  "delete_success": "Accessory deleted successfully.",
+  "delete_failed": "Failed to delete accessory.",
+  "options": {
+    "accessory_type": {
+      "tracked": "Tracked",
+      "bulk": "Bulk Quantity"
+    }
+  }
 }
+
 
 
 
