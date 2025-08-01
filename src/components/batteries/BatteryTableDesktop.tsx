@@ -80,9 +80,10 @@ export default function BatteryTableDesktop({ batteries, onEdit, onDelete, setBa
 
               <td className="px-4 py-2 border text-center">
                 <span className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(battery.status)}`}>
-                  {getStatusLabel(battery.status)}
+                  {t(`battery_table.status.${battery.status}`)}
                 </span>
               </td>
+
 
               <td className="px-4 py-2 border">
                 {battery.notes || '—'}

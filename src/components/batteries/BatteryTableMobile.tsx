@@ -43,7 +43,7 @@ export default function BatteryTableMobile({
   };
 
   const getStatusLabel = (status: Battery['status']) =>
-    t(`status.${status}`, { defaultValue: status });
+    t(`battery_table.status.${status}`, { defaultValue: status });
 
   if (batteries.length === 0) {
     return (
