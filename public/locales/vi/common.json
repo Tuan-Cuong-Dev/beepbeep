@@ -1720,8 +1720,15 @@
   "delete_title": "Xoá phụ kiện {{name}}?",
   "delete_description": "Hành động này không thể hoàn tác.",
   "delete_success": "Đã xoá phụ kiện thành công.",
-  "delete_failed": "Không thể xoá phụ kiện."
-}
+  "delete_failed": "Không thể xoá phụ kiện.",
+
+  "options": {
+    "accessory_type": {
+      "tracked": "Có mã theo dõi",
+      "bulk": "Số lượng"
+      }
+    }
+  }
 
 
 

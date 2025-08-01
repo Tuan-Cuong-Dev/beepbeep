@@ -109,7 +109,7 @@ export default function BatteryTableMobile({
                   className="w-full"
                   onClick={() => onDelete(battery.id)}
                 >
-                  {t('actions.delete')}
+                  {t('battery_table.delete')}
                 </Button>
               )}
               {onEdit && (
@@ -118,7 +118,7 @@ export default function BatteryTableMobile({
                   className="w-full bg-[#00d289] hover:bg-green-600 text-white"
                   onClick={() => onEdit(battery)}
                 >
-                  {t('actions.edit')}
+                  {t('battery_table.edit')}
                 </Button>
               )}
               {setBatteries && (
@@ -127,7 +127,7 @@ export default function BatteryTableMobile({
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => printSingleBatteryQR(battery)}
                 >
-                  {t('actions.print')}
+                  {t('battery_table.print')}
                 </Button>
               )}
             </div>

@@ -12,14 +12,14 @@ import {
   DialogTitle,
 } from '@/src/components/ui/dialog';
 import { formatCurrency } from '@/src/utils/formatCurrency';
-import { useUser } from '@/src/context/AuthContext'; // ✅
+import { useUser } from '@/src/context/AuthContext';
 
 interface Props {
   accessories: Accessory[];
   onEdit?: (item: Accessory) => void;
   onDelete?: (id: string) => void;
   onUpdateAccessory?: (updated: Accessory) => void;
-  normalizedRole?: string; // ✅ Thêm dòng này
+  normalizedRole?: string;
 }
 
 export default function AccessoryTable({
@@ -29,7 +29,7 @@ export default function AccessoryTable({
   onUpdateAccessory,
 }: Props) {
   const { t } = useTranslation('common');
-  const { role } = useUser(); // ✅ lấy role từ AuthContext
+  const { role } = useUser();
   const isTechnician = role === 'technician';
 
   const [selectedAccessory, setSelectedAccessory] = useState<Accessory | null>(null);
@@ -62,13 +62,19 @@ export default function AccessoryTable({
           {sortedAccessories.map((a) => (
             <tr key={a.id} className="border-t hover:bg-gray-50">
               <td className="p-2">{a.name}</td>
-              <td className="p-2 capitalize">{a.type}</td>
+              <td className="p-2 capitalize">
+                {t(`accessory_management_page.options.accessory_type.${a.type}`, { defaultValue: a.type })}
+              </td>
               <td className="p-2">
                 {a.type === 'tracked'
                   ? a.code
                   : t('accessory_table.pcs', { qty: a.quantity ?? 0 })}
               </td>
-              <td className="p-2 capitalize">{a.status}</td>
+              <td className="p-2 capitalize">
+                {t(`accessory_management_page.status.${a.status}`, {
+                  defaultValue: a.status,
+                })}
+              </td>
               <td className="p-2">
                 {a.importDate?.toDate().toLocaleDateString('en-GB') || '-'}
               </td>
