@@ -1,4 +1,3 @@
-// 📄 AccessoryManagementPage.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -23,6 +22,7 @@ import { useAccessoryData } from '@/src/hooks/useAccessoryData';
 import { Accessory } from '@/src/lib/accessories/accessoryTypes';
 import { useUser } from '@/src/context/AuthContext';
 import { db } from '@/src/firebaseConfig';
+import { useTranslation } from 'react-i18next';
 
 const emptyAccessory: Accessory = {
   id: '',
@@ -37,6 +37,7 @@ const emptyAccessory: Accessory = {
 };
 
 export default function AccessoryManagementPage() {
+  const { t } = useTranslation('common');
   const { user, role, companyId: contextCompanyId } = useUser();
   const isTechnician = role?.toLowerCase() === 'technician';
   const [companyId, setCompanyId] = useState<string | null>(contextCompanyId ?? null);
@@ -112,18 +113,18 @@ export default function AccessoryManagementPage() {
     setDialog({
       open: true,
       type: 'confirm',
-      title: `Delete accessory ${accessory.name}?`,
-      description: 'This action cannot be undone.',
+      title: t('accessory_management_page.delete_title', { name: accessory.name }),
+      description: t('accessory_management_page.delete_description'),
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'accessories', id));
           const updatedList = accessories.filter((a) => a.id !== id);
           setAccessories(updatedList);
           setDialog((prev) => ({ ...prev, open: false }));
-          showDialog('success', 'Accessory deleted successfully');
+          showDialog('success', t('accessory_management_page.delete_success'));
         } catch (error) {
           console.error('Failed to delete accessory:', error);
-          showDialog('error', 'Failed to delete accessory');
+          showDialog('error', t('accessory_management_page.delete_failed'));
         }
       },
     });
@@ -137,11 +138,13 @@ export default function AccessoryManagementPage() {
       <div className="p-6">
         {isTechnician && (
           <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-md border border-yellow-300">
-            👀 You have <strong>view-only access</strong> as a Technician. You cannot add, edit, or delete accessories.
+            {t('accessory_management_page.view_only_warning')}
           </div>
         )}
 
-        <h1 className="text-2xl font-semibold mb-4 border-b pb-2">Accessory Management</h1>
+        <h1 className="text-2xl font-semibold mb-4 border-b pb-2">
+          {t('accessory_management_page.title')}
+        </h1>
 
         <AccessorySearchImportExport
           accessories={accessories}
@@ -150,20 +153,21 @@ export default function AccessoryManagementPage() {
           {...(!isTechnician && { setAccessories })}
         />
 
-
         <div className="flex gap-4 items-center mb-4">
-          <label className="text-sm font-medium">Filter by status:</label>
+          <label className="text-sm font-medium">
+            {t('accessory_management_page.filter_label')}
+          </label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="border px-3 py-2 rounded"
           >
-            <option value="">All Statuses</option>
-            <option value="in_stock">In Stock</option>
-            <option value="in_use">In Use</option>
-            <option value="damaged">Damaged</option>
-            <option value="lost">Lost</option>
-            <option value="retired">Retired</option>
+            <option value="">{t('accessory_management_page.all_statuses')}</option>
+            <option value="in_stock">{t('accessory_management_page.status.in_stock')}</option>
+            <option value="in_use">{t('accessory_management_page.status.in_use')}</option>
+            <option value="damaged">{t('accessory_management_page.status.damaged')}</option>
+            <option value="lost">{t('accessory_management_page.status.lost')}</option>
+            <option value="retired">{t('accessory_management_page.status.retired')}</option>
           </select>
         </div>
 
@@ -181,7 +185,6 @@ export default function AccessoryManagementPage() {
           } : undefined}
           normalizedRole={isTechnician ? 'technician' : 'other'}
         />
-
 
         {totalPages > 1 && (
           <Pagination

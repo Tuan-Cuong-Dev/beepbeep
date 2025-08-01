@@ -1639,7 +1639,34 @@
   "confirm": "確認",
   "success_message": "正常に戻されました。変更を確認するには再読み込みしてください。",
   "error_message": "戻しに失敗しました。"
+},
+
+"accessory_table": {
+  "name": "名前",
+  "type": "タイプ",
+  "code_quantity": "コード / 数量",
+  "status": "ステータス",
+  "import_date": "入荷日",
+  "import_price": "仕入れ価格",
+  "retail_price": "販売価格",
+  "notes": "備考",
+  "actions": "操作",
+  "edit": "編集",
+  "delete": "削除",
+  "export": "出庫",
+  "export_title": "アクセサリー出庫",
+  "view_only": "閲覧のみ",
+  "pcs": "{{qty}} 個"
+},
+
+"accessory_search_import_export": {
+  "search_placeholder": "アクセサリを検索...",
+  "import": "インポート",
+  "export": "エクスポート",
+  "import_failed": "アクセサリのインポートに失敗しました。",
+  "not_array_warning": "インポートされたデータは配列ではありません"
 }
+
 
 
 

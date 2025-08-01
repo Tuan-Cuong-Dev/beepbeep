@@ -1677,7 +1677,55 @@
   "confirm": "Xác nhận",
   "success_message": "Nhập lại thành công. Vui lòng tải lại để xem thay đổi.",
   "error_message": "Lỗi khi nhập lại phụ kiện."
+},
+
+"accessory_table": {
+  "name": "Tên",
+  "type": "Loại",
+  "code_quantity": "Mã / Số lượng",
+  "status": "Trạng thái",
+  "import_date": "Ngày nhập kho",
+  "import_price": "Giá nhập",
+  "retail_price": "Giá bán",
+  "notes": "Ghi chú",
+  "actions": "Thao tác",
+  "edit": "Chỉnh sửa",
+  "delete": "Xoá",
+  "export": "Xuất kho",
+  "export_title": "Xuất phụ kiện",
+  "view_only": "Chỉ xem",
+  "pcs": "{{qty}} cái"
+},
+
+"accessory_search_import_export": {
+  "search_placeholder": "Tìm kiếm phụ kiện...",
+  "import": "Nhập kho",
+  "export": "Xuất kho",
+  "import_failed": "Không thể nhập phụ kiện.",
+  "not_array_warning": "Dữ liệu nhập không phải là một mảng"
+},
+
+"accessory_management_page": {
+  "view_only_warning": "👀 Bạn chỉ có quyền xem vì bạn là Kỹ thuật viên. Bạn không thể thêm, sửa hoặc xoá phụ kiện.",
+  "title": "Quản lý Phụ kiện",
+  "filter_label": "Lọc theo trạng thái:",
+  "all_statuses": "Tất cả trạng thái",
+  "status": {
+    "in_stock": "Trong kho",
+    "in_use": "Đang sử dụng",
+    "damaged": "Hư hỏng",
+    "lost": "Thất lạc",
+    "retired": "Ngừng sử dụng"
+  },
+  "delete_title": "Xoá phụ kiện {{name}}?",
+  "delete_description": "Hành động này không thể hoàn tác.",
+  "delete_success": "Đã xoá phụ kiện thành công.",
+  "delete_failed": "Không thể xoá phụ kiện."
 }
+
+
+
+
 
 
 

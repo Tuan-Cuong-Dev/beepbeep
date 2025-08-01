@@ -1669,7 +1669,34 @@
   "confirm": "Confirm",
   "success_message": "Imported back successfully. Please refresh to see changes.",
   "error_message": "Failed to import back."
+},
+
+"accessory_table": {
+  "name": "Name",
+  "type": "Type",
+  "code_quantity": "Code / Quantity",
+  "status": "Status",
+  "import_date": "Import Date",
+  "import_price": "Import Price",
+  "retail_price": "Retail Price",
+  "notes": "Notes",
+  "actions": "Actions",
+  "edit": "Edit",
+  "delete": "Delete",
+  "export": "Export",
+  "export_title": "Export Accessory",
+  "view_only": "View only",
+  "pcs": "{{qty}} pcs"
+},
+
+"accessory_search_import_export": {
+  "search_placeholder": "Search accessory...",
+  "import": "Import",
+  "export": "Export",
+  "import_failed": "Failed to import accessories.",
+  "not_array_warning": "Imported data is not an array"
 }
+
 
 
 
