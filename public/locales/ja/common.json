@@ -1612,7 +1612,36 @@
   "confirm_delete_all": "⚠️ すべてのバッテリーを削除してもよろしいですか？",
   "delete_success": "✅ すべてのバッテリーを削除しました。",
   "delete_failed": "❌ バッテリーの削除に失敗しました。"
+},
+
+"accessory_export_page": {
+  "title": "📦 アクセサリー出庫履歴",
+  "loading": "出庫記録を読み込んでいます..."
+},
+
+"accessory_export_table": {
+  "search_accessory": "アクセサリー名で検索...",
+  "search_target": "対象で検索...",
+  "accessory": "アクセサリー",
+  "quantity": "数量",
+  "target": "対象",
+  "import_price": "仕入価格",
+  "retail_price": "販売価格",
+  "note": "備考",
+  "exported_by": "出庫者",
+  "date": "日付",
+  "actions": "操作",
+  "import_back": "戻す",
+  "importing": "戻しています...",
+  "confirm_title": "戻し確認",
+  "confirm_message": "「{{name}}」（数量: {{qty}}）を在庫に戻してもよろしいですか？",
+  "cancel": "キャンセル",
+  "confirm": "確認",
+  "success_message": "正常に戻されました。変更を確認するには再読み込みしてください。",
+  "error_message": "戻しに失敗しました。"
 }
+
+
 
 
 

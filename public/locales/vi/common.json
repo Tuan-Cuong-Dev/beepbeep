@@ -1650,7 +1650,36 @@
   "confirm_delete_all": "⚠️ Bạn có chắc chắn muốn xoá toàn bộ pin không?",
   "delete_success": "✅ Đã xoá toàn bộ pin.",
   "delete_failed": "❌ Không thể xoá pin."
+},
+
+"accessory_export_page": {
+  "title": "📦 Lịch sử xuất phụ kiện",
+  "loading": "Đang tải danh sách xuất kho..."
+},
+
+"accessory_export_table": {
+  "search_accessory": "Tìm theo tên phụ kiện...",
+  "search_target": "Tìm theo đối tượng...",
+  "accessory": "Phụ kiện",
+  "quantity": "Số lượng",
+  "target": "Đối tượng",
+  "import_price": "Giá nhập",
+  "retail_price": "Giá bán",
+  "note": "Ghi chú",
+  "exported_by": "Người xuất",
+  "date": "Ngày",
+  "actions": "Thao tác",
+  "import_back": "Nhập lại",
+  "importing": "Đang nhập...",
+  "confirm_title": "Xác nhận nhập lại",
+  "confirm_message": "Bạn có chắc muốn nhập lại \"{{name}}\" (SL: {{qty}}) vào kho?",
+  "cancel": "Huỷ",
+  "confirm": "Xác nhận",
+  "success_message": "Nhập lại thành công. Vui lòng tải lại để xem thay đổi.",
+  "error_message": "Lỗi khi nhập lại phụ kiện."
 }
+
+
 
 
 

@@ -17,12 +17,18 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/src/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
+import { useUser } from '@/src/context/AuthContext';
 
 interface Props {
   exports: AccessoryExport[];
 }
 
 export default function AccessoryExportTable({ exports }: Props) {
+  const { t } = useTranslation();
+  const { role } = useUser(); // 🔥 dùng trực tiếp từ AuthContext
+  const isTechnician = role === 'technician';
+
   const [exportedByMap, setExportedByMap] = useState<Record<string, string>>({});
   const [searchName, setSearchName] = useState('');
   const [searchTarget, setSearchTarget] = useState('');
@@ -55,10 +61,10 @@ export default function AccessoryExportTable({ exports }: Props) {
     setImportingId(selectedItem.id);
     try {
       await importBackAccessory(selectedItem);
-      alert('Imported back successfully. Please refresh to see changes.');
+      alert(t('accessory_export_table.success_message'));
     } catch (error) {
       console.error(error);
-      alert('Failed to import back.');
+      alert(t('accessory_export_table.error_message'));
     } finally {
       setImportingId(null);
       setSelectedItem(null);
@@ -69,12 +75,12 @@ export default function AccessoryExportTable({ exports }: Props) {
     <div>
       <div className="flex gap-4 mb-4">
         <Input
-          placeholder="Search by accessory name..."
+          placeholder={t('accessory_export_table.search_accessory')}
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
         />
         <Input
-          placeholder="Search by target..."
+          placeholder={t('accessory_export_table.search_target')}
           value={searchTarget}
           onChange={(e) => setSearchTarget(e.target.value)}
         />
@@ -84,15 +90,17 @@ export default function AccessoryExportTable({ exports }: Props) {
         <table className="min-w-full text-sm">
           <thead className="bg-gray-100">
             <tr>
-              <th className="p-2 text-left">Accessory</th>
-              <th className="p-2 text-left">Quantity</th>
-              <th className="p-2 text-left">Target</th>
-              <th className="p-2 text-left">Import Price</th>
-              <th className="p-2 text-left">Retail Price</th>
-              <th className="p-2 text-left">Note</th>
-              <th className="p-2 text-left">Exported By</th>
-              <th className="p-2 text-left">Date</th>
-              <th className="p-2 text-right">Actions</th>
+              <th className="p-2 text-left">{t('accessory_export_table.accessory')}</th>
+              <th className="p-2 text-left">{t('accessory_export_table.quantity')}</th>
+              <th className="p-2 text-left">{t('accessory_export_table.target')}</th>
+              <th className="p-2 text-left">{t('accessory_export_table.import_price')}</th>
+              <th className="p-2 text-left">{t('accessory_export_table.retail_price')}</th>
+              <th className="p-2 text-left">{t('accessory_export_table.note')}</th>
+              <th className="p-2 text-left">{t('accessory_export_table.exported_by')}</th>
+              <th className="p-2 text-left">{t('accessory_export_table.date')}</th>
+              {!isTechnician && (
+                <th className="p-2 text-right">{t('accessory_export_table.actions')}</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -104,39 +112,54 @@ export default function AccessoryExportTable({ exports }: Props) {
                 <td className="p-2">{formatCurrency(item.importPrice || 0)}</td>
                 <td className="p-2">{formatCurrency(item.retailPrice || 0)}</td>
                 <td className="p-2">{item.note}</td>
-                <td className="p-2 whitespace-nowrap">{exportedByMap[item.exportedBy] || item.exportedBy}</td>
-                <td className="p-2 whitespace-nowrap">{format(item.exportedAt.toDate(), 'dd/MM/yyyy')}</td>
-                <td className="p-2 text-right">
-                  <Dialog open={selectedItem?.id === item.id} onOpenChange={(open) => !open && setSelectedItem(null)}>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setSelectedItem(item)}
-                        disabled={importingId === item.id}
-                      >
-                        {importingId === item.id ? 'Importing...' : 'Import Back'}
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Confirm Import Back</DialogTitle>
-                        <DialogDescription>
-                          Are you sure you want to return{' '}
-                          <strong>{item.accessoryName}</strong> (qty: {item.quantity}) into stock?
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setSelectedItem(null)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={handleImportConfirm} disabled={importingId === item.id}>
-                          {importingId === item.id ? 'Importing...' : 'Confirm'}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                <td className="p-2 whitespace-nowrap">
+                  {exportedByMap[item.exportedBy] || item.exportedBy}
                 </td>
+                <td className="p-2 whitespace-nowrap">
+                  {format(item.exportedAt.toDate(), 'dd/MM/yyyy')}
+                </td>
+                {!isTechnician && (
+                  <td className="p-2 text-right">
+                    <Dialog
+                      open={selectedItem?.id === item.id}
+                      onOpenChange={(open) => !open && setSelectedItem(null)}
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedItem(item)}
+                          disabled={importingId === item.id}
+                        >
+                          {importingId === item.id
+                            ? t('accessory_export_table.importing')
+                            : t('accessory_export_table.import_back')}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{t('accessory_export_table.confirm_title')}</DialogTitle>
+                          <DialogDescription>
+                            {t('accessory_export_table.confirm_message', {
+                              name: item.accessoryName,
+                              qty: item.quantity,
+                            })}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setSelectedItem(null)}>
+                            {t('accessory_export_table.cancel')}
+                          </Button>
+                          <Button onClick={handleImportConfirm} disabled={importingId === item.id}>
+                            {importingId === item.id
+                              ? t('accessory_export_table.importing')
+                              : t('accessory_export_table.confirm')}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

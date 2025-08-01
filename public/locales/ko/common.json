@@ -1628,7 +1628,35 @@
   "confirm_delete_all": "⚠️ 모든 배터리를 삭제하시겠습니까?",
   "delete_success": "✅ 모든 배터리가 삭제되었습니다.",
   "delete_failed": "❌ 배터리 삭제에 실패했습니다."
+},
+"accessory_export_page": {
+  "title": "📦 액세서리 출고 내역",
+  "loading": "출고 기록을 불러오는 중..."
+},
+
+"accessory_export_table": {
+  "search_accessory": "악세서리 이름으로 검색...",
+  "search_target": "대상으로 검색...",
+  "accessory": "악세서리",
+  "quantity": "수량",
+  "target": "대상",
+  "import_price": "입고 가격",
+  "retail_price": "소매 가격",
+  "note": "비고",
+  "exported_by": "출고자",
+  "date": "날짜",
+  "actions": "작업",
+  "import_back": "반환",
+  "importing": "반환 중...",
+  "confirm_title": "반환 확인",
+  "confirm_message": "‘{{name}}’ (수량: {{qty}})을(를) 재고로 반환하시겠습니까?",
+  "cancel": "취소",
+  "confirm": "확인",
+  "success_message": "성공적으로 반환되었습니다. 변경사항을 보려면 새로고침하세요.",
+  "error_message": "반환에 실패했습니다."
 }
+
+
 
 
 

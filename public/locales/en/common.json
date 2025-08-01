@@ -1642,7 +1642,36 @@
   "confirm_delete_all": "⚠️ Are you sure you want to delete ALL batteries?",
   "delete_success": "✅ All batteries deleted.",
   "delete_failed": "❌ Failed to delete batteries."
+},
+
+"accessory_export_page": {
+  "title": "📦 Accessory Export History",
+  "loading": "Loading export records..."
+},
+
+"accessory_export_table": {
+  "search_accessory": "Search by accessory name...",
+  "search_target": "Search by target...",
+  "accessory": "Accessory",
+  "quantity": "Quantity",
+  "target": "Target",
+  "import_price": "Import Price",
+  "retail_price": "Retail Price",
+  "note": "Note",
+  "exported_by": "Exported By",
+  "date": "Date",
+  "actions": "Actions",
+  "import_back": "Import Back",
+  "importing": "Importing...",
+  "confirm_title": "Confirm Import Back",
+  "confirm_message": "Are you sure you want to return '{{name}}' (qty: {{qty}}) into stock?",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "success_message": "Imported back successfully. Please refresh to see changes.",
+  "error_message": "Failed to import back."
 }
+
+
 
 
 
