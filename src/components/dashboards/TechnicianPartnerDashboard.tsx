@@ -38,6 +38,7 @@ function renderStatusBadge(status: VehicleIssueStatus, t: any) {
   return <span className={`px-2 py-1 text-white rounded ${colorMap[status]}`}>{t(`status.${status}`)}</span>;
 }
 
+
 export default function TechnicianPartnerDashboard() {
   const { t } = useTranslation('common');
   const { user, role, loading: userLoading } = useUser();
@@ -50,6 +51,11 @@ export default function TechnicianPartnerDashboard() {
   const { issues, updateIssue, loading: issuesLoading } = useVehicleIssues(
     !isPartner ? { disabled: true } as any : { technicianUserId: user?.uid, role: 'technician_partner' }
   );
+
+  const getTranslatedIssueType = (rawType: string) => {
+    const normalized = rawType.toLowerCase().replace(/\s+/g, '_');
+    return t(`vehicle_issue_type.${normalized}`, { defaultValue: rawType });
+  };
 
   useEffect(() => {
     if (notification) {
@@ -120,7 +126,9 @@ export default function TechnicianPartnerDashboard() {
           <div className="md:hidden space-y-4">
             {issues.map(issue => (
               <div key={issue.id} className="border rounded-xl p-4 bg-white shadow">
-                <div className="text-sm font-semibold mb-2">{issue.issueType} – {renderStatusBadge(issue.status, t)}</div>
+                <div className="text-sm font-semibold mb-2">
+                  {getTranslatedIssueType(issue.issueType)} – {renderStatusBadge(issue.status, t)}
+                </div>
                 <p className="text-sm text-gray-600"><strong>VIN:</strong> {issue.vin}</p>
                 <p className="text-sm text-gray-600"><strong>Plate:</strong> {issue.plateNumber}</p>
                 <p className="text-sm text-gray-600"><strong>{t('technician_partner_dashboard.description')}:</strong> {issue.description}</p>
@@ -156,7 +164,7 @@ export default function TechnicianPartnerDashboard() {
                   <tr key={issue.id} className="border-t hover:bg-gray-50">
                     <td className="p-2">{issue.vin}</td>
                     <td className="p-2">{issue.plateNumber}</td>
-                    <td className="p-2">{issue.issueType}</td>
+                    <td className="p-2">{getTranslatedIssueType(issue.issueType)}</td>
                     <td className="p-2">{issue.description}</td>
                     <td className="p-2">{renderStatusBadge(issue.status, t)}</td>
                     <td className="p-2">{issue.reportedAt?.toDate().toLocaleString()}</td>

@@ -40,6 +40,11 @@ function renderStatusBadge(status: VehicleIssueStatus, t: any) {
 
 export default function TechnicianDashboard() {
   const { t } = useTranslation('common');
+  const getTranslatedIssueType = (rawType: string) => {
+    const normalized = rawType.toLowerCase().replace(/\s+/g, '_');
+    return t(`vehicle_issue_type.${normalized}`, { defaultValue: rawType });
+  };
+
   const { user, role, loading: userLoading } = useUser();
   const [notification, setNotification] = useState<string | null>(null);
   const [proposingIssue, setProposingIssue] = useState<ExtendedVehicleIssue | null>(null);
@@ -120,7 +125,9 @@ export default function TechnicianDashboard() {
           <div className="md:hidden space-y-4">
             {issues.map(issue => (
               <div key={issue.id} className="border rounded-xl p-4 bg-white shadow">
-                <div className="text-sm font-semibold mb-2">{issue.issueType} – {renderStatusBadge(issue.status, t)}</div>
+                <div className="text-sm font-semibold mb-2">
+                  {getTranslatedIssueType(issue.issueType)} – {renderStatusBadge(issue.status, t)}
+                </div>
                 <p className="text-sm text-gray-600"><strong>VIN:</strong> {issue.vin}</p>
                 <p className="text-sm text-gray-600"><strong>{t('technician_partner_dashboard.table_headers.plate')}:</strong> {issue.plateNumber}</p>
                 <p className="text-sm text-gray-600"><strong>{t('technician_partner_dashboard.table_headers.description')}:</strong> {issue.description}</p>
@@ -155,7 +162,7 @@ export default function TechnicianDashboard() {
                   <tr key={issue.id} className="border-t hover:bg-gray-50">
                     <td className="p-2">{issue.vin}</td>
                     <td className="p-2">{issue.plateNumber}</td>
-                    <td className="p-2">{issue.issueType}</td>
+                    <td className="p-2">{getTranslatedIssueType(issue.issueType)}</td>
                     <td className="p-2">{issue.description}</td>
                     <td className="p-2">{renderStatusBadge(issue.status, t)}</td>
                     <td className="p-2">{issue.reportedAt?.toDate().toLocaleString()}</td>

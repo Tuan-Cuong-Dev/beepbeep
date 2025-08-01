@@ -98,8 +98,8 @@ export default function UserTopMenu() {
   if (!filteredMenu.length) return null;
 
   return (
-    <nav className="hidden md:block font-inter bg-[#00d289] text-white w-full shadow overflow-x-auto no-scrollbar">
-      <div className="flex gap-x-6 items-center px-4 py-2 min-w-max">
+    <nav className="hidden md:block font-inter bg-[#00d289] text-white w-full shadow overflow-x-auto no-scrollbar ">
+      <div className="flex gap-x-6 justify-center items-center px-4 py-2 min-w-max">
         {filteredMenu.map((item) => (
           <button
             key={item.key}

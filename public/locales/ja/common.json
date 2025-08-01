@@ -1300,12 +1300,12 @@
     "resolved": "解決済み"
   },
   "quick_actions": {
-    "my_issues": "自分の問題",
-    "proposal_history": "提案履歴",
-    "suggest_error_fix": "エラー修正を提案",
-    "error_codes": "エラーコード",
-    "service_pricing": "サービス料金表"
-  },
+  "my_issues": "割り当てられた不具合",
+  "proposal_history": "提案履歴",
+  "suggest_error_fix": "修理方法を提案する",
+  "error_codes": "エラーコード参照",
+  "service_pricing": "標準サービス料金表"
+},
   "assigned_issues": "🚧 割り当てられた問題",
   "table_headers": {
     "vin": "車台番号（VIN）",
@@ -1524,7 +1524,38 @@
   "price_unit": "{{price}} ₫",
   "no_description": "説明がありません",
   "no_features": "表示できる機能がありません"
+},
+
+"status": {
+  "pending": "処理待ち",
+  "assigned": "対応済み",
+  "proposed": "提案済み",
+  "confirmed": "確認済み",
+  "rejected": "却下されました",
+  "in_progress": "進行中",
+  "resolved": "解決済み",
+  "closed": "クローズ済み"
+},
+
+"pagination": {
+  "previous": "前へ",
+  "next": "次へ",
+  "page_info": "ページ {{current}} / {{total}}"
+},
+
+"vehicle_issue_type": {
+  "flat_tire": "パンク",
+  "motor_problem": "モーターの問題",
+  "brake_issue": "ブレーキの問題",
+  "battery_problem": "バッテリーの問題",
+  "light_issue": "ライトの問題",
+  "electrical": "電気系の問題",
+  "software": "ソフトウェアの問題",
+  "other": "その他"
 }
+
+
+
 
 
 

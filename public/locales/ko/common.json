@@ -1318,11 +1318,11 @@
     "resolved": "해결됨"
   },
   "quick_actions": {
-    "my_issues": "내 문제",
-    "proposal_history": "제안 내역",
-    "suggest_error_fix": "오류 수정 제안",
-    "error_codes": "오류 코드",
-    "service_pricing": "서비스 요금표"
+  "my_issues": "할당된 문제",
+  "proposal_history": "제안 내역",
+  "suggest_error_fix": "오류 수정 제안",
+  "error_codes": "오류 코드 참조",
+  "service_pricing": "표준 서비스 요금표"
   },
   "assigned_issues": "🚧 할당된 문제",
   "table_headers": {
@@ -1553,7 +1553,25 @@
   "in_progress": "진행 중",
   "resolved": "해결됨",
   "closed": "종료됨"
+},
+
+"pagination": {
+  "previous": "이전",
+  "next": "다음",
+  "page_info": "{{current}} / {{total}} 페이지"
+},
+"vehicle_issue_type": {
+  "flat_tire": "타이어 펑크",
+  "motor_problem": "모터 문제",
+  "brake_issue": "브레이크 문제",
+  "battery_problem": "배터리 문제",
+  "light_issue": "조명 문제",
+  "electrical": "전기 문제",
+  "software": "소프트웨어 문제",
+  "other": "기타"
 }
+
+
 
 
 

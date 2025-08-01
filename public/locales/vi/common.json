@@ -1339,11 +1339,11 @@
     "resolved": "Đã xử lý"
   },
   "quick_actions": {
-    "my_issues": "Sự cố của tôi",
+    "my_issues": "Sự cố được giao",
     "proposal_history": "Lịch sử đề xuất",
-    "suggest_error_fix": "Gợi ý sửa lỗi",
-    "error_codes": "Mã lỗi",
-    "service_pricing": "Bảng giá dịch vụ"
+    "suggest_error_fix": "Đóng góp phương án sửa lỗi",
+    "error_codes": "Tham chiếu bộ mã lỗi",
+    "service_pricing": "Bảng giá dịch vụ chuẩn"
   },
   "assigned_issues": "🚧 Sự cố đã giao",
   "table_headers": {
@@ -1477,8 +1477,8 @@
   "brand": "Hãng",
   "model": "Mẫu",
   "video": "Video",
-  "suggestions": "Gợi ý",
-  "reference": "Tham chiếu",
+  "suggestions": "Đề xuất",
+  "reference": "Tham chiếu Kỹ thuật",
   "created_at": "Thời gian tạo",
   "actions": "Hành động",
   "no_link": "Không có liên kết",
@@ -1574,7 +1574,28 @@
   "in_progress": "Đang xử lý",
   "resolved": "Đã xử lý",
   "closed": "Đã đóng"
+},
+
+"pagination": {
+  "previous": "Trước",
+  "next": "Sau",
+  "page_info": "Trang {{current}} / {{total}}"
+},
+
+"vehicle_issue_type": {
+  "flat_tire": "Lốp xịt",
+  "motor_problem": "Lỗi mô tơ",
+  "brake_issue": "Lỗi phanh",
+  "battery_problem": "Sự cố pin",
+  "light_issue": "Lỗi đèn",
+  "electrical": "Lỗi điện",
+  "software": "Lỗi phần mềm",
+  "other": "Khác"
 }
+
+
+
+
 
 
 
