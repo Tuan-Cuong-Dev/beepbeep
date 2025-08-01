@@ -6,6 +6,7 @@ import QRCode from 'react-qr-code';
 import { printSingleBatteryQR } from './printSingleBatteryQR';
 import { Button } from '@/src/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@/src/context/AuthContext'; // ✅
 
 interface Props {
   batteries: Battery[];
@@ -16,6 +17,8 @@ interface Props {
 
 export default function BatteryTableDesktop({ batteries, onEdit, onDelete, setBatteries }: Props) {
   const { t } = useTranslation('common');
+  const { role } = useUser(); // ✅ lấy role hiện tại
+  const isTechnician = role === 'technician';
 
   const formatDate = (timestamp?: any) => {
     if (!timestamp?.toDate) return '—';
@@ -37,9 +40,6 @@ export default function BatteryTableDesktop({ batteries, onEdit, onDelete, setBa
     }
   };
 
-  const getStatusLabel = (status: Battery['status']) =>
-    t(`status.${status}`, { defaultValue: status });
-
   return (
     <div className="overflow-x-auto bg-white shadow rounded-xl">
       <table className="min-w-full text-sm">
@@ -51,7 +51,9 @@ export default function BatteryTableDesktop({ batteries, onEdit, onDelete, setBa
             <th className="px-4 py-2 border">{t('battery_table.export_date')}</th>
             <th className="px-4 py-2 border">{t('battery_table.status_label')}</th>
             <th className="px-4 py-2 border">{t('battery_table.notes')}</th>
-            <th className="px-4 py-2 border">{t('battery_table.actions')}</th>
+            {!isTechnician && (
+              <th className="px-4 py-2 border">{t('battery_table.actions')}</th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -60,7 +62,6 @@ export default function BatteryTableDesktop({ batteries, onEdit, onDelete, setBa
               <td className="px-4 py-2 border font-medium whitespace-nowrap">
                 {battery.batteryCode}
               </td>
-
               <td className="px-4 py-2 border text-center">
                 <div className="inline-block bg-white p-1 rounded">
                   <QRCode value={battery.batteryCode} size={48} />
@@ -69,60 +70,57 @@ export default function BatteryTableDesktop({ batteries, onEdit, onDelete, setBa
                   {battery.physicalCode || '—'}
                 </div>
               </td>
-
               <td className="px-4 py-2 border whitespace-nowrap">
                 {formatDate(battery.importDate)}
               </td>
-
               <td className="px-4 py-2 border whitespace-nowrap">
                 {formatDate(battery.exportDate)}
               </td>
-
               <td className="px-4 py-2 border text-center">
                 <span className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(battery.status)}`}>
                   {t(`battery_table.status.${battery.status}`)}
                 </span>
               </td>
-
-
               <td className="px-4 py-2 border">
                 {battery.notes || '—'}
               </td>
 
-              <td className="border px-3 py-2 space-y-2 flex flex-col">
-                {onDelete && (
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => onDelete(battery.id)}
-                  >
-                    {t('actions.delete')}
-                  </Button>
-                )}
-                {onEdit && (
-                  <Button
-                    size="sm"
-                    className="bg-[#00d289] hover:bg-green-600 text-white"
-                    onClick={() => onEdit(battery)}
-                  >
-                    {t('actions.edit')}
-                  </Button>
-                )}
-                {setBatteries && (
-                  <Button
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => printSingleBatteryQR(battery)}
-                  >
-                    {t('actions.print')}
-                  </Button>
-                )}
-              </td>
+              {!isTechnician && (
+                <td className="border px-3 py-2 space-y-2 flex flex-col">
+                  {onDelete && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => onDelete(battery.id)}
+                    >
+                      {t('battery_table.delete')}
+                    </Button>
+                  )}
+                  {onEdit && (
+                    <Button
+                      size="sm"
+                      className="bg-[#00d289] hover:bg-green-600 text-white"
+                      onClick={() => onEdit(battery)}
+                    >
+                      {t('battery_table.edit')}
+                    </Button>
+                  )}
+                  {setBatteries && (
+                    <Button
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={() => printSingleBatteryQR(battery)}
+                    >
+                      {t('battery_table.print')}
+                    </Button>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
           {batteries.length === 0 && (
             <tr>
-              <td colSpan={7} className="text-center py-4 text-gray-500">
+              <td colSpan={isTechnician ? 6 : 7} className="text-center py-4 text-gray-500">
                 {t('battery_table.no_batteries')}
               </td>
             </tr>

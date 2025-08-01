@@ -6,6 +6,7 @@ import QRCode from 'react-qr-code';
 import { printSingleBatteryQR } from './printSingleBatteryQR';
 import { Button } from '@/src/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@/src/context/AuthContext'; // ✅ thêm hook
 
 interface Props {
   batteries: Battery[];
@@ -21,6 +22,8 @@ export default function BatteryTableMobile({
   onDelete,
 }: Props) {
   const { t } = useTranslation('common');
+  const { role } = useUser(); // ✅ lấy role từ context
+  const isTechnician = role === 'technician';
 
   const formatDate = (timestamp?: any) => {
     if (!timestamp?.toDate) return '—';
@@ -97,38 +100,38 @@ export default function BatteryTableMobile({
             )}
           </div>
 
-          <div className="flex gap-2 pt-2">
-            {onDelete && (
-              <Button
-                size="sm"
-                variant="destructive"
-                className="w-full"
-                onClick={() => onDelete(battery.id)}
-              >
-                {t('actions.delete')}
-              </Button>
-            )}
-
-            {onEdit && (
-              <Button
-                size="sm"
-                className="w-full bg-[#00d289] hover:bg-green-600 text-white"
-                onClick={() => onEdit(battery)}
-              >
-                {t('actions.edit')}
-              </Button>
-            )}
-
-            {setBatteries && (
-              <Button
-                size="sm"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={() => printSingleBatteryQR(battery)}
-              >
-                {t('actions.print')}
-              </Button>
-            )}
-          </div>
+          {!isTechnician && ( // ✅ ẩn nút nếu technician
+            <div className="flex gap-2 pt-2">
+              {onDelete && (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="w-full"
+                  onClick={() => onDelete(battery.id)}
+                >
+                  {t('actions.delete')}
+                </Button>
+              )}
+              {onEdit && (
+                <Button
+                  size="sm"
+                  className="w-full bg-[#00d289] hover:bg-green-600 text-white"
+                  onClick={() => onEdit(battery)}
+                >
+                  {t('actions.edit')}
+                </Button>
+              )}
+              {setBatteries && (
+                <Button
+                  size="sm"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => printSingleBatteryQR(battery)}
+                >
+                  {t('actions.print')}
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       ))}
     </div>
