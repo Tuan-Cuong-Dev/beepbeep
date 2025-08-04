@@ -65,7 +65,6 @@ export default function NotificationDialog({
           <DialogTitle className="text-lg sm:text-xl font-semibold">{title}</DialogTitle>
         </DialogHeader>
 
-
         {type === 'custom' ? (
           <div className="space-y-4 text-sm text-gray-700">{children}</div>
         ) : (

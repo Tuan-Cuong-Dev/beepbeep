@@ -1,10 +1,9 @@
 'use client';
-// Page chính thức của Booking
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBookingData } from '@/src/hooks/useBookingData';
 import { useUser } from '@/src/context/AuthContext';
-
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
@@ -20,9 +19,10 @@ import { Card, CardContent } from '@/src/components/ui/card';
 import { Button } from '@/src/components/ui/button';
 import { Badge } from '@/src/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
-import NotificationDialog from '@/src/components/ui/NotificationDialog';
+import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
 
 export default function BookingManagementPage() {
+  const { t } = useTranslation('common', { keyPrefix: 'booking_management_page' });
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,7 +47,7 @@ export default function BookingManagementPage() {
 
   const [notification, setNotification] = useState<{
     open: boolean;
-    type: 'success' | 'error' | 'info' | 'confirm';
+    type: NotificationType;
     title: string;
     description?: string;
     onConfirm?: () => void;
@@ -58,20 +58,22 @@ export default function BookingManagementPage() {
   });
 
   const filteredBookings = bookings.filter((b) => {
-    const matchesRole = (() => {
-      if (normalizedRole === 'admin') return true;
-      if (normalizedRole === 'company_owner' || normalizedRole === 'private_provider' || normalizedRole === 'company_admin') return b.companyId === companyId;
-      if (normalizedRole === 'station_manager') return b.stationId === stationId;
-      return false;
-    })();
+    const matchesRole =
+      normalizedRole === 'admin' ||
+      ((normalizedRole === 'company_owner' ||
+        normalizedRole === 'private_provider' ||
+        normalizedRole === 'company_admin') &&
+        b.companyId === companyId) ||
+      (normalizedRole === 'station_manager' && b.stationId === stationId);
 
     const matchesSearch = searchText
-      ? b.fullName?.toLowerCase().includes(searchText.toLowerCase()) || b.phone?.includes(searchText) || b.vin?.includes(searchText)
+      ? b.fullName?.toLowerCase().includes(searchText.toLowerCase()) ||
+        b.phone?.includes(searchText) ||
+        b.vin?.includes(searchText)
       : true;
 
-    const matchesStatus = statusFilter === 'All'
-      ? true
-      : b.bookingStatus?.toLowerCase() === statusFilter.toLowerCase();
+    const matchesStatus =
+      statusFilter === 'All' || b.bookingStatus?.toLowerCase() === statusFilter.toLowerCase();
 
     return matchesRole && matchesSearch && matchesStatus;
   });
@@ -81,10 +83,11 @@ export default function BookingManagementPage() {
   const totalPages = Math.ceil(filteredBookings.length / pageSize);
 
   const roleDisplayName: Record<string, string> = {
-    admin: 'Admin - All Bookings',
-    company_owner: 'Company Owner',
-    private_provider: 'Private Provider',
-    station_manager: 'Station Manager',
+    admin: t('badge_roles.admin'),
+    company_owner: t('badge_roles.company_owner'),
+    private_provider: t('badge_roles.private_provider'),
+    company_admin: t('badge_roles.company_admin'),
+    station_manager: t('badge_roles.station_manager'),
   };
 
   const getBadgeColor = (role: string) => {
@@ -106,14 +109,14 @@ export default function BookingManagementPage() {
     setNotification({
       open: true,
       type: 'confirm',
-      title: 'Confirm Deletion',
-      description: 'Are you sure you want to delete this booking? This action cannot be undone.',
+      title: t('notification.delete_confirm_title'),
+      description: t('notification.delete_confirm_description'),
       onConfirm: () => {
         deleteBooking(id);
         setNotification({
           open: true,
           type: 'success',
-          title: 'Deleted successfully',
+          title: t('notification.delete_success'),
         });
       },
     });
@@ -128,15 +131,13 @@ export default function BookingManagementPage() {
       setNotification({
         open: true,
         type: 'success',
-        title: 'Import completed',
-        description: `${importedBookings.length} bookings imported successfully.`,
+        title: t('notification.import_success', { count: importedBookings.length }),
       });
-    } catch (_error) {
+    } catch {
       setNotification({
         open: true,
         type: 'error',
-        title: 'Import failed',
-        description: 'An error occurred while importing bookings.',
+        title: t('notification.import_failed'),
       });
     }
   };
@@ -148,25 +149,24 @@ export default function BookingManagementPage() {
 
       <main className="flex-1 p-4 space-y-6 bg-gray-50">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Booking Management</h1>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
           <Badge className={`text-sm px-3 py-1 rounded-full ${getBadgeColor(normalizedRole)}`}>
-            {roleDisplayName[normalizedRole] || 'User'}
+            {roleDisplayName[normalizedRole] || t('badge_roles.user')}
           </Badge>
         </div>
 
         <BookingSearchFilter
           onSearchChange={setSearchText}
           onStatusFilterChange={setStatusFilter}
-          onDateRangeChange={(start, end) => {
-            setFilters({ startDate: start, endDate: end });
-          }}
+          onDateRangeChange={(start, end) => setFilters({ startDate: start, endDate: end })}
         />
 
         <BookingSummaryCards bookings={filteredBookings} />
 
         <div className="flex gap-3 justify-end mb-4">
-          <Button onClick={() => exportBookingsToExcel(filteredBookings)}>Export to Excel</Button>
-
+          <Button onClick={() => exportBookingsToExcel(filteredBookings)}>
+            {t('export_button')}
+          </Button>
           <input
             type="file"
             accept=".xlsx,.xls"
@@ -178,16 +178,16 @@ export default function BookingManagementPage() {
             }}
           />
           <Button onClick={() => document.getElementById('importBookings')?.click()}>
-            Import from Excel
+            {t('import_button')}
           </Button>
         </div>
 
         <Card>
           <CardContent className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Bookings List</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('table_title')}</h2>
 
             {loading ? (
-              <p>Loading bookings...</p>
+              <p>{t('loading')}</p>
             ) : bookings.length > 0 ? (
               <ResponsiveBookingTable
                 bookings={paginatedBookings}
@@ -199,28 +199,23 @@ export default function BookingManagementPage() {
                 onDelete={(id) => handleDeleteBooking(id)}
               />
             ) : (
-              <p className="text-gray-500 text-center">No bookings found.</p>
+              <p className="text-gray-500 text-center">{t('no_bookings')}</p>
             )}
           </CardContent>
         </Card>
 
         {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         )}
       </main>
 
       <Footer />
 
-      {/* Booking Form Dialog */}
       <Dialog open={!!editingBooking} onOpenChange={(open) => !open && setEditingBooking(null)}>
         <DialogContent className="!p-0 w-full max-w-none h-screen overflow-y-auto rounded-none bg-white">
           <DialogHeader className="bg-[#00d289] text-white px-6 py-4">
             <DialogTitle className="text-lg font-semibold">
-              {editingBooking ? 'Edit Booking' : 'New Booking'}
+              {editingBooking ? t('dialog.edit_title') : t('dialog.new_title')}
             </DialogTitle>
           </DialogHeader>
 

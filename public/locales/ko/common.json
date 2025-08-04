@@ -1706,20 +1706,101 @@
       "bulk": "수량 기반"
     }
   }
+},
+
+"booking_management_page": {
+  "title": "예약 관리",
+  "badge_roles": {
+    "admin": "관리자 - 전체 예약",
+    "company_owner": "회사 소유자",
+    "private_provider": "개인 제공자",
+    "station_manager": "스테이션 관리자",
+    "user": "사용자"
+  },
+  "search_filter": {
+    "status_filter": "상태로 필터링",
+    "date_range": "날짜 범위"
+  },
+  "summary_cards_title": "예약 요약",
+  "export_button": "엑셀로 내보내기",
+  "import_button": "엑셀에서 가져오기",
+  "table_title": "예약 목록",
+  "loading": "예약 불러오는 중...",
+  "no_bookings": "예약이 없습니다.",
+  "dialog": {
+    "edit_title": "예약 수정",
+    "new_title": "새 예약"
+  },
+  "notification": {
+    "delete_confirm_title": "삭제 확인",
+    "delete_confirm_description": "이 예약을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "delete_success": "성공적으로 삭제되었습니다.",
+    "import_success": "{{count}}개의 예약이 성공적으로 가져왔습니다.",
+    "import_failed": "예약 가져오기 중 오류가 발생했습니다."
+  }
+},
+
+"booking_summary_cards": {
+  "total_bookings": "총 예약 수",
+  "total_revenue": "총 수익",
+  "today_bookings": "오늘의 예약",
+  "cancelled_bookings": "취소된 예약"
+},
+
+"booking_search_filter": {
+  "search_placeholder": "이름, 전화번호 또는 VIN으로 검색...",
+  "start_date_placeholder": "시작일",
+  "end_date_placeholder": "종료일",
+  "status_all": "전체",
+  "status_draft": "임시 저장",
+  "status_confirmed": "확정됨",
+  "status_returned": "반납됨",
+  "status_completed": "완료됨",
+  "status_cancelled": "취소됨"
+},
+
+"booking_table": {
+  "no_bookings": "예약이 없습니다.",
+  "customer": "고객",
+  "vehicle_info": "차량 정보",
+  "pricing": "가격",
+  "rental_period": "대여 기간",
+  "rental_method": "수령 방식",
+  "accessories": "액세서리",
+  "battery_info": "배터리 정보",
+  "notes": "비고",
+  "station": "대여소",
+  "created_by": "작성자",
+  "booked_at": "예약 일시",
+  "status_label": "상태",
+  "status_comment": "상태 설명",
+  "actions": "작업",
+  "plate": "번호판",
+  "package": "패키지",
+  "deposit": "보증금",
+  "remaining": "잔액",
+  "days": "일",
+  "helmet": "헬멧",
+  "charger": "충전기",
+  "phone_holder": "폰 홀더",
+  "rear_rack": "리어 랙",
+  "raincoat": "우비",
+  "none": "없음",
+  "no_batteries": "배터리 없음",
+  "no_notes": "비고 없음",
+  "unknown_user": "알 수 없는 사용자",
+  "unknown": "알 수 없음",
+  "no_comment": "설명 없음",
+  "update": "수정",
+  "delete": "삭제",
+  "status": {
+    "draft": "초안",
+    "confirmed": "확정",
+    "completed": "완료",
+    "cancelled": "취소됨",
+    "returned": "반납됨"
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

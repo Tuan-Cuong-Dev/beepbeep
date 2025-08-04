@@ -1,14 +1,17 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { Card, CardContent } from '@/src/components/ui/card';
-import { formatCurrency } from '@/src/utils/formatCurrency'; // nếu chưa có mình gửi
+import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Props {
   bookings: Booking[];
 }
 
 export default function BookingSummaryCards({ bookings }: Props) {
+  const { t } = useTranslation('common', { keyPrefix: 'booking_summary_cards' });
+
   const totalBookings = bookings.length;
   const totalAmount = bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
 
@@ -29,25 +32,25 @@ export default function BookingSummaryCards({ bookings }: Props) {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <Card>
         <CardContent className="p-6">
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Total Bookings</h3>
+          <h3 className="text-sm font-medium text-gray-500 mb-1">{t('total_bookings')}</h3>
           <div className="text-2xl font-bold">{totalBookings}</div>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-6">
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Total Revenue</h3>
+          <h3 className="text-sm font-medium text-gray-500 mb-1">{t('total_revenue')}</h3>
           <div className="text-2xl font-bold">{formatCurrency(totalAmount)}</div>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-6">
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Today's Bookings</h3>
+          <h3 className="text-sm font-medium text-gray-500 mb-1">{t('today_bookings')}</h3>
           <div className="text-2xl font-bold">{todayBookings}</div>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-6">
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Cancelled Bookings</h3>
+          <h3 className="text-sm font-medium text-gray-500 mb-1">{t('cancelled_bookings')}</h3>
           <div className="text-2xl font-bold">{cancelledBookings}</div>
         </CardContent>
       </Card>

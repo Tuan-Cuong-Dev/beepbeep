@@ -1730,20 +1730,101 @@
       "bulk": "Số lượng"
       }
     }
+  },
+
+  "booking_management_page": {
+  "title": "Quản lý Đơn đặt xe",
+  "badge_roles": {
+    "admin": "Admin - Tất cả đơn",
+    "company_owner": "Chủ công ty",
+    "private_provider": "Đơn vị cho thuê cá nhân",
+    "station_manager": "Quản lý trạm",
+    "user": "Người dùng"
+  },
+  "search_filter": {
+    "status_filter": "Lọc theo trạng thái",
+    "date_range": "Khoảng thời gian"
+  },
+  "summary_cards_title": "Tổng quan đơn đặt xe",
+  "export_button": "Xuất Excel",
+  "import_button": "Nhập từ Excel",
+  "table_title": "Danh sách đơn đặt xe",
+  "loading": "Đang tải đơn đặt xe...",
+  "no_bookings": "Không có đơn đặt xe nào.",
+  "dialog": {
+    "edit_title": "Chỉnh sửa đơn đặt xe",
+    "new_title": "Tạo đơn đặt xe mới"
+  },
+  "notification": {
+    "delete_confirm_title": "Xác nhận xoá",
+    "delete_confirm_description": "Bạn có chắc chắn muốn xoá đơn đặt xe này? Hành động này không thể hoàn tác.",
+    "delete_success": "Xoá đơn đặt xe thành công.",
+    "import_success": "{{count}} đơn đặt xe đã được nhập thành công.",
+    "import_failed": "Đã xảy ra lỗi khi nhập đơn đặt xe."
   }
+},
 
+"booking_summary_cards": {
+  "total_bookings": "Tổng số đơn đặt",
+  "total_revenue": "Tổng doanh thu",
+  "today_bookings": "Đơn đặt hôm nay",
+  "cancelled_bookings": "Đơn bị huỷ"
+},
 
+"booking_search_filter": {
+  "search_placeholder": "Tìm theo tên, số điện thoại hoặc VIN...",
+  "start_date_placeholder": "Ngày bắt đầu",
+  "end_date_placeholder": "Ngày kết thúc",
+  "status_all": "Tất cả",
+  "status_draft": "Nháp",
+  "status_confirmed": "Đã xác nhận",
+  "status_returned": "Đã trả",
+  "status_completed": "Hoàn tất",
+  "status_cancelled": "Đã hủy"
+},
 
-
-
-
-
-
-
-
-
-
-
+"booking_table": {
+  "no_bookings": "Không có đơn đặt xe nào.",
+  "customer": "Khách hàng",
+  "vehicle_info": "Thông tin xe",
+  "pricing": "Giá thuê",
+  "rental_period": "Thời gian thuê",
+  "rental_method": "Hình thức nhận xe",
+  "accessories": "Phụ kiện",
+  "battery_info": "Thông tin pin",
+  "notes": "Ghi chú",
+  "station": "Trạm",
+  "created_by": "Người tạo",
+  "booked_at": "Thời gian đặt",
+  "status_label": "Trạng thái",
+  "status_comment": "Ghi chú trạng thái",
+  "actions": "Thao tác",
+  "plate": "Biển số",
+  "package": "Gói thuê",
+  "deposit": "Đặt cọc",
+  "remaining": "Còn lại",
+  "days": "ngày",
+  "helmet": "Nón bảo hiểm",
+  "charger": "Bộ sạc",
+  "phone_holder": "Giá đỡ điện thoại",
+  "rear_rack": "Gác baga",
+  "raincoat": "Áo mưa",
+  "none": "Không có",
+  "no_batteries": "Không có pin",
+  "no_notes": "Không có ghi chú",
+  "unknown_user": "Người dùng không rõ",
+  "unknown": "Không xác định",
+  "no_comment": "Không có ghi chú",
+  "update": "Cập nhật",
+  "delete": "Xóa",
+  "status": {
+    "draft": "Bản nháp",
+    "confirmed": "Đã xác nhận",
+    "completed": "Đã hoàn tất",
+    "cancelled": "Đã hủy",
+    "returned": "Đã trả"
+  }
+}
 
 
 

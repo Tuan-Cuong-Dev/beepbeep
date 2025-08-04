@@ -5,6 +5,7 @@ import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   onSearchChange: (searchText: string) => void;
@@ -12,15 +13,24 @@ interface Props {
   onDateRangeChange: (startDate: string, endDate: string) => void;
 }
 
-const statusOptions = ['All', 'Draft', 'Confirmed', 'Returned', 'Completed', 'Cancelled'];
+const statusOptions = [
+  'all',
+  'draft',
+  'confirmed',
+  'returned',
+  'completed',
+  'cancelled',
+];
 
 export default function BookingSearchFilter({
   onSearchChange,
   onStatusFilterChange,
   onDateRangeChange,
 }: Props) {
+  const { t } = useTranslation('common', { keyPrefix: 'booking_search_filter' });
+
   const [searchText, setSearchText] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
@@ -56,21 +66,21 @@ export default function BookingSearchFilter({
       {/* Row 1: Search + Dates */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Input
-          placeholder="Search by name, phone, or VIN..."
+          placeholder={t('search_placeholder')}
           value={searchText}
           onChange={handleSearchChange}
         />
         <DatePicker
           selected={startDate}
           onChange={handleStartDateChange}
-          placeholderText="Start date"
+          placeholderText={t('start_date_placeholder')}
           dateFormat="yyyy-MM-dd"
           className="w-full border rounded p-2 text-sm"
         />
         <DatePicker
           selected={endDate}
           onChange={handleEndDateChange}
-          placeholderText="End date"
+          placeholderText={t('end_date_placeholder')}
           dateFormat="yyyy-MM-dd"
           className="w-full border rounded p-2 text-sm"
         />
@@ -86,7 +96,7 @@ export default function BookingSearchFilter({
               onClick={() => handleStatusChange(status)}
               className="whitespace-nowrap"
             >
-              {status}
+              {t(`status_${status}`)}
             </Button>
           ))}
         </div>

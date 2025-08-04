@@ -1691,7 +1691,105 @@
       "bulk": "数量管理"
     }
   }
+},
+
+"booking_management_page": {
+  "title": "予約管理",
+  "badge_roles": {
+    "admin": "管理者 - すべての予約",
+    "company_owner": "会社オーナー",
+    "private_provider": "個人提供者",
+    "station_manager": "ステーションマネージャー",
+    "user": "ユーザー"
+  },
+  "search_filter": {
+    "status_filter": "ステータスで絞り込み",
+    "date_range": "日付範囲"
+  },
+  "summary_cards_title": "予約概要",
+  "export_button": "Excel にエクスポート",
+  "import_button": "Excel からインポート",
+  "table_title": "予約リスト",
+  "loading": "予約を読み込んでいます...",
+  "no_bookings": "予約が見つかりません。",
+  "dialog": {
+    "edit_title": "予約を編集",
+    "new_title": "新しい予約"
+  },
+  "notification": {
+    "delete_confirm_title": "削除の確認",
+    "delete_confirm_description": "この予約を削除してもよろしいですか？この操作は元に戻せません。",
+    "delete_success": "正常に削除されました。",
+    "import_success": "{{count}} 件の予約が正常にインポートされました。",
+    "import_failed": "予約のインポート中にエラーが発生しました。"
+  }
+},
+
+"booking_summary_cards": {
+  "total_bookings": "予約総数",
+  "total_revenue": "総収益",
+  "today_bookings": "本日の予約",
+  "cancelled_bookings": "キャンセルされた予約"
+},
+
+"booking_search_filter": {
+  "search_placeholder": "名前、電話番号、またはVINで検索...",
+  "start_date_placeholder": "開始日",
+  "end_date_placeholder": "終了日",
+  "status_all": "すべて",
+  "status_draft": "下書き",
+  "status_confirmed": "確認済み",
+  "status_returned": "返却済み",
+  "status_completed": "完了",
+  "status_cancelled": "キャンセル"
+},
+
+"booking_table": {
+  "no_bookings": "予約が見つかりません。",
+  "customer": "顧客",
+  "vehicle_info": "車両情報",
+  "pricing": "料金",
+  "rental_period": "レンタル期間",
+  "rental_method": "受け渡し方法",
+  "accessories": "付属品",
+  "battery_info": "バッテリー情報",
+  "notes": "備考",
+  "station": "ステーション",
+  "created_by": "作成者",
+  "booked_at": "予約日時",
+  "status_label": "ステータス",
+  "status_comment": "ステータスコメント",
+  "actions": "操作",
+  "plate": "ナンバー",
+  "package": "パッケージ",
+  "deposit": "デポジット",
+  "remaining": "残額",
+  "days": "日間",
+  "helmet": "ヘルメット",
+  "charger": "充電器",
+  "phone_holder": "スマホホルダー",
+  "rear_rack": "リアラック",
+  "raincoat": "レインコート",
+  "none": "なし",
+  "no_batteries": "バッテリーなし",
+  "no_notes": "備考なし",
+  "unknown_user": "不明なユーザー",
+  "unknown": "不明",
+  "no_comment": "コメントなし",
+  "update": "更新",
+  "delete": "削除",
+  "status": {
+    "draft": "下書き",
+    "confirmed": "確定済み",
+    "completed": "完了",
+    "cancelled": "キャンセル済み",
+    "returned": "返却済み"
+  }
 }
+
+
+
+
 
 
 

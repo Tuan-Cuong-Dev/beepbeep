@@ -1482,7 +1482,7 @@
   "next": "Next",
   "suggestions_title": "💬 Suggestions for {{code}}",
   "all_brands": "All brands",
-"brand_filter": "Filter by brand"
+  "brand_filter": "Filter by brand"
 },
 
 "error_code_form": {
@@ -1721,7 +1721,104 @@
       "bulk": "Bulk Quantity"
     }
   }
+},
+
+"booking_management_page": {
+  "title": "Booking Management",
+  "badge_roles": {
+    "admin": "Admin - All Bookings",
+    "company_owner": "Company Owner",
+    "private_provider": "Private Provider",
+    "station_manager": "Station Manager",
+    "user": "User"
+  },
+  "search_filter": {
+    "status_filter": "Filter by status",
+    "date_range": "Date Range"
+  },
+  "summary_cards_title": "Booking Summary",
+  "export_button": "Export to Excel",
+  "import_button": "Import from Excel",
+  "table_title": "Bookings List",
+  "loading": "Loading bookings...",
+  "no_bookings": "No bookings found.",
+  "dialog": {
+    "edit_title": "Edit Booking",
+    "new_title": "New Booking"
+  },
+  "notification": {
+    "delete_confirm_title": "Confirm Deletion",
+    "delete_confirm_description": "Are you sure you want to delete this booking? This action cannot be undone.",
+    "delete_success": "Deleted successfully.",
+    "import_success": "{{count}} bookings imported successfully.",
+    "import_failed": "An error occurred while importing bookings."
+  }
+},
+
+"booking_summary_cards": {
+  "total_bookings": "Total Bookings",
+  "total_revenue": "Total Revenue",
+  "today_bookings": "Today's Bookings",
+  "cancelled_bookings": "Cancelled Bookings"
+},
+
+"booking_search_filter": {
+  "search_placeholder": "Search by name, phone, or VIN...",
+  "start_date_placeholder": "Start date",
+  "end_date_placeholder": "End date",
+  "status_all": "All",
+  "status_draft": "Draft",
+  "status_confirmed": "Confirmed",
+  "status_returned": "Returned",
+  "status_completed": "Completed",
+  "status_cancelled": "Cancelled"
+},
+
+"booking_table":{
+  "no_bookings": "No bookings found.",
+  "customer": "Customer",
+  "vehicle_info": "Vehicle Info",
+  "pricing": "Pricing",
+  "rental_period": "Rental Period",
+  "rental_method": "Rental Method",
+  "accessories": "Accessories",
+  "battery_info": "Battery Info",
+  "notes": "Notes",
+  "station": "Station",
+  "created_by": "Created By",
+  "booked_at": "Booked At",
+  "status_label": "Status",
+  "status_comment": "Status Comment",
+  "actions": "Actions",
+  "plate": "Plate",
+  "package": "Package",
+  "deposit": "Deposit",
+  "remaining": "Remaining",
+  "days": "days",
+  "helmet": "Helmet",
+  "charger": "Charger",
+  "phone_holder": "Phone Holder",
+  "rear_rack": "Rear Rack",
+  "raincoat": "Raincoat",
+  "none": "None",
+  "no_batteries": "No Batteries",
+  "no_notes": "No Notes",
+  "unknown_user": "Unknown User",
+  "unknown": "Unknown",
+  "no_comment": "No Comment",
+  "update": "Update",
+  "delete": "Delete",
+  "status": {
+    "draft": "Draft",
+    "confirmed": "Confirmed",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "returned": "Returned"
+  }
 }
+
+
+
 
 
 
