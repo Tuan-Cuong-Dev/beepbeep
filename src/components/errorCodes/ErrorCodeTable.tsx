@@ -76,7 +76,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
         {paginatedItems.map((item) => (
           <div key={item.id} className="border rounded-xl p-4 bg-white shadow-sm space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-[#00d289]">{item.code}</h3>
+              <h3 className="text-lg font-bold text-[#00d289]">{item.description}</h3>
               {!isTechnician && !isTechnicianPartner && (
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => onEdit(item)}>
@@ -88,7 +88,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-800">{item.description}</p>
+            <p className="text-sm text-gray-800">{t('code')}: {item.code}</p>
             <p className="text-sm text-gray-700 italic">💡 {item.recommendedSolution}</p>
             <div className="text-xs text-gray-500 space-y-1">
               <p>📦 {t('brand')}: {item.brand || '-'}</p>
@@ -150,8 +150,8 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
           <tbody>
             {paginatedItems.map((item) => (
               <tr key={item.id} className="border-b">
-                <td className="p-2 font-semibold text-[#00d289]">{item.code}</td>
-                <td className="p-2">{item.description}</td>
+                <td className="p-2">{item.code}</td>
+                <td className="p-2 font-semibold text-[#00d289]">{item.description}</td>
                 <td className="p-2">{item.recommendedSolution}</td>
                 <td className="p-2">{item.brand || '-'}</td>
                 <td className="p-2">{item.modelName || '-'}</td>
