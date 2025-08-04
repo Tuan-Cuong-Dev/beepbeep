@@ -1785,7 +1785,13 @@
     "cancelled": "キャンセル済み",
     "returned": "返却済み"
   }
+},
+
+"delivery_method": {
+  "Deliver to Address": "自宅まで配達",
+  "Pickup at Shop": "店舗で受け取り"
 }
+
 
 
 

@@ -1824,7 +1824,13 @@
     "cancelled": "Đã hủy",
     "returned": "Đã trả"
   }
+},
+
+"delivery_method": {
+  "Deliver to Address": "Giao xe tận nơi",
+  "Pickup at Shop": "Nhận xe tại cửa hàng"
 }
+
 
 
 

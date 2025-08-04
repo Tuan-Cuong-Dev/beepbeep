@@ -1800,7 +1800,13 @@
     "cancelled": "취소됨",
     "returned": "반납됨"
   }
+},
+
+"delivery_method": {
+  "Deliver to Address": "주소로 배달",
+  "Pickup at Shop": "매장에서 수령"
 }
+
 
 
 
