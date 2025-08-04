@@ -1480,7 +1480,9 @@
   "of": "of",
   "prev": "Previous",
   "next": "Next",
-  "suggestions_title": "💬 Suggestions for {{code}}"
+  "suggestions_title": "💬 Suggestions for {{code}}",
+  "all_brands": "All brands",
+"brand_filter": "Filter by brand"
 },
 
 "error_code_form": {

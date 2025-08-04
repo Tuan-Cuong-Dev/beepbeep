@@ -1487,7 +1487,9 @@
   "of": "trên tổng số",
   "prev": "Trước",
   "next": "Sau",
-  "suggestions_title": "💬 Gợi ý cho mã lỗi {{code}}"
+  "suggestions_title": "💬 Gợi ý cho mã lỗi {{code}}",
+  "all_brands": "Tất cả hãng",
+  "brand_filter": "Lọc theo hãng"
 },
 
 "error_code_form": {

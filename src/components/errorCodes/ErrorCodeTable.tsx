@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Pencil, Trash, ExternalLink } from 'lucide-react';
 import { ErrorCode } from '@/src/lib/errorCodes/errorCodeTypes';
 import { useUser } from '@/src/context/AuthContext';
 import { Input } from '@/src/components/ui/input';
-import { Pencil, Trash, ExternalLink } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
 import TechnicianSuggestionList from './TechnicianSuggestionList';
-import { useTranslation } from 'react-i18next';
 
 interface Props {
   errorCodes: ErrorCode[];
@@ -25,14 +25,18 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
   const { t } = useTranslation('common', { keyPrefix: 'error_code_table' });
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [brandFilter, setBrandFilter] = useState('');
   const [selectedForSuggestion, setSelectedForSuggestion] = useState<ErrorCode | null>(null);
   const [page, setPage] = useState(1);
 
+  const uniqueBrands = Array.from(new Set(errorCodes.map(e => e.brand).filter(Boolean)));
+
   const filtered = errorCodes.filter((e) => {
-    const matchSearch = searchTerm
+    const matchesSearch = searchTerm
       ? (e.code + e.description + e.recommendedSolution).toLowerCase().includes(searchTerm.toLowerCase())
       : true;
-    return matchSearch;
+    const matchesBrand = brandFilter ? e.brand === brandFilter : true;
+    return matchesSearch && matchesBrand;
   });
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -45,6 +49,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
 
   return (
     <div className="space-y-6">
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <Input
           placeholder={t('search_placeholder')}
@@ -52,6 +57,18 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full sm:w-64"
         />
+        <select
+          value={brandFilter}
+          onChange={(e) => setBrandFilter(e.target.value)}
+          className="border rounded px-3 py-2 text-sm text-gray-700"
+        >
+          <option value="">{t('all_brands')}</option>
+          {uniqueBrands.map((brand) => (
+            <option key={brand} value={brand}>
+              {brand}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* 📱 Mobile Cards */}
@@ -73,12 +90,11 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
             </div>
             <p className="text-sm text-gray-800">{item.description}</p>
             <p className="text-sm text-gray-700 italic">💡 {item.recommendedSolution}</p>
-
             <div className="text-xs text-gray-500 space-y-1">
-              <p>📦 Brand: {item.brand || '-'}</p>
-              <p>🚗 Model: {item.modelName || '-'}</p>
+              <p>📦 {t('brand')}: {item.brand || '-'}</p>
+              <p>🚗 {t('model')}: {item.modelName || '-'}</p>
               <p>
-                🎥 Video:{' '}
+                🎥 {t('video')}:{" "}
                 {item.tutorialVideoUrl ? (
                   <a
                     href={item.tutorialVideoUrl}
@@ -93,20 +109,20 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                 )}
               </p>
               <p>
-                🛠 Suggestions:{' '}
+                🛠 {t('suggestions')}:{" "}
                 {(item.technicianSuggestions?.length ?? 0) > 0 ? (
                   <button
                     onClick={() => setSelectedForSuggestion(item)}
                     className="text-[#00d289] underline"
                   >
-                    {item.technicianSuggestions?.length ?? 0}
+                    {item.technicianSuggestions?.length}
                   </button>
                 ) : (
                   <span className="text-gray-400">0</span>
                 )}
               </p>
-              <p>📞 References: {renderReferences(item.technicianReferences || [])}</p>
-              <p>🕒 Created: {item.createdAt?.toDate().toLocaleString()}</p>
+              <p>📞 {t('reference')}: {renderReferences(item.technicianReferences || [])}</p>
+              <p>🕒 {t('created_at')}: {item.createdAt?.toDate().toLocaleString()}</p>
             </div>
           </div>
         ))}
@@ -126,7 +142,9 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
               <th className="p-2 text-left">{t('suggestions')}</th>
               <th className="p-2 text-left">{t('reference')}</th>
               <th className="p-2 text-left">{t('created_at')}</th>
-              {!isTechnician && !isTechnicianPartner && <th className="p-2 text-left">{t('actions')}</th>}
+              {!isTechnician && !isTechnicianPartner && (
+                <th className="p-2 text-left">{t('actions')}</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -187,22 +205,19 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
           <Button size="sm" onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
             ← {t('prev')}
           </Button>
-          <span>
-            {t('page')} {page} / {totalPages}
-          </span>
+          <span>{t('page')} {page} / {totalPages}</span>
           <Button size="sm" onClick={() => setPage((p) => Math.min(p + 1, totalPages))} disabled={page === totalPages}>
             {t('next')} →
           </Button>
         </div>
       )}
 
+      {/* Technician Suggestions Dialog */}
       {selectedForSuggestion && (
         <Dialog open={!!selectedForSuggestion} onOpenChange={() => setSelectedForSuggestion(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>
-                {t('suggestions_title', { code: selectedForSuggestion.code })}
-              </DialogTitle>
+              <DialogTitle>{t('suggestions_title', { code: selectedForSuggestion.code })}</DialogTitle>
             </DialogHeader>
             <TechnicianSuggestionList suggestions={selectedForSuggestion.technicianSuggestions || []} />
           </DialogContent>

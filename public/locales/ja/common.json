@@ -1449,7 +1449,9 @@
   "of": "の",
   "prev": "前へ",
   "next": "次へ",
-  "suggestions_title": "💬 {{code}} の提案"
+  "suggestions_title": "💬 {{code}} の提案",
+  "all_brands": "すべてのメーカー",
+  "brand_filter": "メーカーで絞り込む"
 },
 
 "error_code_form": {

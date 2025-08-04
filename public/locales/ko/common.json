@@ -1466,7 +1466,9 @@
   "of": "중",
   "prev": "이전",
   "next": "다음",
-  "suggestions_title": "💬 {{code}}에 대한 제안"
+  "suggestions_title": "💬 {{code}}에 대한 제안",
+  "all_brands": "모든 브랜드",
+  "brand_filter": "브랜드로 필터링"
 },
 
 "error_code_form": {
