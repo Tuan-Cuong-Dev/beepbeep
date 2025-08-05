@@ -1805,7 +1805,33 @@
 "delivery_method": {
   "Deliver to Address": "주소로 배달",
   "Pickup at Shop": "매장에서 수령"
-}
+},
+
+"rental_company_dashboard": {
+  "title": "🏢 렌터카 회사 대시보드",
+  "stations": "대여 스테이션",
+  "vehicles": "전기차",
+  "bookings_this_month": "이번 달 예약",
+  "revenue_this_month": "이번 달 수익",
+  "programs": "프로그램",
+  "staff": "직원",
+  "issues": "차량 문제",
+  "batteries": "배터리",
+  "accessories": "액세서리",
+  "subscription_packages": "구독 패키지"
+},
+"quick_actions": {
+  "title": "⚡ 빠른 작업",
+  "add_station": "새 스테이션 추가",
+  "create_vehicle_model": "차량 모델 생성",
+  "assign_staff": "직원 할당",
+  "form_builder": "폼 사용자 정의",
+  "rent": "예약 생성",
+  "return": "차량 반납",
+  "report_issue": "문제 보고"
+},
+"manage": "관리"
+
 
 
 

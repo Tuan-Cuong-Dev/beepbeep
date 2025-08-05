@@ -149,9 +149,11 @@ export default function BookingManagementPage() {
 
       <main className="flex-1 p-4 space-y-6 bg-gray-50">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <h1 className="text-2xl font-bold">
+            {t('title', { defaultValue: 'Quản lý đơn thuê xe' })}
+          </h1>
           <Badge className={`text-sm px-3 py-1 rounded-full ${getBadgeColor(normalizedRole)}`}>
-            {roleDisplayName[normalizedRole] || t('badge_roles.user')}
+            {roleDisplayName[normalizedRole] || t('badge_roles.user', { defaultValue: 'Người dùng' })}
           </Badge>
         </div>
 

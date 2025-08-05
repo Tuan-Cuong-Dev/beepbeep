@@ -1819,7 +1819,33 @@
 "delivery_method": {
   "Deliver to Address": "주소로 배달",
   "Pickup at Shop": "매장에서 수령"
-}
+},
+
+"rental_company_dashboard": {
+  "title": "🏢 Rental Company Dashboard",
+  "stations": "Rental Stations",
+  "vehicles": "Electric Vehicles",
+  "bookings_this_month": "Bookings This Month",
+  "revenue_this_month": "Revenue This Month",
+  "programs": "Programs",
+  "staff": "Staff",
+  "issues": "Vehicle Issues",
+  "batteries": "Batteries",
+  "accessories": "Accessories",
+  "subscription_packages": "Subscription Packages"
+},
+"quick_actions": {
+  "title": "⚡ Quick Actions",
+  "add_station": "Add New Station",
+  "create_vehicle_model": "Create Vehicle Model",
+  "assign_staff": "Assign Staff",
+  "form_builder": "Customize Form",
+  "rent": "Create Booking",
+  "return": "Return Vehicle",
+  "report_issue": "Report an Issue"
+},
+"manage": "Manage"
+
 
 
 

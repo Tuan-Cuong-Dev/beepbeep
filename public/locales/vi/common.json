@@ -1829,7 +1829,33 @@
 "delivery_method": {
   "Deliver to Address": "Giao xe tận nơi",
   "Pickup at Shop": "Nhận xe tại cửa hàng"
-}
+},
+
+"rental_company_dashboard": {
+  "title": "🏢 Bảng điều khiển công ty cho thuê",
+  "stations": "Trạm cho thuê",
+  "vehicles": "Xe điện",
+  "bookings_this_month": "Đơn thuê trong tháng",
+  "revenue_this_month": "Doanh thu trong tháng",
+  "programs": "Chương trình",
+  "staff": "Nhân sự",
+  "issues": "Sự cố xe",
+  "batteries": "Pin",
+  "accessories": "Phụ kiện",
+  "subscription_packages": "Gói thuê"
+},
+"quick_actions": {
+  "title": "⚡ Hành động nhanh",
+  "add_station": "Thêm trạm mới",
+  "create_vehicle_model": "Thêm xem mới",
+  "assign_staff": "Phân công nhân sự",
+  "form_builder": "Tùy chỉnh form cho thuê",
+  "rent": "Tạo đơn thuê",
+  "return": "Trả xe",
+  "report_issue": "Báo cáo sự cố xe"
+},
+"manage": "Quản lý"
+
 
 
 

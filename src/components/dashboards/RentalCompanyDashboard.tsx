@@ -8,21 +8,16 @@ import { useUser } from '@/src/context/AuthContext';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import {
-  DollarSign,
-  Bike,
-  MapPin,
-  Users,
-  FileText,
-  Wrench,
-  FileTextIcon,
-  ClipboardList,
-  BatteryCharging,
-  Package,
+  DollarSign, Bike, MapPin, Users, FileText, Wrench,
+  FileTextIcon, ClipboardList, BatteryCharging, Package,
 } from 'lucide-react';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { formatCurrency } from '@/src/utils/formatCurrency';
+import { useTranslation } from 'react-i18next';
+import { JSX } from 'react/jsx-runtime';
 
 export default function RentalCompanyDashboard() {
+  const { t } = useTranslation('common');
   const { user } = useUser();
   const [stats, setStats] = useState({
     stations: 0,
@@ -46,16 +41,18 @@ export default function RentalCompanyDashboard() {
 
       const companyId = companySnap.docs[0].id;
 
-      const [stationSnap, ebikeSnap, staffSnap, issuesSnap, bookingsSnap, batterySnap, accessorySnap] =
-        await Promise.all([
-          getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', companyId))),
-          getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId))),
-          getDocs(query(collection(db, 'staffs'), where('companyId', '==', companyId))),
-          getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId))),
-          getDocs(query(collection(db, 'bookings'), where('companyId', '==', companyId))),
-          getDocs(query(collection(db, 'batteries'), where('companyId', '==', companyId))),
-          getDocs(query(collection(db, 'accessories'), where('companyId', '==', companyId))),
-        ]);
+      const [
+        stationSnap, ebikeSnap, staffSnap, issuesSnap,
+        bookingsSnap, batterySnap, accessorySnap
+      ] = await Promise.all([
+        getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'staffs'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'bookings'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'batteries'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'accessories'), where('companyId', '==', companyId))),
+      ]);
 
       const bookings: Booking[] = bookingsSnap.docs.map(doc => ({
         id: doc.id,
@@ -68,10 +65,9 @@ export default function RentalCompanyDashboard() {
 
       const monthlyBookings = bookings.filter(b => {
         try {
-          const date =
-            b.createdAt instanceof Date
-              ? b.createdAt
-              : b.createdAt?.toDate?.();
+          const date = b.createdAt instanceof Date
+            ? b.createdAt
+            : b.createdAt?.toDate?.();
           return (
             date?.getFullYear() === currentYear &&
             date?.getMonth() === currentMonth
@@ -86,9 +82,6 @@ export default function RentalCompanyDashboard() {
         const amount = typeof b.totalAmount === 'number' ? b.totalAmount : 0;
         return sum + amount;
       }, 0);
-
-      console.log("📅 Monthly bookings:", monthlyBookings.length);
-      console.log("💰 Revenue items:", monthlyBookings.map(b => b.totalAmount));
 
       setStats({
         stations: stationSnap.size,
@@ -109,30 +102,35 @@ export default function RentalCompanyDashboard() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       <main className="flex-1 px-6 py-10 space-y-10">
-        <h1 className="text-3xl font-bold text-center text-gray-800">🏢 Rental Company Dashboard</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          {t('rental_company_dashboard.title')}
+        </h1>
+
         <DashboardGrid1>
-          <DashboardCard title="Stations" value={stats.stations.toString()} href="/dashboard/stations" icon={<MapPin className="w-6 h-6" />} />
-          <DashboardCard title="Vehicles" value={stats.ebikes.toString()} href="/vehicles" icon={<Bike className="w-6 h-6" />} />
-          <DashboardCard title="Bookings (This Month)" value={stats.bookings.toString()} href="/bookings" icon={<FileTextIcon className="w-6 h-6" />} />
-          <DashboardCard title="Revenue (This Month)" value={formatCurrency(stats.revenue)} href="/dashboard/revenue" icon={<DollarSign className="w-6 h-6" />} />
-          <DashboardCard icon={<ClipboardList className="w-6 h-6" />} title="Programs" value="Manage" href="/dashboard/programs" />
-          <DashboardCard title="Staff" value={stats.staffs.toString()} href="/dashboard/staff" icon={<Users className="w-6 h-6" />} />
-          <DashboardCard title="Vehicle Issues" value={stats.issues.toString()} href="/vehicle-issues" icon={<Wrench className="w-6 h-6" />} />
-          <DashboardCard title="Batteries" value={stats.batteries.toString()} href="/battery" icon={<BatteryCharging className="w-6 h-6" />} />
-          <DashboardCard title="Accessories" value={stats.accessories.toString()} href="/accessories" icon={<Package className="w-6 h-6" />} />
-          <DashboardCard title="Subscription Packages" value="Manage" href="/subscriptionPackages" icon={<ClipboardList className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.stations')} value={stats.stations.toString()} href="/dashboard/stations" icon={<MapPin className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.vehicles')} value={stats.ebikes.toString()} href="/vehicles" icon={<Bike className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.bookings_this_month')} value={stats.bookings.toString()} href="/bookings" icon={<FileTextIcon className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.revenue_this_month')} value={formatCurrency(stats.revenue)} href="/dashboard/revenue" icon={<DollarSign className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.programs')} value={t('manage')} href="/dashboard/programs" icon={<ClipboardList className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.staff')} value={stats.staffs.toString()} href="/dashboard/staff" icon={<Users className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.issues')} value={stats.issues.toString()} href="/vehicle-issues" icon={<Wrench className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.batteries')} value={stats.batteries.toString()} href="/battery" icon={<BatteryCharging className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.accessories')} value={stats.accessories.toString()} href="/accessories" icon={<Package className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.subscription_packages')} value={t('manage')} href="/subscriptionPackages" icon={<ClipboardList className="w-6 h-6" />} />
         </DashboardGrid1>
 
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            {t('quick_actions.title')}
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            <QuickAction label="Add New Station" href="/dashboard/stations" />
-            <QuickAction label="Create Vehicle Model" href="/vehicles" />
-            <QuickAction label="Assign Staff" href="/dashboard/staff" />
-            <QuickAction label="Form Builder" href="/dashboard/form-builder" />
-            <QuickAction label="Rent a Ride" href="/rent" />
-            <QuickAction label="Return Vehicle" href="/return" />
-            <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />
+            <QuickAction label={t('quick_actions.add_station')} href="/dashboard/stations" />
+            <QuickAction label={t('quick_actions.create_vehicle_model')} href="/vehicles" />
+            <QuickAction label={t('quick_actions.assign_staff')} href="/dashboard/staff" />
+            <QuickAction label={t('quick_actions.form_builder')} href="/dashboard/form-builder" />
+            <QuickAction label={t('quick_actions.rent')} href="/rent" />
+            <QuickAction label={t('quick_actions.return')} href="/return" />
+            <QuickAction label={t('quick_actions.report_issue')} href="/vehicle-issues/report" />
           </div>
         </section>
       </main>
@@ -142,11 +140,7 @@ export default function RentalCompanyDashboard() {
 }
 
 function DashboardGrid1({ children }: { children: React.ReactNode }) {
-  return <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">{children}</section>;
-}
-
-function DashboardGrid2({ children }: { children: React.ReactNode }) {
-  return <section className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">{children}</section>;
+  return <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">{children}</section>;
 }
 
 function DashboardCard({
@@ -173,24 +167,6 @@ function DashboardCard({
         <h3 className="text-lg font-bold text-gray-800">{value}</h3>
       </div>
     </Link>
-  );
-}
-
-function InfoCard({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-white rounded-2xl p-6 border shadow space-y-2">
-      <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-      {children}
-    </div>
-  );
-}
-
-function RecentActivityItem({ text }: { text: string }) {
-  return (
-    <li className="flex items-start gap-2">
-      <FileText className="mt-0.5 w-4 h-4 text-[#00d289]" />
-      <span>{text}</span>
-    </li>
   );
 }
 

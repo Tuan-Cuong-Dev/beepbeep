@@ -84,15 +84,15 @@ export default function BookingTableMobile({
             </div>
 
             {/* Delivery Method */}
-            <td className="px-3 py-3 border align-top">
-                  <div className="flex items-center gap-1">
-                    <Truck className="h-4 w-4 text-blue-600" />
-                    {t(`delivery_method.${b.deliveryMethod}`, { defaultValue: b.deliveryMethod })}
-                  </div>
-                  {b.deliveryMethod === 'Deliver to Address' && b.deliveryAddress && (
-                    <div className="text-xs text-gray-600 ml-6">{b.deliveryAddress}</div>
-                  )}
-                </td>
+            <div className="text-xs text-gray-700">
+              <div className="flex items-center gap-1">
+                <Truck className="h-4 w-4 text-blue-600" />
+                {t(`delivery_method.${b.deliveryMethod}`, { defaultValue: b.deliveryMethod })}
+              </div>
+              {b.deliveryMethod === 'Deliver to Address' && b.deliveryAddress && (
+                <div className="text-xs text-gray-600 ml-6">{b.deliveryAddress}</div>
+              )}
+            </div>
             {/* Accessories */}
             <div className="text-xs text-gray-700">
               {t('booking_table.accessories')}:
