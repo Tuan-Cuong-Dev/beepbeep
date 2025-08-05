@@ -6,6 +6,7 @@ import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issu
 import { Button } from '@/src/components/ui/button';
 import ViewProposalDialog from '@/src/components/vehicle-issues/ViewProposalDialog';
 import ApproveProposalDialog from '@/src/components/vehicle-issues/ApproveProposalDialog';
+import { safeFormatDate } from '@/src/utils/safeFormatDate';
 
 interface Props {
   issues: ExtendedVehicleIssue[];
@@ -31,7 +32,6 @@ interface Props {
 
 export default function VehicleIssueTable({
   issues,
-  technicianMap,
   updateIssue,
   setClosingIssue,
   setCloseDialogOpen,
@@ -70,9 +70,92 @@ export default function VehicleIssueTable({
     const normalized = rawType.toLowerCase().replace(/\s+/g, '_');
     return t(`vehicle_issue_type.${normalized}`, { defaultValue: rawType });
   };
+  
+  const renderActions = (issue: ExtendedVehicleIssue) => {
+    const buttons = [];
+
+    if (isTechnician) {
+      if (issue.status === 'assigned') {
+        buttons.push(
+          <Button key="submitProposal" size="sm" onClick={() => setProposingIssue?.(issue)}>
+            {t('vehicle_issue_table.submit_proposal')}
+          </Button>
+        );
+      }
+      if (issue.status === 'confirmed') {
+        buttons.push(
+          <Button key="submitActual" size="sm" onClick={() => setUpdatingActualIssue?.(issue)}>
+            {t('vehicle_issue_table.submit_actual')}
+          </Button>
+        );
+      }
+    } else {
+      if (issue.status === 'proposed') {
+        buttons.push(
+          <Button key="approve" size="sm" variant="outline" onClick={() => setApprovingProposal(issue)}>
+            {t('vehicle_issue_table.approve_proposal')}
+          </Button>
+        );
+      }
+      if (issue.status === 'resolved') {
+        buttons.push(
+          <Button
+            key="close"
+            size="sm"
+            variant="destructive"
+            onClick={() => {
+              setClosingIssue(issue);
+              setCloseDialogOpen(true);
+            }}
+          >
+            {t('vehicle_issue_table.close_issue')}
+          </Button>
+        );
+      }
+    }
+
+    // ✅ "Xem đề xuất" - màu xanh, kiểu ghost
+    if (issue.proposedSolution) {
+      buttons.push(
+        <Button
+          key="viewProposal"
+          size="sm"
+          className="text-[#00d289] font-semibold hover:underline"
+          variant="ghost"
+          onClick={() => setViewingProposal(issue)}
+        >
+          {t('vehicle_issue_table.view_proposal')}
+        </Button>
+      );
+    }
+
+    // ✅ "Chỉnh sửa" - outline xanh
+    buttons.push(
+      <Button
+        key="edit"
+        size="sm"
+        className="border-[#00d289] text-[#00d289] hover:bg-[#00d289]/10"
+        variant="outline"
+        onClick={() => {
+          setEditingIssue(issue);
+          setShowForm(true);
+        }}
+      >
+        {t('vehicle_issue_table.edit')}
+      </Button>
+    );
+
+    return buttons.length > 0 ? (
+      <div className="flex flex-wrap gap-2">{buttons}</div>
+    ) : (
+      <span className="text-gray-400 italic">{t('vehicle_issue_table.no_actions')}</span>
+    );
+  };
+
 
   return (
     <>
+      {/* ✅ Mobile Card View */}
       <div className="grid gap-4 sm:hidden">
         {issues.map((issue) => (
           <div key={issue.id} className="border rounded-lg p-4 bg-white shadow space-y-2">
@@ -85,81 +168,14 @@ export default function VehicleIssueTable({
             <div className="text-sm text-gray-600">{t('vehicle_issue_table.assigned_to')}: {issue.assignedToName || '-'}</div>
             <div className="text-sm text-gray-600">{t('vehicle_issue_table.proposal')}: {issue.proposedSolution || '-'}</div>
             <div className="text-sm text-gray-600">{t('vehicle_issue_table.actual')}: {issue.actualSolution || '-'}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.reported')}: {issue.reportedAt?.toDate().toLocaleString()}</div>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <div className="flex flex-wrap gap-2 pt-2">
-                  {/* 👨‍🔧 Technician actions */}
-                  {isTechnician && (
-                    <>
-                      {issue.status === 'assigned' && (
-                        <Button size="sm" onClick={() => setProposingIssue?.(issue)}>
-                          {t('vehicle_issue_table.submit_proposal')}
-                        </Button>
-                      )}
-                      {issue.status === 'confirmed' && (
-                        <Button size="sm" onClick={() => setUpdatingActualIssue?.(issue)}>
-                          {t('vehicle_issue_table.submit_actual')}
-                        </Button>
-                      )}
-                    </>
-                  )}
-
-                  {/* 👩‍💼 Admin/Company Owner actions */}
-                  {!isTechnician && (
-                    <>
-                      {issue.status === 'proposed' && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setApprovingProposal(issue)}
-                        >
-                          {t('vehicle_issue_table.approve_proposal')}
-                        </Button>
-                      )}
-                      {issue.status === 'resolved' && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => {
-                            setClosingIssue(issue);
-                            setCloseDialogOpen(true);
-                          }}
-                        >
-                          {t('vehicle_issue_table.close_issue')}
-                        </Button>
-                      )}
-                    </>
-                  )}
-
-                  {/* 👁️ View proposal */}
-                  {issue.proposedSolution && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setViewingProposal(issue)}
-                    >
-                      {t('vehicle_issue_table.view_proposal')}
-                    </Button>
-                  )}
-
-                  {/* ✏️ Edit */}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setEditingIssue(issue);
-                      setShowForm(true);
-                    }}
-                  >
-                    {t('vehicle_issue_table.edit')}
-                  </Button>
-                </div>
-            </div>
+            <div className="text-sm text-gray-600">{t('vehicle_issue_table.reported')}: {safeFormatDate(issue.reportedAt)}</div>
+            <div className="pt-2">{renderActions(issue)}</div>
           </div>
         ))}
       </div>
 
-      <div className="hidden sm:block">
+      {/* ✅ Desktop Table View */}
+      <div className="hidden sm:block overflow-auto border rounded-xl">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-100 text-left">
             <tr>
@@ -168,6 +184,9 @@ export default function VehicleIssueTable({
               <th className="p-2">{t('vehicle_issue_table.type')}</th>
               <th className="p-2">{t('vehicle_issue_table.description')}</th>
               <th className="p-2">{t('vehicle_issue_table.status')}</th>
+              <th className="p-2">{t('vehicle_issue_table.assigned_to')}</th>
+              <th className="p-2">{t('vehicle_issue_table.proposal')}</th>
+              <th className="p-2">{t('vehicle_issue_table.actual')}</th>
               <th className="p-2">{t('vehicle_issue_table.reported')}</th>
               <th className="p-2">{t('vehicle_issue_table.actions')}</th>
             </tr>
@@ -180,14 +199,18 @@ export default function VehicleIssueTable({
                 <td className="p-2">{getTranslatedIssueType(issue.issueType)}</td>
                 <td className="p-2">{issue.description || '-'}</td>
                 <td className="p-2">{renderStatusBadge(issue.status)}</td>
-                <td className="p-2">{issue.reportedAt?.toDate().toLocaleString()}</td>
-                <td className="p-2 text-right text-gray-400 italic">{t('vehicle_issue_table.no_actions')}</td>
+                <td className="p-2">{issue.assignedToName || '-'}</td>
+                <td className="p-2">{issue.proposedSolution || '-'}</td>
+                <td className="p-2">{issue.actualSolution || '-'}</td>
+                <td className="p-2">{safeFormatDate(issue.reportedAt)}</td>
+                <td className="p-2">{renderActions(issue)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
+      {/* 🔍 Proposal Dialogs */}
       <ViewProposalDialog open={!!viewingProposal} issue={viewingProposal} onClose={() => setViewingProposalState(null)} />
       <ApproveProposalDialog
         open={!!approvingProposal}
