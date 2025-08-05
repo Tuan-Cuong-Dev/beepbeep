@@ -5,7 +5,8 @@ import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscription
 import { Button } from '@/src/components/ui/button';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { formatCurrency } from '@/src/utils/formatCurrency'; // ✅ nhớ import formatCurrency
+import { formatCurrency } from '@/src/utils/formatCurrency';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   packages: SubscriptionPackage[];
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function SubscriptionPackageTable({ packages, onEdit, onDelete }: Props) {
+  const { t } = useTranslation('common');
   const [companyMap, setCompanyMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -40,20 +42,22 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
 
   return (
     <div className="bg-white p-6 rounded-xl shadow mt-6 overflow-x-auto">
-      <h2 className="text-xl font-semibold mb-4">Subscription Packages List</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {t('subscription_package_table.title')}
+      </h2>
       <table className="min-w-full text-sm border border-gray-200">
         <thead className="bg-gray-100 text-gray-700">
           <tr>
-            <th className="px-3 py-2 border">Company</th>
-            <th className="px-3 py-2 border">Name</th>
-            <th className="px-3 py-2 border">Duration</th>
-            <th className="px-3 py-2 border">KM Limit</th>
-            <th className="px-3 py-2 border">Charging</th>
-            <th className="px-3 py-2 border">Base Price</th>
-            <th className="px-3 py-2 border">Overage Rate</th>
-            <th className="px-3 py-2 border">Note</th>
-            <th className="px-3 py-2 border">Status</th> {/* ✅ Mới thêm */}
-            <th className="px-3 py-2 border">Actions</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.company')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.name')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.duration')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.km_limit')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.charging')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.base_price')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.overage_rate')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.note')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.status')}</th>
+            <th className="px-3 py-2 border">{t('subscription_package_table.actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -63,9 +67,15 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
                 {pkg.companyId ? (companyMap[pkg.companyId] || pkg.companyId) : 'Unknown Company'}
               </td>
               <td className="px-3 py-2 border font-medium">{pkg.name}</td>
-              <td className="px-3 py-2 border capitalize">{pkg.durationType}</td>
-              <td className="px-3 py-2 border text-center">{pkg.kmLimit ?? 'Unlimited'}</td>
-              <td className="px-3 py-2 border capitalize">{pkg.chargingMethod}</td>
+              <td className="px-3 py-2 border capitalize">
+                {t(`subscription_package_table.duration_type.${pkg.durationType}`)}
+              </td>
+              <td className="px-3 py-2 border text-center">
+                {pkg.kmLimit ?? t('subscription_package_table.unlimited')}
+              </td>
+              <td className="px-3 py-2 border capitalize">
+                {t(`subscription_package_table.charging_method.${pkg.chargingMethod}`)}
+              </td>
               <td className="px-3 py-2 border text-right">{formatCurrency(pkg.basePrice)}</td>
               <td className="px-3 py-2 border text-right">
                 {pkg.overageRate !== undefined && pkg.overageRate !== null
@@ -81,16 +91,18 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
                       : 'bg-green-100 text-green-600'
                   }`}
                 >
-                  {pkg.status ?? 'available'}
+                  {pkg.status
+                    ? t(`subscription_package_table.${pkg.status}`)
+                    : t('subscription_package_table.available')}
                 </span>
               </td>
               <td className="px-3 py-2 border">
                 <div className="flex gap-2 justify-center">
                   <Button size="sm" onClick={() => onEdit(pkg)}>
-                    Edit
+                    {t('subscription_package_table.edit')}
                   </Button>
                   <Button size="sm" variant="destructive" onClick={() => onDelete(pkg.id!)}>
-                    Delete
+                    {t('subscription_package_table.delete')}
                   </Button>
                 </div>
               </td>
@@ -100,13 +112,12 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
           {packages.length === 0 && (
             <tr>
               <td colSpan={10} className="text-center py-6 text-gray-500">
-                No subscription packages found.
+                {t('subscription_package_table.no_packages')}
               </td>
             </tr>
           )}
         </tbody>
       </table>
-
     </div>
   );
 }

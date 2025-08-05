@@ -1866,7 +1866,113 @@
   "error_invalid_quantity": "数量管理アクセサリーの正しい数量を入力してください",
   "success_saved": "✅ アクセサリーが正常に保存されました",
   "error_save_failed": "❌ アクセサリーの保存に失敗しました"
+},
+
+
+  "subscription_package_manager_page": {
+    "title": "サブスクリプションパッケージの管理",
+    "loading_user": "ユーザー情報を読み込み中...",
+    "no_company": "まず会社を設定してください。",
+    "loading_packages": "パッケージを読み込み中...",
+    "created": "パッケージが正常に作成されました！",
+    "updated": "パッケージが正常に更新されました！",
+    "deleted": "パッケージが正常に削除されました！",
+    "deleted_all": "すべてのパッケージが削除されました。",
+    "imported": "{{count}} 件のパッケージを正常にインポートしました。",
+    "company_required": "新しいパッケージには会社IDが必要です。",
+    "confirm_title": "削除の確認",
+    "confirm_desc": "このパッケージを完全に削除してもよろしいですか？"
+  },
+  "actions": {
+    "cancel": "キャンセル",
+    "delete": "削除"
+  },
+
+  "subscription_package_search_import_export": {
+    "search_placeholder": "パッケージ名で検索...",
+    "all_durations": "すべての期間",
+    "daily": "日単位",
+    "monthly": "月単位",
+    "all_status": "すべてのステータス",
+    "available": "利用可能",
+    "inactive": "無効",
+    "import_excel": "Excelをインポート",
+    "export_excel": "Excelをエクスポート",
+    "delete_all": "すべて削除",
+    "import_title": "インポートの確認",
+    "import_message": "このファイルからパッケージをインポートしてもよろしいですか？",
+    "export_title": "エクスポートの確認",
+    "export_message": "{{count}} 件のサブスクリプションパッケージをエクスポートしようとしています。",
+    "delete_title": "すべてのパッケージを削除",
+    "delete_message": "{{count}} 件のパッケージを完全に削除してもよろしいですか？この操作は元に戻せません。",
+    "cancel": "キャンセル",
+    "confirm_import": "インポートを確認",
+    "confirm_export": "エクスポートを確認",
+    "confirm_delete": "はい、すべて削除",
+    "deleting": "削除中..."
+  },
+
+  "subscription_package_table": {
+  "title": "サブスクリプションパッケージ一覧",
+  "company": "会社",
+  "name": "名前",
+  "duration": "期間",
+  "km_limit": "走行距離制限",
+  "charging": "充電方法",
+  "base_price": "基本料金",
+  "overage_rate": "超過料金",
+  "note": "メモ",
+  "status": "ステータス",
+  "actions": "操作",
+  "edit": "編集",
+  "delete": "削除",
+  "unlimited": "無制限",
+  "available": "有効",
+  "inactive": "無効",
+  "no_packages": "サブスクリプションパッケージが見つかりません。",
+  "duration_type": {
+    "daily": "日単位",
+    "monthly": "月単位"
+  },
+  "charging_method": {
+    "swap": "バッテリー交換",
+    "self": "自己充電"
+  }
+},
+
+"subscription_package_form": {
+  "edit_title": "サブスクリプションパッケージを編集",
+  "add_title": "新しいサブスクリプションパッケージを追加",
+  "package_name": "パッケージ名",
+  "select_duration": "期間を選択",
+  "select_charging": "充電方法を選択",
+  "km_limit": "走行距離の上限（任意）",
+  "base_price": "基本料金（VND）",
+  "overage_rate": "超過料金（VND/km）",
+  "select_status": "ステータスを選択",
+  "notes": "備考（任意）",
+  "save_changes": "変更を保存",
+  "add_package": "パッケージを追加",
+  "cancel": "キャンセル",
+  "required_fields_warning": "必須項目をすべて入力してください",
+  "options": {
+    "durationType": {
+      "daily": "日単位",
+      "monthly": "月単位"
+    },
+    "chargingMethod": {
+      "swap": "バッテリー交換",
+      "self": "自己充電"
+    },
+    "status": {
+      "available": "利用可能",
+      "inactive": "無効"
+    }
+  }
 }
+
+
+
 
 
 

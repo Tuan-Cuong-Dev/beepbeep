@@ -1,9 +1,12 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { SimpleSelect } from '@/src/components/ui/select';
 import { formatCurrency } from '@/src/utils/formatCurrency';
+import { useTranslation } from 'react-i18next';
 
 import {
   SubscriptionPackage,
@@ -19,6 +22,7 @@ interface Props {
 }
 
 export default function SubscriptionPackageForm({ initialData, onSave, onCancel }: Props) {
+  const { t } = useTranslation('common');
   const isUpdateMode = Boolean(initialData);
 
   const [form, setForm] = useState<Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>>({
@@ -30,7 +34,7 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
     basePrice: 0,
     overageRate: null,
     note: '',
-    status: 'available', // ✅ mặc định là available
+    status: 'available',
   });
 
   useEffect(() => {
@@ -46,7 +50,7 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
 
   const handleSubmit = () => {
     if (!form.name || !form.durationType || !form.chargingMethod) {
-      alert('Please fill in all required fields');
+      alert(t('subscription_package_form.required_fields_warning'));
       return;
     }
 
@@ -63,12 +67,14 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
   return (
     <div className="bg-white rounded-xl shadow p-6">
       <h2 className="text-xl font-semibold mb-4">
-        {isUpdateMode ? 'Edit Subscription Package' : 'Add New Subscription Package'}
+        {isUpdateMode
+          ? t('subscription_package_form.edit_title')
+          : t('subscription_package_form.add_title')}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Input
-          placeholder="Package Name"
+          placeholder={t('subscription_package_form.package_name')}
           value={form.name}
           onChange={(e) => handleChange('name', e.target.value)}
         />
@@ -77,34 +83,35 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
           value={form.durationType}
           onChange={(val) => handleChange('durationType', val as DurationType)}
           options={[
-            { label: 'Daily', value: 'daily' },
-            { label: 'Monthly', value: 'monthly' },
+            { label: t('subscription_package_form.options.durationType.daily'), value: 'daily' },
+            { label: t('subscription_package_form.options.durationType.monthly'), value: 'monthly' },
           ]}
-          placeholder="Select Duration"
+          placeholder={t('subscription_package_form.select_duration')}
         />
 
         <SimpleSelect
           value={form.chargingMethod}
           onChange={(val) => handleChange('chargingMethod', val as ChargingMethod)}
           options={[
-            { label: 'Swap Battery', value: 'swap' },
-            { label: 'Self Charge', value: 'self' },
+            { label: t('subscription_package_form.options.chargingMethod.swap'), value: 'swap' },
+            { label: t('subscription_package_form.options.chargingMethod.self'), value: 'self' },
           ]}
-          placeholder="Select Charging"
+          placeholder={t('subscription_package_form.select_charging')}
         />
 
         <Input
           type="number"
-          placeholder="KM Limit (optional)"
+          placeholder={t('subscription_package_form.km_limit')}
           value={form.kmLimit !== null ? form.kmLimit : ''}
           onChange={(e) => {
             const val = e.target.value;
             handleChange('kmLimit', val === '' ? null : parseInt(val));
           }}
         />
+
         <Input
           type="text"
-          placeholder="Base Price (VND)"
+          placeholder={t('subscription_package_form.base_price')}
           value={form.basePrice ? formatCurrency(form.basePrice) : ''}
           onChange={(e) => {
             const val = e.target.value.replace(/[^\d]/g, '');
@@ -114,30 +121,27 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
 
         <Input
           type="text"
-          placeholder="Overage Rate (VND/km)"
-          value={
-            form.overageRate !== null ? formatCurrency(form.overageRate) : ''
-          }
+          placeholder={t('subscription_package_form.overage_rate')}
+          value={form.overageRate !== null ? formatCurrency(form.overageRate) : ''}
           onChange={(e) => {
             const val = e.target.value.replace(/[^\d]/g, '');
             handleChange('overageRate', val === '' ? null : parseInt(val));
           }}
         />
 
-
         <SimpleSelect
           value={form.status}
           onChange={(val) => handleChange('status', val as SubscriptionPackageStatus)}
           options={[
-            { label: 'Available', value: 'available' },
-            { label: 'Inactive', value: 'inactive' },
+            { label: t('subscription_package_form.options.status.available'), value: 'available' },
+            { label: t('subscription_package_form.options.status.inactive'), value: 'inactive' },
           ]}
-          placeholder="Select Status"
+          placeholder={t('subscription_package_form.select_status')}
         />
 
         <Textarea
           className="md:col-span-3"
-          placeholder="Notes (optional)"
+          placeholder={t('subscription_package_form.notes')}
           value={form.note ?? ''}
           onChange={(e) => handleChange('note', e.target.value)}
         />
@@ -145,10 +149,12 @@ export default function SubscriptionPackageForm({ initialData, onSave, onCancel 
 
       <div className="flex justify-start gap-2 mt-6">
         <Button type="button" onClick={handleSubmit}>
-          {isUpdateMode ? 'Save Changes' : 'Add Package'}
+          {isUpdateMode
+            ? t('subscription_package_form.save_changes')
+            : t('subscription_package_form.add_package')}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t('subscription_package_form.cancel')}
         </Button>
       </div>
     </div>

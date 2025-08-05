@@ -1661,6 +1661,7 @@
   "loading": "Đang tải danh sách xuất kho..."
 },
 
+
 "accessory_export_table": {
   "search_accessory": "Tìm theo tên phụ kiện...",
   "search_target": "Tìm theo đối tượng...",
@@ -1906,7 +1907,113 @@
   "error_invalid_quantity": "Vui lòng nhập số lượng hợp lệ cho phụ kiện theo số lượng",
   "success_saved": "✅ Đã lưu phụ kiện thành công",
   "error_save_failed": "❌ Lưu phụ kiện thất bại"
+},
+
+
+  "subscription_package_manager_page": {
+    "title": "Quản lý gói thuê",
+    "loading_user": "Đang tải thông tin người dùng...",
+    "no_company": "Vui lòng thiết lập công ty trước.",
+    "loading_packages": "Đang tải các gói thuê...",
+    "created": "Tạo gói thành công!",
+    "updated": "Cập nhật gói thành công!",
+    "deleted": "Xoá gói thành công!",
+    "deleted_all": "Đã xoá tất cả gói thành công.",
+    "imported": "Đã nhập {{count}} gói thành công.",
+    "company_required": "Cần chọn công ty khi tạo gói mới.",
+    "confirm_title": "Xác nhận xoá",
+    "confirm_desc": "Bạn có chắc chắn muốn xoá vĩnh viễn gói này?"
+  },
+  "actions": {
+    "cancel": "Huỷ",
+    "delete": "Xoá"
+  },
+
+  "subscription_package_search_import_export": {
+  "search_placeholder": "Tìm theo tên gói...",
+  "all_durations": "Tất cả thời hạn",
+  "daily": "Theo ngày",
+  "monthly": "Theo tháng",
+  "all_status": "Tất cả trạng thái",
+  "available": "Đang hoạt động",
+  "inactive": "Ngưng hoạt động",
+  "import_excel": "Nhập Excel",
+  "export_excel": "Xuất Excel",
+  "delete_all": "Xoá tất cả",
+  "import_title": "Xác nhận nhập Excel",
+  "import_message": "Bạn có chắc muốn nhập các gói thuê từ tập tin này không?",
+  "confirm_import": "Xác nhận nhập",
+  "export_title": "Xác nhận xuất Excel",
+  "export_message": "Bạn sắp xuất {{count}} gói thuê ra file Excel.",
+  "confirm_export": "Xác nhận xuất",
+  "delete_title": "Xoá tất cả gói thuê",
+  "delete_message": "Bạn có chắc muốn xoá vĩnh viễn {{count}} gói thuê không? Hành động này không thể hoàn tác.",
+  "confirm_delete": "Đồng ý xoá tất cả",
+  "deleting": "Đang xoá...",
+  "cancel": "Huỷ"
+},
+
+"subscription_package_table": {
+  "title": "Danh sách gói thuê",
+  "company": "Công ty",
+  "name": "Tên gói",
+  "duration": "Thời hạn",
+  "km_limit": "Giới hạn KM",
+  "charging": "Hình thức sạc",
+  "base_price": "Giá cơ bản",
+  "overage_rate": "Phí vượt hạn",
+  "note": "Ghi chú",
+  "status": "Trạng thái",
+  "actions": "Hành động",
+  "edit": "Chỉnh sửa",
+  "delete": "Xoá",
+  "unlimited": "Không giới hạn",
+  "available": "Hoạt động",
+  "inactive": "Ngưng hoạt động",
+  "no_packages": "Không tìm thấy gói thuê nào.",
+   "duration_type": {
+    "daily": "Theo ngày",
+    "monthly": "Theo tháng"
+  },
+  "charging_method": {
+    "swap": "Đổi pin",
+    "self": "Tự sạc"
+  }
+},
+
+"subscription_package_form": {
+  "edit_title": "Chỉnh sửa gói thuê",
+  "add_title": "Thêm gói thuê mới",
+  "package_name": "Tên gói thuê",
+  "select_duration": "Chọn thời hạn",
+  "select_charging": "Chọn hình thức sạc",
+  "km_limit": "Giới hạn KM (tùy chọn)",
+  "base_price": "Giá cơ bản (VND)",
+  "overage_rate": "Phí vượt giới hạn (VND/km)",
+  "select_status": "Chọn trạng thái",
+  "notes": "Ghi chú (tùy chọn)",
+  "save_changes": "Lưu thay đổi",
+  "add_package": "Thêm gói",
+  "cancel": "Hủy",
+  "required_fields_warning": "Vui lòng điền đầy đủ các trường bắt buộc",
+  "options": {
+    "durationType": {
+      "daily": "Theo ngày",
+      "monthly": "Theo tháng"
+    },
+    "chargingMethod": {
+      "swap": "Đổi pin",
+      "self": "Tự sạc"
+    },
+    "status": {
+      "available": "Đang áp dụng",
+      "inactive": "Ngưng sử dụng"
+    }
+  }
 }
+
+
+
 
 
 

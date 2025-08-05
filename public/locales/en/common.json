@@ -1895,7 +1895,116 @@
   "error_invalid_quantity": "Please enter valid quantity for bulk accessory",
   "success_saved": "✅ Accessory saved successfully",
   "error_save_failed": "❌ Failed to save accessory"
+},
+
+
+  "subscription_package_manager_page": {
+    "title": "Manage Subscription Packages",
+    "loading_user": "Loading user info...",
+    "no_company": "Please set up your company first.",
+    "loading_packages": "Loading packages...",
+    "created": "Package created successfully!",
+    "updated": "Package updated successfully!",
+    "deleted": "Package deleted successfully!",
+    "deleted_all": "All packages deleted successfully.",
+    "imported": "Imported {{count}} packages successfully.",
+    "company_required": "CompanyId is required for new package.",
+    "confirm_title": "Confirm Deletion",
+    "confirm_desc": "Are you sure you want to permanently delete this package?"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+
+  "subscription_package_search_import_export": {
+    "search_placeholder": "Search by package name...",
+    "all_durations": "All Durations",
+    "daily": "Daily",
+    "monthly": "Monthly",
+    "all_status": "All Status",
+    "available": "Available",
+    "inactive": "Inactive",
+    "import_excel": "Import Excel",
+    "export_excel": "Export Excel",
+    "delete_all": "Delete All",
+    "import_title": "Import Confirmation",
+    "import_message": "Are you sure you want to import packages from this file?",
+    "export_title": "Export Confirmation",
+    "export_message": "You are about to export {{count}} subscription packages.",
+    "delete_title": "Delete All Packages",
+    "delete_message": "Are you sure you want to permanently delete {{count}} subscription packages? This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm_import": "Confirm Import",
+    "confirm_export": "Confirm Export",
+    "confirm_delete": "Yes, Delete All",
+    "deleting": "Deleting..."
+  },
+
+  "subscription_package_table": {
+  "title": "Subscription Packages List",
+  "company": "Company",
+  "name": "Name",
+  "duration": "Duration",
+  "km_limit": "KM Limit",
+  "charging": "Charging",
+  "base_price": "Base Price",
+  "overage_rate": "Overage Rate",
+  "note": "Note",
+  "status": "Status",
+  "actions": "Actions",
+  "edit": "Edit",
+  "delete": "Delete",
+  "unlimited": "Unlimited",
+  "available": "Available",
+  "inactive": "Inactive",
+  "no_packages": "No subscription packages found.",
+  "duration_type": {
+    "daily": "Daily",
+    "monthly": "Monthly"
+  },
+  "charging_method": {
+    "swap": "Battery Swap",
+    "self": "Self-charging"
+  }
+},
+
+"subscription_package_form": {
+  "edit_title": "Edit Subscription Package",
+  "add_title": "Add New Subscription Package",
+  "package_name": "Package Name",
+  "select_duration": "Select Duration",
+  "select_charging": "Select Charging Method",
+  "km_limit": "KM Limit (optional)",
+  "base_price": "Base Price (VND)",
+  "overage_rate": "Overage Rate (VND/km)",
+  "select_status": "Select Status",
+  "notes": "Notes (optional)",
+  "save_changes": "Save Changes",
+  "add_package": "Add Package",
+  "cancel": "Cancel",
+  "required_fields_warning": "Please fill in all required fields",
+  "options": {
+  "durationType": {
+    "daily": "Daily",
+    "monthly": "Monthly"
+  },
+  "chargingMethod": {
+    "swap": "Swap Battery",
+    "self": "Self Charge"
+  },
+  "status": {
+    "available": "Available",
+    "inactive": "Inactive"
+  }
 }
+
+}
+
+
+
+
+
 
 
 

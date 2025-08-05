@@ -17,8 +17,10 @@ import { useSubscriptionPackageData } from '@/src/hooks/useSubscriptionPackageDa
 import { exportSubscriptionPackagesToExcel } from '@/src/lib/subscriptionPackages/exportSubscriptionPackages';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 import { useUser } from '@/src/context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function SubscriptionPackageManagerPage() {
+  const { t } = useTranslation('common');
   const { companyId: rawCompanyId, role, loading: userLoading } = useUser();
   const isAdmin = role === 'Admin';
   const companyId = rawCompanyId ?? '';
@@ -54,11 +56,11 @@ export default function SubscriptionPackageManagerPage() {
   }, [searchTerm, durationFilter, statusFilter]);
 
   if (userLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading user info...</div>;
+    return <div className="flex justify-center items-center h-screen">{t('subscription_package_manager_page.loading_user')}</div>;
   }
 
   if (!companyId && !isAdmin) {
-    return <div className="flex justify-center items-center h-screen">Please set up your company first.</div>;
+    return <div className="flex justify-center items-center h-screen">{t('subscription_package_manager_page.no_company')}</div>;
   }
 
   const filteredPackages = packages.filter((pkg) => {
@@ -77,18 +79,18 @@ export default function SubscriptionPackageManagerPage() {
   const handleSave = async (data: Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingPackage) {
       await updatePackage(editingPackage.id!, data);
-      showDialog('success', 'Package updated successfully!');
+      showDialog('success', t('subscription_package_manager_page.updated'));
     } else {
       if (isAdmin) {
         if (!data.companyId) {
-          showDialog('error', 'CompanyId is required for new package.');
+          showDialog('error', t('subscription_package_manager_page.company_required'));
           return;
         }
         await createPackage({ ...data, companyId: data.companyId });
       } else {
         await createPackage({ ...data, companyId });
       }
-      showDialog('success', 'Package created successfully!');
+      showDialog('success', t('subscription_package_manager_page.created'));
     }
     await fetchPackages();
     setEditingPackage(null);
@@ -102,7 +104,7 @@ export default function SubscriptionPackageManagerPage() {
     if (deleteConfirmId) {
       await deletePackage(deleteConfirmId);
       await fetchPackages();
-      showDialog('success', 'Package deleted successfully!');
+      showDialog('success', t('subscription_package_manager_page.deleted'));
       setDeleteConfirmId(null);
     }
   };
@@ -112,7 +114,7 @@ export default function SubscriptionPackageManagerPage() {
       await createPackage(pkg);
     }
     await fetchPackages();
-    showDialog('success', `Imported ${imported.length} packages successfully.`);
+    showDialog('success', t('subscription_package_manager_page.imported', { count: imported.length }));
   };
 
   const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
@@ -125,7 +127,7 @@ export default function SubscriptionPackageManagerPage() {
       <UserTopMenu />
 
       <main className="flex-1 p-6">
-        <h1 className="text-2xl font-semibold mb-6 border-b pb-2">Manage Subscription Packages</h1>
+        <h1 className="text-2xl font-semibold mb-6 border-b pb-2">{t('subscription_package_manager_page.title')}</h1>
 
         <SubscriptionPackageSearchImportExport
           packages={packages}
@@ -142,13 +144,13 @@ export default function SubscriptionPackageManagerPage() {
               await deletePackage(pkg.id!);
             }
             await fetchPackages();
-            showDialog('success', 'All packages deleted successfully.');
+            showDialog('success', t('subscription_package_manager_page.deleted_all'));
           }}
           companyId={companyId}
         />
 
         {loading ? (
-          <div className="text-center text-gray-500 mt-8">Loading packages...</div>
+          <div className="text-center text-gray-500 mt-8">{t('subscription_package_manager_page.loading_packages')}</div>
         ) : error ? (
           <div className="text-center text-red-500 mt-8">{error}</div>
         ) : (
@@ -192,17 +194,17 @@ export default function SubscriptionPackageManagerPage() {
       <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-red-600">Confirm Deletion</DialogTitle>
+            <DialogTitle className="text-red-600">{t('subscription_package_manager_page.confirm_title')}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground mt-2">
-            Are you sure you want to permanently delete this package?
+            {t('subscription_package_manager_page.confirm_desc')}
           </p>
           <DialogFooter className="mt-4">
             <Button variant="ghost" onClick={() => setDeleteConfirmId(null)}>
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              Delete
+              {t('actions.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

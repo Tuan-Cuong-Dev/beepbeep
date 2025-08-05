@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/src/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   packages: SubscriptionPackage[];
@@ -43,6 +44,7 @@ export default function SubscriptionPackageSearchImportExport({
   onDeleteAll,
   companyId,
 }: Props) {
+  const { t } = useTranslation('common');
   const [importFile, setImportFile] = useState<File | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [openDialog, setOpenDialog] = useState<'import' | 'export' | 'delete' | null>(null);
@@ -89,7 +91,7 @@ export default function SubscriptionPackageSearchImportExport({
         {/* Search + Filter */}
         <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
           <Input
-            placeholder="Search by package name..."
+            placeholder={t('subscription_package_search_import_export.search_placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full sm:w-64"
@@ -99,25 +101,25 @@ export default function SubscriptionPackageSearchImportExport({
             onChange={(e) => setDurationFilter(e.target.value)}
             className="border border-gray-300 rounded-md px-3 py-2 text-sm"
           >
-            <option value="">All Durations</option>
-            <option value="daily">Daily</option>
-            <option value="monthly">Monthly</option>
+            <option value="">{t('subscription_package_search_import_export.all_durations')}</option>
+            <option value="daily">{t('subscription_package_search_import_export.daily')}</option>
+            <option value="monthly">{t('subscription_package_search_import_export.monthly')}</option>
           </select>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="border border-gray-300 rounded-md px-3 py-2 text-sm"
           >
-            <option value="">All Status</option>
-            <option value="available">Available</option>
-            <option value="inactive">Inactive</option>
+            <option value="">{t('subscription_package_search_import_export.all_status')}</option>
+            <option value="available">{t('subscription_package_search_import_export.available')}</option>
+            <option value="inactive">{t('subscription_package_search_import_export.inactive')}</option>
           </select>
         </div>
 
         {/* Action Buttons */}
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
           <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-            Import Excel
+            {t('subscription_package_search_import_export.import_excel')}
           </Button>
           <input
             type="file"
@@ -132,9 +134,11 @@ export default function SubscriptionPackageSearchImportExport({
             }}
             className="hidden"
           />
-          <Button onClick={() => setOpenDialog('export')}>Export Excel</Button>
+          <Button onClick={() => setOpenDialog('export')}>
+            {t('subscription_package_search_import_export.export_excel')}
+          </Button>
           <Button variant="destructive" onClick={() => setOpenDialog('delete')}>
-            Delete All
+            {t('subscription_package_search_import_export.delete_all')}
           </Button>
         </div>
       </div>
@@ -145,50 +149,63 @@ export default function SubscriptionPackageSearchImportExport({
           {openDialog === 'import' && (
             <>
               <DialogHeader>
-                <DialogTitle>Import Confirmation</DialogTitle>
+                <DialogTitle>{t('subscription_package_search_import_export.import_title')}</DialogTitle>
               </DialogHeader>
-              <p>Are you sure you want to import packages from this file?</p>
+              <p>{t('subscription_package_search_import_export.import_message')}</p>
               <DialogFooter>
                 <Button variant="ghost" onClick={() => setOpenDialog(null)}>
-                  Cancel
+                  {t('subscription_package_search_import_export.cancel')}
                 </Button>
-                <Button onClick={handleImport}>Confirm Import</Button>
+                <Button onClick={handleImport}>
+                  {t('subscription_package_search_import_export.confirm_import')}
+                </Button>
               </DialogFooter>
             </>
           )}
           {openDialog === 'export' && (
             <>
               <DialogHeader>
-                <DialogTitle>Export Confirmation</DialogTitle>
+                <DialogTitle>{t('subscription_package_search_import_export.export_title')}</DialogTitle>
               </DialogHeader>
               <p>
-                You are about to export <strong>{packages.length}</strong> subscription packages.
+                {t('subscription_package_search_import_export.export_message', {
+                  count: packages.length,
+                })}
               </p>
               <DialogFooter>
                 <Button variant="ghost" onClick={() => setOpenDialog(null)}>
-                  Cancel
+                  {t('subscription_package_search_import_export.cancel')}
                 </Button>
-                <Button onClick={handleExport}>Confirm Export</Button>
+                <Button onClick={handleExport}>
+                  {t('subscription_package_search_import_export.confirm_export')}
+                </Button>
               </DialogFooter>
             </>
           )}
           {openDialog === 'delete' && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-red-600">Delete All Packages</DialogTitle>
+                <DialogTitle className="text-red-600">
+                  {t('subscription_package_search_import_export.delete_title')}
+                </DialogTitle>
               </DialogHeader>
               <p className="text-sm text-muted-foreground mt-2">
-                Are you sure you want to permanently delete{' '}
-                <strong>{packages.length}</strong> subscription packages?
-                <br />
-                This action <span className="text-red-600 font-semibold">cannot be undone</span>.
+                {t('subscription_package_search_import_export.delete_message', {
+                  count: packages.length,
+                })}
               </p>
               <DialogFooter className="mt-4">
                 <Button variant="ghost" onClick={() => setOpenDialog(null)}>
-                  Cancel
+                  {t('subscription_package_search_import_export.cancel')}
                 </Button>
-                <Button variant="destructive" onClick={handleDeleteAll} disabled={deleting}>
-                  {deleting ? 'Deleting...' : 'Yes, Delete All'}
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteAll}
+                  disabled={deleting}
+                >
+                  {deleting
+                    ? t('subscription_package_search_import_export.deleting')
+                    : t('subscription_package_search_import_export.confirm_delete')}
                 </Button>
               </DialogFooter>
             </>
