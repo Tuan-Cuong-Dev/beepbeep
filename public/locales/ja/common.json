@@ -1385,7 +1385,9 @@
   "assign": "割り当て",
   "view_proposal": "提案を見る",
   "approve_or_reject": "承認 / 拒否",
-  "close": "クローズ"
+  "close": "クローズ",
+  "no_actions": "利用可能な操作はありません",
+  "edit": "編集"
 },
 
 "vehicle_issue_proposals_page": {

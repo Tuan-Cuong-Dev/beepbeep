@@ -1417,7 +1417,8 @@
   "assign": "Assign",
   "view_proposal": "View Proposal",
   "approve_or_reject": "Approve / Reject",
-  "close": "Close"
+  "close": "Close",
+  "no_actions": "No actions available"
 },
 
 "vehicle_issue_proposals_page": {

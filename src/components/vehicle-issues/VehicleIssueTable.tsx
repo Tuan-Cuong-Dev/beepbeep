@@ -87,7 +87,73 @@ export default function VehicleIssueTable({
             <div className="text-sm text-gray-600">{t('vehicle_issue_table.actual')}: {issue.actualSolution || '-'}</div>
             <div className="text-sm text-gray-600">{t('vehicle_issue_table.reported')}: {issue.reportedAt?.toDate().toLocaleString()}</div>
             <div className="flex flex-wrap gap-2 pt-2">
-              {/* Buttons logic vẫn giữ nguyên như cũ */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                  {/* 👨‍🔧 Technician actions */}
+                  {isTechnician && (
+                    <>
+                      {issue.status === 'assigned' && (
+                        <Button size="sm" onClick={() => setProposingIssue?.(issue)}>
+                          {t('vehicle_issue_table.submit_proposal')}
+                        </Button>
+                      )}
+                      {issue.status === 'confirmed' && (
+                        <Button size="sm" onClick={() => setUpdatingActualIssue?.(issue)}>
+                          {t('vehicle_issue_table.submit_actual')}
+                        </Button>
+                      )}
+                    </>
+                  )}
+
+                  {/* 👩‍💼 Admin/Company Owner actions */}
+                  {!isTechnician && (
+                    <>
+                      {issue.status === 'proposed' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setApprovingProposal(issue)}
+                        >
+                          {t('vehicle_issue_table.approve_proposal')}
+                        </Button>
+                      )}
+                      {issue.status === 'resolved' && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            setClosingIssue(issue);
+                            setCloseDialogOpen(true);
+                          }}
+                        >
+                          {t('vehicle_issue_table.close_issue')}
+                        </Button>
+                      )}
+                    </>
+                  )}
+
+                  {/* 👁️ View proposal */}
+                  {issue.proposedSolution && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setViewingProposal(issue)}
+                    >
+                      {t('vehicle_issue_table.view_proposal')}
+                    </Button>
+                  )}
+
+                  {/* ✏️ Edit */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setEditingIssue(issue);
+                      setShowForm(true);
+                    }}
+                  >
+                    {t('vehicle_issue_table.edit')}
+                  </Button>
+                </div>
             </div>
           </div>
         ))}

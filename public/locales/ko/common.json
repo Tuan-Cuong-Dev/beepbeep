@@ -1402,7 +1402,9 @@
   "assign": "배정",
   "view_proposal": "제안 보기",
   "approve_or_reject": "승인 / 거절",
-  "close": "종료"
+  "close": "종료",
+  "no_actions": "사용 가능한 작업이 없습니다",
+  "edit": "편집"
 },
 
 "vehicle_issue_proposals_page": {

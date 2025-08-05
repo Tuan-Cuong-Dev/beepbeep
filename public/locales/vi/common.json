@@ -1423,7 +1423,9 @@
   "assign": "Phân công",
   "view_proposal": "Xem đề xuất",
   "approve_or_reject": "Duyệt / Từ chối",
-  "close": "Đóng"
+  "close": "Đóng",
+  "no_actions": "Không có hành động",
+  "edit": "Chỉnh sửa"
 },
 
 "vehicle_issue_proposals_page": {
