@@ -1856,22 +1856,57 @@
   "return": "Trả xe",
   "report_issue": "Báo cáo sự cố xe"
 },
-"manage": "Quản lý"
+"manage": "Quản lý",
 
+"battery_form": {
+  "title_add": "Thêm pin mới",
+  "title_update": "Cập nhật thông tin pin",
+  "battery_code": "Mã pin",
+  "import_date": "Ngày nhập kho",
+  "export_date": "Ngày xuất kho",
+  "status": "Trạng thái",
+  "in_stock": "Trong kho",
+  "in_use": "Đang sử dụng",
+  "returned": "Đã trả",
+  "maintenance": "Bảo trì",
+  "notes": "Ghi chú",
+  "button_add": "Thêm pin",
+  "button_update": "Cập nhật pin",
+  "cancel": "Hủy",
+  "save_success": "✅ Đã lưu pin thành công",
+  "save_error": "❌ Lưu pin thất bại. Vui lòng thử lại.",
+  "error_required_code": "Vui lòng nhập mã pin.",
+  "error_no_company_id": "❌ Không thể lưu pin nếu thiếu companyId."
+},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+"accessory_form": {
+  "title_add": "Thêm phụ kiện",
+  "title_update": "Cập nhật phụ kiện",
+  "name": "Tên",
+  "type": "Loại",
+  "type_tracked": "Có mã riêng",
+  "type_bulk": "Theo số lượng",
+  "code": "Mã phụ kiện",
+  "quantity": "Số lượng",
+  "status": "Trạng thái",
+  "status_in_stock": "Trong kho",
+  "status_in_use": "Đang sử dụng",
+  "status_damaged": "Hỏng",
+  "status_lost": "Thất lạc",
+  "status_retired": "Đã ngưng dùng",
+  "import_date": "Ngày nhập kho",
+  "import_price": "Giá nhập (VNĐ)",
+  "retail_price": "Giá bán lẻ (VNĐ)",
+  "notes": "Ghi chú",
+  "button_add": "Thêm",
+  "button_update": "Cập nhật",
+  "button_cancel": "Hủy",
+  "error_fill_required": "Vui lòng điền đầy đủ thông tin bắt buộc",
+  "error_missing_code": "Vui lòng nhập mã cho phụ kiện có theo dõi",
+  "error_invalid_quantity": "Vui lòng nhập số lượng hợp lệ cho phụ kiện theo số lượng",
+  "success_saved": "✅ Đã lưu phụ kiện thành công",
+  "error_save_failed": "❌ Lưu phụ kiện thất bại"
+}
 
 
 

@@ -1832,7 +1832,59 @@
   "return": "차량 반납",
   "report_issue": "문제 보고"
 },
-"manage": "관리"
+"manage": "관리",
+
+"battery_form": {
+  "title_add": "배터리 추가",
+  "title_update": "배터리 정보 수정",
+  "battery_code": "배터리 코드",
+  "import_date": "입고 날짜",
+  "export_date": "출고 날짜",
+  "status": "상태",
+  "in_stock": "재고 있음",
+  "in_use": "사용 중",
+  "returned": "반납됨",
+  "maintenance": "정비 중",
+  "notes": "비고",
+  "button_add": "배터리 추가",
+  "button_update": "배터리 수정",
+  "cancel": "취소",
+  "save_success": "✅ 배터리가 성공적으로 저장되었습니다",
+  "save_error": "❌ 배터리 저장에 실패했습니다. 다시 시도해 주세요.",
+  "error_required_code": "배터리 코드는 필수입니다.",
+  "error_no_company_id": "❌ companyId 없이 배터리를 저장할 수 없습니다."
+},
+
+"accessory_form": {
+  "title_add": "액세서리 추가",
+  "title_update": "액세서리 수정",
+  "name": "이름",
+  "type": "유형",
+  "type_tracked": "코드 있음 (추적 가능)",
+  "type_bulk": "수량 기준 (대량)",
+  "code": "코드",
+  "quantity": "수량",
+  "status": "상태",
+  "status_in_stock": "재고 있음",
+  "status_in_use": "사용 중",
+  "status_damaged": "손상됨",
+  "status_lost": "분실됨",
+  "status_retired": "사용 종료",
+  "import_date": "입고 날짜",
+  "import_price": "입고 가격 (VND)",
+  "retail_price": "소매 가격 (VND)",
+  "notes": "비고",
+  "button_add": "추가",
+  "button_update": "수정",
+  "button_cancel": "취소",
+  "error_fill_required": "필수 항목을 모두 입력해주세요",
+  "error_missing_code": "코드 액세서리는 코드를 입력해야 합니다",
+  "error_invalid_quantity": "수량형 액세서리는 올바른 수량을 입력해주세요",
+  "success_saved": "✅ 액세서리가 성공적으로 저장되었습니다",
+  "error_save_failed": "❌ 액세서리 저장에 실패했습니다"
+}
+
+
 
 
 

@@ -1845,44 +1845,57 @@
   "return": "Return Vehicle",
   "report_issue": "Report an Issue"
 },
-"manage": "Manage"
+"manage": "Manage",
 
+"battery_form": {
+  "title_add": "Add New Battery",
+  "title_update": "Update Battery Information",
+  "battery_code": "Battery Code",
+  "import_date": "Import Date",
+  "export_date": "Export Date",
+  "status": "Status",
+  "in_stock": "In Stock",
+  "in_use": "In Use",
+  "returned": "Returned",
+  "maintenance": "Maintenance",
+  "notes": "Notes",
+  "button_add": "Add Battery",
+  "button_update": "Update Battery",
+  "cancel": "Cancel",
+  "save_success": "✅ Battery saved successfully",
+  "save_error": "❌ Failed to save battery. Please try again.",
+  "error_required_code": "Battery Code is required.",
+  "error_no_company_id": "❌ Cannot save battery without companyId."
+},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"accessory_form": {
+  "title_add": "Add Accessory",
+  "title_update": "Update Accessory",
+  "name": "Name",
+  "type": "Type",
+  "type_tracked": "Tracked (with Code)",
+  "type_bulk": "Bulk (by Quantity)",
+  "code": "Code",
+  "quantity": "Quantity",
+  "status": "Status",
+  "status_in_stock": "In Stock",
+  "status_in_use": "In Use",
+  "status_damaged": "Damaged",
+  "status_lost": "Lost",
+  "status_retired": "Retired",
+  "import_date": "Imported Date",
+  "import_price": "Import Price (VND)",
+  "retail_price": "Retail Price (VND)",
+  "notes": "Notes",
+  "button_add": "Add",
+  "button_update": "Update",
+  "button_cancel": "Cancel",
+  "error_fill_required": "Please fill all required fields",
+  "error_missing_code": "Please enter code for tracked accessory",
+  "error_invalid_quantity": "Please enter valid quantity for bulk accessory",
+  "success_saved": "✅ Accessory saved successfully",
+  "error_save_failed": "❌ Failed to save accessory"
+}
 
 
 

@@ -9,6 +9,7 @@ import { Button } from '@/src/components/ui/button';
 import { Label } from '@/src/components/ui/label';
 import { Battery } from '@/src/lib/batteries/batteryTypes';
 import { useUser } from '@/src/context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   newBattery: Battery;
@@ -27,6 +28,7 @@ export default function BatteryForm({
   setBatteries,
   onNotify,
 }: Props) {
+  const { t } = useTranslation('common');
   const { user } = useUser();
   const [companyId, setCompanyId] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -65,12 +67,12 @@ export default function BatteryForm({
 
   const handleSave = async () => {
     if (!newBattery.batteryCode.trim()) {
-      setError('Battery Code is required.');
+      setError(t('battery_form.error_required_code'));
       return;
     }
 
     if (!companyId && !newBattery.companyId) {
-      onNotify?.('❌ Cannot save battery without companyId.', 'error');
+      onNotify?.(t('battery_form.error_no_company_id'), 'error');
       return;
     }
 
@@ -100,11 +102,11 @@ export default function BatteryForm({
       const allBatteries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Battery[];
       setBatteries(allBatteries);
 
-      onNotify?.('✅ Battery saved successfully', 'success');
+      onNotify?.(t('battery_form.save_success'), 'success');
       resetForm();
     } catch (err) {
       console.error('❌ Error saving battery:', err);
-      onNotify?.('Failed to save battery. Please try again.', 'error');
+      onNotify?.(t('battery_form.save_error'), 'error');
     } finally {
       setLoading(false);
     }
@@ -117,12 +119,12 @@ export default function BatteryForm({
   return (
     <div className="bg-white shadow rounded-xl p-4 mb-6 space-y-4 mt-4">
       <h2 className="text-xl font-semibold text-gray-800">
-        {isUpdateMode ? 'Update Battery Information' : 'Add New Battery'}
+        {isUpdateMode ? t('battery_form.title_update') : t('battery_form.title_add')}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
-          <Label htmlFor="batteryCode">Battery Code</Label>
+          <Label htmlFor="batteryCode">{t('battery_form.battery_code')}</Label>
           <Input
             id="batteryCode"
             value={newBattery.batteryCode}
@@ -132,7 +134,7 @@ export default function BatteryForm({
         </div>
 
         <div>
-          <Label htmlFor="importDate">Import Date</Label>
+          <Label htmlFor="importDate">{t('battery_form.import_date')}</Label>
           <Input
             id="importDate"
             type="datetime-local"
@@ -147,7 +149,7 @@ export default function BatteryForm({
         </div>
 
         <div>
-          <Label htmlFor="exportDate">Export Date</Label>
+          <Label htmlFor="exportDate">{t('battery_form.export_date')}</Label>
           <Input
             id="exportDate"
             type="datetime-local"
@@ -162,23 +164,23 @@ export default function BatteryForm({
         </div>
 
         <div>
-          <Label htmlFor="status">Status</Label>
+          <Label htmlFor="status">{t('battery_form.status')}</Label>
           <select
             id="status"
             value={newBattery.status}
             onChange={(e) => setNewBattery({ ...newBattery, status: e.target.value as Battery['status'] })}
             className="w-full border border-gray-300 rounded px-3 py-2"
           >
-            <option value="in_stock">In Stock</option>
-            <option value="in_use">In Use</option>
-            <option value="returned">Returned</option>
-            <option value="maintenance">Maintenance</option>
+            <option value="in_stock">{t('battery_form.in_stock')}</option>
+            <option value="in_use">{t('battery_form.in_use')}</option>
+            <option value="returned">{t('battery_form.returned')}</option>
+            <option value="maintenance">{t('battery_form.maintenance')}</option>
           </select>
         </div>
       </div>
 
       <div>
-        <Label htmlFor="notes">Notes</Label>
+        <Label htmlFor="notes">{t('battery_form.notes')}</Label>
         <Textarea
           id="notes"
           value={newBattery.notes || ''}
@@ -188,11 +190,11 @@ export default function BatteryForm({
 
       <div className="flex gap-4">
         <Button onClick={handleSave} disabled={loading}>
-          {isUpdateMode ? 'Update Battery' : 'Add Battery'}
+          {isUpdateMode ? t('battery_form.button_update') : t('battery_form.button_add')}
         </Button>
         {isUpdateMode && (
           <Button variant="ghost" onClick={handleCancel}>
-            Cancel
+            {t('battery_form.cancel')}
           </Button>
         )}
       </div>

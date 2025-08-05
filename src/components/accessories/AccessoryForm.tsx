@@ -11,6 +11,7 @@ import { Textarea } from '@/src/components/ui/textarea';
 import { Dispatch, SetStateAction } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   newAccessory: Accessory;
@@ -21,9 +22,6 @@ interface Props {
   onNotify?: (msg: string, type?: 'success' | 'error') => void;
 }
 
-/**
- * Parse chuỗi tiền (ví dụ '1.250.000 ₫') thành số nguyên 1250000
- */
 function parseCurrencyString(value: string): number {
   if (!value) return 0;
   const numericString = value.replace(/[^\d]/g, '');
@@ -39,26 +37,27 @@ export default function AccessoryForm({
   setAccessories,
   onNotify,
 }: Props) {
+  const { t } = useTranslation('common');
+
   const handleSave = async () => {
     if (!newAccessory.name || !newAccessory.type || !newAccessory.companyId) {
-      onNotify?.('Please fill all required fields', 'error');
+      onNotify?.(t('accessory_form.error_fill_required'), 'error');
       return;
     }
 
     if (newAccessory.type === 'tracked' && !newAccessory.code) {
-      onNotify?.('Please enter code for tracked accessory', 'error');
+      onNotify?.(t('accessory_form.error_missing_code'), 'error');
       return;
     }
 
     if (newAccessory.type === 'bulk' && (!newAccessory.quantity || newAccessory.quantity <= 0)) {
-      onNotify?.('Please enter valid quantity for bulk accessory', 'error');
+      onNotify?.(t('accessory_form.error_invalid_quantity'), 'error');
       return;
     }
 
     try {
       const id = isUpdateMode ? newAccessory.id : uuidv4();
 
-      // Bước 1: tạo payload gốc
       const rawPayload: Partial<Accessory> = {
         ...newAccessory,
         id,
@@ -68,19 +67,14 @@ export default function AccessoryForm({
         retailPrice: newAccessory.retailPrice || 0,
       };
 
-      // Bước 2: loại bỏ các field undefined
       const payload = Object.fromEntries(
         Object.entries(rawPayload).filter(([_, v]) => v !== undefined)
       ) as unknown as Accessory;
 
-      console.log('📤 Saving accessory:', payload);
-
       await setDoc(doc(db, 'accessories', id), payload, { merge: true });
 
       setAccessories((prev) =>
-        isUpdateMode
-          ? prev.map((item) => (item.id === id ? payload : item))
-          : [...prev, payload]
+        isUpdateMode ? prev.map((item) => (item.id === id ? payload : item)) : [...prev, payload]
       );
 
       setNewAccessory({
@@ -98,21 +92,21 @@ export default function AccessoryForm({
       });
 
       setIsUpdateMode(false);
-      onNotify?.('Accessory saved successfully', 'success');
+      onNotify?.(t('accessory_form.success_saved'), 'success');
     } catch (error) {
       console.error('❌ Error saving accessory:', error);
-      onNotify?.('Failed to save accessory', 'error');
+      onNotify?.(t('accessory_form.error_save_failed'), 'error');
     }
   };
 
   return (
     <div className="border p-4 rounded bg-white shadow mb-6 mt-6">
       <h2 className="text-lg font-semibold mb-4">
-        {isUpdateMode ? 'Update Accessory' : 'Add Accessory'}
+        {isUpdateMode ? t('accessory_form.title_update') : t('accessory_form.title_add')}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label>Name *</Label>
+          <Label>{t('accessory_form.name')} *</Label>
           <Input
             value={newAccessory.name}
             onChange={(e) => setNewAccessory({ ...newAccessory, name: e.target.value })}
@@ -121,7 +115,7 @@ export default function AccessoryForm({
         </div>
 
         <div>
-          <Label>Type *</Label>
+          <Label>{t('accessory_form.type')} *</Label>
           <select
             className="w-full border px-3 py-2 rounded"
             value={newAccessory.type}
@@ -134,14 +128,14 @@ export default function AccessoryForm({
               })
             }
           >
-            <option value="tracked">Tracked (with Code)</option>
-            <option value="bulk">Bulk (by Quantity)</option>
+            <option value="tracked">{t('accessory_form.type_tracked')}</option>
+            <option value="bulk">{t('accessory_form.type_bulk')}</option>
           </select>
         </div>
 
         {newAccessory.type === 'tracked' && (
           <div>
-            <Label>Code *</Label>
+            <Label>{t('accessory_form.code')} *</Label>
             <Input
               value={newAccessory.code || ''}
               onChange={(e) => setNewAccessory({ ...newAccessory, code: e.target.value })}
@@ -152,7 +146,7 @@ export default function AccessoryForm({
 
         {newAccessory.type === 'bulk' && (
           <div>
-            <Label>Quantity *</Label>
+            <Label>{t('accessory_form.quantity')} *</Label>
             <Input
               type="number"
               min={1}
@@ -169,7 +163,7 @@ export default function AccessoryForm({
         )}
 
         <div>
-          <Label>Status</Label>
+          <Label>{t('accessory_form.status')}</Label>
           <select
             className="w-full border px-3 py-2 rounded"
             value={newAccessory.status}
@@ -177,16 +171,16 @@ export default function AccessoryForm({
               setNewAccessory({ ...newAccessory, status: e.target.value as Accessory['status'] })
             }
           >
-            <option value="in_stock">In Stock</option>
-            <option value="in_use">In Use</option>
-            <option value="damaged">Damaged</option>
-            <option value="lost">Lost</option>
-            <option value="retired">Retired</option>
+            <option value="in_stock">{t('accessory_form.status_in_stock')}</option>
+            <option value="in_use">{t('accessory_form.status_in_use')}</option>
+            <option value="damaged">{t('accessory_form.status_damaged')}</option>
+            <option value="lost">{t('accessory_form.status_lost')}</option>
+            <option value="retired">{t('accessory_form.status_retired')}</option>
           </select>
         </div>
 
         <div>
-          <Label>Imported Date</Label>
+          <Label>{t('accessory_form.import_date')}</Label>
           <Input
             type="date"
             value={safeFormatDate(newAccessory.importDate, 'yyyy-MM-dd')}
@@ -202,7 +196,7 @@ export default function AccessoryForm({
         </div>
 
         <div>
-          <Label>Import Price (VNĐ)</Label>
+          <Label>{t('accessory_form.import_price')}</Label>
           <Input
             type="text"
             value={newAccessory.importPrice?.toLocaleString('vi-VN') ?? ''}
@@ -217,7 +211,7 @@ export default function AccessoryForm({
         </div>
 
         <div>
-          <Label>Retail Price (VNĐ)</Label>
+          <Label>{t('accessory_form.retail_price')}</Label>
           <Input
             type="text"
             value={newAccessory.retailPrice?.toLocaleString('vi-VN') ?? ''}
@@ -232,7 +226,7 @@ export default function AccessoryForm({
         </div>
 
         <div className="md:col-span-2">
-          <Label>Notes</Label>
+          <Label>{t('accessory_form.notes')}</Label>
           <Textarea
             value={newAccessory.notes || ''}
             onChange={(e) => setNewAccessory({ ...newAccessory, notes: e.target.value })}
@@ -242,7 +236,9 @@ export default function AccessoryForm({
       </div>
 
       <div className="mt-4 flex gap-4">
-        <Button onClick={handleSave}>{isUpdateMode ? 'Update' : 'Add'}</Button>
+        <Button onClick={handleSave}>
+          {isUpdateMode ? t('accessory_form.button_update') : t('accessory_form.button_add')}
+        </Button>
         {isUpdateMode && (
           <Button
             type="button"
@@ -264,7 +260,7 @@ export default function AccessoryForm({
               setIsUpdateMode(false);
             }}
           >
-            Cancel
+            {t('accessory_form.button_cancel')}
           </Button>
         )}
       </div>

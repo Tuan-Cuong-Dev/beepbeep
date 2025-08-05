@@ -1816,7 +1816,59 @@
   "return": "車両を返却",
   "report_issue": "問題を報告"
 },
-"manage": "管理"
+"manage": "管理",
+
+"battery_form": {
+  "title_add": "バッテリーを追加",
+  "title_update": "バッテリー情報を更新",
+  "battery_code": "バッテリーコード",
+  "import_date": "入庫日",
+  "export_date": "出庫日",
+  "status": "ステータス",
+  "in_stock": "在庫あり",
+  "in_use": "使用中",
+  "returned": "返却済み",
+  "maintenance": "メンテナンス中",
+  "notes": "備考",
+  "button_add": "バッテリーを追加",
+  "button_update": "バッテリーを更新",
+  "cancel": "キャンセル",
+  "save_success": "✅ バッテリーが正常に保存されました",
+  "save_error": "❌ バッテリーの保存に失敗しました。再試行してください。",
+  "error_required_code": "バッテリーコードは必須です。",
+  "error_no_company_id": "❌ companyIdがないため保存できません。"
+},
+
+"accessory_form": {
+  "title_add": "アクセサリーを追加",
+  "title_update": "アクセサリーを更新",
+  "name": "名前",
+  "type": "タイプ",
+  "type_tracked": "コード付き（個別管理）",
+  "type_bulk": "数量管理（まとめて）",
+  "code": "コード",
+  "quantity": "数量",
+  "status": "状態",
+  "status_in_stock": "在庫あり",
+  "status_in_use": "使用中",
+  "status_damaged": "破損",
+  "status_lost": "紛失",
+  "status_retired": "使用終了",
+  "import_date": "入庫日",
+  "import_price": "仕入価格（VND）",
+  "retail_price": "小売価格（VND）",
+  "notes": "備考",
+  "button_add": "追加",
+  "button_update": "更新",
+  "button_cancel": "キャンセル",
+  "error_fill_required": "必須項目をすべて入力してください",
+  "error_missing_code": "コード付きアクセサリーのコードを入力してください",
+  "error_invalid_quantity": "数量管理アクセサリーの正しい数量を入力してください",
+  "success_saved": "✅ アクセサリーが正常に保存されました",
+  "error_save_failed": "❌ アクセサリーの保存に失敗しました"
+}
+
+
 
 
 
