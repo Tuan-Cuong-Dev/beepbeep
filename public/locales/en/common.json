@@ -2167,7 +2167,68 @@
   "add": "Add",
   "update": "Update",
   "cancel": "Cancel"
+},
+
+"station_management_page": {
+  "title": "Rental Stations",
+  "subtitle": "Manage and view your stations linked to the company.",
+  "loading_company": "🔄 Loading company info...",
+  "no_company": "❌ No company linked to this account.",
+  "existing_stations": "📍 Existing Stations",
+  "search_placeholder": "Search by name...",
+  "refreshing": "🔄 Refreshing station list...",
+  "no_result": "No stations match the search.",
+  "edit": "Edit",
+  "delete": "Delete",
+  "add_model": "Add Model",
+  "confirm_delete_title": "❗ Confirm Deletion",
+  "confirm_delete_message": "Are you sure you want to delete this station?",
+  "cancel": "Cancel",
+  "delete_success": "Station deleted successfully.",
+  "delete_failed": "Could not delete station.",
+  "load_failed": "Could not load stations. Please try again."
+},
+
+"station_form": {
+    "station_name": "Station Name",
+    "display_address": "Display Address (shown to users)",
+    "map_address": "Map Address (Google Maps link with coordinates)",
+    "contact_phone": "Contact Phone (e.g. 090-xxx-xxxx)",
+    "coordinates": "Coordinates (lat,lng)",
+    "creating": "Creating...",
+    "create_button": "Create Station",
+    "company": "Company",
+    "role": "Role",
+    "error_title": "Missing Data",
+    "error_missing_fields": "Please fill in all required fields.",
+    "invalid_coords_title": "Invalid Coordinates",
+    "invalid_coords_desc": "Use format: \"16.0514,108.2123\"",
+    "success_title": "Station Created",
+    "success_desc": "✅ The station was added successfully.",
+    "create_failed_title": "Failed to Create",
+    "create_failed_desc": "❌ Please try again.",
+    "detecting_coords": "📍 Detecting coordinates...",
+    "detected_coords": "📌 Detected: {{lat}}° N, {{lng}}° E"
+  },
+
+"station_form": {
+  "edit_title": "Edit Station",
+  "station_name": "Station Name",
+  "display_address": "Display Address",
+  "map_address": "Map Address (Google link or full address)",
+  "contact_phone": "Contact Phone (e.g. 090-xxx-xxxx)",
+  "coordinates": "Location (auto-filled)",
+  "status_label": "Status",
+  "status_active": "Active",
+  "status_inactive": "Inactive",
+  "detecting_coords": "📍 Detecting location..."
+},
+"actions": {
+  "cancel": "Cancel",
+  "save_changes": "Save Changes"
 }
+
+
 
 
 

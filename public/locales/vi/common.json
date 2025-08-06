@@ -2193,7 +2193,69 @@
   "add": "Thêm",
   "update": "Cập nhật",
   "cancel": "Huỷ"
+},
+
+"station_management_page": {
+  "title": "Quản lý trạm cho thuê xe",
+  "subtitle": "Quản lý và xem các trạm cho thuê xe của với công ty.",
+  "loading_company": "🔄 Đang tải thông tin công ty...",
+  "no_company": "❌ Không tìm thấy công ty liên kết với tài khoản.",
+  "existing_stations": "📍 Danh sách trạm hiện tại",
+  "search_placeholder": "Tìm theo tên...",
+  "refreshing": "🔄 Đang làm mới danh sách trạm...",
+  "no_result": "Không có trạm nào phù hợp với tìm kiếm.",
+  "edit": "Chỉnh sửa",
+  "delete": "Xoá",
+  "add_model": "Thêm mẫu xe mới",
+  "confirm_delete_title": "❗ Xác nhận xoá",
+  "confirm_delete_message": "Bạn có chắc chắn muốn xoá trạm này không?",
+  "cancel": "Huỷ",
+  "delete_success": "Xoá trạm thành công.",
+  "delete_failed": "Không thể xoá trạm.",
+  "load_failed": "Không thể tải danh sách trạm. Vui lòng thử lại."
+},
+
+"station_form": {
+  "station_name": "Tên trạm mới",
+  "display_address": "Địa chỉ hiển thị (cho người dùng xem)",
+  "map_address": "Địa chỉ bản đồ (liên kết Google Maps với tọa độ)",
+  "contact_phone": "Số điện thoại liên hệ (ví dụ: 090-xxx-xxxx)",
+  "coordinates": "Tọa độ (lat,lng)",
+  "creating": "Đang tạo...",
+  "create_button": "Tạo trạm",
+  "company": "Công ty",
+  "role": "Vai trò",
+  "error_title": "Thiếu dữ liệu",
+  "error_missing_fields": "Vui lòng điền đầy đủ các trường bắt buộc.",
+  "invalid_coords_title": "Tọa độ không hợp lệ",
+  "invalid_coords_desc": "Vui lòng nhập theo định dạng: \"16.0514,108.2123\"",
+  "success_title": "Tạo trạm thành công",
+  "success_desc": "✅ Trạm đã được thêm thành công.",
+  "create_failed_title": "Không thể tạo trạm",
+  "create_failed_desc": "❌ Vui lòng thử lại.",
+  "detecting_coords": "📍 Đang dò tọa độ...",
+  "detected_coords": "📌 Đã phát hiện: {{lat}}° N, {{lng}}° E"
+},
+
+"rental_station_form": {
+  "edit_title": "Chỉnh sửa trạm",
+  "station_name": "Tên trạm",
+  "display_address": "Địa chỉ hiển thị",
+  "map_address": "Địa chỉ bản đồ (liên kết Google hoặc địa chỉ đầy đủ)",
+  "contact_phone": "Số điện thoại liên hệ (ví dụ: 090-xxx-xxxx)",
+  "coordinates": "Tọa độ (tự động điền)",
+  "status_label": "Trạng thái",
+  "status_active": "Đang hoạt động",
+  "status_inactive": "Không hoạt động",
+  "detecting_coords": "📍 Đang dò tọa độ...",
+  "actions": {
+    "cancel": "Hủy",
+    "save_changes": "Lưu thay đổi"
+  }
 }
+
+
+
 
 
 

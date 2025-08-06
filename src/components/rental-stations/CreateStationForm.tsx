@@ -16,6 +16,7 @@ import { getIdTokenResult } from 'firebase/auth';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { StationFormValues } from '@/src/lib/stations/stationTypes';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   companyId: string;
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export default function CreateStationForm({ companyId, onCreated }: Props) {
+  const { t } = useTranslation('common');
   const [companyName, setCompanyName] = useState('');
   const [userRole, setUserRole] = useState<string | null>(null);
 
@@ -96,7 +98,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
     const { name, displayAddress, mapAddress, location, contactPhone } = formValues;
 
     if (!name.trim() || !displayAddress.trim() || !mapAddress.trim() || !location.trim()) {
-      return showDialog('error', 'Missing Data', 'Please fill in all required fields.');
+      return showDialog('error', t('station_form.error_title'), t('station_form.error_missing_fields'));
     }
 
     const [latStr, lngStr] = location.split(',').map((s) => s.trim());
@@ -104,7 +106,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
     const lng = parseFloat(lngStr);
 
     if (isNaN(lat) || isNaN(lng)) {
-      return showDialog('error', 'Invalid Coordinates', 'Use format: "16.0514,108.2123"');
+      return showDialog('error', t('station_form.invalid_coords_title'), t('station_form.invalid_coords_desc'));
     }
 
     const formattedLocation = `${lat}° N, ${lng}° E`;
@@ -123,7 +125,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
         createdAt: serverTimestamp(),
       });
 
-      showDialog('success', 'Station Created', '✅ The station was added successfully.');
+      showDialog('success', t('station_form.success_title'), t('station_form.success_desc'));
       setFormValues({
         name: '',
         displayAddress: '',
@@ -134,7 +136,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
       if (onCreated) onCreated();
     } catch (err) {
       console.error('❌ Error creating station:', err);
-      showDialog('error', 'Failed to Create', '❌ Please try again.');
+      showDialog('error', t('station_form.create_failed_title'), t('station_form.create_failed_desc'));
     } finally {
       setLoading(false);
     }
@@ -147,25 +149,25 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
           <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-800 space-y-1">
             {companyName && (
               <p>
-                🏢 <span className="font-semibold">Company:</span> {companyName}
+                🏢 <span className="font-semibold">{t('station_form.company')}:</span> {companyName}
               </p>
             )}
             {userRole && (
               <p>
-                🛂 <span className="font-semibold">Role:</span> {userRole}
+                🛂 <span className="font-semibold">{t('station_form.role')}:</span> {userRole}
               </p>
             )}
           </div>
         )}
 
         <Input
-          placeholder="Station Name"
+          placeholder={t('station_form.station_name')}
           value={formValues.name}
           onChange={(e) => setFormValues((prev) => ({ ...prev, name: e.target.value }))}
         />
 
         <Textarea
-          placeholder="Display Address (shown to users)"
+          placeholder={t('station_form.display_address')}
           value={formValues.displayAddress}
           onChange={(e) =>
             setFormValues((prev) => ({ ...prev, displayAddress: e.target.value }))
@@ -173,7 +175,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
         />
 
         <Textarea
-          placeholder="Map Address (Google Maps link with coordinates)"
+          placeholder={t('station_form.map_address')}
           value={formValues.mapAddress}
           onChange={(e) =>
             setFormValues((prev) => ({ ...prev, mapAddress: e.target.value }))
@@ -182,7 +184,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
         />
 
         <Input
-          placeholder="Contact Phone (e.g. 090-xxx-xxxx)"
+          placeholder={t('station_form.contact_phone')}
           value={formValues.contactPhone}
           onChange={(e) =>
             setFormValues((prev) => ({ ...prev, contactPhone: e.target.value }))
@@ -190,7 +192,7 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
         />
 
         <Input
-          placeholder="Coordinates (lat,lng)"
+          placeholder={t('station_form.coordinates')}
           value={formValues.location}
           readOnly={!!coords}
           onChange={(e) =>
@@ -198,13 +200,13 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
           }
         />
 
-        {geoLoading && <p className="text-sm text-gray-500">📍 Detecting coordinates...</p>}
+        {geoLoading && <p className="text-sm text-gray-500">{t('station_form.detecting_coords')}</p>}
         {geoError && <p className="text-sm text-red-500">{geoError}</p>}
 
         {coords && (
           <>
             <p className="text-sm text-gray-600">
-              📌 Detected: {coords.lat}° N, {coords.lng}° E
+              📌 {t('station_form.detected_coords', { lat: coords.lat.toString(), lng: coords.lng.toString() })}
             </p>
             <iframe
               title="Map Preview"
@@ -214,13 +216,13 @@ export default function CreateStationForm({ companyId, onCreated }: Props) {
               style={{ border: 0 }}
               loading="lazy"
               allowFullScreen
-              src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&hl=vi&z=16&output=embed`}
+              src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&hl=en&z=16&output=embed`}
             ></iframe>
           </>
         )}
 
         <Button onClick={handleCreate} disabled={loading}>
-          {loading ? 'Creating...' : 'Create Station'}
+          {loading ? t('station_form.creating') : t('station_form.create_button')}
         </Button>
       </div>
 

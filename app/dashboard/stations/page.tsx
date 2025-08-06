@@ -20,8 +20,10 @@ import { Station } from '@/src/lib/stations/stationTypes';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 export default function StationManagementPage() {
+  const { t } = useTranslation('common');
   const { companyId, loading } = useCurrentCompanyId();
   const [stations, setStations] = useState<Station[]>([]);
   const [editingStation, setEditingStation] = useState<Station | null>(null);
@@ -53,20 +55,20 @@ export default function StationManagementPage() {
       setStations(result);
     } catch (err) {
       console.error('❌ Failed to load stations:', err);
-      showDialog('error', 'Load Failed', 'Could not load stations. Please try again.');
+      showDialog('error', t('station_management_page.load_failed'));
     } finally {
       setRefreshing(false);
     }
-  }, [companyId]);
+  }, [companyId, t]);
 
   const handleDelete = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'rentalStations', id));
-      showDialog('success', 'Deleted', 'Station deleted successfully.');
+      showDialog('success', t('station_management_page.delete'), t('station_management_page.delete_success'));
       await fetchStations();
     } catch (err) {
       console.error('❌ Failed to delete station:', err);
-      showDialog('error', 'Delete Failed', 'Could not delete station.');
+      showDialog('error', t('station_management_page.delete'), t('station_management_page.delete_failed'));
     } finally {
       setConfirmDeleteId(null);
     }
@@ -90,13 +92,13 @@ export default function StationManagementPage() {
       <main className="flex-1 px-4 py-24 flex justify-center">
         <div className="w-full max-w-5xl bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 border border-gray-200 space-y-10">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-800">Rental Stations</h1>
+            <h1 className="text-2xl font-bold text-gray-800">{t('station_management_page.title')}</h1>
             <div className="w-16 h-[3px] bg-[#00d289] mx-auto mt-2 mb-4 rounded-full" />
-            <p className="text-sm text-gray-600">Manage and view your stations linked to the company.</p>
+            <p className="text-sm text-gray-600">{t('station_management_page.subtitle')}</p>
           </div>
 
           {loading ? (
-            <p className="text-center text-gray-500">🔄 Loading company info...</p>
+            <p className="text-center text-gray-500">{t('station_management_page.loading_company')}</p>
           ) : companyId ? (
             <>
               {editingStation ? (
@@ -115,10 +117,10 @@ export default function StationManagementPage() {
 
               <div className="pt-6 border-t border-gray-300 space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold">📍 Existing Stations</h2>
+                  <h2 className="text-lg font-semibold">{t('station_management_page.existing_stations')}</h2>
                   <Input
                     type="text"
-                    placeholder="Search by name..."
+                    placeholder={t('station_management_page.search_placeholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-64"
@@ -126,9 +128,9 @@ export default function StationManagementPage() {
                 </div>
 
                 {refreshing ? (
-                  <p className="text-sm text-gray-500">🔄 Refreshing station list...</p>
+                  <p className="text-sm text-gray-500">{t('station_management_page.refreshing')}</p>
                 ) : filteredStations.length === 0 ? (
-                  <p className="text-sm text-gray-500">No stations match the search.</p>
+                  <p className="text-sm text-gray-500">{t('station_management_page.no_result')}</p>
                 ) : (
                   <ul className="space-y-3">
                     {filteredStations.map((station) => (
@@ -144,13 +146,10 @@ export default function StationManagementPage() {
                           </div>
                           <div className="space-x-2">
                             <Button variant="outline" onClick={() => setEditingStation(station)}>
-                              Edit
+                              {t('station_management_page.edit')}
                             </Button>
-                            <Button
-                              variant="destructive"
-                              onClick={() => setConfirmDeleteId(station.id)}
-                            >
-                              Delete
+                            <Button variant="destructive" onClick={() => setConfirmDeleteId(station.id)}>
+                              {t('station_management_page.delete')}
                             </Button>
                           </div>
                         </div>
@@ -164,14 +163,14 @@ export default function StationManagementPage() {
                 <div className="pt-10 border-t border-gray-300 space-y-4">
                   <Link href="/ebikeManagement">
                     <Button className="bg-[#00d289] hover:bg-[#00b67a] text-white rounded px-6 py-2 shadow-md">
-                      Add Model
+                      {t('station_management_page.add_model')}
                     </Button>
                   </Link>
                 </div>
               )}
             </>
           ) : (
-            <p className="text-center text-red-600">❌ No company linked to this account.</p>
+            <p className="text-center text-red-600">{t('station_management_page.no_company')}</p>
           )}
         </div>
       </main>
@@ -189,14 +188,14 @@ export default function StationManagementPage() {
       {confirmDeleteId && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg space-y-4 max-w-sm w-full">
-            <h2 className="text-lg font-semibold text-gray-800">❗ Confirm Deletion</h2>
-            <p className="text-sm text-gray-600">Are you sure you want to delete this station?</p>
+            <h2 className="text-lg font-semibold text-gray-800">{t('station_management_page.confirm_delete_title')}</h2>
+            <p className="text-sm text-gray-600">{t('station_management_page.confirm_delete_message')}</p>
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setConfirmDeleteId(null)}>
-                Cancel
+                {t('station_management_page.cancel')}
               </Button>
               <Button variant="destructive" onClick={() => handleDelete(confirmDeleteId)}>
-                Delete
+                {t('station_management_page.delete')}
               </Button>
             </div>
           </div>

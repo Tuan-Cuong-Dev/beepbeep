@@ -7,6 +7,7 @@ import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { Station, StationFormValues } from '@/src/lib/stations/stationTypes';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   companyId: string;
@@ -21,6 +22,8 @@ export default function EditStationForm({
   onCancel,
   onSaved,
 }: Props) {
+  const { t } = useTranslation('common');
+
   const [form, setForm] = useState<StationFormValues>({
     name: editingStation.name,
     displayAddress: editingStation.displayAddress,
@@ -68,7 +71,6 @@ export default function EditStationForm({
     }
   };
 
-  // ✅ Trích xuất lat/lng từ location nếu hợp lệ
   const getMapCoords = (): { lat: string; lng: string } | null => {
     const match = form.location.match(/([-]?\d+(\.\d+)?)°\s*N?,?\s*([-]?\d+(\.\d+)?)°\s*E?/i);
     if (!match) return null;
@@ -79,49 +81,50 @@ export default function EditStationForm({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-gray-800">✏️ Edit Station</h2>
+      <h2 className="text-lg font-semibold text-gray-800">✏️ {t('rental_station_form.edit_title')}</h2>
 
       <Input
-        placeholder="Station Name"
+        placeholder={t('rental_station_form.station_name')}
         value={form.name}
         onChange={(e) => handleChange('name', e.target.value)}
       />
       <Input
-        placeholder="Display Address"
+        placeholder={t('rental_station_form.display_address')}
         value={form.displayAddress}
         onChange={(e) => handleChange('displayAddress', e.target.value)}
       />
       <Input
-        placeholder="Map Address (Google link or full address)"
+        placeholder={t('rental_station_form.map_address')}
         value={form.mapAddress}
         onChange={(e) => handleChange('mapAddress', e.target.value)}
         onBlur={handleMapAddressBlur}
       />
       <Input
-        placeholder="Contact Phone (e.g. 090-xxx-xxxx)"
+        placeholder={t('station_form.contact_phone')}
         value={form.contactPhone}
         onChange={(e) => handleChange('contactPhone', e.target.value)}
       />
       <Input
-        placeholder="Location (auto-filled)"
+        placeholder={t('rental_station_form.coordinates')}
         value={form.location}
         readOnly
       />
 
-      {/* ✅ Toggle trạng thái */}
       <div className="flex items-center gap-4">
-        <label className="text-sm font-medium text-gray-700">Status:</label>
+        <label className="text-sm font-medium text-gray-700">
+          {t('rental_station_form.status_label')}:
+        </label>
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as 'active' | 'inactive')}
           className="border border-gray-300 rounded px-3 py-1 text-sm"
         >
-          <option value="active">✅ Active</option>
-          <option value="inactive">🚫 Inactive</option>
+          <option value="active">✅ {t('rental_station_form.status_active')}</option>
+          <option value="inactive">🚫 {t('rental_station_form.status_inactive')}</option>
         </select>
       </div>
 
-      {loading && <p className="text-sm text-gray-500">📍 Detecting location...</p>}
+      {loading && <p className="text-sm text-gray-500">{t('rental_station_form.detecting_coords')}</p>}
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       {coordsForMap && (
@@ -139,13 +142,13 @@ export default function EditStationForm({
 
       <div className="flex gap-2 justify-end">
         <Button variant="outline" onClick={onCancel}>
-          Cancel
+          {t('rental_station_form.actions.cancel')}
         </Button>
         <Button
           onClick={handleUpdate}
           className="bg-[#00d289] text-white hover:bg-[#00b67a]"
         >
-          Save Changes
+          {t('rental_station_form.actions.save_changes')}
         </Button>
       </div>
     </div>
