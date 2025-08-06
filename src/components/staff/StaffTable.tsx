@@ -3,6 +3,7 @@
 import React from 'react';
 import { Staff } from '@/src/lib/staff/staffTypes';
 import { Button } from '@/src/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   staffs: Staff[];
@@ -19,10 +20,12 @@ export default function StaffTable({
   stationMap = {},
   companyNames = {},
 }: Props) {
+  const { t } = useTranslation('common');
+
   if (!staffs.length) {
     return (
       <div className="p-6 text-center text-gray-500">
-        No staff members found.
+        {t('staff_table.no_staff_found')}
       </div>
     );
   }
@@ -39,7 +42,7 @@ export default function StaffTable({
     };
     return (
       <span className={`${base} ${map[role] || 'bg-gray-100 text-gray-500'}`}>
-        {role.replace(/_/g, ' ')}
+        {t(`staff_table.roles.${role}`, { defaultValue: role.replace(/_/g, ' ') })}
       </span>
     );
   };
@@ -51,7 +54,9 @@ export default function StaffTable({
           accepted ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
         }`}
       >
-        {accepted ? 'Accepted' : 'Pending'}
+        {accepted
+          ? t('staff_table.status.accepted')
+          : t('staff_table.status.pending')}
       </span>
     );
   };
@@ -66,13 +71,13 @@ export default function StaffTable({
       <table className="min-w-full text-sm">
         <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
           <tr>
-            <th className="p-3">Staff</th>
-            <th className="p-3">Email</th>
-            <th className="p-3">Role</th>
-            <th className="p-3">Company</th>
-            <th className="p-3">Station</th>
-            <th className="p-3">Status</th>
-            <th className="p-3 text-right">Actions</th>
+            <th className="p-3">{t('staff_table.headers.staff')}</th>
+            <th className="p-3">{t('staff_table.headers.email')}</th>
+            <th className="p-3">{t('staff_table.headers.role')}</th>
+            <th className="p-3">{t('staff_table.headers.company')}</th>
+            <th className="p-3">{t('staff_table.headers.station')}</th>
+            <th className="p-3">{t('staff_table.headers.status')}</th>
+            <th className="p-3 text-right">{t('staff_table.headers.actions')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -97,7 +102,7 @@ export default function StaffTable({
                 <div className="flex justify-end gap-2">
                   {onEdit && (
                     <Button size="sm" onClick={() => onEdit(staff)}>
-                      Edit
+                      {t('staff_table.actions.edit')}
                     </Button>
                   )}
                   {onDelete && (
@@ -106,7 +111,7 @@ export default function StaffTable({
                       variant="destructive"
                       onClick={() => onDelete(staff)}
                     >
-                      Delete
+                      {t('staff_table.actions.delete')}
                     </Button>
                   )}
                 </div>

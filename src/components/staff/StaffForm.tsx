@@ -11,6 +11,7 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { MailSearch, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   editingStaff: Staff | null;
@@ -27,6 +28,7 @@ const ROLE_OPTIONS = [
 ];
 
 export default function StaffForm({ editingStaff, companyId, onSave, onCancel }: Props) {
+  const { t } = useTranslation('common');
   const [form, setForm] = useState<Omit<Staff, 'id' | 'createdAt' | 'updatedAt'>>({
     userId: '',
     companyId,
@@ -75,7 +77,7 @@ export default function StaffForm({ editingStaff, companyId, onSave, onCancel }:
     try {
       const snapshot = await getDocs(query(collection(db, 'users'), where('email', '==', searchEmail.trim())));
       if (snapshot.empty) {
-        setDialog({ open: true, type: 'error', title: 'User not found', description: 'No user with this email exists.' });
+        setDialog({ open: true, type: 'error', title: t('staff_form.dialog.user_not_found_title'), description: t('staff_form.dialog.user_not_found_desc') });
         return;
       }
       const userDoc = snapshot.docs[0];
@@ -87,9 +89,9 @@ export default function StaffForm({ editingStaff, companyId, onSave, onCancel }:
         email: user.email || '',
         phone: user.phone || '',
       }));
-      setDialog({ open: true, type: 'success', title: 'User Loaded', description: '' });
+      setDialog({ open: true, type: 'success', title: t('staff_form.dialog.user_loaded_title'), description: '' });
     } catch (error: any) {
-      setDialog({ open: true, type: 'error', title: 'Error', description: error.message || 'Failed to search user.' });
+      setDialog({ open: true, type: 'error', title: t('staff_form.dialog.error_title'), description: error.message || t('staff_form.dialog.error_desc') });
     } finally {
       setSearching(false);
     }
@@ -97,7 +99,7 @@ export default function StaffForm({ editingStaff, companyId, onSave, onCancel }:
 
   const handleSubmit = async () => {
     if (!form.userId || !form.name || !form.email) {
-      setDialog({ open: true, type: 'error', title: 'Missing Required Fields', description: 'User ID, Name, and Email are required.' });
+      setDialog({ open: true, type: 'error', title: t('staff_form.dialog.missing_fields_title'), description: t('staff_form.dialog.missing_fields_desc') });
       return;
     }
 
@@ -105,7 +107,7 @@ export default function StaffForm({ editingStaff, companyId, onSave, onCancel }:
     try {
       if (editingStaff) {
         await updateStaff(editingStaff.id, form);
-        setDialog({ open: true, type: 'success', title: 'Staff Updated', description: '' });
+        setDialog({ open: true, type: 'success', title: t('staff_form.dialog.updated_title'), description: '' });
       } else {
         await inviteUserAsStaff(
           form.email,
@@ -117,11 +119,11 @@ export default function StaffForm({ editingStaff, companyId, onSave, onCancel }:
           form.name,
           form.phone || ''
         );
-        setDialog({ open: true, type: 'success', title: 'Invitation Sent', description: '' });
+        setDialog({ open: true, type: 'success', title: t('staff_form.dialog.invited_title'), description: '' });
       }
       onSave();
     } catch (error: any) {
-      setDialog({ open: true, type: 'error', title: 'Error', description: error.message || 'Failed to save staff.' });
+      setDialog({ open: true, type: 'error', title: t('staff_form.dialog.error_title'), description: error.message || t('staff_form.dialog.error_desc') });
     } finally {
       setLoading(false);
     }
@@ -130,64 +132,67 @@ export default function StaffForm({ editingStaff, companyId, onSave, onCancel }:
   return (
     <div className="bg-white p-6 rounded-xl shadow max-w-full space-y-6 border">
       <h2 className="text-xl font-bold text-gray-800">
-        {editingStaff ? 'Edit Staff' : 'Invite New Staff'}
+        {editingStaff ? t('staff_form.title.edit') : t('staff_form.title.invite')}
       </h2>
 
-      {/* Email search */}
       <div className="flex gap-2 items-center">
         <Input
-          placeholder="Enter email to find user"
+          placeholder={t('staff_form.search_placeholder')}
           value={searchEmail}
           onChange={(e) => setSearchEmail(e.target.value)}
         />
         <Button onClick={handleEmailSearch} disabled={searching}>
           {searching ? <Loader2 className="animate-spin h-4 w-4" /> : <MailSearch className="h-4 w-4 mr-1" />}
-          {searching ? 'Searching...' : 'Find'}
+          {searching ? t('staff_form.searching') : t('staff_form.search_button')}
         </Button>
       </div>
 
-      {/* Form fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-gray-600 mb-1 block">Full Name</label>
-          <Input value={form.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Full name" />
+          <label className="text-sm font-medium text-gray-600 mb-1 block">{t('staff_form.labels.name')}</label>
+          <Input value={form.name} onChange={(e) => handleChange('name', e.target.value)} placeholder={t('staff_form.labels.name')} />
         </div>
         <div>
-          <label className="text-sm font-medium text-gray-600 mb-1 block">Email</label>
-          <Input value={form.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="Email" />
+          <label className="text-sm font-medium text-gray-600 mb-1 block">{t('staff_form.labels.email')}</label>
+          <Input value={form.email} onChange={(e) => handleChange('email', e.target.value)} placeholder={t('staff_form.labels.email')} />
         </div>
         <div>
-          <label className="text-sm font-medium text-gray-600 mb-1 block">Phone</label>
-          <Input value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} placeholder="Phone" />
+          <label className="text-sm font-medium text-gray-600 mb-1 block">{t('staff_form.labels.phone')}</label>
+          <Input value={form.phone} onChange={(e) => handleChange('phone', e.target.value)} placeholder={t('staff_form.labels.phone')} />
         </div>
         <div>
-          <label className="text-sm font-medium text-gray-600 mb-1 block">Station</label>
+          <label className="text-sm font-medium text-gray-600 mb-1 block">{t('staff_form.labels.station')}</label>
           <SimpleSelect
             options={stationOptions}
             value={form.stationId}
             onChange={(val) => handleChange('stationId', val)}
-            placeholder="Select station (optional)"
+            placeholder={t('staff_form.labels.station_placeholder')}
           />
         </div>
-        <div className="sm:col-span-2">
-          <label className="text-sm font-medium text-gray-600 mb-1 block">Role</label>
+        <div className="sm:col-span-1">
+          <label className="text-sm font-medium text-gray-600 mb-1 block">{t('staff_form.labels.role')}</label>
           <SimpleSelect
-            options={ROLE_OPTIONS}
+            options={ROLE_OPTIONS.map((role) => ({
+              value: role.value,
+              label: t(`staff_table.roles.${role.value}`),
+            }))}
             value={form.role}
             onChange={(val) => handleChange('role', val)}
-            placeholder="Select role"
+            placeholder={t('staff_table.labels.role_placeholder')}
           />
         </div>
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
+            {editingStaff ? t('staff_form.buttons.update') : t('staff_form.buttons.invite')}
+          </Button>
+          <Button variant="ghost" onClick={onCancel}>{t('staff_form.buttons.cancel')}</Button>
+        </div>
+
       </div>
 
-      {/* Actions */}
-      <div className="flex justify-end gap-2 pt-4">
-        <Button onClick={handleSubmit} disabled={loading}>
-          {loading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
-          {editingStaff ? 'Update Staff' : 'Send Invitation'}
-        </Button>
-        <Button variant="ghost" onClick={onCancel}>Cancel</Button>
-      </div>
+      
 
       <NotificationDialog
         open={dialog.open}

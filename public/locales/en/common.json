@@ -1997,9 +1997,110 @@
     "available": "Available",
     "inactive": "Inactive"
   }
+  }
+},
+
+"staff_management_page": {
+  "title_admin": "👥 All Staff (Admin)",
+  "title_company": "👥 Staff Management",
+  "add_staff": "+ Add Staff",
+  "pending_invitations": "Pending Invitations",
+  "role": "Role",
+  "delete_invitation_title": "Delete Invitation",
+  "delete_invitation_confirm": "Are you sure you want to delete the invitation for {{name}}?",
+  "delete_staff_title": "Delete Staff",
+  "delete_staff_confirm": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+  "success_delete_staff": "Staff deleted successfully.",
+  "error_delete_staff": "Failed to delete staff.",
+  "success_delete_invitation": "Invitation deleted successfully.",
+  "error_delete_invitation": "Failed to delete invitation.",
+  "loading": "Loading...",
+  "no_permission": "You do not have permission to view this page."
+},
+
+"staff_table": {
+  "no_staff_found": "No staff members found.",
+  "headers": {
+    "staff": "Staff",
+    "email": "Email",
+    "role": "Role",
+    "company": "Company",
+    "station": "Station",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "roles": {
+    "admin": "Admin",
+    "company_owner": "Owner",
+    "company_admin": "Admin",
+    "station_manager": "Manager",
+    "technician": "Technician",
+    "support": "Support",
+    "staff": "Staff"
+  },
+  "status": {
+    "accepted": "Accepted",
+    "pending": "Pending"
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  }
+},
+
+"staff_table_mobile": {
+  "no_staff_found": "No staff members found.",
+  "role": "Role",
+  "company": "Company",
+  "station": "Station",
+  "status": {
+    "accepted": "Accepted",
+    "pending": "Pending"
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  }
+},
+
+"staff_form": {
+  "title": {
+    "edit": "Edit Staff",
+    "invite": "Invite New Staff"
+  },
+  "search_placeholder": "Enter email to find user",
+  "search_button": "Find",
+  "searching": "Searching...",
+  "labels": {
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "station": "Station",
+    "station_placeholder": "Select station (optional)",
+    "role": "Role",
+    "role_placeholder": "Select role"
+  },
+  "buttons": {
+    "update": "Update Staff",
+    "invite": "Send Invitation",
+    "cancel": "Cancel"
+  },
+  "dialog": {
+    "user_not_found_title": "User Not Found",
+    "user_not_found_desc": "No user with this email exists.",
+    "user_loaded_title": "User Loaded",
+    "missing_fields_title": "Missing Required Fields",
+    "missing_fields_desc": "User ID, name, and email are required.",
+    "updated_title": "Staff Updated",
+    "invited_title": "Invitation Sent",
+    "error_title": "Error",
+    "error_desc": "Failed to save staff."
+  }
 }
 
-}
+
+
+
 
 
 

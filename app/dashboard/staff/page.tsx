@@ -15,7 +15,7 @@ import { db } from '@/src/firebaseConfig';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { deleteInvitationMessage } from '@/src/lib/invitations/invitationService';
 import ResponsiveStaffTable from '@/src/components/staff/ResponsiveStaffTable';
-
+import { useTranslation } from 'react-i18next';
 
 interface Invitation {
   id: string;
@@ -28,13 +28,14 @@ interface Invitation {
 }
 
 export default function StaffManagementPage() {
-  const { role, companyId, loading,user } = useUser();
+  const { t } = useTranslation('common');
+  const { role, companyId, loading, user } = useUser();
   const normalizedRole = role?.toLowerCase();
   const isAdmin = normalizedRole === 'admin';
   const canViewStaff =
-  isAdmin ||
-  normalizedRole === 'technician_assistant' ||
-  (['company_owner', 'company_admin'].includes(normalizedRole || '') && !!companyId);
+    isAdmin ||
+    normalizedRole === 'technician_assistant' ||
+    (['company_owner', 'company_admin'].includes(normalizedRole || '') && !!companyId);
 
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -58,9 +59,9 @@ export default function StaffManagementPage() {
   useEffect(() => {
     if (!loading && canViewStaff) {
       if (isAdmin || normalizedRole === 'technician_assistant') {
-      loadAllCompanyNames();
-      loadAllStations();
-    } else if (companyId) {
+        loadAllCompanyNames();
+        loadAllStations();
+      } else if (companyId) {
         loadCompanyName(companyId);
         loadStations(companyId);
         loadPendingInvitations(companyId);
@@ -113,26 +114,26 @@ export default function StaffManagementPage() {
   const confirmDeleteStaff = async (staff: Staff) => {
     try {
       await handleDelete(staff.id);
-      showDialog('success', 'Staff deleted successfully');
+      showDialog('success', t('staff_management_page.success_delete_staff'));
     } catch (err) {
       console.error('Failed to delete staff:', err);
-      showDialog('error', 'Failed to delete staff');
+      showDialog('error', t('staff_management_page.error_delete_staff'));
     }
   };
 
   const confirmDeleteInvitation = async (invite: Invitation) => {
     try {
       await deleteInvitationMessage(invite.id);
-      showDialog('success', 'Invitation deleted successfully');
+      showDialog('success', t('staff_management_page.success_delete_invitation'));
       setRefreshInvites(prev => !prev);
     } catch (err) {
       console.error('Failed to delete invitation:', err);
-      showDialog('error', 'Failed to delete invitation');
+      showDialog('error', t('staff_management_page.error_delete_invitation'));
     }
   };
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
-  if (!canViewStaff) return <div className="text-center py-10 text-red-500">You do not have permission to view this page.</div>;
+  if (loading) return <div className="text-center py-10">{t('staff_management_page.loading')}</div>;
+  if (!canViewStaff) return <div className="text-center py-10 text-red-500">{t('staff_management_page.no_permission')}</div>;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -142,79 +143,76 @@ export default function StaffManagementPage() {
       <main className="flex-1 p-6 space-y-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">
-            {isAdmin ? '👥 All Staff (Admin)' : '👥 Staff Management'}
+            {isAdmin ? t('staff_management_page.title_admin') : t('staff_management_page.title_company')}
           </h1>
 
-          {/* ✅ Ẩn nút nếu là technician_assistant */}
           {role !== 'technician_assistant' && (
             <Button onClick={() => {
               setEditingStaff(null);
               setShowForm(true);
             }}>
-              + Add Staff
+              {t('staff_management_page.add_staff')}
             </Button>
           )}
         </div>
 
         <StaffSummaryCard staffs={staffs} />
 
-          <ResponsiveStaffTable
-            staffs={staffs}
-            onEdit={(staff) => {
-              setEditingStaff(staff);
-              setShowForm(true);
+        <ResponsiveStaffTable
+          staffs={staffs}
+          onEdit={(staff) => {
+            setEditingStaff(staff);
+            setShowForm(true);
+          }}
+          onDelete={(staff) =>
+            showDialog(
+              'confirm',
+              t('staff_management_page.delete_staff_title'),
+              t('staff_management_page.delete_staff_confirm', { name: staff.name || staff.email }),
+              () => confirmDeleteStaff(staff)
+            )
+          }
+          stationMap={stationMap}
+          companyNames={companyNames}
+        />
+
+        {showForm && (
+          <StaffForm
+            editingStaff={editingStaff}
+            companyId={companyId || ''}
+            onSave={() => {
+              setShowForm(false);
+              setEditingStaff(null);
             }}
-            onDelete={(staff) =>
-              showDialog(
-                'confirm',
-                'Delete Staff',
-                `Are you sure you want to delete ${staff.name || staff.email}? This action cannot be undone.`,
-                () => confirmDeleteStaff(staff)
-              )
-            }
-            stationMap={stationMap}
-            companyNames={companyNames}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingStaff(null);
+            }}
           />
-
-
-          {showForm && (
-            <StaffForm
-              editingStaff={editingStaff}
-              companyId={companyId || ''}
-              onSave={() => {
-                setShowForm(false);
-                setEditingStaff(null);
-              }}
-              onCancel={() => {
-                setShowForm(false);
-                setEditingStaff(null);
-              }}
-            />
-          )}
-
+        )}
 
         {pendingInvites.length > 0 && (
           <section className="pt-8">
-            <h2 className="text-xl font-semibold mb-4">Pending Invitations</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('staff_management_page.pending_invitations')}</h2>
             <ul className="space-y-3">
               {pendingInvites.map(invite => (
                 <li key={invite.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
                   <div>
                     <p className="font-medium">{invite.name || invite.email}</p>
-                    <p className="text-sm text-gray-500">Role: {invite.role}</p>
+                    <p className="text-sm text-gray-500">{t('staff_management_page.role')}: {invite.role}</p>
                   </div>
                   <Button
                     variant="destructive"
                     onClick={() =>
                       showDialog(
                         'confirm',
-                        'Delete Invitation',
-                        `Are you sure you want to delete invitation for ${invite.name || invite.email}?`,
+                        t('staff_management_page.delete_invitation_title'),
+                        t('staff_management_page.delete_invitation_confirm', { name: invite.name || invite.email }),
                         () => confirmDeleteInvitation(invite)
                       )
                     }
                   >
-                    Delete
+                    {t('staff_management_page.delete_invitation_button')}
                   </Button>
                 </li>
               ))}

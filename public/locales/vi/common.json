@@ -2010,7 +2010,124 @@
       "inactive": "Ngưng sử dụng"
     }
   }
+},
+
+"staff_management_page": {
+  "title_admin": "👥 Tất cả nhân sự (Admin)",
+  "title_company": "👥 Quản lý nhân sự",
+  "add_staff": "+ Thêm nhân sự",
+  "pending_invitations": "Lời mời đang chờ",
+  "role": "Vai trò",
+  "delete_invitation_title": "Xoá lời mời",
+  "delete_invitation_confirm": "Bạn có chắc muốn xoá lời mời dành cho {{name}}?",
+  "delete_staff_title": "Xoá nhân sự",
+  "delete_staff_confirm": "Bạn có chắc muốn xoá {{name}}? Hành động này không thể hoàn tác.",
+  "success_delete_staff": "Xoá nhân sự thành công.",
+  "error_delete_staff": "Xoá nhân sự thất bại.",
+  "success_delete_invitation": "Đã xoá lời mời thành công.",
+  "error_delete_invitation": "Xoá lời mời thất bại.",
+  "loading": "Đang tải...",
+  "no_permission": "Bạn không có quyền xem trang này."
+},
+
+"staff_summary_card": {
+  "total_staff": "Tổng số nhân sự",
+  "accepted": "Đã chấp nhận",
+  "pending": "Đang chờ",
+  "by_role": "Theo vai trò",
+  "roles": {
+    "company_owner": "Chủ doanh nghiệp",
+    "company_admin": "Quản trị viên",
+    "station_manager": "Quản lý trạm",
+    "technician": "Kỹ thuật viên",
+    "support": "Hỗ trợ"
+  }
+},
+
+"staff_table": {
+  "no_staff_found": "Không tìm thấy nhân viên nào.",
+  "headers": {
+    "staff": "Nhân viên",
+    "email": "Email",
+    "role": "Vai trò",
+    "company": "Công ty cho thuê",
+    "station": "Trạm cho thuê",
+    "status": "Trạng thái",
+    "actions": "Hành động"
+  },
+  "roles": {
+    "admin": "Quản trị viên",
+    "company_owner": "Chủ doanh nghiệp",
+    "company_admin": "Quản lý doanh nghiệp",
+    "station_manager": "Quản lý trạm",
+    "technician": "Kỹ thuật viên",
+    "support": "Hỗ trợ",
+    "staff": "Nhân viên"
+  },
+  "status": {
+    "accepted": "Đã chấp nhận",
+    "pending": "Chờ xác nhận"
+  },
+  "actions": {
+    "edit": "Chỉnh sửa",
+    "delete": "Xoá"
+  }
+},
+
+"staff_table_mobile": {
+  "no_staff_found": "Không tìm thấy nhân viên nào.",
+  "role": "Vai trò",
+  "company": "Công ty",
+  "station": "Trạm",
+  "status": {
+    "accepted": "Đã chấp nhận",
+    "pending": "Chờ xác nhận"
+  },
+  "actions": {
+    "edit": "Chỉnh sửa",
+    "delete": "Xoá"
+  }
+},
+
+"staff_form": {
+  "title": {
+    "edit": "Chỉnh sửa nhân sự",
+    "invite": "Mời nhân sự mới"
+  },
+  "search_placeholder": "Nhập email để tìm người dùng",
+  "search_button": "Tìm",
+  "searching": "Đang tìm...",
+  "labels": {
+    "name": "Họ và tên",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "station": "Trạm",
+    "station_placeholder": "Chọn trạm (tuỳ chọn)",
+    "role": "Vai trò",
+    "role_placeholder": "Chọn vai trò"
+  },
+  "buttons": {
+    "update": "Cập nhật nhân sự",
+    "invite": "Gửi lời mời",
+    "cancel": "Huỷ"
+  },
+  "dialog": {
+    "user_not_found_title": "Không tìm thấy người dùng",
+    "user_not_found_desc": "Không có người dùng nào với email này.",
+    "user_loaded_title": "Đã tải thông tin người dùng",
+    "missing_fields_title": "Thiếu thông tin bắt buộc",
+    "missing_fields_desc": "Cần điền đầy đủ ID, tên và email.",
+    "updated_title": "Đã cập nhật nhân sự",
+    "invited_title": "Đã gửi lời mời",
+    "error_title": "Lỗi",
+    "error_desc": "Không thể lưu thông tin nhân sự."
+  }
 }
+
+
+
+
+
 
 
 
