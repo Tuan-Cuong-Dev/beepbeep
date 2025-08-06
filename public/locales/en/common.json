@@ -2096,7 +2096,82 @@
     "error_title": "Error",
     "error_desc": "Failed to save staff."
   }
+},
+
+"customers_page": {
+  "title": "Customers Management",
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{current}} of {{total}}"
+  },
+  "dialog": {
+    "delete_title": "Delete {{name}}?",
+    "delete_description": "This action cannot be undone.",
+    "delete_success": "Customer deleted successfully",
+    "delete_error": "Failed to delete customer",
+    "save_error": "Failed to save customer",
+    "save_success": "Customer added successfully",
+    "update_success": "Customer updated successfully",
+    "missing_company": "Missing companyId"
+  }
+},
+
+"customer_table": {
+  "search_placeholder": "Search by name or email...",
+  "columns": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "company": "Company",
+    "address": "Address",
+    "place_of_residence": "Place of Residence",
+    "place_of_origin": "Place of Origin",
+    "nationality": "Nationality",
+    "sex": "Sex",
+    "date_of_birth": "Date of Birth",
+    "id_number": "ID Number",
+    "actions": "Actions"
+  },
+  "sex_options": {
+    "Male": "Male",
+    "Female": "Female",
+    "Other": "Other"
+  },
+  "unknown_company": "Unknown",
+  "edit": "Edit",
+  "delete": "Delete"
+},
+
+"customer_form": {
+  "title_add": "Add New Customer",
+  "title_update": "Update Customer",
+  "full_name": "Full Name",
+  "email": "Email",
+  "phone": "Phone Number",
+  "company_name": "Company Name",
+  "address": "Address",
+  "dob": "Date of Birth",
+  "driver_license": "Driver License Number",
+  "id_number": "Citizen ID / Passport Number",
+  "nationality": "Nationality",
+  "sex": {
+    "label": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "placeholder": "Select gender"
+  },
+  "place_of_origin": "Place of Origin",
+  "place_of_residence": "Place of Residence",
+  "add": "Add",
+  "update": "Update",
+  "cancel": "Cancel"
 }
+
+
+
+
 
 
 

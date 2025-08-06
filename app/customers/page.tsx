@@ -17,6 +17,7 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
 import { db } from '@/src/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
+import { useTranslation } from 'react-i18next'; // ✅ thêm
 
 const initialCustomer = {
   userId: '',
@@ -28,7 +29,7 @@ const initialCustomer = {
   driverLicense: '',
   idNumber: '',
   nationality: '',
-  sex: '',
+  sex: undefined,
   placeOfOrigin: '',
   placeOfResidence: '',
   companyId: '',
@@ -38,6 +39,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function CustomersPage() {
   const { companyId, role } = useUser();
+  const { t } = useTranslation('common'); // ✅ dùng common
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -71,16 +73,16 @@ export default function CustomersPage() {
     setDialog({
       open: true,
       type: 'confirm',
-      title: `Delete ${customer.name}?`,
-      description: 'This action cannot be undone.',
+      title: t('customers_page.dialog.delete_title', { name: customer.name }), // ✅
+      description: t('customers_page.dialog.delete_description'), // ✅
       onConfirm: async () => {
         try {
           await deleteCustomer(id);
           setCustomers(customers.filter((c) => c.id !== id));
           setDialog((prev) => ({ ...prev, open: false }));
-          showDialog('success', 'Customer deleted successfully');
+          showDialog('success', t('customers_page.dialog.delete_success')); // ✅
         } catch (_err) {
-          showDialog('error', 'Failed to delete customer');
+          showDialog('error', t('customers_page.dialog.delete_error')); // ✅
         }
       },
     });
@@ -111,7 +113,7 @@ export default function CustomersPage() {
   const saveCustomer = async () => {
     try {
       if (!companyId) {
-        showDialog('error', 'Missing companyId');
+        showDialog('error', t('customers_page.dialog.missing_company')); // ✅
         return;
       }
 
@@ -120,18 +122,18 @@ export default function CustomersPage() {
       if (editingCustomer) {
         await updateCustomer(editingCustomer.id, customerData);
         setCustomers(customers.map(c => c.id === editingCustomer.id ? { ...c, ...customerData } : c));
-        showDialog('success', 'Customer updated successfully');
+        showDialog('success', t('customers_page.dialog.update_success')); // ✅
         setEditingCustomer(null);
       } else {
         const created = await createCustomer(customerData);
         setCustomers([...customers, created]);
-        showDialog('success', 'Customer added successfully');
+        showDialog('success', t('customers_page.dialog.save_success')); // ✅
       }
 
       setNewCustomer({ ...initialCustomer, companyId });
     } catch (error) {
       console.error('❌ Error in saveCustomer:', error);
-      showDialog('error', 'Failed to save customer');
+      showDialog('error', t('customers_page.dialog.save_error')); // ✅
     }
   };
 
@@ -146,7 +148,9 @@ export default function CustomersPage() {
       <Header />
       <UserTopMenu />
       <div className="p-6">
-        <h1 className="text-2xl font-semibold mb-4 border-[#00d289] border-b-2 pb-2">Customers Management</h1>
+        <h1 className="text-2xl font-semibold mb-4 border-[#00d289] border-b-2 pb-2">
+          {t('customers_page.title')} {/* ✅ */}
+        </h1>
 
         <CustomerTable
           customers={paginatedCustomers}
@@ -154,7 +158,7 @@ export default function CustomersPage() {
           onDelete={confirmDelete}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          companyMap={companyMap} // ✅ truyền thêm
+          companyMap={companyMap}
         />
 
         <div className="flex justify-center items-center gap-4 mt-4 text-sm">
@@ -163,17 +167,19 @@ export default function CustomersPage() {
             disabled={currentPage === 1}
             className={`px-4 py-2 rounded text-gray-600 border ${currentPage === 1 ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:bg-gray-50 border-gray-300'}`}
           >
-            Previous
+            {t('customers_page.pagination.previous')} {/* ✅ */}
           </button>
 
-          <span className="text-gray-700">Page {currentPage} of {totalPages}</span>
+          <span className="text-gray-700">
+            {t('customers_page.pagination.page', { current: currentPage, total: totalPages })} {/* ✅ */}
+          </span>
 
           <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
             className={`px-4 py-2 rounded text-gray-600 border ${currentPage === totalPages ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:bg-gray-50 border-gray-300'}`}
           >
-            Next
+            {t('customers_page.pagination.next')} {/* ✅ */}
           </button>
         </div>
 
@@ -186,7 +192,7 @@ export default function CustomersPage() {
             setEditingCustomer(null);
             setNewCustomer({ ...initialCustomer, companyId: companyId || '' });
           }}
-          companyMap={companyMap} // ✅ truyền thêm
+          companyMap={companyMap}
         />
       </div>
       <Footer />

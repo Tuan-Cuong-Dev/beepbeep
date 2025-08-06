@@ -2081,52 +2081,78 @@
     "error_title": "エラー",
     "error_desc": "スタッフ情報の保存に失敗しました。"
   }
+},
+
+"customers_page": {
+  "title": "顧客管理",
+  "pagination": {
+    "previous": "前へ",
+    "next": "次へ",
+    "page": "ページ {{current}} / {{total}}"
+  },
+  "dialog": {
+    "delete_title": "{{name}} を削除しますか？",
+    "delete_description": "この操作は元に戻せません。",
+    "delete_success": "顧客を削除しました。",
+    "delete_error": "顧客の削除に失敗しました。",
+    "save_error": "顧客の保存に失敗しました。",
+    "save_success": "顧客を追加しました。",
+    "update_success": "顧客情報を更新しました。",
+    "missing_company": "companyId が見つかりません。"
+  }
+},
+
+"customer_table": {
+  "search_placeholder": "名前またはメールで検索...",
+  "columns": {
+    "name": "名前",
+    "email": "メール",
+    "phone": "電話番号",
+    "company": "会社",
+    "address": "住所",
+    "place_of_residence": "現住所",
+    "place_of_origin": "出身地",
+    "nationality": "国籍",
+    "sex": "性別",
+    "date_of_birth": "生年月日",
+    "id_number": "ID番号",
+    "actions": "操作"
+  },
+  "sex_options": {
+    "Male": "男性",
+    "Female": "女性",
+    "Other": "その他"
+  },
+  "unknown_company": "不明",
+  "edit": "編集",
+  "delete": "削除"
+},
+
+"customer_form": {
+  "title_add": "新しい顧客を追加",
+  "title_update": "顧客情報を更新",
+  "full_name": "氏名",
+  "email": "メールアドレス",
+  "phone": "電話番号",
+  "company_name": "会社名",
+  "address": "住所",
+  "dob": "生年月日",
+  "driver_license": "運転免許証番号",
+  "id_number": "身分証番号 / パスポート番号",
+  "nationality": "国籍",
+  "sex": {
+    "label": "性別",
+    "male": "男性",
+    "female": "女性",
+    "other": "その他",
+    "placeholder": "性別を選択"
+  },
+  "place_of_origin": "出身地",
+  "place_of_residence": "現住所",
+  "add": "追加",
+  "update": "更新",
+  "cancel": "キャンセル"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

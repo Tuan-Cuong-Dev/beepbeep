@@ -2061,7 +2061,7 @@
     "company_admin": "Quản lý doanh nghiệp",
     "station_manager": "Quản lý trạm",
     "technician": "Kỹ thuật viên",
-    "support": "Hỗ trợ",
+    "support": "Nhân viên Hỗ trợ",
     "staff": "Nhân viên"
   },
   "status": {
@@ -2122,7 +2122,79 @@
     "error_title": "Lỗi",
     "error_desc": "Không thể lưu thông tin nhân sự."
   }
+},
+
+"customers_page": {
+  "title": "Quản lý khách hàng",
+  "pagination": {
+    "previous": "Trước",
+    "next": "Tiếp",
+    "page": "Trang {{current}} / {{total}}"
+  },
+  "dialog": {
+    "delete_title": "Xoá {{name}}?",
+    "delete_description": "Hành động này không thể hoàn tác.",
+    "delete_success": "Đã xoá khách hàng thành công",
+    "delete_error": "Xoá khách hàng thất bại",
+    "save_error": "Lưu khách hàng thất bại",
+    "save_success": "Đã thêm khách hàng thành công",
+    "update_success": "Cập nhật khách hàng thành công",
+    "missing_company": "Thiếu mã công ty (companyId)"
+  }
+},
+
+"customer_table": {
+  "search_placeholder": "Tìm theo tên hoặc email...",
+  "columns": {
+    "name": "Tên",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "company": "Công ty",
+    "address": "Địa chỉ",
+    "place_of_residence": "Nơi cư trú",
+    "place_of_origin": "Nguyên quán",
+    "nationality": "Quốc tịch",
+    "sex": "Giới tính",
+    "date_of_birth": "Ngày sinh",
+    "id_number": "Số CCCD",
+    "actions": "Hành động"
+  },
+  "sex_options": {
+    "Male": "Nam",
+    "Female": "Nữ",
+    "Other": "Khác"
+  },
+  "unknown_company": "Không rõ",
+  "edit": "Chỉnh sửa",
+  "delete": "Xoá"
+},
+
+"customer_form": {
+  "title_add": "Thêm khách hàng mới",
+  "title_update": "Cập nhật khách hàng",
+  "full_name": "Họ và tên",
+  "email": "Email",
+  "phone": "Số điện thoại",
+  "company_name": "Tên công ty",
+  "address": "Địa chỉ",
+  "dob": "Ngày sinh",
+  "driver_license": "Số bằng lái",
+  "id_number": "CMND / Hộ chiếu",
+  "nationality": "Quốc tịch",
+  "sex": {
+    "label": "Giới tính",
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác",
+    "placeholder": "Chọn giới tính"
+  },
+  "place_of_origin": "Nguyên quán",
+  "place_of_residence": "Nơi cư trú",
+  "add": "Thêm",
+  "update": "Cập nhật",
+  "cancel": "Huỷ"
 }
+
 
 
 
