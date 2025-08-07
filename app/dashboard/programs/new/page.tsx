@@ -129,7 +129,13 @@ export default function ProgramsFormPage() {
         )}
 
         <Input placeholder={t('programs_form_page.placeholders.title')} value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Textarea placeholder={t('programs_form_page.placeholders.description')} value={description} onChange={(e) => setDescription(e.target.value)} />
+
+        <Textarea
+          className="h-32"
+          placeholder={t('programs_form_page.placeholders.description')}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
         {stations.length > 0 && (
           <div>
@@ -151,19 +157,21 @@ export default function ProgramsFormPage() {
         {models.length > 0 && (
           <div>
             <h3 className="font-semibold mb-2">{t('programs_form_page.labels.set_discounts')}</h3>
-            {models.map(model => (
-              <div key={model.id} className="flex gap-2 items-center mb-2">
-                <div className="w-1/3">{model.name}</div>
-                <Input
-                  placeholder={t('programs_form_page.placeholders.discount')}
-                  value={selectedModelDiscounts[model.id] ?? ''}
-                  onChange={(e) => {
-                    const formatted = formatCurrency(parseCurrencyString(e.target.value));
-                    setSelectedModelDiscounts(prev => ({ ...prev, [model.id]: formatted }))
-                  }}
-                />
-              </div>
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {models.map(model => (
+                <div key={model.id} className="flex gap-2 items-center">
+                  <div className="w-1/2 text-sm font-medium">{model.name}</div>
+                  <Input
+                    placeholder={t('programs_form_page.placeholders.discount')}
+                    value={selectedModelDiscounts[model.id] ?? ''}
+                    onChange={(e) => {
+                      const formatted = formatCurrency(parseCurrencyString(e.target.value));
+                      setSelectedModelDiscounts(prev => ({ ...prev, [model.id]: formatted }))
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

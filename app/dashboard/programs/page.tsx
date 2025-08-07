@@ -103,7 +103,7 @@ export default function ProgramsPage() {
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
               🎯 {t('programs_page.title')}
             </h1>
-            <p className="text-gray-600 text-sm sm:text-base max-w-3xl mt-1">
+            <p className="text-gray-600 text-sm sm:text-base max-w-3xl mt-1 md:px-12">
               {t('programs_page.subtitle')}
             </p>
           </div>
