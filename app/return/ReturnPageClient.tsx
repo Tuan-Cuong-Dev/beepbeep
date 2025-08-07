@@ -19,9 +19,7 @@ import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import ExtendRentalModal from '@/src/components/return/ExtendRentalModal';
 import SwitchBikeModal from '@/src/components/return/SwitchBikeModal';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes'; // ✅ Sử dụng type gốc
-
-
+import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
 import {
   Bike,
   User,
@@ -34,8 +32,10 @@ import {
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { format, differenceInDays } from 'date-fns';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
+import { useTranslation } from 'react-i18next';
 
 export default function ReturnPageClient() {
+  const { t } = useTranslation('common');
   const [rentalInfo, setRentalInfo] = useState<any>(null);
   const [extendOpen, setExtendOpen] = useState(false);
   const [switchOpen, setSwitchOpen] = useState(false);
@@ -107,16 +107,14 @@ export default function ReturnPageClient() {
     await processReturn();
   };
 
-  // ✅ Xử lý khi xác nhận chuyển xe mới
-    const handleSwitchConfirm = async (newBike: Ebike) => {
+  const handleSwitchConfirm = async (newBike: Ebike) => {
     if (!bookingDocId || !rentalInfo) return;
 
     try {
       const bookingRef = doc(db, 'bookings', bookingDocId);
-
-      // Cập nhật trạng thái xe cũ → Available
       const oldBikeQuery = query(collection(db, 'ebikes'), where('vehicleID', '==', rentalInfo.vin));
       const oldBikeSnap = await getDocs(oldBikeQuery);
+
       if (!oldBikeSnap.empty) {
         const oldBikeDoc = oldBikeSnap.docs[0];
         await updateDoc(doc(db, 'ebikes', oldBikeDoc.id), {
@@ -125,13 +123,11 @@ export default function ReturnPageClient() {
         });
       }
 
-      // Cập nhật xe mới → In Use
       await updateDoc(doc(db, 'ebikes', newBike.id), {
         status: 'In Use',
         updatedAt: Timestamp.now(),
       });
 
-      // Cập nhật booking với thông tin xe mới
       await updateDoc(bookingRef, {
         vin: newBike.vehicleID,
         plateNumber: newBike.plateNumber,
@@ -140,27 +136,27 @@ export default function ReturnPageClient() {
         statusComment: `Switched from ${rentalInfo.vin} to ${newBike.vehicleID} on ${format(new Date(), 'dd/MM/yyyy HH:mm')}`,
       });
 
-      // Cập nhật state
       const updatedSnap = await getDoc(bookingRef);
       if (updatedSnap.exists()) {
         setRentalInfo({ ...updatedSnap.data(), id: bookingDocId });
-        setSuccessMessage(`Successfully switched to ${newBike.vehicleID}`);
+        setSuccessMessage(
+          t('return_page_client.success_switch', { vehicleID: newBike.vehicleID })
+        );
       }
     } catch (error) {
       console.error('❌ Switch vehicle failed:', error);
-      setErrorMessage('Failed to switch vehicle. Please try again.');
+      setErrorMessage(t('return_page_client.error_switch'));
     }
   };
-
 
   const processReturn = async () => {
     if (!bookingDocId || !rentalInfo) return;
 
     const bookingRef = doc(db, 'bookings', bookingDocId);
     await updateDoc(bookingRef, {
-      bookingStatus: 'returned', // Đã trả xe nhưng chưa xác nhận thu tiền
+      bookingStatus: 'returned',
       updatedAt: Timestamp.now(),
-      statusComment: `Staff marked vehicle as returned on ${format(new Date(), 'dd/MM/yyyy HH:mm')}. Awaiting finance confirmation.`
+      statusComment: `Staff marked vehicle as returned on ${format(new Date(), 'dd/MM/yyyy HH:mm')}. Awaiting finance confirmation.`,
     });
 
     const ebikeQuery = query(collection(db, 'ebikes'), where('vehicleID', '==', rentalInfo.vin));
@@ -173,7 +169,7 @@ export default function ReturnPageClient() {
       });
     }
 
-    setSuccessMessage('Vehicle has been successfully returned and marked as available.');
+    setSuccessMessage(t('return_page_client.success_return'));
     setRentalInfo(null);
     setBookingDocId(null);
     setVehicleIdInput('');
@@ -209,7 +205,7 @@ export default function ReturnPageClient() {
       setRentalInfo({ ...updatedSnap.data(), id: rentalInfo.id });
     }
 
-    setSuccessMessage('Rental time successfully extended.');
+    setSuccessMessage(t('return_page_client.success_return'));
     setExtendOpen(false);
   };
 
@@ -234,16 +230,18 @@ export default function ReturnPageClient() {
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
       <main className="flex-1 py-10 px-4">
-        <h1 className="text-3xl font-bold text-center mb-8">Return Vehicle</h1>
+        <h1 className="text-3xl font-bold text-center mb-8">
+          {t('return_page_client.title')}
+        </h1>
 
         <div className="max-w-2xl mx-auto space-y-8">
           <Card className="shadow-md rounded-xl">
             <CardContent className="p-5 space-y-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
-                <Bike className="w-5 h-5 text-[#00d289]" /> Search by VIN or Plate Number
+                <Bike className="w-5 h-5 text-[#00d289]" /> {t('return_page_client.search_heading')}
               </h2>
               <Input
-                placeholder="Type at least 2 characters..."
+                placeholder={t('return_page_client.search_placeholder')}
                 value={vehicleIdInput}
                 onChange={(e) => setVehicleIdInput(e.target.value)}
               />
@@ -276,21 +274,21 @@ export default function ReturnPageClient() {
           {rentalInfo && (
             <Card className="shadow-md rounded-xl">
               <CardContent className="p-5 space-y-4 text-sm text-gray-800">
-                <div className="flex gap-2"><User className="w-4 h-4 text-[#00d289]" /> <strong>Renter:</strong> {rentalInfo.fullName}</div>
-                <div className="flex gap-2"><PhoneCall className="w-4 h-4 text-[#00d289]" /> <strong>Phone:</strong> {rentalInfo.phone}</div>
-                <div className="flex gap-2"><span className="text-[#00d289]">🔧</span> <strong>Vehicle ID:</strong> {rentalInfo.vin}</div>
-                <div className="flex gap-2"><span className="text-[#00d289]">🪪</span> <strong>Plate Number:</strong> {rentalInfo.licensePlate}</div>
-                <div className="flex gap-2"><Calendar className="w-4 h-4 text-[#00d289]" /> <strong>Start:</strong> {formatDateTime(rentalInfo.rentalStartDate, rentalInfo.rentalStartHour)}</div>
-                <div className="flex gap-2"><Calendar className="w-4 h-4 text-[#00d289]" /> <strong>End:</strong> {formatDateTime(rentalInfo.rentalEndDate)}</div>
-                <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>Price / Day:</strong> {(rentalInfo.pricePerDay || 0).toLocaleString()}₫</div>
-                <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>Total:</strong> {rentalInfo.totalAmount?.toLocaleString()}₫</div>
-                <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>Deposit:</strong> {rentalInfo.deposit?.toLocaleString()}₫</div>
-                <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>Remaining:</strong> {rentalInfo.remainingBalance?.toLocaleString()}₫</div>
+                <div className="flex gap-2"><User className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.renter')}:</strong> {rentalInfo.fullName}</div>
+                <div className="flex gap-2"><PhoneCall className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.phone')}:</strong> {rentalInfo.phone}</div>
+                <div className="flex gap-2"><span className="text-[#00d289]">🔧</span> <strong>{t('return_page_client.vehicle_id')}:</strong> {rentalInfo.vin}</div>
+                <div className="flex gap-2"><span className="text-[#00d289]">🪪</span> <strong>{t('return_page_client.plate_number')}:</strong> {rentalInfo.licensePlate}</div>
+                <div className="flex gap-2"><Calendar className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.start')}:</strong> {formatDateTime(rentalInfo.rentalStartDate, rentalInfo.rentalStartHour)}</div>
+                <div className="flex gap-2"><Calendar className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.end')}:</strong> {formatDateTime(rentalInfo.rentalEndDate)}</div>
+                <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.price_per_day')}:</strong> {(rentalInfo.pricePerDay || 0).toLocaleString()}₫</div>
+                <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.total')}:</strong> {rentalInfo.totalAmount?.toLocaleString()}₫</div>
+                <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.deposit')}:</strong> {rentalInfo.deposit?.toLocaleString()}₫</div>
+                <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.remaining')}:</strong> {rentalInfo.remainingBalance?.toLocaleString()}₫</div>
 
                 <div className="flex justify-between flex-wrap mt-6 gap-2">
-                  <Button variant="outline" onClick={() => setExtendOpen(true)}>Extend Rental</Button>
-                  <Button variant="secondary" onClick={() => setSwitchOpen(true)}>Switch Vehicle</Button>
-                  <Button variant="default" onClick={handleReturnBike}>Return Vehicle</Button>
+                  <Button variant="outline" onClick={() => setExtendOpen(true)}>{t('return_page_client.extend_button')}</Button>
+                  <Button variant="secondary" onClick={() => setSwitchOpen(true)}>{t('return_page_client.switch_button')}</Button>
+                  <Button variant="default" onClick={handleReturnBike}>{t('return_page_client.return_button')}</Button>
                 </div>
               </CardContent>
             </Card>
@@ -313,19 +311,20 @@ export default function ReturnPageClient() {
             onClose={() => setSwitchOpen(false)}
             onConfirm={handleSwitchConfirm}
           />
-
         </div>
       </main>
       <Footer />
 
-      {/* Confirmation Dialog */}
+      {/* ✅ Dialog confirm return if still owing */}
       <NotificationDialog
         open={showConfirmDialog}
         type="confirm"
-        title="Confirm Remaining Balance"
+        title={t('return_page_client.confirm_title')}
         description={
           rentalInfo?.remainingBalance !== undefined
-            ? `The customer still owes ${rentalInfo.remainingBalance.toLocaleString()}₫. Have you collected this amount?`
+            ? t('return_page_client.confirm_description', {
+                amount: rentalInfo.remainingBalance.toLocaleString(),
+              })
             : ''
         }
         onClose={() => setShowConfirmDialog(false)}

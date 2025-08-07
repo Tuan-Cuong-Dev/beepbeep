@@ -94,7 +94,7 @@ export default function ReportIssueForm({
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto px-4">
+    <div className="space-y-8 max-w-4xl mx-auto">
       {/* Vehicle & Issue Type */}
       <div className="flex flex-col md:flex-row md:space-x-4 space-y-6 md:space-y-0">
         {/* Vehicle Dropdown */}

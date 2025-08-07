@@ -39,19 +39,13 @@ export default function ReportIssueClient() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
 
-      <main className="flex-1 p-3 sm:p-6 space-y-8 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-gray-800">
+      <main className="flex-1 py-10 px-4">
+        <h1 className="text-3xl font-bold text-center mb-8">
           🚨 {t('report_issue_client.heading')}
         </h1>
-
-        <div className="text-sm text-gray-500 text-center space-y-1">
-          <div><strong>{t('report_issue_client.company')}:</strong> {companyName || '—'}</div>
-          {stationId && <div><strong>{t('report_issue_client.station')}:</strong> {stationName}</div>}
-        </div>
-
         <div className="bg-white rounded-2xl border p-4 sm:p-6 md:p-10 space-y-8 shadow w-full max-w-4xl mx-auto">
           <ReportIssueForm
             companyId={companyId || ''}

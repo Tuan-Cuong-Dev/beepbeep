@@ -1,6 +1,8 @@
 'use client';
+
 // Form này hoạt động theo company, user và cấu hình động từ Company-Owner setup cho.
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getFormConfigurationByCompanyId } from '@/src/lib/services/Configirations/formConfigurationService';
 import { FormConfiguration } from '@/src/lib/formConfigurations/formConfigurationTypes';
 import { useRentalForm } from '../../hooks/useRentalForm';
@@ -14,6 +16,7 @@ interface Props {
 }
 
 export default function DynamicRentalForm({ companyId, userId }: Props) {
+  const { t } = useTranslation('common');
   const [config, setConfig] = useState<FormConfiguration | null>(null);
   const [bikeSuggestions, setBikeSuggestions] = useState<any[]>([]);
   const [dialog, setDialog] = useState<{
@@ -32,7 +35,6 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
     loading,
   } = useRentalForm(companyId, userId);
 
-  // Load form configuration
   useEffect(() => {
     const fetchConfig = async () => {
       const result = await getFormConfigurationByCompanyId(companyId);
@@ -42,7 +44,6 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
     fetchConfig();
   }, [companyId]);
 
-  // Suggest bikes when user types
   const populateVehicleSuggestions = (search: string) => {
     const suggestions = allBikes.filter(bike =>
       bike.vehicleID?.toLowerCase().includes(search.toLowerCase()) ||
@@ -52,7 +53,6 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
     setBikeSuggestions(suggestions);
   };
 
-  // When user selects bike from suggestions
   const handleSelectBike = (bike: any) => {
     handleChange('vehicleSearch', bike.vehicleID || '');
     handleChange('vehicleModel', bike.modelName || '');
@@ -63,37 +63,35 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
     setBikeSuggestions([]);
   };
 
-  // Handle booking confirmation
   const handleConfirmBooking = async () => {
     const result = await handleSubmit();
 
     if (result.status === 'success') {
-      const booking = result.booking;
       setDialog({
         open: true,
         type: 'success',
-        title: 'Booking Successful!',
-        description: 'Your booking has been created successfully.',
+        title: t('dynamic_rental_form.success_title'),
+        description: t('dynamic_rental_form.success_desc'),
       });
     } else if (result.status === 'validation_error') {
       setDialog({
         open: true,
         type: 'error',
-        title: 'Missing Information',
-        description: 'Please fill in the required rental information before submitting.',
+        title: t('dynamic_rental_form.validation_title'),
+        description: t('dynamic_rental_form.validation_desc'),
       });
     } else {
       setDialog({
         open: true,
         type: 'error',
-        title: 'Booking Failed',
-        description: 'An error occurred while creating your booking. Please try again later.',
+        title: t('dynamic_rental_form.failed_title'),
+        description: t('dynamic_rental_form.failed_desc'),
       });
     }
   };
 
   if (loading || !config) {
-    return <div className="text-center py-10 text-gray-500">Loading form...</div>;
+    return <div className="text-center py-10 text-gray-500">{t('dynamic_rental_form.loading')}</div>;
   }
 
   return (
@@ -125,10 +123,10 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
 
       <div className="flex flex-col sm:flex-row gap-4 mt-6 p-4">
         <Button onClick={handleConfirmBooking} className="flex-1">
-          ✅ Confirm Booking
+          ✅ {t('dynamic_rental_form.confirm_button')}
         </Button>
         <Button variant="outline" onClick={() => window.print()} className="flex-1">
-          🖨️ Print Invoice
+          🖨️ {t('dynamic_rental_form.print_button')}
         </Button>
       </div>
 

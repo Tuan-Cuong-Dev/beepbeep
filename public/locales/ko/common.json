@@ -2365,7 +2365,68 @@
   "station": "지점",
   "success": "문제가 성공적으로 신고되었습니다.",
   "success_title": "성공"
+},
+
+"return_page_client": {
+  "title": "차량 반납",
+  "search_heading": "VIN 또는 번호판으로 검색",
+  "search_placeholder": "2자 이상 입력하세요...",
+  "renter": "대여자",
+  "phone": "전화번호",
+  "vehicle_id": "차량 ID",
+  "plate_number": "번호판",
+  "start": "시작 시간",
+  "end": "종료 시간",
+  "price_per_day": "일일 요금",
+  "total": "총 금액",
+  "deposit": "보증금",
+  "remaining": "남은 금액",
+  "extend_button": "대여 연장",
+  "switch_button": "차량 교체",
+  "return_button": "차량 반납",
+  "success_return": "차량이 성공적으로 반납되어 사용 가능 상태로 표시되었습니다.",
+  "success_switch": "{{vehicleID}}로 차량을 성공적으로 교체했습니다.",
+  "error_switch": "차량 교체에 실패했습니다. 다시 시도해주세요.",
+  "confirm_title": "남은 금액 확인",
+  "confirm_description": "고객이 아직 {{amount}}₫을(를) 지불하지 않았습니다. 이 금액을 받으셨나요?"
+},
+
+"rent_page_client": {
+  "loading": "데이터를 불러오는 중...",
+  "access_denied": "이 페이지에 접근할 수 있는 권한이 없습니다.",
+  "missing_company": "회사를 찾을 수 없습니다. 다시 확인해 주세요.",
+  "company": "회사",
+  "role": "역할",
+  "no_company": "등록된 회사가 없습니다"
+},
+
+"dynamic_rental_form": {
+  "loading": "양식을 불러오는 중...",
+  "confirm_button": "예약 확인",
+  "print_button": "인보이스 출력",
+  "success_title": "예약 성공!",
+  "success_desc": "예약이 성공적으로 생성되었습니다.",
+  "validation_title": "누락된 정보",
+  "validation_desc": "제출하기 전에 필요한 정보를 입력해주세요.",
+  "failed_title": "예약 실패",
+  "failed_desc": "예약 중 오류가 발생했습니다. 나중에 다시 시도해주세요."
+},
+
+"rent_bike_form_factory": {
+  "missing": "사용자 또는 회사 ID가 없습니다.",
+  "unsupported": "지원되지 않는 역할: {{role}}"
+},
+
+"rent_form_by_company": {
+  "loading": "로딩 중...",
+  "access_denied": "접근이 거부되었습니다.",
+  "title": "오토바이 대여"
 }
+
+
+
+
+
 
 
 

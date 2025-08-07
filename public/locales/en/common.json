@@ -2366,7 +2366,68 @@
   "station": "Station",
   "success": "Reported issue successfully.",
   "success_title": "Success"
+},
+
+"return_page_client": {
+  "title": "Return Vehicle",
+  "search_heading": "Search by VIN or Plate Number",
+  "search_placeholder": "Type at least 2 characters...",
+  "renter": "Renter",
+  "phone": "Phone",
+  "vehicle_id": "Vehicle ID",
+  "plate_number": "Plate Number",
+  "start": "Start Time",
+  "end": "End Time",
+  "price_per_day": "Price / Day",
+  "total": "Total Amount",
+  "deposit": "Deposit",
+  "remaining": "Remaining",
+  "extend_button": "Extend Rental",
+  "switch_button": "Switch Vehicle",
+  "return_button": "Return Vehicle",
+  "success_return": "Vehicle has been successfully returned and marked as available.",
+  "success_switch": "Successfully switched to {{vehicleID}}.",
+  "error_switch": "Failed to switch vehicle. Please try again.",
+  "confirm_title": "Confirm Remaining Balance",
+  "confirm_description": "The customer still owes {{amount}}₫. Have you collected this amount?"
+},
+
+"rent_page_client": {
+  "loading": "Loading data...",
+  "access_denied": "You do not have permission to access this page.",
+  "missing_company": "Company not found. Please check again.",
+  "company": "Company",
+  "role": "Role",
+  "no_company": "No company found"
+},
+
+"dynamic_rental_form": {
+  "loading": "Loading form...",
+  "confirm_button": "Confirm Booking",
+  "print_button": "Print Invoice",
+  "success_title": "Booking Successful!",
+  "success_desc": "Your booking has been created successfully.",
+  "validation_title": "Missing Information",
+  "validation_desc": "Please fill in the required rental information before submitting.",
+  "failed_title": "Booking Failed",
+  "failed_desc": "An error occurred while creating your booking. Please try again later."
+},
+
+"rent_bike_form_factory": {
+  "missing": "Missing user or company ID.",
+  "unsupported": "Unsupported role: {{role}}"
+},
+
+"rent_form_by_company": {
+  "loading": "Loading...",
+  "access_denied": "Access denied.",
+  "title": "Rent a Bike"
 }
+
+
+
+
+
 
 
 

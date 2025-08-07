@@ -2350,7 +2350,65 @@
   "station": "ステーション",
   "success": "問題が正常に報告されました。",
   "success_title": "成功"
+},
+
+"return_page_client": {
+  "title": "車両を返却",
+  "search_heading": "VINまたはナンバープレートで検索",
+  "search_placeholder": "2文字以上入力してください...",
+  "renter": "レンター",
+  "phone": "電話番号",
+  "vehicle_id": "車両ID",
+  "plate_number": "ナンバープレート",
+  "start": "開始時間",
+  "end": "終了時間",
+  "price_per_day": "料金 / 日",
+  "total": "合計金額",
+  "deposit": "デポジット",
+  "remaining": "未払い額",
+  "extend_button": "レンタル延長",
+  "switch_button": "車両を変更",
+  "return_button": "車両を返却",
+  "success_return": "車両は正常に返却され、利用可能としてマークされました。",
+  "success_switch": "{{vehicleID}}に正常に切り替えました。",
+  "error_switch": "車両の切り替えに失敗しました。もう一度お試しください。",
+  "confirm_title": "未払い金の確認",
+  "confirm_description": "顧客には{{amount}}₫の未払いがあります。この金額を回収しましたか？"
+},
+"rent_page_client": {
+  "loading": "データを読み込み中...",
+  "access_denied": "このページへのアクセス権限がありません。",
+  "missing_company": "会社が見つかりません。もう一度ご確認ください。",
+  "company": "会社",
+  "role": "役割",
+  "no_company": "会社が登録されていません"
+},
+
+"dynamic_rental_form": {
+  "loading": "フォームを読み込み中...",
+  "confirm_button": "予約を確定する",
+  "print_button": "請求書を印刷",
+  "success_title": "予約が完了しました！",
+  "success_desc": "予約が正常に作成されました。",
+  "validation_title": "情報が不足しています",
+  "validation_desc": "送信する前に必要な情報を入力してください。",
+  "failed_title": "予約に失敗しました",
+  "failed_desc": "予約中にエラーが発生しました。後でもう一度お試しください。"
+},
+
+"rent_bike_form_factory": {
+  "missing": "ユーザーまたは会社IDが見つかりません。",
+  "unsupported": "サポートされていない役割: {{role}}"
+},
+
+"rent_form_by_company": {
+  "loading": "読み込み中...",
+  "access_denied": "アクセスが拒否されました。",
+  "title": "バイクをレンタル"
 }
+
+
+
 
 
 

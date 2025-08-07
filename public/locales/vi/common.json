@@ -2365,7 +2365,7 @@
 },
 
 "report_issue_form": {
-  "select_vehicle_label": "Chọn xe (VIN)",
+  "select_vehicle_label": "Chọn xe (Số khung, Biển số)",
   "select_vehicle_placeholder": "Chọn xe",
   "search_vehicle_placeholder": "Tìm xe...",
   "no_vehicle_found": "Không tìm thấy xe nào",
@@ -2392,7 +2392,67 @@
     "station": "Trạm",
     "success": "Đã gửi báo cáo sự cố thành công.",
     "success_title": "Thành công"
-  }
+  },
+
+"return_page_client": {
+  "title": "Trả xe",
+  "search_heading": "Tìm theo số khung hoặc biển số",
+  "search_placeholder": "Nhập ít nhất 2 ký tự...",
+  "renter": "Người thuê",
+  "phone": "Số điện thoại",
+  "vehicle_id": "Mã xe",
+  "plate_number": "Biển số",
+  "start": "Thời gian bắt đầu",
+  "end": "Thời gian kết thúc",
+  "price_per_day": "Giá / ngày",
+  "total": "Tổng tiền",
+  "deposit": "Đặt cọc",
+  "remaining": "Còn nợ",
+  "extend_button": "Gia hạn thuê",
+  "switch_button": "Đổi xe khác",
+  "return_button": "Trả xe",
+  "success_return": "Xe đã được trả thành công và chuyển về trạng thái sẵn sàng.",
+  "success_switch": "Chuyển xe thành công sang {{vehicleID}}.",
+  "error_switch": "Không thể chuyển xe. Vui lòng thử lại.",
+  "confirm_title": "Xác nhận còn nợ",
+  "confirm_description": "Khách hàng còn nợ {{amount}}₫. Bạn đã thu khoản này chưa?"
+},
+
+"rent_page_client": {
+  "loading": "Đang tải dữ liệu...",
+  "access_denied": "Bạn không có quyền truy cập.",
+  "missing_company": "Không tìm thấy công ty. Vui lòng kiểm tra lại.",
+  "company": "Công ty",
+  "role": "Vai trò",
+  "no_company": "Chưa có công ty"
+},
+
+"dynamic_rental_form": {
+  "loading": "Đang tải biểu mẫu...",
+  "confirm_button": "Xác nhận thuê xe",
+  "print_button": "In hóa đơn",
+  "success_title": "Thuê xe thành công!",
+  "success_desc": "Đơn thuê xe của bạn đã được tạo thành công.",
+  "validation_title": "Thiếu thông tin",
+  "validation_desc": "Vui lòng điền đầy đủ thông tin cần thiết trước khi gửi.",
+  "failed_title": "Thuê xe thất bại",
+  "failed_desc": "Có lỗi xảy ra khi tạo đơn thuê. Vui lòng thử lại sau."
+},
+
+"rent_bike_form_factory": {
+  "missing": "Thiếu thông tin người dùng hoặc mã công ty.",
+  "unsupported": "Vai trò không được hỗ trợ: {{role}}"
+},
+
+"rent_form_by_company": {
+  "loading": "Đang tải dữ liệu...",
+  "access_denied": "Bạn không có quyền truy cập.",
+  "title": "Thuê xe"
+}
+
+
+
+
 
 
 
