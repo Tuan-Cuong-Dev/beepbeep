@@ -2355,7 +2355,19 @@
   "brake_issue": "🛑 Brake Issue",
   "motor_problem": "⚡ Motor Problem",
   "other_issue": "❓ Other"
+},
+
+"report_issue_client": {
+  "loading": "Loading company information...",
+  "title": "Cannot Report Issue",
+  "missing_company": "Missing company information. Please make sure you are assigned to a company or select one first.",
+  "heading": "Report Vehicle Issue",
+  "company": "Company",
+  "station": "Station",
+  "success": "Reported issue successfully.",
+  "success_title": "Success"
 }
+
 
 
 

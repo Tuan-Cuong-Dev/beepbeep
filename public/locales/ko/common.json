@@ -2354,6 +2354,17 @@
   "brake_issue": "🛑 브레이크 문제",
   "motor_problem": "⚡ 모터 문제",
   "other_issue": "❓ 기타"
+},
+
+"report_issue_client": {
+  "loading": "회사 정보를 불러오는 중...",
+  "title": "문제를 보고할 수 없습니다",
+  "missing_company": "회사 정보가 없습니다. 회사에 배정되었는지 또는 먼저 회사를 선택했는지 확인하세요.",
+  "heading": "차량 문제 신고",
+  "company": "회사",
+  "station": "지점",
+  "success": "문제가 성공적으로 신고되었습니다.",
+  "success_title": "성공"
 }
 
 

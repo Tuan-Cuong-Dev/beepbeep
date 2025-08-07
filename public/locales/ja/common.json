@@ -2339,7 +2339,19 @@
   "brake_issue": "🛑 ブレーキの問題",
   "motor_problem": "⚡ モーターの問題",
   "other_issue": "❓ その他"
+},
+
+"report_issue_client": {
+  "loading": "会社情報を読み込み中...",
+  "title": "問題を報告できません",
+  "missing_company": "会社情報が見つかりません。会社に割り当てられているか、最初に会社を選択してください。",
+  "heading": "車両の問題を報告する",
+  "company": "会社",
+  "station": "ステーション",
+  "success": "問題が正常に報告されました。",
+  "success_title": "成功"
 }
+
 
 
 

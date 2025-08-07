@@ -2381,7 +2381,18 @@
   "brake_issue": "🛑 Hỏng phanh",
   "motor_problem": "⚡ Vấn đề động cơ",
   "other_issue": "❓ Khác"
-}
+},
+
+"report_issue_client": {
+    "loading": "Đang tải thông tin công ty...",
+    "title": "Không thể báo sự cố",
+    "missing_company": "Thiếu thông tin công ty. Vui lòng đảm bảo bạn đã được gán vào công ty hoặc chọn công ty trước.",
+    "heading": "Báo cáo sự cố xe",
+    "company": "Công ty",
+    "station": "Trạm",
+    "success": "Đã gửi báo cáo sự cố thành công.",
+    "success_title": "Thành công"
+  }
 
 
 
