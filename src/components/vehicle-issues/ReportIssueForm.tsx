@@ -48,26 +48,16 @@ export default function ReportIssueForm({
   ];
 
   const filteredEbikes = useMemo(() => {
-    return ebikes.filter((bike) => (bike.vehicleID || '').toLowerCase().includes(searchText.toLowerCase()));
+    return ebikes.filter((bike) =>
+      (bike.vehicleID || '').toLowerCase().includes(searchText.toLowerCase())
+    );
   }, [searchText, ebikes]);
 
   const handleSubmit = async () => {
     const isGlobal = role === 'admin' || role === 'technician_assistant';
-
-    if (!isGlobal && (!companyId || !companyName)) {
-      alert('Company information missing.');
-      return;
-    }
-
-    if (!selectedEbike) {
-      alert(t('report_issue_form.select_vehicle_placeholder'));
-      return;
-    }
-
-    if (!issueType) {
-      alert(t('report_issue_form.select_issue_type_placeholder'));
-      return;
-    }
+    if (!isGlobal && (!companyId || !companyName)) return alert('Company information missing.');
+    if (!selectedEbike) return alert(t('report_issue_form.select_vehicle_placeholder'));
+    if (!issueType) return alert(t('report_issue_form.select_issue_type_placeholder'));
 
     setSubmitting(true);
 
@@ -104,10 +94,14 @@ export default function ReportIssueForm({
   };
 
   return (
-    <div className="space-y-8 max-w-3xl mx-auto px-4">
+    <div className="space-y-8 max-w-4xl mx-auto px-4">
+      {/* Vehicle & Issue Type */}
       <div className="flex flex-col md:flex-row md:space-x-4 space-y-6 md:space-y-0">
+        {/* Vehicle Dropdown */}
         <div className="flex-1 space-y-1">
-          <label className="text-sm font-medium text-gray-700">{t('report_issue_form.select_vehicle_label')}</label>
+          <label className="text-sm font-medium text-gray-700">
+            {t('report_issue_form.select_vehicle_label')}
+          </label>
           <div className="relative">
             <button
               className="w-full h-12 px-4 border rounded-lg bg-white text-left"
@@ -118,8 +112,9 @@ export default function ReportIssueForm({
                 : t('report_issue_form.select_vehicle_placeholder')}
               <span className="float-right">▼</span>
             </button>
+
             {ebikeDropdownOpen && (
-              <div className="absolute z-10 bg-white border rounded-lg shadow mt-2 w-full max-h-72 overflow-y-auto">
+              <div className="absolute z-10 bg-white border rounded-lg shadow mt-2 w-full min-w-[300px] max-h-72 overflow-y-auto">
                 <Input
                   className="m-2"
                   placeholder={t('report_issue_form.search_vehicle_placeholder')}
@@ -142,9 +137,7 @@ export default function ReportIssueForm({
                     )}
                   >
                     🚲 {ebike.vehicleID}
-                    <span className="text-xs text-gray-400 ml-2">
-                      Plate: {ebike.plateNumber || '-'}
-                    </span>
+                    <div className="text-xs text-gray-400">Plate: {ebike.plateNumber || '-'}</div>
                   </div>
                 ))}
               </div>
@@ -152,18 +145,22 @@ export default function ReportIssueForm({
           </div>
         </div>
 
+        {/* Issue Type Dropdown */}
         <div className="flex-1 space-y-1">
-          <label className="text-sm font-medium text-gray-700">{t('report_issue_form.select_issue_type_label')}</label>
+          <label className="text-sm font-medium text-gray-700">
+            {t('report_issue_form.select_issue_type_label')}
+          </label>
           <div className="relative">
             <button
               className="w-full h-12 px-4 border rounded-lg bg-white text-left"
               onClick={() => setIssueDropdownOpen(!issueDropdownOpen)}
             >
-              {issueType || t('report_issue_form.select_issue_type_placeholder')}
+              {issueOptions.find((opt) => opt.value === issueType)?.label || t('report_issue_form.select_issue_type_placeholder')}
               <span className="float-right">▼</span>
             </button>
+
             {issueDropdownOpen && (
-              <div className="absolute z-10 bg-white border rounded-lg shadow mt-2 w-full">
+              <div className="absolute z-10 bg-white border rounded-lg shadow mt-2 w-full min-w-[250px]">
                 {issueOptions.map((opt) => (
                   <div
                     key={opt.value}
@@ -185,18 +182,24 @@ export default function ReportIssueForm({
         </div>
       </div>
 
+      {/* Description */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">{t('report_issue_form.description_label')}</label>
+        <label className="text-sm font-medium text-gray-700">
+          {t('report_issue_form.description_label')}
+        </label>
         <Textarea
-          className="w-full text-base"
+          className="w-full text-base h-32 resize-none"
           placeholder={t('report_issue_form.description_placeholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
       </div>
 
+      {/* Submit Button */}
       <Button className="w-full h-12 text-lg" onClick={handleSubmit} disabled={submitting}>
-        {submitting ? t('report_issue_form.submitting_button') : t('report_issue_form.submit_button')}
+        {submitting
+          ? t('report_issue_form.submitting_button')
+          : t('report_issue_form.submit_button')}
       </Button>
 
       {success && (

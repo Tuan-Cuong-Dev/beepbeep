@@ -39,7 +39,7 @@ export default function ReportIssueClient() {
       <main className="flex-1 p-3 sm:p-6 space-y-8 max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-center text-gray-800">🚨 Report Vehicle Issue</h1>
 
-        <div className="text-sm text-gray-500 text-right space-y-1">
+        <div className="text-sm text-gray-500 text-center space-y-1">
           <div><strong>Company:</strong> {companyName || '—'}</div>
           {stationId && <div><strong>Station:</strong> {stationName}</div>}
         </div>
