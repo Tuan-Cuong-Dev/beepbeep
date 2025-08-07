@@ -2300,7 +2300,65 @@
   "status_joined": "참여 완료",
   "status_pending": "대기 중",
   "status_rejected": "거절됨"
+},
+
+"actual_result_popup": {
+  "title": "실제 결과 제출",
+  "solution_label": "실제 해결 방법",
+  "solution_placeholder": "문제를 해결하기 위해 실제로 수행한 방법을 입력하세요...",
+  "cost_label": "실제 비용 (VND)",
+  "cost_placeholder": "예: 500,000 ₫",
+  "cancel": "취소",
+  "submit": "제출"
+},
+
+"approve_proposal_dialog": {
+  "title": "📝 제안 승인 또는 거절",
+  "proposal": "제안 내용",
+  "estimated_cost": "예상 비용",
+  "rejection_reason_label": "거절 사유 (선택사항)",
+  "rejection_reason_placeholder": "제안을 거절하는 경우 사유를 입력하세요",
+  "cancel": "취소",
+  "reject": "거절",
+  "approve": "승인"
+},
+
+"assign_technician_form": {
+  "placeholder": "기술자를 선택하세요",
+  "assign_button": "기술자 지정",
+  "unnamed": "(이름 없음)"
+},
+
+"proposal_popup": {
+  "title": "제안 제출",
+  "solution_placeholder": "제안된 해결책",
+  "cost_placeholder": "예상 비용 (VND)",
+  "cancel": "취소",
+  "submit": "제안 제출"
+},
+
+"report_issue_form": {
+  "select_vehicle_label": "차량 선택 (VIN)",
+  "select_vehicle_placeholder": "차량 선택",
+  "search_vehicle_placeholder": "차량 검색...",
+  "no_vehicle_found": "차량을 찾을 수 없습니다",
+  "select_issue_type_label": "문제 유형 선택",
+  "select_issue_type_placeholder": "문제 유형 선택",
+  "description_label": "설명",
+  "description_placeholder": "선택 사항 설명...",
+  "submit_button": "문제 신고",
+  "submitting_button": "신고 중...",
+  "success_message": "✅ 문제가 성공적으로 신고되었습니다!",
+  "flat_tire": "🚲 펑크",
+  "battery_problem": "🔋 배터리 문제",
+  "brake_issue": "🛑 브레이크 문제",
+  "motor_problem": "⚡ 모터 문제",
+  "other_issue": "❓ 기타"
 }
+
+
+
+
 
 
 

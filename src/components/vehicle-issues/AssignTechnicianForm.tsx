@@ -6,6 +6,7 @@ import { db } from "@/src/firebaseConfig";
 import { Button } from "../ui/button";
 import { SimpleSelect } from "../ui/select";
 import { useUser } from "@/src/context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   companyId?: string; // 👈 optional
@@ -18,6 +19,7 @@ interface Technician {
 }
 
 export default function AssignTechnicianForm({ companyId, onAssign }: Props) {
+  const { t } = useTranslation('common');
   const { role } = useUser();
   const isGlobalRole = role === 'admin' || role === 'technician_assistant';
 
@@ -29,13 +31,11 @@ export default function AssignTechnicianForm({ companyId, onAssign }: Props) {
       let q;
 
       if (isGlobalRole) {
-        // ✅ Lấy tất cả kỹ thuật viên trên hệ thống
         q = query(
           collection(db, "staffs"),
           where("role", "in", ["technician", "Technician"])
         );
       } else if (companyId) {
-        // ✅ Lấy kỹ thuật viên trong công ty
         q = query(
           collection(db, "staffs"),
           where("companyId", "==", companyId),
@@ -49,14 +49,14 @@ export default function AssignTechnicianForm({ companyId, onAssign }: Props) {
       const snap = await getDocs(q);
       const techs: Technician[] = snap.docs.map(doc => ({
         userId: doc.data().userId,
-        displayName: doc.data().name || "(Unnamed Technician)",
+        displayName: doc.data().name || t('assign_technician_form.unnamed'),
       }));
 
       setTechnicians(techs);
     };
 
     fetchTechnicians();
-  }, [companyId, isGlobalRole]);
+  }, [companyId, isGlobalRole, t]);
 
   useEffect(() => {
     if (technicians.length > 0 && !selectedUserId) {
@@ -73,7 +73,7 @@ export default function AssignTechnicianForm({ companyId, onAssign }: Props) {
     <div className="space-y-4">
       <SimpleSelect
         options={options}
-        placeholder="Select Technician"
+        placeholder={t('assign_technician_form.placeholder')}
         value={selectedUserId}
         onChange={setSelectedUserId}
       />
@@ -83,7 +83,7 @@ export default function AssignTechnicianForm({ companyId, onAssign }: Props) {
         onClick={() => onAssign(selectedUserId)}
         className="w-full"
       >
-        Assign Technician
+        {t('assign_technician_form.assign_button')}
       </Button>
     </div>
   );

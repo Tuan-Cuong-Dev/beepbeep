@@ -2285,7 +2285,65 @@
   "status_joined": "参加済み",
   "status_pending": "保留中",
   "status_rejected": "拒否済み"
+},
+
+"actual_result_popup": {
+  "title": "実際の結果を送信",
+  "solution_label": "実際の解決策",
+  "solution_placeholder": "問題を解決するために実際に行った内容を記入してください...",
+  "cost_label": "実際の費用 (VND)",
+  "cost_placeholder": "例：500,000 ₫",
+  "cancel": "キャンセル",
+  "submit": "送信"
+},
+
+"approve_proposal_dialog": {
+  "title": "📝 提案の承認または却下",
+  "proposal": "提案内容",
+  "estimated_cost": "見積もり費用",
+  "rejection_reason_label": "却下の理由（任意）",
+  "rejection_reason_placeholder": "提案を却下する場合は理由を入力してください",
+  "cancel": "キャンセル",
+  "reject": "却下",
+  "approve": "承認"
+},
+
+"assign_technician_form": {
+  "placeholder": "技術者を選択",
+  "assign_button": "技術者を割り当てる",
+  "unnamed": "（名前なし）"
+},
+
+"proposal_popup": {
+  "title": "提案を提出",
+  "solution_placeholder": "提案された解決策",
+  "cost_placeholder": "予想コスト（VND）",
+  "cancel": "キャンセル",
+  "submit": "提案を送信"
+},
+
+"report_issue_form": {
+  "select_vehicle_label": "車両を選択 (VIN)",
+  "select_vehicle_placeholder": "車両を選択",
+  "search_vehicle_placeholder": "車両を検索...",
+  "no_vehicle_found": "該当する車両が見つかりません",
+  "select_issue_type_label": "問題の種類を選択",
+  "select_issue_type_placeholder": "問題の種類を選択",
+  "description_label": "説明",
+  "description_placeholder": "任意の説明を入力...",
+  "submit_button": "問題を報告する",
+  "submitting_button": "送信中...",
+  "success_message": "✅ 問題が正常に報告されました！",
+  "flat_tire": "🚲 パンク",
+  "battery_problem": "🔋 バッテリーの問題",
+  "brake_issue": "🛑 ブレーキの問題",
+  "motor_problem": "⚡ モーターの問題",
+  "other_issue": "❓ その他"
 }
+
+
+
+
 
 
 

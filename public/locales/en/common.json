@@ -2301,7 +2301,65 @@
   "status_joined": "Joined",
   "status_pending": "Pending",
   "status_rejected": "Rejected"
+},
+
+"actual_result_popup": {
+  "title": "Submit Actual Result",
+  "solution_label": "Actual Solution",
+  "solution_placeholder": "Describe the actual solution applied to fix the issue...",
+  "cost_label": "Actual Cost (VND)",
+  "cost_placeholder": "e.g. 500,000 ₫",
+  "cancel": "Cancel",
+  "submit": "Submit"
+},
+
+"approve_proposal_dialog": {
+  "title": "📝 Approve or Reject Proposal",
+  "proposal": "Proposal",
+  "estimated_cost": "Estimated Cost",
+  "rejection_reason_label": "Reason for Rejection (optional)",
+  "rejection_reason_placeholder": "Enter reason if rejecting proposal",
+  "cancel": "Cancel",
+  "reject": "Reject",
+  "approve": "Approve"
+},
+
+"assign_technician_form": {
+  "placeholder": "Select technician",
+  "assign_button": "Assign technician",
+  "unnamed": "(Unnamed)"
+},
+
+"proposal_popup": {
+  "title": "Submit Proposal",
+  "solution_placeholder": "Proposed solution",
+  "cost_placeholder": "Estimated cost (VND)",
+  "cancel": "Cancel",
+  "submit": "Submit Proposal"
+},
+
+"report_issue_form": {
+  "select_vehicle_label": "Select Vehicle (VIN)",
+  "select_vehicle_placeholder": "Select Vehicle",
+  "search_vehicle_placeholder": "Search Vehicles...",
+  "no_vehicle_found": "No Vehicles found",
+  "select_issue_type_label": "Select Issue Type",
+  "select_issue_type_placeholder": "Select Issue Type",
+  "description_label": "Description",
+  "description_placeholder": "Optional description...",
+  "submit_button": "Submit Issue",
+  "submitting_button": "Submitting...",
+  "success_message": "✅ Issue reported successfully!",
+  "flat_tire": "🚲 Flat Tire",
+  "battery_problem": "🔋 Battery Problem",
+  "brake_issue": "🛑 Brake Issue",
+  "motor_problem": "⚡ Motor Problem",
+  "other_issue": "❓ Other"
 }
+
+
+
+
 
 
 

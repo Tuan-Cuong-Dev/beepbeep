@@ -2327,18 +2327,61 @@
   "status_joined": "Đã tham gia",
   "status_pending": "Chờ duyệt",
   "status_rejected": "Từ chối"
+},
+
+"actual_result_popup":{
+  "title": "Gửi kết quả thực tế",
+  "solution_label": "Giải pháp thực tế",
+  "solution_placeholder": "Mô tả phương án thực tế đã thực hiện để sửa lỗi...",
+  "cost_label": "Chi phí thực tế (VND)",
+  "cost_placeholder": "ví dụ: 500.000 ₫",
+  "cancel": "Huỷ",
+  "submit": "Gửi"
+},
+
+"approve_proposal_dialog": {
+  "title": "📝 Duyệt hoặc Từ chối Đề xuất",
+  "proposal": "Đề xuất",
+  "estimated_cost": "Chi phí ước tính",
+  "rejection_reason_label": "Lý do từ chối (không bắt buộc)",
+  "rejection_reason_placeholder": "Nhập lý do nếu từ chối đề xuất",
+  "cancel": "Huỷ",
+  "reject": "Từ chối",
+  "approve": "Duyệt"
+},
+
+"assign_technician_form": {
+  "placeholder": "Chọn kỹ thuật viên",
+  "assign_button": "Gán kỹ thuật viên",
+  "unnamed": "(Không tên)"
+},
+
+"proposal_popup": {
+  "title": "Gửi đề xuất",
+  "solution_placeholder": "Phương án đề xuất",
+  "cost_placeholder": "Chi phí dự kiến (VNĐ)",
+  "cancel": "Huỷ",
+  "submit": "Gửi đề xuất"
+},
+
+"report_issue_form": {
+  "select_vehicle_label": "Chọn xe (VIN)",
+  "select_vehicle_placeholder": "Chọn xe",
+  "search_vehicle_placeholder": "Tìm xe...",
+  "no_vehicle_found": "Không tìm thấy xe nào",
+  "select_issue_type_label": "Chọn loại sự cố",
+  "select_issue_type_placeholder": "Chọn loại sự cố",
+  "description_label": "Mô tả",
+  "description_placeholder": "Mô tả chi tiết (không bắt buộc)...",
+  "submit_button": "Gửi sự cố",
+  "submitting_button": "Đang gửi...",
+  "success_message": "✅ Gửi sự cố thành công!",
+  "flat_tire": "🚲 Xì lốp",
+  "battery_problem": "🔋 Vấn đề về pin",
+  "brake_issue": "🛑 Hỏng phanh",
+  "motor_problem": "⚡ Vấn đề động cơ",
+  "other_issue": "❓ Khác"
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

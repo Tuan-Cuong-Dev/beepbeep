@@ -92,7 +92,12 @@ export default function VehicleIssueTable({
     } else {
       if (issue.status === 'proposed') {
         buttons.push(
-          <Button key="approve" size="sm" variant="outline" onClick={() => setApprovingProposal(issue)}>
+          <Button
+            key="approve"
+            size="sm"
+            variant="outline"
+            onClick={() => setApprovingProposal(issue)}
+          >
             {t('vehicle_issue_table.approve_proposal')}
           </Button>
         );
@@ -108,13 +113,13 @@ export default function VehicleIssueTable({
               setCloseDialogOpen(true);
             }}
           >
-            {t('vehicle_issue_table.close_issue')}
+            {t('vehicle_issue_table.close')}
           </Button>
         );
       }
     }
 
-    // ✅ "Xem đề xuất" - màu xanh, kiểu ghost
+    // ✅ "Xem đề xuất"
     if (issue.proposedSolution) {
       buttons.push(
         <Button
@@ -129,7 +134,7 @@ export default function VehicleIssueTable({
       );
     }
 
-    // ✅ "Chỉnh sửa" - outline xanh
+    // ✅ "Chỉnh sửa"
     buttons.push(
       <Button
         key="edit"
@@ -146,11 +151,12 @@ export default function VehicleIssueTable({
     );
 
     return buttons.length > 0 ? (
-      <div className="flex flex-wrap gap-2">{buttons}</div>
+      <div className="flex flex-nowrap gap-2 overflow-x-auto max-w-full">{buttons}</div>
     ) : (
       <span className="text-gray-400 italic">{t('vehicle_issue_table.no_actions')}</span>
     );
   };
+
 
 
   return (
