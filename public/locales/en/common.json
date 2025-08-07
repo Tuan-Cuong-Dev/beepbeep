@@ -2211,7 +2211,7 @@
     "detected_coords": "📌 Detected: {{lat}}° N, {{lng}}° E"
   },
 
-"station_form": {
+"rental_station_form": {
   "edit_title": "Edit Station",
   "station_name": "Station Name",
   "display_address": "Display Address",
@@ -2221,11 +2221,58 @@
   "status_label": "Status",
   "status_active": "Active",
   "status_inactive": "Inactive",
-  "detecting_coords": "📍 Detecting location..."
+  "detecting_coords": "📍 Detecting location...",
+  "actions": {
+    "cancel": "Cancel",
+    "save_changes": "Save Changes"
+  }
 },
-"actions": {
-  "cancel": "Cancel",
-  "save_changes": "Save Changes"
+
+"programs_page": {
+  "title": "Programs",
+  "create_button": "Create New Program",
+  "no_programs": "No programs available.",
+  "joined": "Joined",
+  "join_button": "Join Program",
+  "view_participants": "View Participants",
+  "delete_button": "Delete",
+  "status": {
+    "inactive": "Inactive",
+    "upcoming": "Upcoming",
+    "ended": "Ended",
+    "active": "Active"
+  }
+},
+
+"programs_form_page":{
+  "title": "Create Program",
+  "placeholders": {
+    "title": "Program Title",
+    "description": "Enter detailed program information, e.g., for new customers, model-based discounts, applicable stations, etc.",
+    "discount": "Discount Price (VND)",
+    "select_company": "Select Company"
+  },
+  "labels": {
+    "select_stations": "Select Stations (optional)",
+    "set_discounts": "Set Discount Price per Model",
+    "start_date": "Start Date",
+    "end_date": "End Date"
+  },
+  "buttons": {
+    "submit": "Submit Program",
+    "saving": "Saving..."
+  },
+  "messages": {
+    "success": "Program created successfully!",
+    "error": "Error saving program."
+  },
+  "notification": {
+    "success": "Success",
+    "error": "Error"
+  },
+  "validation": {
+    "fill_required": "Please fill in all required fields."
+  }
 }
 
 

@@ -158,16 +158,6 @@ export default function StationManagementPage() {
                   </ul>
                 )}
               </div>
-
-              {stations.length > 0 && (
-                <div className="pt-10 border-t border-gray-300 space-y-4">
-                  <Link href="/ebikeManagement">
-                    <Button className="bg-[#00d289] hover:bg-[#00b67a] text-white rounded px-6 py-2 shadow-md">
-                      {t('station_management_page.add_model')}
-                    </Button>
-                  </Link>
-                </div>
-              )}
             </>
           ) : (
             <p className="text-center text-red-600">{t('station_management_page.no_company')}</p>

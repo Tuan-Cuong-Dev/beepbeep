@@ -2252,7 +2252,57 @@
     "cancel": "Hủy",
     "save_changes": "Lưu thay đổi"
   }
+},
+
+"programs_page": {
+  "title": "Chương trình khuyến mãi",
+  "subtitle": "Nhằm kích thích sự tham gia của CTV để phát triển doanh số",
+  "create_button": "Tạo chương trình mới",
+  "no_programs": "Hiện chưa có chương trình nào.",
+  "joined": "Đã tham gia",
+  "join_button": "Tham gia chương trình",
+  "view_participants": "Xem người tham gia",
+  "delete_button": "Xóa",
+  "status": {
+    "inactive": "Không hoạt động",
+    "upcoming": "Sắp diễn ra",
+    "ended": "Đã kết thúc",
+    "active": "Đang diễn ra"
+  }
+},
+
+"programs_form_page": {
+  "title": "Tạo Chương Trình",
+  "placeholders": {
+    "title": "Tiêu đề chương trình",
+    "description": "Nhập mô tả chi tiết về chương trình, ví dụ: dành cho khách mới, giảm giá theo mẫu xe, áp dụng tại trạm nào...",
+    "discount": "Giá ưu đãi (VND)",
+    "select_company": "Chọn công ty"
+  },
+  "labels": {
+    "select_stations": "Chọn trạm (không bắt buộc)",
+    "set_discounts": "Thiết lập giá ưu đãi theo mẫu xe",
+    "start_date": "Ngày bắt đầu",
+    "end_date": "Ngày kết thúc"
+  },
+  "buttons": {
+    "submit": "Gửi chương trình",
+    "saving": "Đang lưu..."
+  },
+  "messages": {
+    "success": "Tạo chương trình thành công!",
+    "error": "Có lỗi khi lưu chương trình."
+  },
+  "notification": {
+    "success": "Thành công",
+    "error": "Lỗi"
+  },
+  "validation": {
+    "fill_required": "Vui lòng điền đầy đủ các trường bắt buộc."
+  }
 }
+
+
 
 
 

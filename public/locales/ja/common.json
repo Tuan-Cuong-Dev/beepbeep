@@ -2211,7 +2211,55 @@
     "cancel": "キャンセル",
     "save_changes": "変更を保存"
   }
+},
+
+"programs_page": {
+  "title": "プログラム",
+  "create_button": "新しいプログラムを作成",
+  "no_programs": "利用可能なプログラムはありません。",
+  "joined": "参加済み",
+  "join_button": "プログラムに参加",
+  "view_participants": "参加者を見る",
+  "delete_button": "削除",
+  "status": {
+    "inactive": "非アクティブ",
+    "upcoming": "近日開始",
+    "ended": "終了済み",
+    "active": "実施中"
+  }
+},
+
+"programs_form_page": {
+  "title": "プログラムの作成",
+  "placeholders": {
+    "title": "プログラムのタイトル",
+    "description": "プログラムの詳細を入力してください（例：新規顧客向け、モデル別割引、適用ステーションなど）",
+    "discount": "割引価格（VND）",
+    "select_company": "会社を選択"
+  },
+  "labels": {
+    "select_stations": "ステーションを選択（任意）",
+    "set_discounts": "モデルごとの割引価格を設定",
+    "start_date": "開始日",
+    "end_date": "終了日"
+  },
+  "buttons": {
+    "submit": "プログラムを送信",
+    "saving": "保存中..."
+  },
+  "messages": {
+    "success": "プログラムが正常に作成されました！",
+    "error": "プログラムの保存中にエラーが発生しました。"
+  },
+  "notification": {
+    "success": "成功",
+    "error": "エラー"
+  },
+  "validation": {
+    "fill_required": "必須項目をすべて入力してください。"
+  }
 }
+
 
 
 

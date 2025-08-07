@@ -13,9 +13,13 @@ import { Textarea } from '@/src/components/ui/textarea';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { SimpleSelect } from '@/src/components/ui/select';
 import { stringToTimestamp } from '@/src/utils/date';
+import { formatCurrency } from '@/src/utils/formatCurrency';
+import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
 import { ProgramType } from '@/src/lib/programs/programsType';
+import { useTranslation } from 'react-i18next';
 
 export default function ProgramsFormPage() {
+  const { t } = useTranslation('common');
   const { user, role, companyId } = useUser();
   const router = useRouter();
 
@@ -35,7 +39,6 @@ export default function ProgramsFormPage() {
   const isAdmin = role === 'Admin';
   const isCompanyRole = role === 'company_owner' || role === 'private_provider';
 
-  // Fetch Companies nếu là Admin
   useEffect(() => {
     if (isAdmin) {
       getDocs(collection(db, 'rentalCompanies')).then(snapshot => {
@@ -47,7 +50,6 @@ export default function ProgramsFormPage() {
     }
   }, [isAdmin, isCompanyRole, companyId]);
 
-  // Fetch Stations + Models khi có Company
   useEffect(() => {
     if (!selectedCompanyId) return;
 
@@ -64,7 +66,7 @@ export default function ProgramsFormPage() {
 
   const handleSubmit = async () => {
     if (!title || !description || !selectedCompanyId || Object.keys(selectedModelDiscounts).length === 0) {
-      setNotification({ type: 'error', message: 'Please fill in all required fields.' });
+      setNotification({ type: 'error', message: t('programs_form_page.validation.fill_required') });
       return;
     }
 
@@ -73,13 +75,18 @@ export default function ProgramsFormPage() {
     try {
       const programType: ProgramType = isCompanyRole ? 'rental_program' : 'agent_program';
 
+      const parsedDiscounts: Record<string, number> = {};
+      Object.entries(selectedModelDiscounts).forEach(([modelId, value]) => {
+        parsedDiscounts[modelId] = parseCurrencyString(value);
+      });
+
       await addDoc(collection(db, 'programs'), {
         title,
         description,
         type: programType,
         companyId: selectedCompanyId,
         stationIds: selectedStationIds,
-        modelDiscounts: selectedModelDiscounts,
+        modelDiscounts: parsedDiscounts,
         startDate: stringToTimestamp(startDate),
         endDate: stringToTimestamp(endDate),
         createdByUserId: user?.uid,
@@ -89,11 +96,11 @@ export default function ProgramsFormPage() {
         updatedAt: serverTimestamp(),
       });
 
-      setNotification({ type: 'success', message: 'Program created successfully!' });
+      setNotification({ type: 'success', message: t('programs_form_page.messages.success') });
       setTimeout(() => router.push('/dashboard/programs'), 1000);
     } catch (err) {
       console.error(err);
-      setNotification({ type: 'error', message: 'Error saving program.' });
+      setNotification({ type: 'error', message: t('programs_form_page.messages.error') });
     } finally {
       setIsSubmitting(false);
     }
@@ -110,23 +117,23 @@ export default function ProgramsFormPage() {
       <Header />
 
       <div className="max-w-2xl mx-auto p-6 space-y-6">
-        <h1 className="text-2xl font-bold">Create Program</h1>
+        <h1 className="text-2xl font-bold">{t('programs_form_page.title')}</h1>
 
         {isAdmin && (
           <SimpleSelect
             options={companies.map(c => ({ value: c.id, label: c.name }))}
-            placeholder="Select Company"
+            placeholder={t('programs_form_page.placeholders.select_company')}
             value={selectedCompanyId ?? ''}
             onChange={(val) => setSelectedCompanyId(val)}
           />
         )}
 
-        <Input placeholder="Program Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+        <Input placeholder={t('programs_form_page.placeholders.title')} value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Textarea placeholder={t('programs_form_page.placeholders.description')} value={description} onChange={(e) => setDescription(e.target.value)} />
 
         {stations.length > 0 && (
           <div>
-            <h3 className="font-semibold mb-2">Select Stations (optional)</h3>
+            <h3 className="font-semibold mb-2">{t('programs_form_page.labels.select_stations')}</h3>
             <div className="grid grid-cols-2 gap-2">
               {stations.map(station => (
                 <Button
@@ -143,16 +150,17 @@ export default function ProgramsFormPage() {
 
         {models.length > 0 && (
           <div>
-            <h3 className="font-semibold mb-2">Set Discount Price per Model</h3>
+            <h3 className="font-semibold mb-2">{t('programs_form_page.labels.set_discounts')}</h3>
             {models.map(model => (
               <div key={model.id} className="flex gap-2 items-center mb-2">
                 <div className="w-1/3">{model.name}</div>
                 <Input
-                  placeholder="Discount Price (VND)"
+                  placeholder={t('programs_form_page.placeholders.discount')}
                   value={selectedModelDiscounts[model.id] ?? ''}
-                  onChange={(e) =>
-                    setSelectedModelDiscounts(prev => ({ ...prev, [model.id]: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    const formatted = formatCurrency(parseCurrencyString(e.target.value));
+                    setSelectedModelDiscounts(prev => ({ ...prev, [model.id]: formatted }))
+                  }}
                 />
               </div>
             ))}
@@ -160,12 +168,22 @@ export default function ProgramsFormPage() {
         )}
 
         <div className="flex gap-4">
-          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          <div className="w-1/2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('programs_form_page.labels.start_date')}
+            </label>
+            <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          </div>
+          <div className="w-1/2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('programs_form_page.labels.end_date')}
+            </label>
+            <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          </div>
         </div>
 
         <Button onClick={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : 'Submit Program'}
+          {isSubmitting ? t('programs_form_page.buttons.saving') : t('programs_form_page.buttons.submit')}
         </Button>
       </div>
 
@@ -175,7 +193,7 @@ export default function ProgramsFormPage() {
         <NotificationDialog
           open={true}
           type={notification.type}
-          title={notification.type === 'success' ? 'Success' : 'Error'}
+          title={t(`programs_form_page.notification.${notification.type}`)}
           description={notification.message}
           onClose={() => setNotification(null)}
         />
