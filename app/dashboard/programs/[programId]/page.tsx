@@ -3,12 +3,23 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@/src/context/AuthContext';
 import { useParams } from 'next/navigation';
-import { collection, doc, getDoc, getDocs, query, where, addDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  addDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Button } from '@/src/components/ui/button';
 import { getDistance } from 'geolib';
+import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Program {
   id: string;
@@ -23,6 +34,7 @@ interface Program {
 }
 
 export default function ProgramDetailPage() {
+  const { t } = useTranslation('common');
   const { user, role } = useUser();
   const params = useParams();
   const programId = params?.programId as string;
@@ -44,7 +56,6 @@ export default function ProgramDetailPage() {
       const programData = { id: programSnap.id, ...programSnap.data() } as Program;
       setProgram(programData);
 
-      // Company
       if (programData.companyId) {
         const companySnap = await getDoc(doc(db, 'rentalCompanies', programData.companyId));
         if (companySnap.exists()) {
@@ -52,7 +63,6 @@ export default function ProgramDetailPage() {
         }
       }
 
-      // Models
       const modelsSnap = await getDocs(query(collection(db, 'ebikeModels'), where('companyId', '==', programData.companyId)));
       const modelsMap = modelsSnap.docs.reduce((acc, doc) => {
         acc[doc.id] = doc.data().name;
@@ -60,17 +70,14 @@ export default function ProgramDetailPage() {
       }, {} as Record<string, string>);
       setModels(modelsMap);
 
-      // Stations
       const stationsSnap = await getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', programData.companyId)));
       setStations(stationsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-      // Agent
       const agentSnap = await getDocs(query(collection(db, 'agents'), where('ownerId', '==', user.uid)));
       if (!agentSnap.empty) {
         setAgent(agentSnap.docs[0].data());
       }
 
-      // Check join
       const joinedSnap = await getDocs(query(collection(db, 'programParticipants'), where('programId', '==', programId), where('userId', '==', user.uid)));
       if (!joinedSnap.empty) {
         setJoined(true);
@@ -117,21 +124,30 @@ export default function ProgramDetailPage() {
       <Header />
       <main className="flex-1 px-6 py-10 space-y-8 max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold">🎯 {program.title}</h1>
-        <p className="text-gray-600">Áp dụng đến hết ngày {program.endDate?.toDate?.().toLocaleDateString()}</p>
+        <p className="text-gray-600">
+          {t('program_detail_page.active_until', { date: program.endDate?.toDate?.().toLocaleDateString() })}
+        </p>
 
         <div className="space-y-3 text-gray-700">
-          <p>📅 <strong>Period:</strong> {program.startDate?.toDate?.().toLocaleDateString()} → {program.endDate?.toDate?.().toLocaleDateString()}</p>
+          <p>
+            {t('program_detail_page.period', {
+              start: program.startDate?.toDate?.().toLocaleDateString(),
+              end: program.endDate?.toDate?.().toLocaleDateString(),
+            })}
+          </p>
 
           {company && (
-            <p>🏢 <strong>Company:</strong> {company.name} ({company.email || 'No email'})</p>
+            <p>{t('program_detail_page.company_info', { name: company.name, email: company.email || 'N/A' })}</p>
           )}
 
           {program.modelDiscounts && (
             <>
-              <p>🚲 <strong>Discount Models:</strong></p>
+              <p>{t('program_detail_page.discount_models')}</p>
               <ul className="list-disc ml-6">
                 {Object.entries(program.modelDiscounts).map(([modelId, price]) => (
-                  <li key={modelId}>{models[modelId] || modelId}: {price} VND</li>
+                  <li key={modelId}>
+                    {models[modelId] || modelId}: {formatCurrency(price)}
+                  </li>
                 ))}
               </ul>
             </>
@@ -139,7 +155,7 @@ export default function ProgramDetailPage() {
 
           {stations.length > 0 && (
             <>
-              <p>📍 <strong>Stations áp dụng:</strong></p>
+              <p>{t('program_detail_page.stations_applied')}</p>
               <ul className="list-disc ml-6">
                 {stations.map(station => (
                   <li key={station.id}>
@@ -153,9 +169,11 @@ export default function ProgramDetailPage() {
 
         <div>
           {joined ? (
-            <p className="text-green-600 font-semibold">✅ Bạn đã tham gia chương trình này</p>
+            <p className="text-green-600 font-semibold">
+              {t('program_detail_page.already_joined')}
+            </p>
           ) : (
-            <Button onClick={handleJoin}>Join Program</Button>
+            <Button onClick={handleJoin}>{t('program_detail_page.join_button')}</Button>
           )}
         </div>
       </main>

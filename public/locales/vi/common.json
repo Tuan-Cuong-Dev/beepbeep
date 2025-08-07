@@ -2300,7 +2300,36 @@
   "validation": {
     "fill_required": "Vui lòng điền đầy đủ các trường bắt buộc."
   }
+},
+
+"program_detail_page": {
+  "title": "Chi tiết chương trình",
+  "active_until": "Áp dụng đến hết ngày {{date}}",
+  "period": "📅 Thời gian áp dụng: {{start}} → {{end}}",
+  "company_info": "🏢 Công ty: {{name}} ({{email}})",
+  "discount_models": "🚲 Các mẫu xe được giảm giá:",
+  "stations_applied": "📍 Trạm áp dụng:",
+  "already_joined": "✅ Bạn đã tham gia chương trình này",
+  "join_button": "Tham gia chương trình"
+},
+
+"program_participants_page": {
+  "title": "Người tham gia chương trình",
+  "no_participants": "Chưa có người tham gia.",
+  "name": "Tên",
+  "phone": "Số điện thoại",
+  "address": "Địa chỉ",
+  "role": "Vai trò",
+  "status": "Trạng thái",
+  "role_agent": "Cộng tác viên",
+  "role_customer": "Khách hàng",
+  "role_staff": "Nhân viên",
+  "status_joined": "Đã tham gia",
+  "status_pending": "Chờ duyệt",
+  "status_rejected": "Từ chối"
 }
+
+
 
 
 

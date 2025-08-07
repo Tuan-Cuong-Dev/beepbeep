@@ -2258,7 +2258,36 @@
   "validation": {
     "fill_required": "必須項目をすべて入力してください。"
   }
+},
+
+"program_detail_page": {
+  "title": "プログラムの詳細",
+  "active_until": "有効期限: {{date}} まで",
+  "period": "📅 期間: {{start}} → {{end}}",
+  "company_info": "🏢 会社: {{name}} ({{email}})",
+  "discount_models": "🚲 割引対象モデル:",
+  "stations_applied": "📍 適用ステーション:",
+  "already_joined": "✅ このプログラムに参加済みです",
+  "join_button": "プログラムに参加する"
+},
+
+"program_participants_page": {
+  "title": "プログラム参加者",
+  "no_participants": "まだ参加者がいません。",
+  "name": "名前",
+  "phone": "電話番号",
+  "address": "住所",
+  "role": "役割",
+  "status": "ステータス",
+  "role_agent": "代理店",
+  "role_customer": "顧客",
+  "role_staff": "スタッフ",
+  "status_joined": "参加済み",
+  "status_pending": "保留中",
+  "status_rejected": "拒否済み"
 }
+
+
 
 
 

@@ -2273,7 +2273,36 @@
   "validation": {
     "fill_required": "필수 항목을 모두 입력해 주세요."
   }
+},
+
+"program_detail_page": {
+  "title": "프로그램 상세",
+  "active_until": "적용 기한: {{date}} 까지",
+  "period": "📅 기간: {{start}} → {{end}}",
+  "company_info": "🏢 회사: {{name}} ({{email}})",
+  "discount_models": "🚲 할인 대상 모델:",
+  "stations_applied": "📍 적용 스테이션:",
+  "already_joined": "✅ 이 프로그램에 이미 참여하셨습니다",
+  "join_button": "프로그램에 참여하기"
+},
+
+"program_participants_page": {
+  "title": "프로그램 참가자",
+  "no_participants": "아직 참가자가 없습니다.",
+  "name": "이름",
+  "phone": "전화번호",
+  "address": "주소",
+  "role": "역할",
+  "status": "상태",
+  "role_agent": "에이전트",
+  "role_customer": "고객",
+  "role_staff": "직원",
+  "status_joined": "참여 완료",
+  "status_pending": "대기 중",
+  "status_rejected": "거절됨"
 }
+
+
 
 
 

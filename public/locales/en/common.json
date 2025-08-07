@@ -2273,7 +2273,36 @@
   "validation": {
     "fill_required": "Please fill in all required fields."
   }
+},
+
+"program_detail_page": {
+    "page_title": "🎯 {{title}}",
+    "valid_until": "Valid until {{date}}",
+    "period": "📅 Period: {{start}} → {{end}}",
+    "company": "🏢 Company: {{name}} ({{email}})",
+    "no_email": "No email",
+    "discount_models": "🚲 Discounted Models:",
+    "stations_applied": "📍 Applicable Stations:",
+    "joined": "✅ You have already joined this program",
+    "join_button": "Join Program"
+  },
+
+  "program_participants_page": {
+  "title": "Program Participants",
+  "no_participants": "No participants yet.",
+  "name": "Name",
+  "phone": "Phone",
+  "address": "Address",
+  "role": "Role",
+  "status": "Status",
+  "role_agent": "Agent",
+  "role_customer": "Customer",
+  "role_staff": "Staff",
+  "status_joined": "Joined",
+  "status_pending": "Pending",
+  "status_rejected": "Rejected"
 }
+
 
 
 
