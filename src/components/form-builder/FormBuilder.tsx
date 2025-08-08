@@ -21,20 +21,12 @@ import {
 } from '@/src/lib/services/Configirations/formConfigurationService';
 import { DEFAULT_FORM_CONFIG } from '@/src/lib/formConfigurations/defaultFormConfiguration';
 
+const fieldTypes: FormFieldType[] = ['text', 'number', 'date', 'textarea', 'checkbox', 'select', 'upload'];
+
 interface Props {
   companyId: string;
   userId: string;
 }
-
-const fieldTypes: FormFieldType[] = [
-  'text',
-  'number',
-  'date',
-  'textarea',
-  'checkbox',
-  'select',
-  'upload',
-];
 
 export default function FormBuilder({ companyId, userId }: Props) {
   const { t } = useTranslation('common');
@@ -46,104 +38,94 @@ export default function FormBuilder({ companyId, userId }: Props) {
     getFormConfigurationByCompanyId(companyId).then(setConfig);
   }, [companyId]);
 
-  const updateSectionTitle = (sectionId: string, newTitle: string) => {
+  const updateSection = (sectionId: string, updater: (section: FormSection) => FormSection) => {
     if (!config) return;
-    setConfig({
-      ...config,
-      sections: config.sections.map(section =>
-        section.id === sectionId ? { ...section, title: newTitle } : section
+    setConfig(prev => ({
+      ...prev!,
+      sections: prev!.sections.map(section =>
+        section.id === sectionId ? updater(section) : section
       ),
-    });
+    }));
   };
 
   const addSection = () => {
     const newSection: FormSection = {
       id: uuidv4(),
-      title: t('form_builder.new_section'),
+      title: t('form_builder.new_section', { defaultValue: 'New Section' }),
       fields: [],
     };
-    setConfig(prev =>
-      prev ? { ...prev, sections: [...prev.sections, newSection] } : prev
-    );
+    setConfig(prev => prev && { ...prev, sections: [...prev.sections, newSection] });
   };
 
   const addField = (sectionId: string) => {
     const newField: FormField = {
       key: `field_${Date.now()}`,
-      label: t('form_builder.new_field'),
+      label: t('form_builder.new_field', { defaultValue: 'New Field' }),
       type: 'text',
       required: false,
       visible: true,
     };
-    updateSection(sectionId, section =>
-      ({ ...section, fields: [...section.fields, newField] })
-    );
+    updateSection(sectionId, s => ({ ...s, fields: [...s.fields, newField] }));
   };
 
-  const updateField = (
-    sectionId: string,
-    fieldIndex: number,
-    updated: Partial<FormField>
-  ) => {
-    updateSection(sectionId, section => ({
-      ...section,
-      fields: section.fields.map((field, idx) =>
-        idx === fieldIndex ? { ...field, ...updated } : field
-      ),
+  const updateField = (sectionId: string, fieldIndex: number, updates: Partial<FormField>) => {
+    updateSection(sectionId, s => ({
+      ...s,
+      fields: s.fields.map((f, i) => (i === fieldIndex ? { ...f, ...updates } : f)),
     }));
   };
 
   const removeField = (sectionId: string, fieldIndex: number) => {
-    updateSection(sectionId, section => ({
-      ...section,
-      fields: section.fields.filter((_, idx) => idx !== fieldIndex),
+    updateSection(sectionId, s => ({
+      ...s,
+      fields: s.fields.filter((_, i) => i !== fieldIndex),
     }));
   };
 
-  const updateSection = (
-    sectionId: string,
-    updater: (section: FormSection) => FormSection
-  ) => {
-    if (!config) return;
-    setConfig({
-      ...config,
-      sections: config.sections.map(section =>
-        section.id === sectionId ? updater(section) : section
-      ),
-    });
+  const updateSectionTitle = (sectionId: string, newTitle: string) => {
+    updateSection(sectionId, s => ({ ...s, title: newTitle }));
   };
 
   const resetToDefault = () => {
-    const translatedConfig: FormConfiguration = {
+    const translated: FormConfiguration = {
       ...DEFAULT_FORM_CONFIG,
       sections: DEFAULT_FORM_CONFIG.sections.map(section => ({
         ...section,
-        title: t(`form_configuration.section_titles.${section.id}`, {
-          defaultValue: section.title,
-        }),
+        title: t(`form_configuration.section_titles.${section.id}`, { defaultValue: section.title }),
         fields: section.fields.map(field => ({
           ...field,
-          label: t(`form_configuration.fields.${field.key}`, {
-            defaultValue: field.label,
-          }),
+          label: t(`form_configuration.fields.${field.key}`, { defaultValue: field.label }),
           options: field.options?.map(opt =>
             t(`form_configuration.options.${opt}`, { defaultValue: opt })
           ),
         })),
       })),
     };
-    setConfig(translatedConfig);
+    setConfig(translated);
+  };
+
+  const removeUndefined = (obj: any): any => {
+    if (Array.isArray(obj)) return obj.map(removeUndefined);
+    if (obj && typeof obj === 'object') {
+      return Object.fromEntries(
+        Object.entries(obj)
+          .filter(([, v]) => v !== undefined)
+          .map(([k, v]) => [k, removeUndefined(v)])
+      );
+    }
+    return obj;
   };
 
   const save = async () => {
     if (!config) return;
     setSaving(true);
-    await saveFormConfiguration({ ...config, createdBy: userId, companyId });
+    const cleaned = removeUndefined({ ...config, createdBy: userId, companyId });
+    await saveFormConfiguration(cleaned);
     setSaving(false);
     setShowSuccess(true);
   };
 
-  if (!config) return <div>{t('form_builder.loading')}</div>;
+  if (!config) return <div>{t('form_builder.loading', { defaultValue: 'Loading...' })}</div>;
 
   return (
     <div className="space-y-6 p-4">
@@ -154,67 +136,60 @@ export default function FormBuilder({ companyId, userId }: Props) {
             onChange={e => updateSectionTitle(section.id, e.target.value)}
             className="text-lg font-semibold"
           />
-
           {section.fields.map((field, index) => (
             <div key={field.key} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-end">
               <Input
-                value={field.label}
+                value={field.label || ''}
                 onChange={e => updateField(section.id, index, { label: e.target.value })}
-                placeholder={t('form_builder.field_label')}
+                placeholder={t('form_builder.field_label', { defaultValue: 'Field Label' })}
               />
-
               <SimpleSelect
                 options={fieldTypes.map(type => ({ label: type, value: type }))}
                 value={field.type}
                 onChange={val => updateField(section.id, index, { type: val as FormFieldType })}
               />
-
               <CheckboxWithLabel
-                label={t('form_builder.required')}
-                checked={field.required}
-                onChange={val => updateField(section.id, index, { required: Boolean(val) })}
+                label={t('form_builder.required', { defaultValue: 'Required' })}
+                checked={!!field.required}
+                onChange={val => updateField(section.id, index, { required: val })}
               />
-
               <CheckboxWithLabel
-                label={t('form_builder.visible')}
-                checked={field.visible}
-                onChange={val => updateField(section.id, index, { visible: Boolean(val) })}
+                label={t('form_builder.visible', { defaultValue: 'Visible' })}
+                checked={!!field.visible}
+                onChange={val => updateField(section.id, index, { visible: val })}
               />
-
               <Button variant="destructive" onClick={() => removeField(section.id, index)}>
-                {t('form_builder.delete')}
+                {t('form_builder.delete', { defaultValue: 'Delete' })}
               </Button>
             </div>
           ))}
-
           <Button className="mt-3" onClick={() => addField(section.id)}>
-            ➕ {t('form_builder.add_field')}
+            ➕ {t('form_builder.add_field', { defaultValue: 'Add Field' })}
           </Button>
         </div>
       ))}
 
       <div className="flex flex-wrap gap-4 mt-6">
-        <Button onClick={addSection}>➕ {t('form_builder.add_section')}</Button>
+        <Button onClick={addSection}>➕ {t('form_builder.add_section', { defaultValue: 'Add Section' })}</Button>
         <Button onClick={save} disabled={saving}>
-          📎 {saving ? t('form_builder.saving') : t('form_builder.save')}
+          📎 {saving ? t('form_builder.saving', { defaultValue: 'Saving...' }) : t('form_builder.save', { defaultValue: 'Save' })}
         </Button>
         <Button variant="outline" onClick={resetToDefault}>
-          🔄 {t('form_builder.reset')}
+          🔄 {t('form_builder.reset', { defaultValue: 'Reset to Default' })}
         </Button>
       </div>
 
       <NotificationDialog
         open={showSuccess}
         type="success"
-        title={t('form_builder.saved_title')}
-        description={t('form_builder.saved_description')}
+        title={t('form_builder.saved_title', { defaultValue: 'Saved!' })}
+        description={t('form_builder.saved_description', { defaultValue: 'Your configuration has been saved.' })}
         onClose={() => setShowSuccess(false)}
       />
     </div>
   );
 }
 
-// ✅ Helper Component
 function CheckboxWithLabel({
   label,
   checked,
