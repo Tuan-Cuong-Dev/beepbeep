@@ -2463,7 +2463,149 @@
   "minute": "分",
   "rental_days": "レンタル日数",
   "rental_days_placeholder": "レンタル日数を入力してください"
+},
+
+"form_builder_page": {
+  "title": "🛠️ フォームビルダー",
+  "select_company_label": "会社を選択",
+  "loading": "読み込み中...",
+  "please_sign_in": "サインインしてください。",
+  "no_permission": "このページにアクセスする権限がありません。"
+},
+
+"form_builder": {
+  "new_section": "新しいセクション",
+  "new_field": "新しいフィールド",
+  "loading": "フォーム設定を読み込んでいます...",
+  "field_label": "フィールド名",
+  "required": "必須",
+  "visible": "表示する",
+  "delete": "削除",
+  "add_field": "フィールドを追加",
+  "add_section": "セクションを追加",
+  "save": "フォームを保存",
+  "saving": "保存中...",
+  "reset": "デフォルトにリセット",
+  "saved_title": "フォームが保存されました",
+  "saved_description": "フォームの設定が正常に保存されました。"
+},
+
+"predefined_form_templates": {
+  "1.customer_information": "1. 顧客情報",
+  "2.vehicle_information": "2. 車両情報",
+  "3.battery_information": "3. バッテリー情報",
+  "4.rental_period": "4. レンタル期間",
+  "5.pricing_deposit": "5. 料金とデポジット",
+  "6.delivery_method": "6. 配送方法",
+  "7.accessories_info": "7. アクセサリー情報",
+  "8.notes": "8. メモ",
+
+  "upload_id": "身分証アップロード",
+  "full_name": "氏名",
+  "channel": "連絡手段",
+  "add_or_search_phone": "電話番号を追加または検索",
+  "id_number": "ID番号",
+  "address": "住所",
+
+  "enter_vehicle_id": "車両IDの一部を入力",
+  "vehicle_model": "車両モデル",
+  "vehicle_color": "車体の色",
+  "vin": "車台番号 (VIN)",
+  "license_plate": "ナンバープレート（任意）",
+
+  "battery_code_1": "バッテリーコード1",
+  "battery_code_2": "バッテリーコード2",
+  "battery_code_3": "バッテリーコード3",
+  "battery_code_4": "バッテリーコード4",
+
+  "rental_start_date": "レンタル開始日",
+  "rental_start_hour": "レンタル開始時刻",
+  "rental_days": "レンタル日数",
+  "rental_end_date": "レンタル終了日",
+
+  "rental_package": "レンタルパッケージ",
+  "base_price": "基本料金（VND）",
+  "battery_fee": "バッテリー・保険料（VND）",
+  "total_amount": "合計金額（VND）",
+  "deposit": "デポジット（VND）",
+  "remaining_balance": "残額（VND）",
+
+  "delivery_method": "配送方法",
+  "delivery_address": "配送先住所（ある場合）",
+
+  "helmet": "ヘルメット付き",
+  "charger": "充電器付き",
+  "phone_holder": "スマホホルダー",
+  "rear_rack": "リアキャリア",
+  "raincoat": "レインコート付き",
+
+  "note": "追加メモ"
+},
+
+
+"form_configuration": {
+  "section_titles": {
+    "customer_information": "1. 顧客情報",
+    "vehicle_information": "2. 車両情報",
+    "battery_information": "3. バッテリー情報",
+    "rental_schedule": "4. レンタルスケジュール",
+    "pricing_deposit": "5. 料金とデポジット",
+    "rental_method": "6. 受け取り方法",
+    "accessories_info": "7. 付属品情報",
+    "notes": "8. メモ"
+  },
+  "fields": {
+    "idImage": "身分証をアップロード",
+    "fullName": "氏名",
+    "channel": "連絡チャネル",
+    "phone": "電話番号を追加または検索",
+    "idNumber": "身分証番号",
+    "address": "住所",
+    "vehicleSearch": "車両IDの一部を入力",
+    "vehicleModel": "車両モデル",
+    "vehicleColor": "車両の色",
+    "vin": "VINコード",
+    "licensePlate": "ナンバープレート（任意）",
+    "batteryCode1": "バッテリーコード 1",
+    "batteryCode2": "バッテリーコード 2",
+    "batteryCode3": "バッテリーコード 3",
+    "batteryCode4": "バッテリーコード 4",
+    "rentalStartDate": "レンタル開始日",
+    "rentalStartHour": "レンタル開始時間",
+    "rentalDays": "レンタル日数または月数",
+    "rentalEndDate": "レンタル終了日",
+    "package": "レンタルパッケージ",
+    "basePrice": "基本料金 (VND)",
+    "batteryFee": "バッテリー/保険料 (VND)",
+    "totalAmount": "合計金額 (VND)",
+    "deposit": "デポジット (VND)",
+    "remainingBalance": "残高 (VND)",
+    "rentalMethod": "受け取り方法",
+    "deliveryAddress": "配送先住所（配達の場合）",
+    "helmet": "ヘルメット付き",
+    "charger": "充電器付き",
+    "phoneHolder": "スマホホルダー",
+    "rearRack": "リアキャリアラック",
+    "raincoat": "レインコート付き",
+    "note": "追加メモ"
+  },
+  "options": {
+    "Facebook": "Facebook",
+    "Instagram": "Instagram",
+    "KakaoTalk": "カカオトーク",
+    "Phone": "電話",
+    "WeChat": "ウィーチャット",
+    "WhatsApp": "ワッツアップ",
+    "Zalo": "Zalo",
+    "Pickup at Store": "店舗で受け取り",
+    "Deliver to Address": "住所に配達"
+  }
 }
+
+
+
+
+
 
 
 

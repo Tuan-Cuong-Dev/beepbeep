@@ -1,13 +1,14 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
-import FormBuilder from '@/src/components/form-builder/FormBuilder';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
-import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import FormBuilder from '@/src/components/form-builder/FormBuilder';
 import { db } from '@/src/firebaseConfig';
+import { useTranslation } from 'react-i18next';
 
 interface CompanyOption {
   id: string;
@@ -15,9 +16,9 @@ interface CompanyOption {
 }
 
 export default function FormBuilderPage() {
+  const { t } = useTranslation('common');
   const { user, companyId, role, loading } = useUser();
   const normalizedRole = (role || '').toLowerCase();
-
   const allowedRoles = ['admin', 'company_owner', 'private_provider'];
   const canEdit = allowedRoles.includes(normalizedRole);
 
@@ -47,22 +48,23 @@ export default function FormBuilderPage() {
     setLoadingCompanies(false);
   };
 
-  if (loading || loadingCompanies) return <div>Loading...</div>;
-  if (!user) return <div>Please sign in.</div>;
-  if (!canEdit) return <div>You don't have permission to access this page.</div>;
+  if (loading || loadingCompanies) return <div>{t('form_builder_page.loading')}</div>;
+  if (!user) return <div>{t('form_builder_page.please_sign_in')}</div>;
+  if (!canEdit) return <div>{t('form_builder_page.no_permission')}</div>;
 
   return (
     <>
       <Header />
-      <UserTopMenu /> {/* ✅ Bổ sung UserTopMenu */}
+      <UserTopMenu />
 
       <main className="max-w-5xl mx-auto py-6 px-4 min-h-[70vh] space-y-6">
-        <h1 className="text-2xl font-semibold mb-4">🛠️ Form Builder</h1>
+        <h1 className="text-2xl font-semibold mb-4">{t('form_builder_page.title')}</h1>
 
-        {/* Admin có dropdown chọn công ty */}
         {normalizedRole === 'admin' && (
           <div className="mb-6">
-            <label className="block mb-2 text-sm font-medium text-gray-700">Select Company</label>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              {t('form_builder_page.select_company_label')}
+            </label>
             <select
               value={selectedCompanyId || ''}
               onChange={(e) => setSelectedCompanyId(e.target.value)}
@@ -77,7 +79,6 @@ export default function FormBuilderPage() {
           </div>
         )}
 
-        {/* Form Builder */}
         {selectedCompanyId && (
           <FormBuilder companyId={selectedCompanyId} userId={user.uid} />
         )}

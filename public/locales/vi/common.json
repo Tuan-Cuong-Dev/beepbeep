@@ -2506,7 +2506,147 @@
   "minute": "Phút",
   "rental_days": "Số ngày thuê",
   "rental_days_placeholder": "Nhập số ngày thuê"
+},
+
+"form_builder_page": {
+  "title": "🛠️ Trình tạo biểu mẫu",
+  "select_company_label": "Chọn công ty",
+  "loading": "Đang tải...",
+  "please_sign_in": "Vui lòng đăng nhập.",
+  "no_permission": "Bạn không có quyền truy cập trang này."
+},
+
+"form_builder": {
+  "new_section": "Mục mới",
+  "new_field": "Trường mới",
+  "loading": "Đang tải cấu hình biểu mẫu...",
+  "field_label": "Nhãn trường",
+  "required": "Bắt buộc",
+  "visible": "Hiển thị",
+  "delete": "Xoá",
+  "add_field": "Thêm trường",
+  "add_section": "Thêm mục",
+  "save": "Lưu biểu mẫu",
+  "saving": "Đang lưu...",
+  "reset": "Khôi phục mặc định",
+  "saved_title": "Đã lưu biểu mẫu",
+  "saved_description": "Cấu hình biểu mẫu đã được lưu thành công."
+},
+
+"predefined_form_templates": {
+  "1.customer_information": "1. THÔNG TIN KHÁCH HÀNG",
+  "2.vehicle_information": "2. THÔNG TIN XE",
+  "3.battery_information": "3. THÔNG TIN PIN",
+  "4.rental_period": "4. THỜI GIAN THUÊ",
+  "5.pricing_deposit": "5. GIÁ THUÊ & ĐẶT CỌC",
+  "6.delivery_method": "6. PHƯƠNG THỨC NHẬN XE",
+  "7.accessories_info": "7. PHỤ KIỆN ĐI KÈM",
+  "8.notes": "8. GHI CHÚ",
+
+  "upload_id": "Tải ảnh CMND/CCCD",
+  "full_name": "Họ và tên",
+  "channel": "Kênh liên hệ",
+  "add_or_search_phone": "Thêm hoặc tìm bằng số điện thoại",
+  "id_number": "Số CMND/CCCD",
+  "address": "Địa chỉ",
+
+  "enter_vehicle_id": "Nhập một phần mã xe",
+  "vehicle_model": "Mẫu xe",
+  "vehicle_color": "Màu xe",
+  "vin": "Số khung (VIN)",
+  "license_plate": "Biển số (nếu có)",
+
+  "battery_code_1": "Mã pin 1",
+  "battery_code_2": "Mã pin 2",
+  "battery_code_3": "Mã pin 3",
+  "battery_code_4": "Mã pin 4",
+
+  "rental_start_date": "Ngày bắt đầu thuê",
+  "rental_start_hour": "Giờ bắt đầu thuê",
+  "rental_days": "Số ngày thuê",
+  "rental_end_date": "Ngày kết thúc thuê",
+
+  "rental_package": "Gói thuê",
+  "base_price": "Giá cơ bản (VND)",
+  "battery_fee": "Phí thuê pin hoặc bảo hiểm (VND)",
+  "total_amount": "Tổng tiền (VND)",
+  "deposit": "Tiền đặt cọc (VND)",
+  "remaining_balance": "Số tiền còn lại (VND)",
+
+  "delivery_method": "Hình thức nhận xe",
+  "delivery_address": "Địa chỉ nhận xe (nếu giao)",
+
+  "helmet": "Có mũ bảo hiểm",
+  "charger": "Có bộ sạc",
+  "phone_holder": "Giá đỡ điện thoại",
+  "rear_rack": "Gác baga sau",
+  "raincoat": "Có áo mưa",
+
+  "note": "Ghi chú thêm"
+},
+
+"form_configuration": {
+  "section_titles": {
+    "customer_information": "1. Thông tin khách hàng",
+    "vehicle_information": "2. Thông tin xe",
+    "battery_information": "3. Thông tin pin",
+    "rental_schedule": "4. Lịch thuê",
+    "pricing_deposit": "5. Giá và đặt cọc",
+    "rental_method": "6. Hình thức nhận xe",
+    "accessories_info": "7. Phụ kiện đi kèm",
+    "notes": "8. Ghi chú"
+  },
+  "fields": {
+    "idImage": "Tải ảnh CCCD",
+    "fullName": "Họ và tên",
+    "channel": "Kênh liên hệ",
+    "phone": "Thêm hoặc tìm số điện thoại",
+    "idNumber": "Số CCCD",
+    "address": "Địa chỉ",
+    "vehicleSearch": "Nhập một phần số khung",
+    "vehicleModel": "Mẫu xe",
+    "vehicleColor": "Màu xe",
+    "vin": "Số VIN",
+    "licensePlate": "Biển số (tuỳ chọn)",
+    "batteryCode1": "Mã pin 1",
+    "batteryCode2": "Mã pin 2",
+    "batteryCode3": "Mã pin 3",
+    "batteryCode4": "Mã pin 4",
+    "rentalStartDate": "Ngày bắt đầu thuê",
+    "rentalStartHour": "Giờ bắt đầu thuê",
+    "rentalDays": "Số ngày hoặc tháng thuê",
+    "rentalEndDate": "Ngày kết thúc thuê",
+    "package": "Gói thuê xe",
+    "basePrice": "Giá cơ bản (VND)",
+    "batteryFee": "Phí thuê/đảm bảo pin (VND)",
+    "totalAmount": "Tổng tiền (VND)",
+    "deposit": "Đặt cọc (VND)",
+    "remainingBalance": "Còn nợ (VND)",
+    "rentalMethod": "Hình thức nhận xe",
+    "deliveryAddress": "Địa chỉ giao xe",
+    "helmet": "Bao gồm nón bảo hiểm",
+    "charger": "Bao gồm sạc",
+    "phoneHolder": "Giá đỡ điện thoại",
+    "rearRack": "Baga chở hàng sau",
+    "raincoat": "Áo mưa đi kèm",
+    "note": "Ghi chú thêm"
+  },
+  "options": {
+    "Facebook": "Facebook",
+    "Instagram": "Instagram",
+    "KakaoTalk": "KakaoTalk",
+    "Phone": "Điện thoại",
+    "WeChat": "WeChat",
+    "WhatsApp": "WhatsApp",
+    "Zalo": "Zalo",
+    "Pickup at Store": "Đến cửa hàng lấy xe",
+    "Deliver to Address": "Giao tận nơi"
+  }
 }
+
+
+
+
 
 
 

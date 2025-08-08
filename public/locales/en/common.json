@@ -2480,7 +2480,147 @@
   "minute": "Minute",
   "rental_days": "Rental Days",
   "rental_days_placeholder": "Enter number of rental days"
+},
+
+"form_builder_page": {
+  "title": "🛠️ Form Builder",
+  "select_company_label": "Select Company",
+  "loading": "Loading...",
+  "please_sign_in": "Please sign in.",
+  "no_permission": "You don't have permission to access this page."
+},
+
+"form_builder": {
+  "new_section": "New Section",
+  "new_field": "New Field",
+  "loading": "Loading form configuration...",
+  "field_label": "Field Label",
+  "required": "Required",
+  "visible": "Visible",
+  "delete": "Delete",
+  "add_field": "Add Field",
+  "add_section": "Add Section",
+  "save": "Save Form",
+  "saving": "Saving...",
+  "reset": "Reset to Default",
+  "saved_title": "Form Saved",
+  "saved_description": "Your form configuration has been saved successfully."
+},
+
+"predefined_form_templates": {
+  "1.customer_information": "1. CUSTOMER INFORMATION",
+  "2.vehicle_information": "2. VEHICLE INFORMATION",
+  "3.battery_information": "3. BATTERY INFORMATION",
+  "4.rental_period": "4. RENTAL PERIOD",
+  "5.pricing_deposit": "5. PRICING & DEPOSIT",
+  "6.delivery_method": "6. DELIVERY METHOD",
+  "7.accessories_info": "7. ACCESSORIES INFO",
+  "8.notes": "8. NOTES",
+
+  "upload_id": "Upload ID",
+  "full_name": "Full Name",
+  "channel": "Channel",
+  "add_or_search_phone": "Add or Search by Phone Number",
+  "id_number": "ID Number",
+  "address": "Address",
+
+  "enter_vehicle_id": "Enter part of Vehicle ID",
+  "vehicle_model": "Vehicle Model",
+  "vehicle_color": "Vehicle Color",
+  "vin": "VIN",
+  "license_plate": "License Plate (optional)",
+
+  "battery_code_1": "Battery Code 1",
+  "battery_code_2": "Battery Code 2",
+  "battery_code_3": "Battery Code 3",
+  "battery_code_4": "Battery Code 4",
+
+  "rental_start_date": "Rental Start Date",
+  "rental_start_hour": "Rental Start Hour",
+  "rental_days": "Rental Days",
+  "rental_end_date": "Rental End Date",
+
+  "rental_package": "Rental Package",
+  "base_price": "Base Price (VND)",
+  "battery_fee": "Battery Rental or Insurance Fee (VND)",
+  "total_amount": "Total Amount (VND)",
+  "deposit": "Deposit (VND)",
+  "remaining_balance": "Remaining Balance (VND)",
+
+  "delivery_method": "Delivery Method",
+  "delivery_address": "Delivery Address (if delivered)",
+
+  "helmet": "Helmet Included",
+  "charger": "Charger Included",
+  "phone_holder": "Phone Holder",
+  "rear_rack": "Rear Carrier Rack",
+  "raincoat": "Raincoat Included",
+
+  "note": "Additional Notes"
+},
+
+"form_configuration": {
+  "section_titles": {
+    "customer_information": "1. Customer Information",
+    "vehicle_information": "2. Vehicle Information",
+    "battery_information": "3. Battery Information",
+    "rental_schedule": "4. Rental Schedule",
+    "pricing_deposit": "5. Pricing & Deposit",
+    "rental_method": "6. Rental Method",
+    "accessories_info": "7. Accessories Info",
+    "notes": "8. Notes"
+  },
+  "fields": {
+    "idImage": "Upload ID",
+    "fullName": "Full Name",
+    "channel": "Contact Channel",
+    "phone": "Add or Search by Phone Number",
+    "idNumber": "ID Number",
+    "address": "Address",
+    "vehicleSearch": "Enter part of Vehicle ID",
+    "vehicleModel": "Vehicle Model",
+    "vehicleColor": "Vehicle Color",
+    "vin": "VIN",
+    "licensePlate": "License Plate (optional)",
+    "batteryCode1": "Battery Code 1",
+    "batteryCode2": "Battery Code 2",
+    "batteryCode3": "Battery Code 3",
+    "batteryCode4": "Battery Code 4",
+    "rentalStartDate": "Rental Start Date",
+    "rentalStartHour": "Rental Start Hour",
+    "rentalDays": "Number of Rental Days or Months",
+    "rentalEndDate": "Rental End Date",
+    "package": "Rental Package",
+    "basePrice": "Base Price (VND)",
+    "batteryFee": "Battery Rental or Insurance Fee (VND)",
+    "totalAmount": "Total Amount (VND)",
+    "deposit": "Deposit (VND)",
+    "remainingBalance": "Remaining Balance (VND)",
+    "rentalMethod": "Rental Method",
+    "deliveryAddress": "Delivery Address (if delivered)",
+    "helmet": "Helmet Included",
+    "charger": "Charger Included",
+    "phoneHolder": "Phone Holder",
+    "rearRack": "Rear Carrier Rack",
+    "raincoat": "Raincoat Included",
+    "note": "Additional Notes"
+  },
+  "options": {
+    "Facebook": "Facebook",
+    "Instagram": "Instagram",
+    "KakaoTalk": "KakaoTalk",
+    "Phone": "Phone",
+    "WeChat": "WeChat",
+    "WhatsApp": "WhatsApp",
+    "Zalo": "Zalo",
+    "Pickup at Store": "Pickup at Store",
+    "Deliver to Address": "Deliver to Address"
+  }
 }
+
+
+
+
 
 
 

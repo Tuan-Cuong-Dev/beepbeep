@@ -2479,7 +2479,147 @@
   "minute": "분",
   "rental_days": "대여 일수",
   "rental_days_placeholder": "대여 일수를 입력하세요"
+},
+
+"form_builder_page": {
+  "title": "🛠️ 폼 빌더",
+  "select_company_label": "회사 선택",
+  "loading": "불러오는 중...",
+  "please_sign_in": "로그인 해주세요.",
+  "no_permission": "이 페이지에 접근할 권한이 없습니다."
+},
+
+"form_builder": {
+  "new_section": "새 섹션",
+  "new_field": "새 필드",
+  "loading": "폼 설정을 불러오는 중...",
+  "field_label": "필드 라벨",
+  "required": "필수",
+  "visible": "표시됨",
+  "delete": "삭제",
+  "add_field": "필드 추가",
+  "add_section": "섹션 추가",
+  "save": "폼 저장",
+  "saving": "저장 중...",
+  "reset": "기본값으로 재설정",
+  "saved_title": "폼이 저장되었습니다",
+  "saved_description": "폼 설정이 성공적으로 저장되었습니다."
+},
+
+"predefined_form_templates": {
+  "1.customer_information": "1. 고객 정보",
+  "2.vehicle_information": "2. 차량 정보",
+  "3.battery_information": "3. 배터리 정보",
+  "4.rental_period": "4. 대여 기간",
+  "5.pricing_deposit": "5. 요금 및 보증금",
+  "6.delivery_method": "6. 배송 방법",
+  "7.accessories_info": "7. 액세서리 정보",
+  "8.notes": "8. 비고",
+
+  "upload_id": "신분증 업로드",
+  "full_name": "성명",
+  "channel": "연락 채널",
+  "add_or_search_phone": "전화번호로 추가 또는 검색",
+  "id_number": "신분증 번호",
+  "address": "주소",
+
+  "enter_vehicle_id": "차량 ID 일부 입력",
+  "vehicle_model": "차량 모델",
+  "vehicle_color": "차량 색상",
+  "vin": "차대 번호 (VIN)",
+  "license_plate": "차량 번호판 (선택)",
+
+  "battery_code_1": "배터리 코드 1",
+  "battery_code_2": "배터리 코드 2",
+  "battery_code_3": "배터리 코드 3",
+  "battery_code_4": "배터리 코드 4",
+
+  "rental_start_date": "대여 시작일",
+  "rental_start_hour": "대여 시작 시간",
+  "rental_days": "대여 일수",
+  "rental_end_date": "대여 종료일",
+
+  "rental_package": "렌탈 패키지",
+  "base_price": "기본 요금 (VND)",
+  "battery_fee": "배터리 또는 보험 요금 (VND)",
+  "total_amount": "총 금액 (VND)",
+  "deposit": "보증금 (VND)",
+  "remaining_balance": "남은 금액 (VND)",
+
+  "delivery_method": "배송 방법",
+  "delivery_address": "배송 주소 (해당 시)",
+
+  "helmet": "헬멧 포함",
+  "charger": "충전기 포함",
+  "phone_holder": "휴대폰 거치대",
+  "rear_rack": "후방 짐받이",
+  "raincoat": "우의 포함",
+
+  "note": "추가 메모"
+},
+
+"form_configuration": {
+  "section_titles": {
+    "customer_information": "1. 고객 정보",
+    "vehicle_information": "2. 차량 정보",
+    "battery_information": "3. 배터리 정보",
+    "rental_schedule": "4. 대여 일정",
+    "pricing_deposit": "5. 요금 및 보증금",
+    "rental_method": "6. 수령 방법",
+    "accessories_info": "7. 액세서리 정보",
+    "notes": "8. 비고"
+  },
+  "fields": {
+    "idImage": "신분증 업로드",
+    "fullName": "이름",
+    "channel": "연락 채널",
+    "phone": "전화번호 추가 또는 검색",
+    "idNumber": "신분증 번호",
+    "address": "주소",
+    "vehicleSearch": "차대번호 일부 입력",
+    "vehicleModel": "차량 모델",
+    "vehicleColor": "차량 색상",
+    "vin": "VIN",
+    "licensePlate": "번호판 (선택사항)",
+    "batteryCode1": "배터리 코드 1",
+    "batteryCode2": "배터리 코드 2",
+    "batteryCode3": "배터리 코드 3",
+    "batteryCode4": "배터리 코드 4",
+    "rentalStartDate": "대여 시작일",
+    "rentalStartHour": "대여 시작 시간",
+    "rentalDays": "대여 일수 또는 개월 수",
+    "rentalEndDate": "대여 종료일",
+    "package": "대여 패키지",
+    "basePrice": "기본 요금 (VND)",
+    "batteryFee": "배터리/보험 요금 (VND)",
+    "totalAmount": "총 금액 (VND)",
+    "deposit": "보증금 (VND)",
+    "remainingBalance": "남은 잔액 (VND)",
+    "rentalMethod": "수령 방법",
+    "deliveryAddress": "배송 주소 (배송 시)",
+    "helmet": "헬멧 포함",
+    "charger": "충전기 포함",
+    "phoneHolder": "폰 거치대",
+    "rearRack": "뒤쪽 짐받이",
+    "raincoat": "우비 포함",
+    "note": "추가 메모"
+  },
+  "options": {
+    "Facebook": "페이스북",
+    "Instagram": "인스타그램",
+    "KakaoTalk": "카카오톡",
+    "Phone": "전화",
+    "WeChat": "위챗",
+    "WhatsApp": "왓츠앱",
+    "Zalo": "Zalo",
+    "Pickup at Store": "매장에서 수령",
+    "Deliver to Address": "주소로 배송"
+  }
 }
+
+
+
+
 
 
 

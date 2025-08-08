@@ -1,87 +1,114 @@
-// file: formConfigurations/predefinedFormTemplates.ts
+'use client';
 
 import { PredefinedSection } from './formConfigurationTypes';
+import { useTranslation } from 'react-i18next';
 
-export const predefinedFormTemplates: PredefinedSection[] = [
-  {
-    id: 'customer_information',
-    title: '1. CUSTOMER INFORMATION',
-    fields: [
-      { key: 'idImage', label: 'Upload ID', type: 'upload' },
-      { key: 'fullName', label: 'Full Name', type: 'text' },
-      { key: 'channel', label: 'Channel', type: 'select', options: ['Facebook', 'Instagram', 'KakaoTalk', 'Phone number', 'WeChat', 'WhatsApp', 'Zalo'] },
-      { key: 'phone', label: 'Add or Search by Phone Number', type: 'text' },
-      { key: 'idNumber', label: 'ID Number', type: 'text' },
-      { key: 'address', label: 'Address', type: 'text' },
-    ],
-  },
-  {
-    id: 'vehicle_information',
-    title: '2. VEHICLE INFORMATION',
-    fields: [
-      { key: 'vehicleSearch', label: 'Enter part of Vehicle ID', type: 'text' },
-      { key: 'vehicleModel', label: 'Vehicle Model', type: 'text' },
-      { key: 'vehicleColor', label: 'Vehicle Color', type: 'text' },
-      { key: 'vin', label: 'VIN', type: 'text' },
-      { key: 'licensePlate', label: 'License Plate (optional)', type: 'text' },
-    ],
-  },
-  {
-    id: 'battery_information',
-    title: '3. BATTERY INFORMATION',
-    fields: [
-      { key: 'batteryCode1', label: 'Battery Code 1', type: 'text' },
-      { key: 'batteryCode2', label: 'Battery Code 2', type: 'text' },
-      { key: 'batteryCode3', label: 'Battery Code 3', type: 'text' },
-      { key: 'batteryCode4', label: 'Battery Code 4', type: 'text' },
-    ],
-  },
-  {
-    id: 'rental_period',
-    title: '4. RENTAL PERIOD',
-    fields: [
-      { key: 'rentalStartDate', label: 'Rental Start Date', type: 'date' },
-      { key: 'rentalStartHour', label: 'Rental Start Hour', type: 'time' },
-      { key: 'rentalDays', label: 'Rental Days', type: 'number' },
-      { key: 'rentalEndDate', label: 'Rental End Date', type: 'date' },
-    ],
-  },
-  {
-    id: 'pricing_deposit',
-    title: '5. PRICING & DEPOSIT',
-    fields: [
-      { key: 'package', label: 'Rental Package', type: 'select' },
-      { key: 'basePrice', label: 'Base Price (VND)', type: 'number' },
-      { key: 'batteryFee', label: 'Battery Rental or Insurance Fee (VND)', type: 'number' }, // 👈 bổ sung rõ tên
-      { key: 'totalAmount', label: 'Total Amount (VND)', type: 'number' },
-      { key: 'deposit', label: 'Deposit (VND)', type: 'number' },
-      { key: 'remainingBalance', label: 'Remaining Balance (VND)', type: 'number' },
-    ],
-  },
-  {
-    id: 'delivery_method',
-    title: '6. DELIVERY METHOD',
-    fields: [
-      { key: 'deliveryMethod', label: 'Delivery Method', type: 'select', options: ['Pickup at Shop', 'Deliver to Address'] },
-      { key: 'deliveryAddress', label: 'Delivery Address (if delivered)', type: 'text' },
-    ],
-  },
-  {
-    id: 'accessories_info',
-    title: '7. ACCESSORIES INFO',
-    fields: [
-      { key: 'helmet', label: 'Helmet Included', type: 'checkbox' },
-      { key: 'charger', label: 'Charger Included', type: 'checkbox' },
-      { key: 'phoneHolder', label: 'Phone Holder', type: 'checkbox' },
-      { key: 'rearRack', label: 'Rear Carrier Rack', type: 'checkbox' },
-      { key: 'raincoat', label: 'Raincoat Included', type: 'checkbox' },
-    ],
-  },
-  {
-    id: 'notes',
-    title: '8. NOTES',
-    fields: [
-      { key: 'note', label: 'Additional Notes', type: 'textarea' },
-    ],
-  },
-];
+export function usePredefinedFormTemplates(): PredefinedSection[] {
+  const { t } = useTranslation('common');
+
+  return [
+    {
+      id: 'customer_information',
+      title: t('predefined_form_templates.1.customer_information'),
+      fields: [
+        { key: 'idImage', label: t('predefined_form_templates.upload_id'), type: 'upload' },
+        { key: 'fullName', label: t('predefined_form_templates.full_name'), type: 'text' },
+        {
+          key: 'channel',
+          label: t('predefined_form_templates.channel'),
+          type: 'select',
+          options: [
+            'Facebook',
+            'Instagram',
+            'KakaoTalk',
+            'Phone number',
+            'WeChat',
+            'WhatsApp',
+            'Zalo',
+          ],
+        },
+        { key: 'phone', label: t('predefined_form_templates.add_or_search_phone'), type: 'text' },
+        { key: 'idNumber', label: t('predefined_form_templates.id_number'), type: 'text' },
+        { key: 'address', label: t('predefined_form_templates.address'), type: 'text' },
+      ],
+    },
+    {
+      id: 'vehicle_information',
+      title: t('predefined_form_templates.2.vehicle_information'),
+      fields: [
+        { key: 'vehicleSearch', label: t('predefined_form_templates.enter_vehicle_id'), type: 'text' },
+        { key: 'vehicleModel', label: t('predefined_form_templates.vehicle_model'), type: 'text' },
+        { key: 'vehicleColor', label: t('predefined_form_templates.vehicle_color'), type: 'text' },
+        { key: 'vin', label: t('predefined_form_templates.vin'), type: 'text' },
+        { key: 'licensePlate', label: t('predefined_form_templates.license_plate'), type: 'text' },
+      ],
+    },
+    {
+      id: 'battery_information',
+      title: t('predefined_form_templates.3.battery_information'),
+      fields: [
+        { key: 'batteryCode1', label: t('predefined_form_templates.battery_code_1'), type: 'text' },
+        { key: 'batteryCode2', label: t('predefined_form_templates.battery_code_2'), type: 'text' },
+        { key: 'batteryCode3', label: t('predefined_form_templates.battery_code_3'), type: 'text' },
+        { key: 'batteryCode4', label: t('predefined_form_templates.battery_code_4'), type: 'text' },
+      ],
+    },
+    {
+      id: 'rental_period',
+      title: t('predefined_form_templates.4.rental_period'),
+      fields: [
+        { key: 'rentalStartDate', label: t('predefined_form_templates.rental_start_date'), type: 'date' },
+        { key: 'rentalStartHour', label: t('predefined_form_templates.rental_start_hour'), type: 'time' },
+        { key: 'rentalDays', label: t('predefined_form_templates.rental_days'), type: 'number' },
+        { key: 'rentalEndDate', label: t('predefined_form_templates.rental_end_date'), type: 'date' },
+      ],
+    },
+    {
+      id: 'pricing_deposit',
+      title: t('predefined_form_templates.5.pricing_deposit'),
+      fields: [
+        { key: 'package', label: t('predefined_form_templates.rental_package'), type: 'select' },
+        { key: 'basePrice', label: t('predefined_form_templates.base_price'), type: 'number' },
+        { key: 'batteryFee', label: t('predefined_form_templates.battery_fee'), type: 'number' },
+        { key: 'totalAmount', label: t('predefined_form_templates.total_amount'), type: 'number' },
+        { key: 'deposit', label: t('predefined_form_templates.deposit'), type: 'number' },
+        { key: 'remainingBalance', label: t('predefined_form_templates.remaining_balance'), type: 'number' },
+      ],
+    },
+    {
+      id: 'delivery_method',
+      title: t('predefined_form_templates.6.delivery_method'),
+      fields: [
+        {
+          key: 'deliveryMethod',
+          label: t('predefined_form_templates.delivery_method'),
+          type: 'select',
+          options: ['Pickup at Shop', 'Deliver to Address'],
+        },
+        {
+          key: 'deliveryAddress',
+          label: t('predefined_form_templates.delivery_address'),
+          type: 'text',
+        },
+      ],
+    },
+    {
+      id: 'accessories_info',
+      title: t('predefined_form_templates.7.accessories_info'),
+      fields: [
+        { key: 'helmet', label: t('predefined_form_templates.helmet'), type: 'checkbox' },
+        { key: 'charger', label: t('predefined_form_templates.charger'), type: 'checkbox' },
+        { key: 'phoneHolder', label: t('predefined_form_templates.phone_holder'), type: 'checkbox' },
+        { key: 'rearRack', label: t('predefined_form_templates.rear_rack'), type: 'checkbox' },
+        { key: 'raincoat', label: t('predefined_form_templates.raincoat'), type: 'checkbox' },
+      ],
+    },
+    {
+      id: 'notes',
+      title: t('predefined_form_templates.8.notes'),
+      fields: [
+        { key: 'note', label: t('predefined_form_templates.note'), type: 'textarea' },
+      ],
+    },
+  ];
+}
