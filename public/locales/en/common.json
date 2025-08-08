@@ -2768,7 +2768,127 @@
       "title": "Pending Contributions",
       "description": "Review user-submitted data before approval"
     }
+  },
+
+  "vehicle_model_management_page": {
+    "title": "Vehicle Model Management"
+  },
+  "loading": "Loading...",
+  "access_denied": "Access denied",
+
+  "vehicle_model_form": {
+  "title_add": "Add New Vehicle Model",
+  "title_edit": "Edit Vehicle Model",
+  "section": {
+    "basic": "Basic Information",
+    "specs": "Specifications",
+    "pricing": "Rental Pricing",
+    "availability": "Availability"
+  },
+  "name": "Model Name",
+  "description": "Description",
+  "image_url": "Image URL",
+  "brand": "Brand (e.g. VinFast)",
+  "model_code": "Model Code",
+  "battery_capacity": "Battery Capacity (e.g. 72V22Ah)",
+  "motor_power": "Motor Power (W)",
+  "top_speed": "Top Speed (km/h)",
+  "range": "Range (km)",
+  "weight": "Weight (kg)",
+  "max_load": "Max Load (kg)",
+  "capacity": "Capacity (seats)",
+  "price_per_hour": "Price Per Hour (VND)",
+  "price_per_day": "Price Per Day (VND)",
+  "price_per_week": "Price Per Week (VND)",
+  "price_per_month": "Price Per Month (VND)",
+  "available": "Available for rent?",
+  "add_model": "Add Model",
+  "save_changes": "Save Changes",
+  "saving": "Saving...",
+  "select_vehicle_type": "Select Vehicle Type",
+  "select_sub_type": "Select Sub Type",
+  "select_fuel_type": "Select Fuel Type",
+  "vehicle_type": {
+    "bike": "Bicycle",
+    "motorbike": "Motorbike",
+    "car": "Car",
+    "van": "Van / Limo",
+    "bus": "Bus / Coach",
+    "other": "Other"
+  },
+  "fuel_type": {
+    "electric": "Electric",
+    "gasoline": "Gasoline",
+    "hybrid": "Hybrid"
+  },
+  "vehicle_model_form": {
+  "sub_type": {
+    "roadbike": "Road Bike",
+    "mountainbike": "Mountain Bike",
+    "citybike": "City Bike",
+    "foldingbike": "Folding Bike",
+    "fatbike": "Fat Bike",
+    "tandem": "Tandem Bike",
+    "ebike": "Electric Bicycle",
+    "cargobike": "Cargo Bike",
+    "scooter": "Scooter",
+    "cub": "Cub / Underbone",
+    "manualbike": "Manual Motorcycle",
+    "tricycle": "Three-Wheeled Bike",
+    "emotorbike": "Electric Motorbike",
+    "escooter": "Electric Scooter",
+    "hatchback": "Hatchback",
+    "sedan": "Sedan",
+    "suv": "SUV",
+    "crossover": "Crossover",
+    "pickup": "Pickup Truck",
+    "electriccar": "Electric Car",
+    "minivan": "Mini Van",
+    "van": "Van",
+    "limousine": "Limousine",
+    "minibus": "Mini Bus",
+    "coach": "Coach Bus",
+    "sleeperbus": "Sleeper Bus",
+    "atv": "ATV / All-Terrain Vehicle",
+    "golfcart": "Golf Cart",
+    "truck": "Truck",
+    "trailer": "Trailer",
+    "other": "Other"
   }
+}
+},
+
+"vehicle_model_table": {
+  "title": "Vehicle Models",
+  "no_image": "No image",
+  "available": "Available",
+  "unavailable": "Unavailable",
+  "edit": "Edit",
+  "delete": "Delete",
+  "headers": {
+    "image": "Image",
+    "name": "Name",
+    "type": "Type",
+    "sub_type": "Sub Type",
+    "brand": "Brand",
+    "fuel": "Fuel",
+    "battery": "Battery",
+    "motor": "Motor",
+    "top_speed": "Top Speed",
+    "range": "Range",
+    "seats": "Seats",
+    "weight": "Weight",
+    "load": "Load",
+    "price_hour": "Price (Hour)",
+    "price_day": "Price (Day)",
+    "price_week": "Price (Week)",
+    "price_month": "Price (Month)",
+    "available": "Available",
+    "actions": "Actions"
+  }
+}
+
+
 
 
 

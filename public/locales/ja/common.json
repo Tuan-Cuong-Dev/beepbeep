@@ -2752,7 +2752,128 @@
     "title": "대기 중인 기여",
     "description": "사용자 제출 데이터 검토 및 승인"
   }
+},
+
+"vehicle_model_management_page": {
+    "title": "車両モデル管理"
+  },
+  "loading": "読み込み中...",
+  "access_denied": "アクセスが拒否されました",
+
+  "vehicle_model_form": {
+  "title_add": "新しい車両モデルを追加",
+  "title_edit": "車両モデルを編集",
+  "section": {
+    "basic": "基本情報",
+    "specs": "仕様",
+    "pricing": "レンタル料金",
+    "availability": "利用可能状況"
+  },
+  "name": "モデル名",
+  "description": "説明",
+  "image_url": "画像URL",
+  "brand": "ブランド（例：VinFast）",
+  "model_code": "モデルコード",
+  "battery_capacity": "バッテリー容量（例：72V22Ah）",
+  "motor_power": "モーター出力（W）",
+  "top_speed": "最高速度（km/h）",
+  "range": "航続距離（km）",
+  "weight": "重量（kg）",
+  "max_load": "最大積載量（kg）",
+  "capacity": "定員（座席数）",
+  "price_per_hour": "時間単位の料金（VND）",
+  "price_per_day": "日単位の料金（VND）",
+  "price_per_week": "週単位の料金（VND）",
+  "price_per_month": "月単位の料金（VND）",
+  "available": "レンタル可能ですか？",
+  "add_model": "モデルを追加",
+  "save_changes": "変更を保存",
+  "saving": "保存中...",
+  "select_vehicle_type": "車両タイプを選択",
+  "select_sub_type": "サブタイプを選択",
+  "select_fuel_type": "燃料タイプを選択",
+  "vehicle_type": {
+    "bike": "自転車",
+    "motorbike": "バイク",
+    "car": "自動車",
+    "van": "バン / リムジン",
+    "bus": "バス / コーチ",
+    "other": "その他"
+  },
+  "fuel_type": {
+    "electric": "電気",
+    "gasoline": "ガソリン",
+    "hybrid": "ハイブリッド"
+  },
+  "vehicle_model_form": {
+  "sub_type": {
+    "roadbike": "ロードバイク",
+    "mountainbike": "マウンテンバイク",
+    "citybike": "シティバイク",
+    "foldingbike": "折りたたみ自転車",
+    "fatbike": "ファットバイク",
+    "tandem": "タンデムバイク",
+    "ebike": "電動自転車",
+    "cargobike": "カーゴバイク",
+    "scooter": "スクーター",
+    "cub": "カブ / アンダーボーン",
+    "manualbike": "マニュアルバイク",
+    "tricycle": "三輪バイク",
+    "emotorbike": "電動バイク",
+    "escooter": "電動スクーター",
+    "hatchback": "ハッチバック",
+    "sedan": "セダン",
+    "suv": "SUV",
+    "crossover": "クロスオーバー",
+    "pickup": "ピックアップトラック",
+    "electriccar": "電気自動車",
+    "minivan": "ミニバン",
+    "van": "バン",
+    "limousine": "リムジン",
+    "minibus": "ミニバス",
+    "coach": "大型バス",
+    "sleeperbus": "寝台バス",
+    "atv": "ATV / 四輪バイク",
+    "golfcart": "ゴルフカート",
+    "truck": "トラック",
+    "trailer": "トレーラー",
+    "other": "その他"
+  }
 }
+
+},
+
+"vehicle_model_table": {
+  "title": "車両モデル",
+  "no_image": "画像なし",
+  "available": "利用可能",
+  "unavailable": "利用不可",
+  "edit": "編集",
+  "delete": "削除",
+  "headers": {
+    "image": "画像",
+    "name": "名前",
+    "type": "タイプ",
+    "sub_type": "サブタイプ",
+    "brand": "ブランド",
+    "fuel": "燃料",
+    "battery": "バッテリー",
+    "motor": "モーター",
+    "top_speed": "最高速度",
+    "range": "航続距離",
+    "seats": "座席数",
+    "weight": "重量",
+    "load": "積載量",
+    "price_hour": "価格（時間）",
+    "price_day": "価格（日）",
+    "price_week": "価格（週）",
+    "price_month": "価格（月）",
+    "available": "利用可否",
+    "actions": "操作"
+  }
+}
+
+
 
 
 

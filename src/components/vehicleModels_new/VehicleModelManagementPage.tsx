@@ -1,19 +1,31 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, addDoc, updateDoc, doc, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+} from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { useVehicleModelForm } from '@/src/hooks/useVehicleModelForm';
 import VehicleModelForm from './VehicleModelForm';
 import VehicleModelTable from './VehicleModelTable';
-import { useUserRole } from '@/src/hooks/useUserRole'; 
+import { useUserRole } from '@/src/hooks/useUserRole';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
+import { useTranslation } from 'react-i18next';
 
 export default function VehicleModelManagementPage() {
-  const { role, loading } = useUserRole(); // ✅ Dùng hook phân quyền
+  const { t } = useTranslation('common');
+  const { role, loading } = useUserRole();
+
   const [models, setModels] = useState<VehicleModel[]>([]);
   const [loadingData, setLoadingData] = useState(false);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
@@ -80,8 +92,11 @@ export default function VehicleModelManagementPage() {
     setIsUpdateMode(true);
   };
 
-  if (loading) return <p className="text-center text-gray-500 py-10">🔄 Loading...</p>;
-  if (role !== 'admin') return <p className="text-center text-red-600 py-10">🚫 Access denied</p>;
+  if (loading)
+    return <p className="text-center text-gray-500 py-10">🔄 {t('loading')}</p>;
+
+  if (role !== 'admin')
+    return <p className="text-center text-red-600 py-10">🚫 {t('access_denied')}</p>;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -90,7 +105,7 @@ export default function VehicleModelManagementPage() {
 
       <main className="flex-1 p-4">
         <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">
-          Vehicle Model Management
+          {t('vehicle_model_management_page.title')}
         </h1>
 
         <VehicleModelForm
@@ -113,6 +128,4 @@ export default function VehicleModelManagementPage() {
       <Footer />
     </div>
   );
-
-  <Footer />
 }

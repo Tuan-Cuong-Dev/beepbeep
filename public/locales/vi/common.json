@@ -2793,7 +2793,127 @@
     "title": "Dữ liệu chờ duyệt",
     "description": "Xét duyệt dữ liệu do người dùng đóng góp"
   }
+},
+
+"vehicle_model_management_page": {
+    "title": "Quản lý mẫu xe"
+  },
+  "loading": "Đang tải...",
+  "access_denied": "Không có quyền truy cập",
+
+"vehicle_model_form": {
+  "title_add": "Thêm mẫu xe mới",
+  "title_edit": "Chỉnh sửa mẫu xe",
+  "section": {
+    "basic": "Thông tin cơ bản",
+    "specs": "Thông số kỹ thuật",
+    "pricing": "Giá thuê",
+    "availability": "Tình trạng sẵn sàng"
+  },
+  "name": "Tên mẫu xe",
+  "description": "Mô tả",
+  "image_url": "URL hình ảnh",
+  "brand": "Hãng xe (VD: VinFast)",
+  "model_code": "Mã mẫu xe",
+  "battery_capacity": "Dung lượng pin (VD: 72V22Ah)",
+  "motor_power": "Công suất động cơ (W)",
+  "top_speed": "Tốc độ tối đa (km/h)",
+  "range": "Quãng đường (km)",
+  "weight": "Khối lượng (kg)",
+  "max_load": "Tải trọng tối đa (kg)",
+  "capacity": "Sức chứa (số chỗ ngồi)",
+  "price_per_hour": "Giá thuê theo giờ (VND)",
+  "price_per_day": "Giá thuê theo ngày (VND)",
+  "price_per_week": "Giá thuê theo tuần (VND)",
+  "price_per_month": "Giá thuê theo tháng (VND)",
+  "available": "Có sẵn để cho thuê?",
+  "add_model": "Thêm mẫu xe",
+  "save_changes": "Lưu thay đổi",
+  "saving": "Đang lưu...",
+  "select_vehicle_type": "Chọn loại phương tiện",
+  "select_sub_type": "Chọn phân loại",
+  "select_fuel_type": "Chọn loại nhiên liệu",
+  "vehicle_type": {
+    "bike": "Xe đạp",
+    "motorbike": "Xe máy",
+    "car": "Ô tô",
+    "van": "Xe van / Limo",
+    "bus": "Xe buýt / Xe khách",
+    "other": "Khác"
+  },
+  "fuel_type": {
+    "electric": "Điện",
+    "gasoline": "Xăng",
+    "hybrid": "Lai (Hybrid)"
+  },
+   "sub_type": {
+    "roadbike": "Xe đạp đua",
+    "mountainbike": "Xe đạp leo núi",
+    "citybike": "Xe đạp thành phố",
+    "foldingbike": "Xe đạp gấp",
+    "fatbike": "Xe đạp bánh béo",
+    "tandem": "Xe đạp đôi",
+    "ebike": "Xe đạp điện",
+    "cargobike": "Xe đạp chở hàng",
+    "scooter": "Xe tay ga",
+    "cub": "Xe số / Cub",
+    "manualbike": "Xe côn tay",
+    "tricycle": "Xe ba bánh",
+    "emotorbike": "Xe máy điện",
+    "escooter": "Xe tay ga điện",
+    "hatchback": "Hatchback",
+    "sedan": "Sedan",
+    "suv": "SUV",
+    "crossover": "Crossover",
+    "pickup": "Xe bán tải",
+    "electriccar": "Ô tô điện",
+    "minivan": "Mini van",
+    "van": "Xe van",
+    "limousine": "Limousine",
+    "minibus": "Xe buýt nhỏ",
+    "coach": "Xe khách",
+    "sleeperbus": "Xe giường nằm",
+    "atv": "Xe địa hình / ATV",
+    "golfcart": "Xe golf",
+    "truck": "Xe tải",
+    "trailer": "Xe moóc / Rơ-moóc",
+    "other": "Khác"
+  }
+},
+
+"vehicle_model_table": {
+  "title": "Mẫu xe",
+  "no_image": "Chưa có hình ảnh",
+  "available": "Sẵn cho thuê",
+  "unavailable": "Chưa sẵn cho thuê",
+  "edit": "Chỉnh sửa",
+  "delete": "Xoá",
+  "headers": {
+    "image": "Ảnh xe",
+    "name": "Tên",
+    "type": "Loại",
+    "sub_type": "Phân loại",
+    "brand": "Hãng",
+    "fuel": "Nhiên liệu",
+    "battery": "Pin",
+    "motor": "Động cơ",
+    "top_speed": "Tốc độ tối đa",
+    "range": "Quãng đường",
+    "seats": "Số chỗ",
+    "weight": "Khối lượng",
+    "load": "Tải trọng",
+    "price_hour": "Giá (Giờ)",
+    "price_day": "Giá (Ngày)",
+    "price_week": "Giá (Tuần)",
+    "price_month": "Giá (Tháng)",
+    "available": "Trạng thái",
+    "actions": "Thao tác"
+  }
 }
+
+
+
+
 
 
 

@@ -4,7 +4,7 @@ export interface VehicleSubType {
   label: string;
   value: string;
   vehicleType:
-    | 'bicycle'
+    | 'bike'
     | 'motorbike'
     | 'car'
     | 'van'
@@ -14,14 +14,14 @@ export interface VehicleSubType {
 
 export const VEHICLE_SUB_TYPES: VehicleSubType[] = [
   // 🚲 Bicycle
-  { label: 'Road Bike', value: 'roadbike', vehicleType: 'bicycle' },
-  { label: 'Mountain Bike', value: 'mountainbike', vehicleType: 'bicycle' },
-  { label: 'City Bike', value: 'citybike', vehicleType: 'bicycle' },
-  { label: 'Folding Bike', value: 'foldingbike', vehicleType: 'bicycle' },
-  { label: 'Fat Bike', value: 'fatbike', vehicleType: 'bicycle' },
-  { label: 'Tandem Bike', value: 'tandem', vehicleType: 'bicycle' },
-  { label: 'Electric Bike (eBike)', value: 'ebike', vehicleType: 'bicycle' },
-  { label: 'Cargo Bike', value: 'cargobike', vehicleType: 'bicycle' },
+  { label: 'Road Bike', value: 'roadbike', vehicleType: 'bike' },
+  { label: 'Mountain Bike', value: 'mountainbike', vehicleType: 'bike' },
+  { label: 'City Bike', value: 'citybike', vehicleType: 'bike' },
+  { label: 'Folding Bike', value: 'foldingbike', vehicleType: 'bike' },
+  { label: 'Fat Bike', value: 'fatbike', vehicleType: 'bike' },
+  { label: 'Tandem Bike', value: 'tandem', vehicleType: 'bike' },
+  { label: 'Electric Bike (eBike)', value: 'ebike', vehicleType: 'bike' },
+  { label: 'Cargo Bike', value: 'cargobike', vehicleType: 'bike' },
 
   // 🛵 Motorbike
   { label: 'Scooter', value: 'scooter', vehicleType: 'motorbike' },

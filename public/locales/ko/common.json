@@ -2766,7 +2766,130 @@
     "title": "대기 중인 기여",
     "description": "사용자 제출 데이터 검토 및 승인"
   }
+},
+
+"vehicle_model_management_page": {
+    "title": "차량 모델 관리"
+  },
+  "loading": "로딩 중...",
+  "access_denied": "접근이 거부되었습니다",
+
+  "vehicle_model_form": {
+  "title_add": "새 차량 모델 추가",
+  "title_edit": "차량 모델 편집",
+  "section": {
+    "basic": "기본 정보",
+    "specs": "사양",
+    "pricing": "대여 요금",
+    "availability": "대여 가능 여부"
+  },
+  "name": "모델명",
+  "description": "설명",
+  "image_url": "이미지 URL",
+  "brand": "브랜드 (예: VinFast)",
+  "model_code": "모델 코드",
+  "battery_capacity": "배터리 용량 (예: 72V22Ah)",
+  "motor_power": "모터 출력 (W)",
+  "top_speed": "최고 속도 (km/h)",
+  "range": "주행 거리 (km)",
+  "weight": "무게 (kg)",
+  "max_load": "최대 적재량 (kg)",
+  "capacity": "좌석 수",
+  "price_per_hour": "시간당 요금 (VND)",
+  "price_per_day": "일일 요금 (VND)",
+  "price_per_week": "주간 요금 (VND)",
+  "price_per_month": "월간 요금 (VND)",
+  "available": "대여 가능합니까?",
+  "add_model": "모델 추가",
+  "save_changes": "변경 사항 저장",
+  "saving": "저장 중...",
+  "select_vehicle_type": "차량 유형 선택",
+  "select_sub_type": "세부 유형 선택",
+  "select_fuel_type": "연료 유형 선택",
+  "vehicle_type": {
+    "bike": "자전거",
+    "motorbike": "오토바이",
+    "car": "자동차",
+    "van": "밴 / 리무진",
+    "bus": "버스 / 코치",
+    "other": "기타"
+  },
+  "fuel_type": {
+    "electric": "전기",
+    "gasoline": "가솔린",
+    "hybrid": "하이브리드"
+  },
+  "vehicle_model_form": {
+  "sub_type": {
+    "roadbike": "로드바이크",
+    "mountainbike": "산악자전거",
+    "citybike": "도시 자전거",
+    "foldingbike": "접이식 자전거",
+    "fatbike": "패트바이크",
+    "tandem": "2인용 자전거",
+    "ebike": "전기 자전거",
+    "cargobike": "화물 자전거",
+    "scooter": "스쿠터",
+    "cub": "컵 / 언더본",
+    "manualbike": "수동 오토바이",
+    "tricycle": "삼륜 오토바이",
+    "emotorbike": "전기 오토바이",
+    "escooter": "전기 스쿠터",
+    "hatchback": "해치백",
+    "sedan": "세단",
+    "suv": "SUV",
+    "crossover": "크로스오버",
+    "pickup": "픽업 트럭",
+    "electriccar": "전기차",
+    "minivan": "미니밴",
+    "van": "밴",
+    "limousine": "리무진",
+    "minibus": "미니버스",
+    "coach": "코치버스",
+    "sleeperbus": "침대버스",
+    "atv": "ATV / 사륜 오토바이",
+    "golfcart": "골프카트",
+    "truck": "트럭",
+    "trailer": "트레일러",
+    "other": "기타"
+  }
 }
+
+},
+
+"vehicle_model_table": {
+  "title": "차량 모델",
+  "no_image": "이미지 없음",
+  "available": "이용 가능",
+  "unavailable": "이용 불가",
+  "edit": "편집",
+  "delete": "삭제",
+  "headers": {
+    "image": "이미지",
+    "name": "이름",
+    "type": "유형",
+    "sub_type": "세부 유형",
+    "brand": "브랜드",
+    "fuel": "연료",
+    "battery": "배터리",
+    "motor": "모터",
+    "top_speed": "최고 속도",
+    "range": "주행 거리",
+    "seats": "좌석 수",
+    "weight": "무게",
+    "load": "적재량",
+    "price_hour": "가격 (시간)",
+    "price_day": "가격 (일)",
+    "price_week": "가격 (주)",
+    "price_month": "가격 (월)",
+    "available": "상태",
+    "actions": "작업"
+  }
+}
+
+
+
+
 
 
 
