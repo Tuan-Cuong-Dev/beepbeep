@@ -2660,7 +2660,100 @@
   "save": "保存",
   "cancel": "キャンセル",
   "validation_required": "氏名・電話番号・車両モデルを入力してください"
+},
+
+"admin_dashboard": {
+  "title": "관리자 대시보드",
+  "groups": {
+    "business": "비즈니스 유형 및 사용자",
+    "vehicles": "차량 및 배터리",
+    "services": "서비스 및 액세서리",
+    "bookings": "예약 및 프로그램",
+    "insurance": "보험 관리",
+    "tools": "도구 및 기여"
+  },
+  "rental_companies": {
+    "title": "렌탈 회사",
+    "description": "모든 렌탈 비즈니스를 관리"
+  },
+  "technician_partners": {
+    "title": "기술 파트너",
+    "description": "외부 수리 파트너를 관리"
+  },
+  "users": {
+    "title": "사용자 관리",
+    "description": "사용자 계정 및 접근 제어"
+  },
+  "staff": {
+    "title": "직원 관리",
+    "description": "시스템 내 모든 직원을 관리"
+  },
+  "customers": {
+    "title": "고객 관리",
+    "description": "고객 데이터를 조회 및 관리"
+  },
+  "vehicle_models": {
+    "title": "차량 모델 관리",
+    "description": "모든 차량 모델을 관리"
+  },
+  "vehicles": {
+    "title": "차량 관리",
+    "description": "모든 차량을 관리"
+  },
+  "vehicle_issues": {
+    "title": "차량 문제 관리",
+    "description": "차량 문제를 모니터링 및 관리"
+  },
+  "batteries": {
+    "title": "배터리 관리",
+    "description": "배터리 재고 및 상태를 추적"
+  },
+  "battery_stations": {
+    "title": "배터리 교환소",
+    "description": "배터리 교환소 위치를 관리"
+  },
+  "battery_charging_stations": {
+    "title": "배터리 충전소",
+    "description": "배터리 충전소 위치를 관리"
+  },
+  "accessories": {
+    "title": "액세서리 관리",
+    "description": "액세서리 및 부품을 관리"
+  },
+  "accessory_export": {
+    "title": "アクセサリー出庫",
+    "description": "アクセサリーの出庫を管理する"
+  },
+  "bookings": {
+    "title": "예약 관리",
+    "description": "모든 예약을 조회 및 관리"
+  },
+  "packages": {
+    "title": "구독 패키지",
+    "description": "요금 및 렌탈 패키지 설정"
+  },
+  "programs": {
+    "title": "프로그램",
+    "description": "특별 프로그램 및 프로모션 관리"
+  },
+  "form_builder": {
+    "title": "폼 빌더",
+    "description": "프로바이더용 렌탈 폼을 사용자 정의"
+  },
+  "insurance_products": {
+    "title": "보험 상품",
+    "description": "사용자 보험 상품 생성 및 관리"
+  },
+  "insurance_approvals": {
+    "title": "보험 승인",
+    "description": "고객 보험 신청 검토 및 승인"
+  },
+  "pending_contributions": {
+    "title": "대기 중인 기여",
+    "description": "사용자 제출 데이터 검토 및 승인"
+  }
 }
+
 
 
 

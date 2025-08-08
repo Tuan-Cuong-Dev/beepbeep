@@ -2675,7 +2675,102 @@
   "save": "Save",
   "cancel": "Cancel",
   "validation_required": "Please enter Full Name, Phone and Vehicle Model"
-}
+},
+
+
+  "admin_dashboard": {
+    "title": "Admin Dashboard",
+    "groups": {
+      "business": "Business Types & Users",
+      "vehicles": "Vehicles & Batteries",
+      "services": "Services & Accessories",
+      "bookings": "Bookings & Programs",
+      "insurance": "Insurance Management",
+      "tools": "Tools & Contributions"
+    },
+    "rental_companies": {
+      "title": "Rental Companies",
+      "description": "Manage all rental businesses"
+    },
+    "technician_partners": {
+      "title": "Technician Partners",
+      "description": "Manage external repair partners"
+    },
+    "users": {
+      "title": "Users Management",
+      "description": "Control user accounts and access"
+    },
+    "staff": {
+      "title": "Staff Management",
+      "description": "Manage all staff members in the system"
+    },
+    "customers": {
+      "title": "Customers Management",
+      "description": "View and manage customer data"
+    },
+    "vehicle_models": {
+      "title": "Vehicle Models Management",
+      "description": "Manage all Vehicle Models in the system"
+    },
+    "vehicles": {
+      "title": "Vehicle Management",
+      "description": "Manage all Vehicles in the system"
+    },
+    "vehicle_issues": {
+      "title": "Vehicle Issues Management",
+      "description": "Monitor and manage all vehicle issues"
+    },
+    "batteries": {
+      "title": "Battery Management",
+      "description": "Track battery inventory and status"
+    },
+    "battery_stations": {
+      "title": "Battery Stations",
+      "description": "Manage battery swapping station locations"
+    },
+    "battery_charging_stations": {
+      "title": "Battery Charging Stations",
+      "description": "Manage battery charging station locations"
+    },
+    "accessories": {
+      "title": "Accessories Management",
+      "description": "Manage accessories and parts"
+    },
+    "accessory_export": {
+      "title": "Accessory Export",
+      "description": "Manage accessory stock exports"
+    },
+    "bookings": {
+      "title": "Bookings",
+      "description": "View and manage all bookings"
+    },
+    "packages": {
+      "title": "Subscription Packages",
+      "description": "Set up pricing and rental packages"
+    },
+    "programs": {
+      "title": "Programs",
+      "description": "Manage special programs and promotions"
+    },
+    "form_builder": {
+      "title": "Form Builder",
+      "description": "Customize rental forms for providers"
+    },
+    "insurance_products": {
+      "title": "Insurance Products",
+      "description": "Create and manage user insurance products"
+    },
+    "insurance_approvals": {
+      "title": "Insurance Approvals",
+      "description": "Review and approve customer insurance requests"
+    },
+    "pending_contributions": {
+      "title": "Pending Contributions",
+      "description": "Review user-submitted data before approval"
+    }
+  }
+
+
 
 
 

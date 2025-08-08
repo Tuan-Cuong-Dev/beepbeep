@@ -2510,7 +2510,7 @@
 },
 
 "form_builder_page": {
-  "title": "🛠️ Trình tạo biểu mẫu",
+  "title": "🛠️ Trình tạo biểu mẫu cho thuê",
   "select_company_label": "Chọn công ty",
   "loading": "Đang tải...",
   "please_sign_in": "Vui lòng đăng nhập.",
@@ -2701,6 +2701,98 @@
   "save": "Lưu",
   "cancel": "Huỷ",
   "validation_required": "Vui lòng nhập đầy đủ Họ tên, SĐT và dòng xe"
+},
+
+"admin_dashboard": {
+  "title": "Bảng Điều Khiển Quản Trị",
+  "groups": {
+    "business": "Loại hình kinh doanh & người dùng",
+    "vehicles": "Phương tiện & Pin",
+    "services": "Dịch vụ & Phụ kiện",
+    "bookings": "Đơn thuê & Gói dịch vụ",
+    "insurance": "Quản lý Bảo hiểm",
+    "tools": "Công cụ & Đóng góp"
+  },
+  "rental_companies": {
+    "title": "Công ty cho thuê",
+    "description": "Quản lý tất cả doanh nghiệp cho thuê"
+  },
+  "technician_partners": {
+    "title": "Đối tác kỹ thuật",
+    "description": "Quản lý đối tác sửa chữa bên ngoài"
+  },
+  "users": {
+    "title": "Quản lý người dùng",
+    "description": "Kiểm soát tài khoản và quyền truy cập"
+  },
+  "staff": {
+    "title": "Quản lý nhân sự",
+    "description": "Quản lý tất cả nhân sự trong hệ thống"
+  },
+  "customers": {
+    "title": "Quản lý khách hàng",
+    "description": "Xem và quản lý dữ liệu khách hàng"
+  },
+  "vehicle_models": {
+    "title": "Quản lý mẫu xe",
+    "description": "Quản lý tất cả các mẫu xe trong hệ thống"
+  },
+  "vehicles": {
+    "title": "Quản lý phương tiện",
+    "description": "Quản lý tất cả phương tiện trong hệ thống"
+  },
+  "vehicle_issues": {
+    "title": "Quản lý sự cố xe",
+    "description": "Theo dõi và xử lý các sự cố phương tiện"
+  },
+  "batteries": {
+    "title": "Quản lý pin",
+    "description": "Theo dõi kho pin và trạng thái hoạt động"
+  },
+  "battery_stations": {
+    "title": "Trạm đổi pin",
+    "description": "Quản lý địa điểm trạm đổi pin"
+  },
+  "battery_charging_stations": {
+    "title": "Trạm sạc pin",
+    "description": "Quản lý địa điểm trạm sạc pin"
+  },
+  "accessories": {
+    "title": "Quản lý phụ kiện",
+    "description": "Quản lý phụ kiện và linh kiện"
+  },
+  "accessory_export": {
+    "title": "Xuất phụ kiện",
+    "description": "Quản lý xuất kho phụ kiện"
+  },
+  "bookings": {
+    "title": "Đơn thuê xe",
+    "description": "Xem và quản lý tất cả đơn thuê"
+  },
+  "packages": {
+    "title": "Gói thuê xe",
+    "description": "Thiết lập giá thuê và các gói dịch vụ"
+  },
+  "programs": {
+    "title": "Chương trình",
+    "description": "Quản lý các chương trình và khuyến mãi"
+  },
+  "form_builder": {
+    "title": "Tùy chỉnh biểu mẫu",
+    "description": "Tùy chỉnh biểu mẫu thuê xe cho các đối tác"
+  },
+  "insurance_products": {
+    "title": "Sản phẩm bảo hiểm",
+    "description": "Tạo và quản lý các gói bảo hiểm cho người dùng"
+  },
+  "insurance_approvals": {
+    "title": "Phê duyệt bảo hiểm",
+    "description": "Xét duyệt yêu cầu mua bảo hiểm của khách hàng"
+  },
+  "pending_contributions": {
+    "title": "Dữ liệu chờ duyệt",
+    "description": "Xét duyệt dữ liệu do người dùng đóng góp"
+  }
 }
 
 

@@ -20,7 +20,7 @@ import { useEbikeData } from '@/src/hooks/useEbikeData';
 import { useEbikeModelForm } from '@/src/hooks/useEbikeModel';
 import { useRentalStations } from '@/src/hooks/useRentalStations';
 import { db } from '@/src/firebaseConfig';
-import { Company } from '@/src/lib/rentalCompanies/rentalCompanyTypes';
+import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 
 const emptyEbike: Ebike = {
   id: '',
@@ -94,7 +94,7 @@ export default function EbikeManagementPage() {
       const snapshot = await getDocs(collection(db, 'rentalCompanies'));
       const map: Record<string, string> = {};
       snapshot.forEach((doc) => {
-        const data = doc.data() as Company;
+        const data = doc.data() as RentalCompany;
         map[doc.id] = data.name;
       });
       setCompanyMap(map);

@@ -1,6 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Card, CardContent } from '@/src/components/ui/card';
@@ -22,154 +24,155 @@ import { faFileContract } from '@fortawesome/free-solid-svg-icons';
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   const groups = [
     {
-      groupTitle: 'Business Types & Users',
+      groupTitle: t('admin_dashboard.groups.business'),
       items: [
         {
           icon: <FaStore className="w-6 h-6 text-[#00d289]" />,
-          title: 'Rental Companies',
-          description: 'Manage all rental businesses',
+          title: t('admin_dashboard.rental_companies.title'),
+          description: t('admin_dashboard.rental_companies.description'),
           route: '/rental-companies',
         },
         {
           icon: <FaWrench className="w-6 h-6 text-[#00d289]" />,
-          title: 'Technician Partners',
-          description: 'Manage external repair partners',
+          title: t('admin_dashboard.technician_partners.title'),
+          description: t('admin_dashboard.technician_partners.description'),
           route: '/assistant/add-technician-partner',
         },
         {
           icon: <FaUser className="w-6 h-6 text-[#00d289]" />,
-          title: 'Users Management',
-          description: 'Control user accounts and access',
+          title: t('admin_dashboard.users.title'),
+          description: t('admin_dashboard.users.description'),
           route: '/users',
         },
         {
           icon: <FaUserCog className="w-6 h-6 text-[#00d289]" />,
-          title: 'Staff Management',
-          description: 'Manage all staff members in the system',
+          title: t('admin_dashboard.staff.title'),
+          description: t('admin_dashboard.staff.description'),
           route: '/dashboard/staff',
         },
         {
           icon: <FaUserCog className="w-6 h-6 text-[#00d289]" />,
-          title: 'Customers Management',
-          description: 'View and manage customer data',
+          title: t('admin_dashboard.customers.title'),
+          description: t('admin_dashboard.customers.description'),
           route: '/customers',
         },
       ],
     },
     {
-      groupTitle: 'Vehicles & Batteries',
+      groupTitle: t('admin_dashboard.groups.vehicles'),
       items: [
         {
           icon: <FaCar className="w-6 h-6 text-[#00d289]" />,
-          title: 'Vehicle Models Management',
-          description: 'Manage all Vehicle Models in the system',
+          title: t('admin_dashboard.vehicle_models.title'),
+          description: t('admin_dashboard.vehicle_models.description'),
           route: '/admin/vehicle_models',
         },
         {
           icon: <FaMotorcycle className="w-6 h-6 text-[#00d289]" />,
-          title: 'Vehicle Management',
-          description: 'Manage all Vehicles in the system',
+          title: t('admin_dashboard.vehicles.title'),
+          description: t('admin_dashboard.vehicles.description'),
           route: '/vehicles',
         },
         {
           icon: <FaWrench className="w-6 h-6 text-[#00d289]" />,
-          title: 'Vehicle Issues Management',
-          description: 'Monitor and manage all vehicle issues',
+          title: t('admin_dashboard.vehicle_issues.title'),
+          description: t('admin_dashboard.vehicle_issues.description'),
           route: '/vehicle-issues',
         },
         {
           icon: <FaBatteryFull className="w-6 h-6 text-[#00d289]" />,
-          title: 'Battery Management',
-          description: 'Track battery inventory and status',
+          title: t('admin_dashboard.batteries.title'),
+          description: t('admin_dashboard.batteries.description'),
           route: '/battery',
         },
         {
           icon: <FaBatteryFull className="w-6 h-6 text-[#00d289]" />,
-          title: 'Battery Stations',
-          description: 'Manage battery swapping station locations',
+          title: t('admin_dashboard.battery_stations.title'),
+          description: t('admin_dashboard.battery_stations.description'),
           route: '/admin/battery-stations',
         },
         {
           icon: <FaBatteryFull className="w-6 h-6 text-[#00d289]" />,
-          title: 'Battery Charging Stations',
-          description: 'Manage battery charging station locations',
+          title: t('admin_dashboard.battery_charging_stations.title'),
+          description: t('admin_dashboard.battery_charging_stations.description'),
           route: '/admin/battery-charging-stations',
         },
       ],
     },
     {
-      groupTitle: 'Services & Accessories',
+      groupTitle: t('admin_dashboard.groups.services'),
       items: [
         {
           icon: <FaToolbox className="w-6 h-6 text-[#00d289]" />,
-          title: 'Accessories Management',
-          description: 'Manage accessories and parts',
+          title: t('admin_dashboard.accessories.title'),
+          description: t('admin_dashboard.accessories.description'),
           route: '/accessories',
         },
         {
           icon: <FaFileExport className="w-6 h-6 text-[#00d289]" />,
-          title: 'Accessory Export',
-          description: 'Export accessory inventory to Excel',
+          title: t('admin_dashboard.accessory_export.title'),
+          description: t('admin_dashboard.accessory_export.description'),
           route: '/accessories/exports',
         },
       ],
     },
     {
-      groupTitle: 'Bookings & Programs',
+      groupTitle: t('admin_dashboard.groups.bookings'),
       items: [
         {
           icon: <FaClipboardList className="w-6 h-6 text-[#00d289]" />,
-          title: 'Bookings',
-          description: 'View and manage all bookings',
+          title: t('admin_dashboard.bookings.title'),
+          description: t('admin_dashboard.bookings.description'),
           route: '/bookings',
         },
         {
           icon: <FontAwesomeIcon icon={faFileContract} className="w-5 h-5 text-[#00d289]" />,
-          title: 'Subscription Packages',
-          description: 'Set up pricing and rental packages',
+          title: t('admin_dashboard.packages.title'),
+          description: t('admin_dashboard.packages.description'),
           route: '/subscriptionPackages',
         },
         {
           icon: <FaPencilAlt className="w-6 h-6 text-[#00d289]" />,
-          title: 'Programs',
-          description: 'Manage special programs and promotions',
+          title: t('admin_dashboard.programs.title'),
+          description: t('admin_dashboard.programs.description'),
           route: '/dashboard/programs',
         },
         {
           icon: <FaPencilAlt className="w-6 h-6 text-[#00d289]" />,
-          title: 'Form Builder',
-          description: 'Customize rental forms for providers',
+          title: t('admin_dashboard.form_builder.title'),
+          description: t('admin_dashboard.form_builder.description'),
           route: '/dashboard/form-builder',
         },
       ],
     },
     {
-      groupTitle: 'Insurance Management',
+      groupTitle: t('admin_dashboard.groups.insurance'),
       items: [
         {
           icon: <FontAwesomeIcon icon={faFileContract} className="w-5 h-5 text-[#00d289]" />,
-          title: 'Insurance Products',
-          description: 'Create and manage user insurance products',
+          title: t('admin_dashboard.insurance_products.title'),
+          description: t('admin_dashboard.insurance_products.description'),
           route: '/admin/insurance-products',
         },
         {
           icon: <FaClipboardList className="w-6 h-6 text-[#00d289]" />,
-          title: 'Insurance Approvals',
-          description: 'Review and approve customer insurance requests',
+          title: t('admin_dashboard.insurance_approvals.title'),
+          description: t('admin_dashboard.insurance_approvals.description'),
           route: '/admin/insurance-approvals',
         },
       ],
     },
     {
-      groupTitle: 'Tools & Contributions',
+      groupTitle: t('admin_dashboard.groups.tools'),
       items: [
         {
           icon: <FaClipboardList className="w-6 h-6 text-[#00d289]" />,
-          title: 'Pending Contributions',
-          description: 'Review user-submitted data before approval',
+          title: t('admin_dashboard.pending_contributions.title'),
+          description: t('admin_dashboard.pending_contributions.description'),
           route: '/admin/pending-contributions',
         },
       ],
@@ -181,7 +184,9 @@ export default function AdminDashboard() {
       <Header />
 
       <main className="flex-grow p-6 space-y-10">
-        <h1 className="text-3xl font-bold text-center text-gray-800">🛡️ Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          🛡️ {t('admin_dashboard.title')}
+        </h1>
 
         {groups.map((group) => (
           <section key={group.groupTitle}>
