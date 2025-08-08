@@ -29,7 +29,7 @@ interface Props {
 }
 
 export default function FormBuilder({ companyId, userId }: Props) {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const [config, setConfig] = useState<FormConfiguration | null>(null);
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -38,11 +38,24 @@ export default function FormBuilder({ companyId, userId }: Props) {
     getFormConfigurationByCompanyId(companyId).then(setConfig);
   }, [companyId]);
 
-  const updateSection = (sectionId: string, updater: (section: FormSection) => FormSection) => {
+  useEffect(() => {
     if (!config) return;
-    setConfig(prev => ({
-      ...prev!,
-      sections: prev!.sections.map(section =>
+    const translatedSections = config.sections.map(section => ({
+      ...section,
+      title: t(`form_configuration.section_titles.${section.id}`, { defaultValue: section.title }),
+      fields: section.fields.map(field => ({
+        ...field,
+        label: t(`form_configuration.fields.${field.key}`, { defaultValue: field.label }),
+        options: field.options?.map(opt => t(`form_configuration.options.${opt}`, { defaultValue: opt })),
+      })),
+    }));
+    setConfig(prev => prev && { ...prev, sections: translatedSections });
+  }, [i18n.language]);
+
+  const updateSection = (sectionId: string, updater: (section: FormSection) => FormSection) => {
+    setConfig(prev => prev && ({
+      ...prev,
+      sections: prev.sections.map(section =>
         section.id === sectionId ? updater(section) : section
       ),
     }));
@@ -95,9 +108,7 @@ export default function FormBuilder({ companyId, userId }: Props) {
         fields: section.fields.map(field => ({
           ...field,
           label: t(`form_configuration.fields.${field.key}`, { defaultValue: field.label }),
-          options: field.options?.map(opt =>
-            t(`form_configuration.options.${opt}`, { defaultValue: opt })
-          ),
+          options: field.options?.map(opt => t(`form_configuration.options.${opt}`, { defaultValue: opt })),
         })),
       })),
     };
@@ -170,7 +181,9 @@ export default function FormBuilder({ companyId, userId }: Props) {
       ))}
 
       <div className="flex flex-wrap gap-4 mt-6">
-        <Button onClick={addSection}>➕ {t('form_builder.add_section', { defaultValue: 'Add Section' })}</Button>
+        <Button onClick={addSection}>
+          ➕ {t('form_builder.add_section', { defaultValue: 'Add Section' })}
+        </Button>
         <Button onClick={save} disabled={saving}>
           📎 {saving ? t('form_builder.saving', { defaultValue: 'Saving...' }) : t('form_builder.save', { defaultValue: 'Save' })}
         </Button>

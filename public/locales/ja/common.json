@@ -2609,7 +2609,60 @@
   "no_plate": "ナンバープレートなし",
   "cancel": "キャンセル",
   "confirm": "確認"
+},
+
+
+"booking_form": {
+  "section_customer": "顧客情報",
+  "section_vehicle": "車両情報",
+  "section_rental_period": "レンタル期間",
+  "section_pricing": "料金とデポジット",
+  "section_accessories": "アクセサリー",
+  "section_battery": "バッテリー",
+  "section_method": "受取方法",
+  "section_station": "レンタルステーション",
+  "section_notes": "メモ",
+  "section_status": "ステータス",
+  "full_name": "氏名",
+  "phone": "電話番号",
+  "id_number": "ID/パスポート番号",
+  "address": "住所",
+  "vehicle_model": "車両モデル",
+  "vehicle_color": "色",
+  "vin": "車台番号 (VIN)",
+  "license_plate": "ナンバープレート",
+  "rental_start_hour": "開始時間",
+  "rental_days": "レンタル日数",
+  "base_price": "基本料金 (₫/日)",
+  "battery_fee": "バッテリー料金 (₫)",
+  "total_amount": "合計金額",
+  "deposit": "デポジット (₫)",
+  "remaining_balance": "残金 (₫)",
+  "package": "レンタルパッケージ",
+  "helmet": "ヘルメット",
+  "charger": "充電器",
+  "rear_rack": "リアラック",
+  "phone_holder": "スマホホルダー",
+  "raincoat": "レインコート",
+  "select_method": "-- 方法を選択 --",
+  "pickup_shop": "店舗で受け取り",
+  "deliver_address": "住所へ配達",
+  "delivery_address": "配達先住所",
+  "select_station": "ステーションを選択",
+  "loading_station": "ステーションを読み込み中...",
+  "additional_notes": "追加メモ",
+  "status": "予約ステータス",
+  "status_comment": "ステータスメモ",
+  "status_draft": "下書き",
+  "status_confirmed": "確認済み",
+  "status_completed": "完了済み",
+  "status_cancelled": "キャンセル済み",
+  "save": "保存",
+  "cancel": "キャンセル",
+  "validation_required": "氏名・電話番号・車両モデルを入力してください"
 }
+
+
 
 
 
