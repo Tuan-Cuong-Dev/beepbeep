@@ -23,7 +23,7 @@ interface Props {
 }
 
 const vehicleTypeOptions = [
-  { value: 'bicycle', label: 'Bicycle' },
+  { value: 'bike', label: 'Bicycle' },
   { value: 'motorbike', label: 'Motorbike' },
   { value: 'car', label: 'Car' },
   { value: 'van', label: 'Van / Limo' },
