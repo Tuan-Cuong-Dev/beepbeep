@@ -20,22 +20,17 @@ import { Input } from '@/src/components/ui/input';
 import ExtendRentalModal from '@/src/components/return/ExtendRentalModal';
 import SwitchBikeModal from '@/src/components/return/SwitchBikeModal';
 import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
-import {
-  Bike,
-  User,
-  Calendar,
-  PhoneCall,
-  Coins,
-  CheckCircle,
-  AlertCircle,
-} from 'lucide-react';
+import { Bike, User as UserIcon, Calendar, PhoneCall, Coins, CheckCircle, AlertCircle } from 'lucide-react';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { format, differenceInDays } from 'date-fns';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@/src/context/AuthContext';
 
 export default function ReturnPageClient() {
   const { t } = useTranslation('common');
+  const { user, companyId } = useUser();
+
   const [rentalInfo, setRentalInfo] = useState<any>(null);
   const [extendOpen, setExtendOpen] = useState(false);
   const [switchOpen, setSwitchOpen] = useState(false);
@@ -46,11 +41,18 @@ export default function ReturnPageClient() {
   const [suggestions, setSuggestions] = useState<Booking[]>([]);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
+  // 🔎 Fetch matching bookings
   useEffect(() => {
+    console.log('🚀 [fetchSuggestions] companyId:', companyId, 'searchTerm:', vehicleIdInput);
     const fetchSuggestions = async () => {
-      if (vehicleIdInput.length < 2) return setSuggestions([]);
+      if (vehicleIdInput.length < 2 || !companyId) return setSuggestions([]);
 
-      const q = query(collection(db, 'bookings'), where('bookingStatus', '==', 'confirmed'));
+      const q = query(
+        collection(db, 'bookings'),
+        where('bookingStatus', '==', 'confirmed'),
+        where('companyId', '==', companyId)
+      );
+
       const snap = await getDocs(q);
       const matches: Booking[] = [];
 
@@ -63,12 +65,13 @@ export default function ReturnPageClient() {
           matches.push({ ...data, id: docSnap.id });
         }
       });
+      
 
       setSuggestions(matches);
     };
 
     fetchSuggestions();
-  }, [vehicleIdInput]);
+  }, [vehicleIdInput, companyId]);
 
   const handleSelectSuggestion = (booking: Booking) => {
     setRentalInfo(booking);
@@ -76,6 +79,7 @@ export default function ReturnPageClient() {
     setSuggestions([]);
   };
 
+  // 🔄 Fetch price from ebike if missing
   useEffect(() => {
     const fetchPriceFromEbike = async () => {
       if (!rentalInfo?.vin || rentalInfo.pricePerDay) return;
@@ -96,25 +100,26 @@ export default function ReturnPageClient() {
     fetchPriceFromEbike();
   }, [rentalInfo?.vin]);
 
+  // ✅ Return vehicle
   const handleReturnBike = async () => {
     if (!bookingDocId || !rentalInfo) return;
-
     if (rentalInfo.remainingBalance > 0) {
       setShowConfirmDialog(true);
       return;
     }
-
     await processReturn();
   };
 
+  // 🔁 Switch bike
   const handleSwitchConfirm = async (newBike: Ebike) => {
     if (!bookingDocId || !rentalInfo) return;
 
     try {
       const bookingRef = doc(db, 'bookings', bookingDocId);
+
+      // Set old bike to Available
       const oldBikeQuery = query(collection(db, 'ebikes'), where('vehicleID', '==', rentalInfo.vin));
       const oldBikeSnap = await getDocs(oldBikeQuery);
-
       if (!oldBikeSnap.empty) {
         const oldBikeDoc = oldBikeSnap.docs[0];
         await updateDoc(doc(db, 'ebikes', oldBikeDoc.id), {
@@ -123,11 +128,13 @@ export default function ReturnPageClient() {
         });
       }
 
+      // Set new bike to In Use
       await updateDoc(doc(db, 'ebikes', newBike.id), {
         status: 'In Use',
         updatedAt: Timestamp.now(),
       });
 
+      // Update booking
       await updateDoc(bookingRef, {
         vin: newBike.vehicleID,
         plateNumber: newBike.plateNumber,
@@ -139,9 +146,7 @@ export default function ReturnPageClient() {
       const updatedSnap = await getDoc(bookingRef);
       if (updatedSnap.exists()) {
         setRentalInfo({ ...updatedSnap.data(), id: bookingDocId });
-        setSuccessMessage(
-          t('return_page_client.success_switch', { vehicleID: newBike.vehicleID })
-        );
+        setSuccessMessage(t('return_page_client.success_switch', { vehicleID: newBike.vehicleID }));
       }
     } catch (error) {
       console.error('❌ Switch vehicle failed:', error);
@@ -211,18 +216,11 @@ export default function ReturnPageClient() {
 
   const formatDateTime = (date: any, hourStr?: string) => {
     if (!date) return '-';
-    let dateObj: Date;
-    if (date instanceof Timestamp) {
-      dateObj = date.toDate();
-    } else {
-      dateObj = new Date(date);
-    }
-
+    const dateObj = date instanceof Timestamp ? date.toDate() : new Date(date);
     if (hourStr) {
       const [hour, minute] = hourStr.split(':').map(Number);
       dateObj.setHours(hour || 0, minute || 0);
     }
-
     return format(dateObj, 'dd/MM/yyyy HH:mm');
   };
 
@@ -230,10 +228,7 @@ export default function ReturnPageClient() {
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
       <main className="flex-1 py-10 px-4">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          {t('return_page_client.title')}
-        </h1>
-
+        <h1 className="text-3xl font-bold text-center mb-8">{t('return_page_client.title')}</h1>
         <div className="max-w-2xl mx-auto space-y-8">
           <Card className="shadow-md rounded-xl">
             <CardContent className="p-5 space-y-4">
@@ -274,17 +269,16 @@ export default function ReturnPageClient() {
           {rentalInfo && (
             <Card className="shadow-md rounded-xl">
               <CardContent className="p-5 space-y-4 text-sm text-gray-800">
-                <div className="flex gap-2"><User className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.renter')}:</strong> {rentalInfo.fullName}</div>
+                <div className="flex gap-2"><UserIcon className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.renter')}:</strong> {rentalInfo.fullName}</div>
                 <div className="flex gap-2"><PhoneCall className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.phone')}:</strong> {rentalInfo.phone}</div>
-                <div className="flex gap-2"><span className="text-[#00d289]">🔧</span> <strong>{t('return_page_client.vehicle_id')}:</strong> {rentalInfo.vin}</div>
-                <div className="flex gap-2"><span className="text-[#00d289]">🪪</span> <strong>{t('return_page_client.plate_number')}:</strong> {rentalInfo.licensePlate}</div>
+                <div className="flex gap-2">🔧 <strong>{t('return_page_client.vehicle_id')}:</strong> {rentalInfo.vin}</div>
+                <div className="flex gap-2">🪪 <strong>{t('return_page_client.plate_number')}:</strong> {rentalInfo.licensePlate}</div>
                 <div className="flex gap-2"><Calendar className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.start')}:</strong> {formatDateTime(rentalInfo.rentalStartDate, rentalInfo.rentalStartHour)}</div>
                 <div className="flex gap-2"><Calendar className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.end')}:</strong> {formatDateTime(rentalInfo.rentalEndDate)}</div>
                 <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.price_per_day')}:</strong> {(rentalInfo.pricePerDay || 0).toLocaleString()}₫</div>
                 <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.total')}:</strong> {rentalInfo.totalAmount?.toLocaleString()}₫</div>
                 <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.deposit')}:</strong> {rentalInfo.deposit?.toLocaleString()}₫</div>
                 <div className="flex gap-2"><Coins className="w-4 h-4 text-[#00d289]" /> <strong>{t('return_page_client.remaining')}:</strong> {rentalInfo.remainingBalance?.toLocaleString()}₫</div>
-
                 <div className="flex justify-between flex-wrap mt-6 gap-2">
                   <Button variant="outline" onClick={() => setExtendOpen(true)}>{t('return_page_client.extend_button')}</Button>
                   <Button variant="secondary" onClick={() => setSwitchOpen(true)}>{t('return_page_client.switch_button')}</Button>
@@ -310,12 +304,13 @@ export default function ReturnPageClient() {
             open={switchOpen}
             onClose={() => setSwitchOpen(false)}
             onConfirm={handleSwitchConfirm}
+            companyId={companyId}
           />
         </div>
       </main>
       <Footer />
 
-      {/* ✅ Dialog confirm return if still owing */}
+      {/* Confirm Return if Owing */}
       <NotificationDialog
         open={showConfirmDialog}
         type="confirm"

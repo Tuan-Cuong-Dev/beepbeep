@@ -2393,12 +2393,13 @@
 },
 
 "rent_page_client": {
+  "title": "Create Rental Order",
   "loading": "Loading data...",
-  "access_denied": "You do not have permission to access this page.",
+  "access_denied": "You do not have permission to access.",
   "missing_company": "Company not found. Please check again.",
   "company": "Company",
   "role": "Role",
-  "no_company": "No company found"
+  "no_company": "No company available"
 },
 
 "dynamic_rental_form": {
@@ -2616,46 +2617,15 @@
     "Pickup at Store": "Pickup at Store",
     "Deliver to Address": "Deliver to Address"
   }
+},
+
+"switch_bike_modal": {
+  "title": "Switch to Another Vehicle",
+  "search_placeholder": "Search by VIN or Plate Number",
+  "no_plate": "No Plate",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

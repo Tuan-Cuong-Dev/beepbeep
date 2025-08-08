@@ -2419,6 +2419,7 @@
 },
 
 "rent_page_client": {
+  "title": "Tạo đơn thuê",
   "loading": "Đang tải dữ liệu...",
   "access_denied": "Bạn không có quyền truy cập.",
   "missing_company": "Không tìm thấy công ty. Vui lòng kiểm tra lại.",
@@ -2642,18 +2643,15 @@
     "Pickup at Store": "Đến cửa hàng lấy xe",
     "Deliver to Address": "Giao tận nơi"
   }
+},
+
+"switch_bike_modal": {
+  "title": "Chuyển sang xe khác",
+  "search_placeholder": "Tìm theo số VIN hoặc biển số",
+  "no_plate": "Chưa có biển số",
+  "cancel": "Huỷ",
+  "confirm": "Xác nhận"
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

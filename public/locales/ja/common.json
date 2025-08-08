@@ -2376,8 +2376,9 @@
   "confirm_description": "顧客には{{amount}}₫の未払いがあります。この金額を回収しましたか？"
 },
 "rent_page_client": {
+  "title": "レンタル注文を作成",
   "loading": "データを読み込み中...",
-  "access_denied": "このページへのアクセス権限がありません。",
+  "access_denied": "アクセスする権限がありません。",
   "missing_company": "会社が見つかりません。もう一度ご確認ください。",
   "company": "会社",
   "role": "役割",
@@ -2600,7 +2601,16 @@
     "Pickup at Store": "店舗で受け取り",
     "Deliver to Address": "住所に配達"
   }
+},
+
+"switch_bike_modal": {
+  "title": "別の車両に切り替える",
+  "search_placeholder": "VIN またはナンバープレートで検索",
+  "no_plate": "ナンバープレートなし",
+  "cancel": "キャンセル",
+  "confirm": "確認"
 }
+
 
 
 

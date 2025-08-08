@@ -2392,9 +2392,10 @@
 },
 
 "rent_page_client": {
-  "loading": "데이터를 불러오는 중...",
-  "access_denied": "이 페이지에 접근할 수 있는 권한이 없습니다.",
-  "missing_company": "회사를 찾을 수 없습니다. 다시 확인해 주세요.",
+  "title": "대여 주문 생성",
+  "loading": "데이터 불러오는 중...",
+  "access_denied": "접근 권한이 없습니다.",
+  "missing_company": "회사를 찾을 수 없습니다. 다시 확인해주세요.",
   "company": "회사",
   "role": "역할",
   "no_company": "등록된 회사가 없습니다"
@@ -2615,7 +2616,16 @@
     "Pickup at Store": "매장에서 수령",
     "Deliver to Address": "주소로 배송"
   }
+},
+
+"switch_bike_modal": {
+  "title": "다른 차량으로 전환",
+  "search_placeholder": "VIN 또는 번호판으로 검색",
+  "no_plate": "번호판 없음",
+  "cancel": "취소",
+  "confirm": "확인"
 }
+
 
 
 

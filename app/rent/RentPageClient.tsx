@@ -89,14 +89,9 @@ export default function RentPageClient() {
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
       <main className="flex-1 py-10">
-        <div className="text-left text-gray-600 text-sm mb-6 space-y-1 p-4 md:text-right">
-          <div>
-            <strong>{t('rent_page_client.company')}:</strong> {companyName || t('rent_page_client.no_company')}
-          </div>
-          <div>
-            <strong>🔐 {t('rent_page_client.role')}:</strong> {role}
-          </div>
-        </div>
+        <h1 className="text-3xl font-bold text-center mb-8">
+          {t('rent_page_client.title')}
+        </h1>
 
         {role === 'staff' ? (
           <DynamicRentalForm companyId={finalCompanyId} userId={user.uid} />
