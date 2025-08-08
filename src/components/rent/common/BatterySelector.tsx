@@ -1,9 +1,11 @@
 'use client';
+
 // Tác vụ chọn pin.
 import { useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { Input } from '@/src/components/ui/input';
+import { useTranslation } from 'react-i18next';
 
 interface BatterySelectorProps {
   value: string;
@@ -11,6 +13,8 @@ interface BatterySelectorProps {
 }
 
 export default function BatterySelector({ value, onChange }: BatterySelectorProps) {
+  const { t } = useTranslation('common');
+
   const [batteries, setBatteries] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -52,7 +56,11 @@ export default function BatterySelector({ value, onChange }: BatterySelectorProp
   return (
     <div className="relative space-y-2">
       <Input
-        placeholder={loading ? '🔄 Loading battery codes...' : 'Search battery code'}
+        placeholder={
+          loading
+            ? t('battery_selector.loading')
+            : t('battery_selector.placeholder')
+        }
         value={search || value}
         onChange={(e) => setSearch(e.target.value)}
       />

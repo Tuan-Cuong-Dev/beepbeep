@@ -21,7 +21,7 @@ export interface Customer {
   placeOfResidence?: string;    // Nơi thường trú
 
   // Liên kết công ty (nếu có)
-  companyId: string;
+  companyId?: string;
 
   // Mở rộng
   personalVehicleIds?: string[]; // Danh sách xe cá nhân (vehicleId)

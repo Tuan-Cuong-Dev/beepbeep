@@ -1,6 +1,7 @@
 'use client';
-// Scan chứng minh nhân dân.
+
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/src/components/ui/input';
 import { createCustomer, getAllCustomers, updateCustomer } from '@/src/lib/services/customers/customerService';
 import { auth } from '@/src/firebaseConfig';
@@ -15,6 +16,8 @@ interface IDUploaderProps {
 }
 
 export default function IDUploader({ onExtracted }: IDUploaderProps) {
+  const { t } = useTranslation('common');
+
   const [fileName, setFileName] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [ocrText, setOcrText] = useState('');
@@ -56,7 +59,7 @@ export default function IDUploader({ onExtracted }: IDUploaderProps) {
         nationality = '',
         placeOfOrigin = '',
         placeOfResidence = '',
-        dateOfBirth = null, // 👈 dạng chuỗi hoặc null
+        dateOfBirth = null,
       } = data;
 
       if (!name || !idNumber) throw new Error('Could not extract sufficient information from ID');
@@ -67,7 +70,6 @@ export default function IDUploader({ onExtracted }: IDUploaderProps) {
       const customers = await getAllCustomers();
       const existing = customers.find((c) => c.idNumber === idNumber);
 
-      // 👇 Chuyển dateOfBirth thành Timestamp nếu hợp lệ
       let parsedDateOfBirth: Timestamp | null = null;
       if (dateOfBirth) {
         const parsedDate = new Date(dateOfBirth);
@@ -84,7 +86,7 @@ export default function IDUploader({ onExtracted }: IDUploaderProps) {
         phone: '',
         address,
         driverLicense: '',
-        dateOfBirth: parsedDateOfBirth, // 👈 đã kiểm tra an toàn
+        dateOfBirth: parsedDateOfBirth,
         sex,
         nationality,
         placeOfOrigin,
@@ -93,14 +95,14 @@ export default function IDUploader({ onExtracted }: IDUploaderProps) {
 
       if (existing) {
         await updateCustomer(existing.id, customerData);
-        setMessage('✅ Customer information has been updated.');
+        setMessage(t('id_uploader.updated_success'));
       } else {
         await createCustomer(customerData);
-        setMessage('✅ New customer has been created.');
+        setMessage(t('id_uploader.created_success'));
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
-      setError('⚠️ OCR failed: ' + message);
+      setError(t('id_uploader.ocr_failed', { error: message }));
     } finally {
       setLoading(false);
     }
@@ -108,10 +110,17 @@ export default function IDUploader({ onExtracted }: IDUploaderProps) {
 
   return (
     <div className="space-y-2">
-      <Input type="file" accept="image/*" onChange={handleUpload} disabled={loading} />
+      <Input
+        type="file"
+        accept="image/*"
+        onChange={handleUpload}
+        disabled={loading}
+        aria-label={t('id_uploader.upload_file')}
+      />
       {fileName && (
         <div className="text-sm text-gray-600">
-          📄 Uploaded: {fileName} {loading && <span className="italic">– Processing...</span>}
+          {t('id_uploader.uploaded_file', { fileName })}{' '}
+          {loading && <span className="italic">– {t('id_uploader.processing')}</span>}
         </div>
       )}
       {message && <div className="text-sm text-blue-700 font-medium">{message}</div>}

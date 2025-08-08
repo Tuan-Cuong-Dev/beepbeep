@@ -2422,7 +2422,73 @@
   "loading": "Loading...",
   "access_denied": "Access denied.",
   "title": "Rent a Bike"
+},
+
+"battery_selector": {
+  "loading": "🔄 Loading battery codes...",
+  "placeholder": "Search battery code"
+},
+
+"dynamic_rental_field_renderer": {
+  "vehicle_search_placeholder": "Search by VIN / Plate / Model",
+  "unknown_model": "Unknown Model",
+  "vehicle_model": "Vehicle Model",
+  "select_date": "Select date",
+  "select_hour": "Select hour",
+  "select_prefix": "-- Select {{label}} --",
+  "package": "Rental package",
+  "base_price": "Base rental price (₫/day)",
+  "battery_fee": "Battery Rental or Insurance Fee (₫)",
+  "deposit": "Deposit amount (₫)",
+  "total_amount": "Total amount (auto-calculated)",
+  "remaining_balance": "Remaining balance (auto-calculated)",
+  "overage_rate": "Overage rate (₫/km)",
+  "date_label": "Date",
+  "hour_label": "Hour"
+},
+
+"id_uploader": {
+  "upload_file": "Upload ID image",
+  "uploaded_file": "📄 Uploaded: {{fileName}}",
+  "processing": "Processing...",
+  "ocr_failed": "⚠️ OCR failed: {{error}}",
+  "created_success": "✅ New customer has been created.",
+  "updated_success": "✅ Customer information has been updated."
+},
+
+"model_selector": {
+  "placeholder": "-- Select Model --"
+},
+
+"package_selector": {
+  "placeholder": "-- Select a package --",
+  "loading": "🔄 Loading packages...",
+  "load_error": "Failed to load subscription packages."
+},
+
+"qr_code_scanner": {
+  "scan_label": "📷 Scan QR Code on the Bike",
+  "scanning": "🔍 Scanning in progress...",
+  "ready": "Ready to scan"
+},
+
+"time_picker": {
+  "start_date": "Start Date",
+  "pick_date": "Pick a date",
+  "start_time": "Start Time",
+  "hour": "Hour",
+  "minute": "Minute",
+  "rental_days": "Rental Days",
+  "rental_days_placeholder": "Enter number of rental days"
 }
+
+
+
+
+
+
+
+
 
 
 

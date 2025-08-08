@@ -1,17 +1,19 @@
 'use client';
-// Dùng để quét mã QR Code => Chưa cho chạy vì nó gọi đên Camera thật nên ko demo được
+
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/src/components/ui/button';
 import { Label } from '@/src/components/ui/label';
 import QrScanner from 'qr-scanner';
 import { db } from '@/src/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
+import { useTranslation } from 'react-i18next';
 
 interface QRCodeScannerProps {
   onScanned: (bikeInfo: any) => void;
 }
 
 export default function QRCodeScanner({ onScanned }: QRCodeScannerProps) {
+  const { t } = useTranslation('common');
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const scannerRef = useRef<QrScanner | null>(null);
   const [scanning, setScanning] = useState(false);
@@ -50,7 +52,7 @@ export default function QRCodeScanner({ onScanned }: QRCodeScannerProps) {
     <div className="space-y-4 p-4 bg-white border border-gray-200 rounded-lg shadow">
       <div className="flex flex-col items-center">
         <Label className="text-center text-gray-700 font-medium text-lg mb-2">
-          📷 Scan QR Code on the Bike
+          {t('qr_code_scanner.scan_label')}
         </Label>
         <video
           ref={videoRef}
@@ -60,7 +62,7 @@ export default function QRCodeScanner({ onScanned }: QRCodeScannerProps) {
           autoPlay
         />
         <p className="text-sm text-gray-500 mt-2">
-          {scanning ? '🔍 Scanning in progress...' : 'Ready to scan'}
+          {scanning ? t('qr_code_scanner.scanning') : t('qr_code_scanner.ready')}
         </p>
       </div>
     </div>

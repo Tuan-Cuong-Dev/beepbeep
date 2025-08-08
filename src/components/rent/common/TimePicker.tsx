@@ -8,6 +8,7 @@ import { Label } from '@/src/components/ui/label';
 import { Input } from '@/src/components/ui/input';
 import { cn } from '@/src/lib/utils';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface TimePickerProps {
   onTimeSelected: (timeRange: {
@@ -24,6 +25,7 @@ function formatDateTimeLocal(date: Date): string {
 }
 
 export default function TimePicker({ onTimeSelected }: TimePickerProps) {
+  const { t } = useTranslation('common');
   const now = new Date();
   const [selectedDate, setSelectedDate] = useState<Date>(now);
   const [selectedHour, setSelectedHour] = useState<number>(now.getHours());
@@ -56,17 +58,17 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
 
         {/* 📅 Start Date */}
         <div className="space-y-2">
-          <Label>Start Date</Label>
+          <Label>{t('time_picker.start_date')}</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !selectedDate && "text-muted-foreground"
+                  'w-full justify-start text-left font-normal',
+                  !selectedDate && 'text-muted-foreground'
                 )}
               >
-                {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
+                {selectedDate ? format(selectedDate, 'PPP') : t('time_picker.pick_date')}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -82,7 +84,7 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
 
         {/* 🕒 Start Time */}
         <div className="space-y-2">
-          <Label>Start Time</Label>
+          <Label>{t('time_picker.start_time')}</Label>
           <div className="flex flex-col sm:flex-row gap-2">
             <Input
               type="number"
@@ -93,7 +95,7 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
                 const val = parseInt(e.target.value);
                 if (!isNaN(val)) setSelectedHour(Math.max(0, Math.min(23, val)));
               }}
-              placeholder="Hour"
+              placeholder={t('time_picker.hour')}
               className="w-full sm:w-1/2"
             />
             <Input
@@ -105,7 +107,7 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
                 const val = parseInt(e.target.value);
                 if (!isNaN(val)) setSelectedMinute(Math.max(0, Math.min(59, val)));
               }}
-              placeholder="Minute"
+              placeholder={t('time_picker.minute')}
               className="w-full sm:w-1/2"
             />
           </div>
@@ -114,7 +116,7 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
 
       {/* 📅 Rental Days */}
       <div className="space-y-2">
-        <Label>Rental Days</Label>
+        <Label>{t('time_picker.rental_days')}</Label>
         <Input
           type="number"
           min={1}
@@ -123,7 +125,7 @@ export default function TimePicker({ onTimeSelected }: TimePickerProps) {
             const val = parseInt(e.target.value);
             setRentalDays(isNaN(val) || val <= 0 ? 1 : val);
           }}
-          placeholder="Number of Rental Days"
+          placeholder={t('time_picker.rental_days_placeholder')}
         />
       </div>
     </div>

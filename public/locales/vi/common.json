@@ -2448,7 +2448,71 @@
   "loading": "Đang tải dữ liệu...",
   "access_denied": "Bạn không có quyền truy cập.",
   "title": "Thuê xe"
+},
+
+"battery_selector": {
+  "loading": "🔄 Đang tải mã pin...",
+  "placeholder": "Tìm mã pin"
+},
+
+"dynamic_rental_field_renderer": {
+  "vehicle_search_placeholder": "Tìm theo VIN / Biển số / Dòng xe",
+  "unknown_model": "Chưa rõ dòng xe",
+  "vehicle_model": "Dòng xe",
+  "select_date": "Chọn ngày",
+  "select_hour": "Chọn giờ",
+  "select_prefix": "-- Chọn {{label}} --",
+  "package": "Gói thuê xe",
+  "base_price": "Giá thuê cơ bản (₫/ngày)",
+  "battery_fee": "Phí thuê pin hoặc bảo hiểm (₫)",
+  "deposit": "Số tiền đặt cọc (₫)",
+  "total_amount": "Tổng tiền (tự động tính)",
+  "remaining_balance": "Số tiền còn lại (tự động tính)",
+  "overage_rate": "Phụ phí vượt giới hạn (₫/km)",
+  "date_label": "Ngày",
+  "hour_label": "Giờ"
+},
+
+"id_uploader": {
+  "upload_file": "Tải ảnh CMND/CCCD",
+  "uploaded_file": "📄 Đã tải lên: {{fileName}}",
+  "processing": "Đang xử lý...",
+  "ocr_failed": "⚠️ Nhận diện ký tự (OCR) thất bại: {{error}}",
+  "created_success": "✅ Đã tạo khách hàng mới.",
+  "updated_success": "✅ Đã cập nhật thông tin khách hàng."
+},
+
+"model_selector": {
+  "placeholder": "-- Chọn mẫu xe --"
+},
+
+"package_selector": {
+  "placeholder": "-- Chọn gói thuê --",
+  "loading": "🔄 Đang tải gói thuê...",
+  "load_error": "Không thể tải danh sách gói thuê."
+},
+
+"qr_code_scanner": {
+  "scan_label": "📷 Quét mã QR trên xe",
+  "scanning": "🔍 Đang quét...",
+  "ready": "Sẵn sàng để quét"
+},
+
+"time_picker": {
+  "start_date": "Ngày bắt đầu",
+  "pick_date": "Chọn ngày",
+  "start_time": "Giờ bắt đầu",
+  "hour": "Giờ",
+  "minute": "Phút",
+  "rental_days": "Số ngày thuê",
+  "rental_days_placeholder": "Nhập số ngày thuê"
 }
+
+
+
+
+
+
 
 
 

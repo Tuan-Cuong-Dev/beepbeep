@@ -2421,7 +2421,73 @@
   "loading": "로딩 중...",
   "access_denied": "접근이 거부되었습니다.",
   "title": "오토바이 대여"
+},
+
+"battery_selector": {
+  "loading": "🔄 배터리 코드를 불러오는 중...",
+  "placeholder": "배터리 코드 검색"
+},
+
+"dynamic_rental_field_renderer": {
+  "vehicle_search_placeholder": "VIN / 번호판 / 모델 검색",
+  "unknown_model": "알 수 없는 모델",
+  "vehicle_model": "차량 모델",
+  "select_date": "날짜 선택",
+  "select_hour": "시간 선택",
+  "select_prefix": "-- {{label}} 선택 --",
+  "package": "렌탈 패키지",
+  "base_price": "기본 대여 요금 (₫/일)",
+  "battery_fee": "배터리 또는 보험 요금 (₫)",
+  "deposit": "보증금 금액 (₫)",
+  "total_amount": "총 금액 (자동 계산)",
+  "remaining_balance": "남은 금액 (자동 계산)",
+  "overage_rate": "초과 요금 (₫/km)",
+  "date_label": "날짜",
+  "hour_label": "시간"
+},
+
+"id_uploader": {
+  "upload_file": "신분증 이미지 업로드",
+  "uploaded_file": "📄 업로드됨: {{fileName}}",
+  "processing": "처리 중...",
+  "ocr_failed": "⚠️ OCR 실패: {{error}}",
+  "created_success": "✅ 신규 고객이 생성되었습니다.",
+  "updated_success": "✅ 고객 정보가 업데이트되었습니다."
+},
+
+"model_selector": {
+  "placeholder": "-- 모델 선택 --"
+},
+
+"package_selector": {
+  "placeholder": "-- 구독 패키지를 선택하세요 --",
+  "loading": "🔄 패키지를 불러오는 중...",
+  "load_error": "구독 패키지를 불러오지 못했습니다."
+},
+
+"qr_code_scanner": {
+  "scan_label": "📷 바이크의 QR 코드를 스캔하세요",
+  "scanning": "🔍 스캔 중...",
+  "ready": "스캔 준비 완료"
+},
+
+"time_picker": {
+  "start_date": "시작 날짜",
+  "pick_date": "날짜 선택",
+  "start_time": "시작 시간",
+  "hour": "시",
+  "minute": "분",
+  "rental_days": "대여 일수",
+  "rental_days_placeholder": "대여 일수를 입력하세요"
 }
+
+
+
+
+
+
+
+
 
 
 

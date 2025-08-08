@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { SimpleSelect } from '@/src/components/ui/select';
+import { useTranslation } from 'react-i18next';
 
 interface PackageSelectorProps {
   value: string;
@@ -18,6 +19,7 @@ export default function PackageSelector({
   onNotify,
   companyId,
 }: PackageSelectorProps) {
+  const { t } = useTranslation('common');
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +32,7 @@ export default function PackageSelector({
         const q = query(
           collection(db, 'subscriptionPackages'),
           where('companyId', '==', companyId),
-          where('status', '==', 'available') // ✅ chỉ lấy gói đang hoạt động
+          where('status', '==', 'available')
         );
         const snap = await getDocs(q);
         const list = snap.docs.map((doc) => {
@@ -43,21 +45,21 @@ export default function PackageSelector({
         setOptions(list);
       } catch (err) {
         console.error('❌ Error fetching packages:', err);
-        onNotify?.('Failed to load subscription packages.', 'error');
+        onNotify?.(t('package_selector.load_error'), 'error');
       } finally {
         setLoading(false);
       }
     };
 
     fetchPackages();
-  }, [companyId]);
+  }, [companyId, t, onNotify]);
 
   return (
     <SimpleSelect
       value={value}
       onChange={onChange}
       options={options}
-      placeholder={loading ? '🔄 Loading packages...' : '-- Select a package --'}
+      placeholder={loading ? t('package_selector.loading') : t('package_selector.placeholder')}
     />
   );
 }
