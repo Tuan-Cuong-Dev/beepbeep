@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
-import { VEHICLE_SUBTYPE_LABELS, VEHICLE_TYPE_LABELS, FUEL_TYPE_LABELS } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { Button } from '@/src/components/ui/button';
@@ -20,6 +19,32 @@ interface Props {
 }
 
 const ITEMS_PER_PAGE = 10;
+
+/** ✅ Icon mặc định theo vehicleType */
+const DEFAULT_ICONS: Record<string, string> = {
+  bicycle: '/assets/images/vehicles/bicycle.png',
+  bus: '/assets/images/vehicles/bus.png',
+  car: '/assets/images/vehicles/car.png',
+  motorbike: '/assets/images/vehicles/motorbike.png',
+  van: '/assets/images/vehicles/van.png',
+};
+
+/** Giữ nguyên: convert link Google Drive thành link trực tiếp */
+const getDirectImageUrl = (url?: string): string | undefined => {
+  if (!url) return undefined;
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+  const id = match?.[1];
+  return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
+};
+
+/** ✅ Ưu tiên ảnh của model; nếu không có -> icon theo type; cuối cùng -> placeholder */
+const resolveModelImage = (model: VehicleModel): string => {
+  return (
+    getDirectImageUrl(model.imageUrl) ||
+    DEFAULT_ICONS[model.vehicleType] ||
+    '/vehicles/placeholder.png'
+  );
+};
 
 export default function VehicleModelTable({ companyId, models, onEdit, onReload }: Props) {
   const { t } = useTranslation('common');
@@ -46,13 +71,6 @@ export default function VehicleModelTable({ companyId, models, onEdit, onReload 
     });
   };
 
-  const getDirectImageUrl = (url?: string): string | undefined => {
-    if (!url) return undefined;
-    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
-    const id = match?.[1];
-    return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
-  };
-
   const getVehicleTypeLabel = (key: string) => t(`vehicle_model_form.vehicle_type.${key}`);
   const getFuelTypeLabel = (key: string) => t(`vehicle_model_form.fuel_type.${key}`);
   const getSubTypeLabel = (key: string) => t(`vehicle_model_form.sub_type.${key}`);
@@ -75,11 +93,13 @@ export default function VehicleModelTable({ companyId, models, onEdit, onReload 
             {pagedModels.map((model) => (
               <tr key={model.id} className="hover:bg-gray-50">
                 <td className="border px-2 py-1">
-                  {model.imageUrl ? (
-                    <Image src={getDirectImageUrl(model.imageUrl) as string} alt={model.name} width={60} height={40} className="rounded object-cover" />
-                  ) : (
-                    <span className="text-gray-400 italic">{t('vehicle_model_table.no_image')}</span>
-                  )}
+                  <Image
+                    src={resolveModelImage(model)}
+                    alt={model.name || model.vehicleType}
+                    width={60}
+                    height={40}
+                    className="rounded object-cover bg-gray-50 border w-[60px] h-[40px]"
+                  />
                 </td>
                 <td className="border px-2 py-1 max-w-[160px] truncate">{model.name}</td>
                 <td className="border px-2 py-1">{getVehicleTypeLabel(model.vehicleType)}</td>
@@ -119,11 +139,13 @@ export default function VehicleModelTable({ companyId, models, onEdit, onReload 
         {pagedModels.map((model) => (
           <div key={model.id} className="border rounded-lg p-4 shadow-sm bg-white">
             <div className="flex gap-3 items-start">
-              {model.imageUrl ? (
-                <Image src={getDirectImageUrl(model.imageUrl) as string} alt={model.name} width={60} height={40} className="rounded object-cover" />
-              ) : (
-                <span className="text-gray-400 italic">{t('vehicle_model_table.no_image')}</span>
-              )}
+              <Image
+                src={resolveModelImage(model)}
+                alt={model.name || model.vehicleType}
+                width={60}
+                height={40}
+                className="rounded object-cover bg-gray-50 border w-[60px] h-[40px]"
+              />
               <div className="flex-1">
                 <h3 className="font-semibold">{model.name}</h3>
                 <p className="text-xs text-gray-500">
