@@ -10,6 +10,7 @@ import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import Image from 'next/image';
+import type { StaticImageData } from 'next/image';
 
 interface Props {
   companyId: string;
@@ -20,16 +21,35 @@ interface Props {
 
 const ITEMS_PER_PAGE = 10;
 
-/** ✅ Icon mặc định theo vehicleType */
-const DEFAULT_ICONS: Record<string, string> = {
-  bicycle: '/assets/images/vehicles/bicycle.png',
-  bus: '/assets/images/vehicles/bus.png',
-  car: '/assets/images/vehicles/car.png',
-  motorbike: '/assets/images/vehicles/motorbike.png',
-  van: '/assets/images/vehicles/van.png',
+/** ✅ Static imports — đảm bảo được bundle vào build */
+import bicycleIcon from '@/public/assets/images/vehicles/bicycle.png';
+import busIcon from '@/public/assets/images/vehicles/bus.png';
+import carIcon from '@/public/assets/images/vehicles/car.png';
+import motorbikeIcon from '@/public/assets/images/vehicles/motorbike.png';
+import vanIcon from '@/public/assets/images/vehicles/van.png';
+
+const placeholderIcon =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40" viewBox="0 0 60 40" fill="none">
+  <rect width="60" height="40" fill="white"/>
+  <path d="M10 30H50L45 20H15L10 30Z" stroke="%2300d289" stroke-width="2" fill="none"/>
+  <circle cx="18" cy="30" r="3" fill="%2300d289"/>
+  <circle cx="42" cy="30" r="3" fill="%2300d289"/>
+</svg>
+`);
+
+
+/** ✅ Map icon mặc định theo vehicleType */
+const DEFAULT_ICONS: Record<string, StaticImageData> = {
+  bicycle: bicycleIcon,
+  bus: busIcon,
+  car: carIcon,
+  motorbike: motorbikeIcon,
+  van: vanIcon,
 };
 
-/** Giữ nguyên: convert link Google Drive thành link trực tiếp */
+/** Convert link Google Drive thành link trực tiếp (nếu có) */
 const getDirectImageUrl = (url?: string): string | undefined => {
   if (!url) return undefined;
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
@@ -37,13 +57,9 @@ const getDirectImageUrl = (url?: string): string | undefined => {
   return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
 };
 
-/** ✅ Ưu tiên ảnh của model; nếu không có -> icon theo type; cuối cùng -> placeholder */
-const resolveModelImage = (model: VehicleModel): string => {
-  return (
-    getDirectImageUrl(model.imageUrl) ||
-    DEFAULT_ICONS[model.vehicleType] ||
-    '/vehicles/placeholder.png'
-  );
+/** ✅ Ưu tiên ảnh của model; nếu không có → icon theo type; cuối cùng → placeholder */
+const resolveModelImage = (model: VehicleModel): string | StaticImageData => {
+  return getDirectImageUrl(model.imageUrl) || DEFAULT_ICONS[model.vehicleType] || placeholderIcon;
 };
 
 export default function VehicleModelTable({ companyId, models, onEdit, onReload }: Props) {
