@@ -95,7 +95,7 @@ export interface VehicleModel {
   modelCode?: string;            // Mã kỹ thuật của hãng (tuỳ chọn)
 
   batteryCapacity?: string;      // Dung lượng pin nếu là xe điện (VD: "72V22Ah")
-  motorPower?: number;           // Công suất motor (W)
+  motorPower?: string;           // Công suất motor (W); Cường chuyển từ number qua String để xữ lý luôn động xăng.
   fuelType?: FuelType;           // Loại nhiên liệu
 
   topSpeed?: number;             // Tốc độ tối đa (km/h)

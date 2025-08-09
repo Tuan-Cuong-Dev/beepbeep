@@ -168,13 +168,12 @@ export default function VehicleModelForm({
             onChange={(e) => handleChange('batteryCapacity', e.target.value)}
           />
           <Input
-            type="number"
+            type="text"
             placeholder={t('vehicle_model_form.motor_power')}
             value={newModel.motorPower ?? ''}
-            onChange={(e) =>
-              handleChange('motorPower', e.target.valueAsNumber || 0)
-            }
+            onChange={(e) => handleChange('motorPower', e.target.value)}
           />
+
           <SimpleSelect
             options={fuelTypeOptions}
             placeholder={t('vehicle_model_form.select_fuel_type')}
