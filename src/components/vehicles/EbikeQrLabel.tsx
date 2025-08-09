@@ -6,7 +6,7 @@
 "use client";
 
 import QRCode from "react-qr-code";
-import { Ebike } from "@/src/lib/vehicles/vehicleTypes";
+import { Ebike } from "@/src/lib/vehicles/ebikeTypes";
 
 interface Props {
   ebike: Ebike;

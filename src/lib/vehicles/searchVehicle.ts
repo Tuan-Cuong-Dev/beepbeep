@@ -1,4 +1,4 @@
-import { Ebike } from './vehicleTypes';
+import { Ebike } from './ebikeTypes';
 
 /**
  * Hàm tìm kiếm xe đạp điện theo nhiều tiêu chí

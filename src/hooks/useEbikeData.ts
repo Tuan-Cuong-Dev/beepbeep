@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { useUser } from '@/src/context/AuthContext';
 

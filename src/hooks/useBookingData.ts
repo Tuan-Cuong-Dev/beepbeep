@@ -18,7 +18,7 @@ import {
 import { db } from '@/src/firebaseConfig';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 
 export function useBookingData(filters?: { startDate?: string; endDate?: string }) {
   const [bookings, setBookings] = useState<Booking[]>([]);

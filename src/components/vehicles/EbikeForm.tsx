@@ -5,7 +5,7 @@ import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { SimpleSelect } from '@/src/components/ui/select';
-import { EbikeStatus, Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { EbikeStatus, Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { useUser } from '@/src/context/AuthContext';

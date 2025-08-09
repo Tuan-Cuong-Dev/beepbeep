@@ -8,7 +8,7 @@ import { ScrollArea } from '@/src/components/ui/scroll-area';
 import { Input } from '@/src/components/ui/input';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 
 interface SwitchBikeModalProps {
   open: boolean;

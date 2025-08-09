@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { Ebike } from './vehicleTypes';
+import { Ebike } from './ebikeTypes';
 import { EbikeModel } from '../vehicle-models/vehicleModelTypes';
 import { Timestamp, collection, addDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';

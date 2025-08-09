@@ -3,7 +3,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 
 interface Props {

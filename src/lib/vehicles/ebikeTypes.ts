@@ -1,4 +1,6 @@
-// lib/ebikes/ebikeTypes.ts
+// lib/ebikes/ebikeTypes.ts 
+
+// Thao tác chuyển rồi xóa
 import { Timestamp } from "firebase/firestore";
 
 // Enum giúp type-safe khi dùng status

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Timestamp, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 import { Booking, SubmitResult } from '@/src/lib/booking/BookingTypes';

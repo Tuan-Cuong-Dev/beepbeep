@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { Button } from '@/src/components/ui/button';

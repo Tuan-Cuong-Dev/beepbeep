@@ -19,7 +19,7 @@ import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import ExtendRentalModal from '@/src/components/return/ExtendRentalModal';
 import SwitchBikeModal from '@/src/components/return/SwitchBikeModal';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { Bike, User as UserIcon, Calendar, PhoneCall, Coins, CheckCircle, AlertCircle } from 'lucide-react';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { format, differenceInDays } from 'date-fns';

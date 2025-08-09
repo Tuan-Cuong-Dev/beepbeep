@@ -13,7 +13,7 @@ import PrintQRModal from '@/src/components/vehicles/PrintQRModal';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import Pagination from '@/src/components/ui/pagination';
 import EbikeSummaryCard from '@/src/components/vehicles/EbikeSummaryCard';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { deleteDoc, doc, Timestamp, collection, getDocs } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
 import { useEbikeData } from '@/src/hooks/useEbikeData';

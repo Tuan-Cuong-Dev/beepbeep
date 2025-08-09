@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Ebike } from '@/src/lib/vehicles/vehicleTypes';
+import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
 import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { exportEbikesToExcel } from '@/src/lib/vehicles/exportVehicle';

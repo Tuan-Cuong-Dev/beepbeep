@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/src/firebaseConfig";
-import { Ebike } from "@/src/lib/vehicles/vehicleTypes";
+import { Ebike } from "@/src/lib/vehicles/ebikeTypes";
 
 export function useEbikeListByCompany(companyId: string) {
   const [ebikes, setEbikes] = useState<Ebike[]>([]);

@@ -1,7 +1,7 @@
 // src/lib/ebikes/exportEbikes.ts
 
 import * as XLSX from 'xlsx';
-import { Ebike } from './vehicleTypes';
+import { Ebike } from './ebikeTypes';
 import { EbikeModel } from '../vehicle-models/vehicleModelTypes';
 import { RentalStation } from '../rentalStations/rentalStationTypes';
 import { getDoc, doc } from 'firebase/firestore';
