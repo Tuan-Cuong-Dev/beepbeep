@@ -1,20 +1,20 @@
-// src/lib/ebikes/exportEbikes.ts
+// src/lib/vehicles/exportvehicles.ts
 
 import * as XLSX from 'xlsx';
 import { Ebike } from './ebikeTypes';
-import { EbikeModel } from '../vehicle-models/vehicleModelTypes';
+import { VehicleModel } from '../vehicle-models/vehicleModelTypes';
 import { RentalStation } from '../rentalStations/rentalStationTypes';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 
 interface ExportEbikeOptions {
-  ebikes: Ebike[];
-  models: EbikeModel[];
+  vehicles: Ebike[];
+  models: VehicleModel[];
   stations: RentalStation[];
   companyId: string;
 }
 
-export const exportEbikesToExcel = async ({ ebikes, models, stations, companyId }: ExportEbikeOptions) => {
+export const exportvehiclesToExcel = async ({ vehicles, models, stations, companyId }: ExportEbikeOptions) => {
   const modelMap: Record<string, string> = {};
   const stationMap: Record<string, string> = {};
   let companyName = 'Unknown Company';
@@ -36,7 +36,7 @@ export const exportEbikesToExcel = async ({ ebikes, models, stations, companyId 
     console.error('❌ Error fetching company name in export:', err);
   }
 
-  const exportData = ebikes.map((e) => ({
+  const exportData = vehicles.map((e) => ({
     id: e.id || '',
     modelName: modelMap[e.modelId] || 'Unknown Model',
     serialNumber: e.serialNumber || '',
@@ -67,6 +67,6 @@ export const exportEbikesToExcel = async ({ ebikes, models, stations, companyId 
 
   const worksheet = XLSX.utils.json_to_sheet(exportData);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Ebikes');
-  XLSX.writeFile(workbook, 'ebikes_export.xlsx');
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'vehicles');
+  XLSX.writeFile(workbook, 'vehicles_export.xlsx');
 };

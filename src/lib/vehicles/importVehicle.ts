@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { Ebike } from './ebikeTypes';
-import { EbikeModel } from '../vehicle-models/vehicleModelTypes';
+import { VehicleModel } from '../vehicle-models/vehicleModelTypes';
 import { Timestamp, collection, addDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 
@@ -25,10 +25,10 @@ interface EbikeExcelImport {
   companyName?: string;
 }
 
-export const importEbikes = async (
+export const importvehicles = async (
   file: File,
-  models: EbikeModel[],
-  onFinish: (newEbikes: Ebike[]) => void,
+  models: VehicleModel[],
+  onFinish: (newvehicles: Ebike[]) => void,
   companyId: string,
   stationMap: Record<string, string>
 ) => {
@@ -51,7 +51,7 @@ export const importEbikes = async (
         (key) => stationMap[key] === item.stationName
       );
 
-      await addDoc(collection(db, 'ebikes'), {
+      await addDoc(collection(db, 'vehicles'), {
         modelId: model.id,
         serialNumber: item.serialNumber || '',
         vehicleID: item.vehicleID || '',
@@ -73,13 +73,13 @@ export const importEbikes = async (
       });
     }
 
-    const ebikesSnapshot = await getDocs(collection(db, 'ebikes'));
-    const ebikesList = ebikesSnapshot.docs.map((doc) => ({
+    const vehiclesSnapshot = await getDocs(collection(db, 'vehicles'));
+    const vehiclesList = vehiclesSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...(doc.data() as Omit<Ebike, 'id'>),
     }));
 
-    onFinish(ebikesList);
+    onFinish(vehiclesList);
   };
 
   reader.readAsArrayBuffer(file);

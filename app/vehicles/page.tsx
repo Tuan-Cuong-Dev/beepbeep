@@ -7,13 +7,13 @@ import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import EbikeModelForm from '@/src/components/vehicleModels/EbikeModelForm';
 import EbikeModelTable from '@/src/components/vehicleModels/EbikeModelTable';
 import EbikeForm from '@/src/components/vehicles/EbikeForm';
-import EbikeTable from '@/src/components/vehicles/EbikeTable';
-import EbikeSearchImportExport from '@/src/lib/vehicles/vehicleSearchImportExport';
+import VehicleTable from '@/src/components/vehicles/VehicleTable';
+import VehicleSearchImportExport from '@/src/components/vehicles/VehicleSearchImportExport';
 import PrintQRModal from '@/src/components/vehicles/PrintQRModal';
+import VehicleSummaryCard from '@/src/components/vehicles/VehicleSummaryCard';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import Pagination from '@/src/components/ui/pagination';
-import EbikeSummaryCard from '@/src/components/vehicles/EbikeSummaryCard';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
+import { Vehicle } from '@/src/lib/vehicles/vehicleTypes';
 import { deleteDoc, doc, Timestamp, collection, getDocs } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
 import { useEbikeData } from '@/src/hooks/useEbikeData';
@@ -22,7 +22,7 @@ import { useRentalStations } from '@/src/hooks/useRentalStations';
 import { db } from '@/src/firebaseConfig';
 import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 
-const emptyEbike: Ebike = {
+const emptyVehicle: Vehicle = {
   id: '',
   modelId: '',
   serialNumber: '',
@@ -77,14 +77,14 @@ export default function EbikeManagementPage() {
   });
 
   const { stations, loading: stationsLoading } = useRentalStations(companyId || '', isAdmin);
-  const [newEbike, setNewEbike] = useState<Ebike | null>(null);
+  const [newEbike, setNewEbike] = useState<Vehicle | null>(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [modelPage, setModelPage] = useState(1);
   const modelPageSize = 5;
 
   useEffect(() => {
     if (companyId || isAdmin) {
-      setNewEbike({ ...emptyEbike, companyId: companyId || '', stationId: stationId || '' });
+      setNewEbike({ ...emptyVehicle, companyId: companyId || '', stationId: stationId || '' });
     }
   }, [companyId, stationId, isAdmin]);
 
@@ -111,28 +111,28 @@ export default function EbikeManagementPage() {
     setIsUpdateMode(false);
   };
 
-  const handleEbikeEdit = (bike: Ebike) => {
+  const handleEbikeEdit = (vehicle: Vehicle) => {
     const safeBike = {
-      ...bike,
+      ...vehicle,
       lastMaintained:
-        bike.lastMaintained instanceof Timestamp
-          ? bike.lastMaintained
+        vehicle.lastMaintained instanceof Timestamp
+          ? vehicle.lastMaintained
           : Timestamp.fromDate(new Date()),
     };
     setNewEbike(safeBike);
     setIsUpdateMode(true);
   };
 
-  const handleConfirmDelete = (bike: Ebike) => {
+  const handleConfirmDelete = (vehicle: Vehicle) => {
     setDialog({
       open: true,
       type: 'confirm',
       title: 'Confirm Delete',
-      description: `Are you sure you want to delete "${bike.serialNumber}"?`,
+      description: `Are you sure you want to delete "${vehicle.serialNumber}"?`,
       onConfirm: async () => {
         try {
-          await deleteDoc(doc(db, 'ebikes', bike.id));
-          setEbikes((prev) => prev.filter((b) => b.id !== bike.id));
+          await deleteDoc(doc(db, 'vehicles', vehicle.id));
+          setEbikes((prev) => prev.filter((b) => b.id !== vehicle.id));
           setDialog((prev) => ({ ...prev, open: false }));
           showDialog('success', 'Ebike deleted successfully!');
         } catch (err) {
@@ -188,17 +188,17 @@ export default function EbikeManagementPage() {
       <main className="p-6 mt-1 flex-grow">
         <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">Vehicle Management</h1>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 mb-6">
-          <EbikeSummaryCard status="Total" count={totalEbikeCount} total={totalEbikeCount} />
+        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-4 mb-6">
+          <VehicleSummaryCard status="Total" count={totalEbikeCount} total={totalEbikeCount} />
           {Object.entries(ebikeStatusCount).map(([status, count]) => (
-            <EbikeSummaryCard key={status} status={status} count={count} total={totalEbikeCount} />
+            <VehicleSummaryCard key={status} status={status} count={count} total={totalEbikeCount} />
           ))}
         </div>
 
-        <EbikeSearchImportExport
-          ebikes={ebikes}
+        <VehicleSearchImportExport
+          vehicles={ebikes}
           models={ebikeModels}
-          setEbikes={setEbikes}
+          setVehicle={setEbikes}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           statusFilter={statusFilter}
@@ -213,11 +213,11 @@ export default function EbikeManagementPage() {
           companyMap={companyMap}
         />
 
-        <EbikeTable
-          ebikes={paginatedEbikes}
+        <VehicleTable
+          vehicles={paginatedEbikes}
           models={ebikeModels}
           stations={stations}
-          setEbikes={setEbikes}
+          setvehicles={setEbikes}
           onEdit={handleEbikeEdit}
           onDeleteConfirm={handleConfirmDelete}
           companyId={companyId || ''}

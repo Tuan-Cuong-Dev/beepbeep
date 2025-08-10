@@ -10,6 +10,7 @@ import {
   HelpCircle,
   Layers,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   status: string;
@@ -17,7 +18,9 @@ interface Props {
   total: number;
 }
 
-export default function EbikeSummaryCard({ status, count, total }: Props) {
+export default function VehicleSummaryCard({ status, count, total }: Props) {
+  const { t } = useTranslation('common');
+
   const statusStyleMap: Record<
     string,
     { color: string; icon: React.ReactNode }
@@ -70,10 +73,10 @@ export default function EbikeSummaryCard({ status, count, total }: Props) {
     >
       <CardContent className="flex flex-col items-center justify-center gap-1 py-6">
         <div>{style.icon}</div>
-        <div className="text-sm font-semibold">{status}</div>
+        <div className="text-sm font-semibold">{t(status)}</div>
         <div className="text-3xl font-bold leading-tight">{count}</div>
         {status !== 'Total' && (
-          <div className="text-xs text-muted-foreground">{percentage} of total</div>
+          <div className="text-xs text-muted-foreground hidden md:block">{percentage} {t('of_total')}</div>
         )}
       </CardContent>
     </Card>

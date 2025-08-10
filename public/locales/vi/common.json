@@ -2909,7 +2909,124 @@
     "available": "Trạng thái",
     "actions": "Thao tác"
   }
-}
+},
+
+  "Total": "Tổng cộng",
+  "Available": "Có sẵn",
+  "Reserved": "Đã đặt trước",
+  "In Use": "Đang sử dụng",
+  "Under Maintenance": "Đang bảo trì",
+  "Broken": "Hư hỏng",
+  "Sold": "Đã bán",
+  "of_total": "trong tổng số",
+  "vehicle_summary_card": {
+    "Total": {
+      "color": "bg-white text-black border border-gray-300",
+      "icon": "Layers"
+    },
+    "Available": {
+      "color": "bg-green-100 text-green-800",
+      "icon": "BadgeCheck"
+    },
+    "Reserved": {
+      "color": "bg-blue-100 text-blue-800",
+      "icon": "HelpCircle"
+    },
+    "In Use": {
+      "color": "bg-orange-100 text-orange-800",
+      "icon": "Car"
+    },
+    "Under Maintenance": {
+      "color": "bg-yellow-100 text-yellow-800",
+      "icon": "Wrench"
+    },
+    "Broken": {
+      "color": "bg-red-100 text-red-800",
+      "icon": "AlertTriangle"
+    },
+    "Sold": {
+      "color": "bg-gray-100 text-gray-800",
+      "icon": "Archive"
+    }
+  },
+
+  "vehicle_search_import_export": {
+    "Import": "Nhập file",
+    "Export": "Xuất file",
+    "Print QR Labels": "In nhãn QR",
+    "Delete All": "Xóa tất cả",
+    "Search...": "Tìm kiếm...",
+    "All Companies": "Tất cả công ty",
+    "All Status": "Tất cả trạng thái",
+    "Available": "Có sẵn",
+    "In Use": "Đang sử dụng",
+    "Under Maintenance": "Đang bảo trì",
+    "Reserved": "Đã đặt trước",
+    "Sold": "Đã bán",
+    "Broken": "Hỏng",
+    "All Stations": "Tất cả trạm",
+    "Confirm Deletion": "Xác nhận xóa",
+    "Are you sure you want to permanently delete": "Bạn có chắc chắn muốn xóa vĩnh viễn",
+    "This action cannot be undone": "Hành động này không thể hoàn tác",
+    "Cancel": "Hủy bỏ",
+    "Confirm Export": "Xác nhận xuất khẩu",
+    "Confirm Import": "Xác nhận nhập khẩu",
+    "Import completed": "Nhập khẩu hoàn tất",
+    "Vehicles imported successfully.": "Các phương tiện đã được nhập khẩu thành công.",
+    "Exported": "Đã xuất khẩu",
+    "vehicles exported": "phương tiện đã xuất khẩu",
+    "Deleted All": "Đã xóa tất cả",
+    "vehicles deleted successfully": "Các phương tiện đã bị xóa thành công",
+    "Delete Failed": "Xóa thất bại",
+    "An error occurred while deleting vehicles.": "Đã xảy ra lỗi khi xóa phương tiện.",
+    "Deleting...": "Đang xóa..."
+  },
+
+  "apply_model_pricing_button": {
+    "Company ID not found!": "Company ID không tìm thấy!",
+    "Updated pricing for": "Đã cập nhật giá cho {{count}} phương tiện.",
+    "Failed to apply pricing.": "Áp dụng giá không thành công.",
+    "Applying...": "Đang áp dụng...",
+    "Apply Pricing from Models": "Áp dụng giá theo các mẫu xe"
+  },
+
+"vehicle_table": {
+    "Vehicle List": "Danh sách phương tiện",
+    "Model": "Mẫu xe",
+    "Serial": "Serial",
+    "Vehicle ID": "Số Khung",
+    "QR Code": "Mã QR",
+    "Plate": "Biển số",
+    "Color": "Màu sắc",
+    "ODO": "Odo",
+    "Battery": "Pin",
+    "Range": "Quảng đường",
+    "Status": "Trạng thái",
+    "Location": "Vị trí",
+    "Note": "Ghi chú",
+    "Price/Hour": "Giá/giờ",
+    "Price/Day": "Giá/ngày",
+    "Price/Week": "Giá/tuần",
+    "Price/Month": "Giá/tháng",
+    "Station Name": "Tên trạm",
+    "Company": "Công ty",
+    "Actions": "Hành động",
+    "Edit": "Chỉnh sửa",
+    "Delete": "Xóa",
+    "Unknown": "Không xác định"
+  },
+
+  "vehicle_status": {
+  "Available": "Sẵn sàng",
+  "Reserved": "Đã đặt",
+  "In Use": "Đang sử dụng",
+  "Under Maintenance": "Bảo dưỡng",
+  "Broken": "Hỏng",
+  "Sold": "Đã bán"
+},
+"vehicle_location": "Vị trí hiện tại",
+"Unknown": "Không xác định"
+
 
 
 

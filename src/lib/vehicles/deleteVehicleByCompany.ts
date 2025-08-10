@@ -8,19 +8,19 @@ const canDeleteByCompany = (role: string) =>
   ['company_owner', 'company_admin'].includes(role.toLowerCase());
 
 /**
- * ❗ Xóa tất cả ebikes của một công ty (dành cho Company Owner, Company Admin)
+ * ❗ Xóa tất cả vehicles của một công ty (dành cho Company Owner, Company Admin)
  * @param companyId - ID của công ty
  * @param role - Vai trò của người dùng gọi hàm
  */
-export async function deleteAllEbikesByCompany(companyId: string, role: string) {
+export async function deleteAllvehiclesByCompany(companyId: string, role: string) {
   if (!companyId) throw new Error('Missing companyId');
   if (!canDeleteByCompany(role)) throw new Error('Permission denied');
 
-  const q = query(collection(db, 'ebikes'), where('companyId', '==', companyId));
+  const q = query(collection(db, 'vehicles'), where('companyId', '==', companyId));
   const snapshot = await getDocs(q);
 
   const deletePromises = snapshot.docs.map(docSnap =>
-    deleteDoc(doc(db, 'ebikes', docSnap.id))
+    deleteDoc(doc(db, 'vehicles', docSnap.id))
   );
   await Promise.all(deletePromises);
 
@@ -28,15 +28,15 @@ export async function deleteAllEbikesByCompany(companyId: string, role: string) 
 }
 
 /**
- * ❗ Xóa tất cả ebikes trong toàn bộ hệ thống (chỉ Admin dùng)
+ * ❗ Xóa tất cả vehicles trong toàn bộ hệ thống (chỉ Admin dùng)
  */
-export async function deleteAllEbikes(role: string) {
-  if (role.toLowerCase() !== 'admin') throw new Error('Only admin can delete all ebikes');
+export async function deleteAllvehicles(role: string) {
+  if (role.toLowerCase() !== 'admin') throw new Error('Only admin can delete all vehicles');
 
-  const snapshot = await getDocs(collection(db, 'ebikes'));
+  const snapshot = await getDocs(collection(db, 'vehicles'));
 
   const deletePromises = snapshot.docs.map(docSnap =>
-    deleteDoc(doc(db, 'ebikes', docSnap.id))
+    deleteDoc(doc(db, 'vehicles', docSnap.id))
   );
   await Promise.all(deletePromises);
 

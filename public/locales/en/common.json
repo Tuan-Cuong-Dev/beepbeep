@@ -2886,7 +2886,87 @@
     "available": "Available",
     "actions": "Actions"
   }
-}
+},
+
+  "Total": "Total",
+  "Available": "Available",
+  "Reserved": "Reserved",
+  "In Use": "In Use",
+  "Under Maintenance": "Under Maintenance",
+  "Broken": "Broken",
+  "Sold": "Sold",
+  "of_total": "of total",
+  "vehicle_summary_card": {
+    "Total": {
+      "color": "bg-white text-black border border-gray-300",
+      "icon": "Layers"
+    },
+    "Available": {
+      "color": "bg-green-100 text-green-800",
+      "icon": "BadgeCheck"
+    },
+    "Reserved": {
+      "color": "bg-blue-100 text-blue-800",
+      "icon": "HelpCircle"
+    },
+    "In Use": {
+      "color": "bg-orange-100 text-orange-800",
+      "icon": "Car"
+    },
+    "Under Maintenance": {
+      "color": "bg-yellow-100 text-yellow-800",
+      "icon": "Wrench"
+    },
+    "Broken": {
+      "color": "bg-red-100 text-red-800",
+      "icon": "AlertTriangle"
+    },
+    "Sold": {
+      "color": "bg-gray-100 text-gray-800",
+      "icon": "Archive"
+    }
+  },
+
+"vehicle_search_import_export":{
+  "Import": "Import",
+  "Export": "Export",
+  "Print QR Labels": "Print QR Labels",
+  "Delete All": "Delete All",
+  "Search...": "Search...",
+  "All Companies": "All Companies",
+  "All Status": "All Status",
+  "Available": "Available",
+  "In Use": "In Use",
+  "Under Maintenance": "Under Maintenance",
+  "Reserved": "Reserved",
+  "Sold": "Sold",
+  "Broken": "Broken",
+  "All Stations": "All Stations",
+  "Confirm Deletion": "Confirm Deletion",
+  "Are you sure you want to permanently delete": "Are you sure you want to permanently delete",
+  "This action cannot be undone": "This action cannot be undone",
+  "Cancel": "Cancel",
+  "Confirm Export": "Confirm Export",
+  "Confirm Import": "Confirm Import",
+  "Import completed": "Import completed",
+  "Vehicles imported successfully.": "Vehicles imported successfully.",
+  "Exported": "Exported",
+  "vehicles exported": "vehicles exported",
+  "Deleted All": "Deleted All",
+  "vehicles deleted successfully": "vehicles deleted successfully",
+  "Delete Failed": "Delete Failed",
+  "An error occurred while deleting vehicles.": "An error occurred while deleting vehicles.",
+  "Deleting...": "Deleting..."
+},
+
+"apply_model_pricing_button": {
+    "Company ID not found!": "Company ID not found!",
+    "Updated pricing for": "Updated pricing for {{count}} vehicles.",
+    "Failed to apply pricing.": "Failed to apply pricing.",
+    "Applying...": "Applying...",
+    "Apply Pricing from Models": "Apply Pricing from Models"
+  }
+
 
 
 

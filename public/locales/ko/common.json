@@ -2885,7 +2885,126 @@
     "available": "상태",
     "actions": "작업"
   }
-}
+},
+
+  "Total": "전체",
+  "Available": "사용 가능",
+  "Reserved": "예약됨",
+  "In Use": "사용 중",
+  "Under Maintenance": "유지 보수 중",
+  "Broken": "고장",
+  "Sold": "판매됨",
+  "of_total": "전체 중",
+  "vehicle_summary_card": {
+    "Total": {
+      "color": "bg-white text-black border border-gray-300",
+      "icon": "Layers"
+    },
+    "Available": {
+      "color": "bg-green-100 text-green-800",
+      "icon": "BadgeCheck"
+    },
+    "Reserved": {
+      "color": "bg-blue-100 text-blue-800",
+      "icon": "HelpCircle"
+    },
+    "In Use": {
+      "color": "bg-orange-100 text-orange-800",
+      "icon": "Car"
+    },
+    "Under Maintenance": {
+      "color": "bg-yellow-100 text-yellow-800",
+      "icon": "Wrench"
+    },
+    "Broken": {
+      "color": "bg-red-100 text-red-800",
+      "icon": "AlertTriangle"
+    },
+    "Sold": {
+      "color": "bg-gray-100 text-gray-800",
+      "icon": "Archive"
+    }
+  },
+
+  "vehicle_search_import_export": {
+    "Import": "가져오기",
+    "Export": "내보내기",
+    "Print QR Labels": "QR 라벨 인쇄",
+    "Delete All": "모두 삭제",
+    "Search...": "검색...",
+    "All Companies": "모든 회사",
+    "All Status": "모든 상태",
+    "Available": "사용 가능",
+    "In Use": "사용 중",
+    "Under Maintenance": "유지보수 중",
+    "Reserved": "예약됨",
+    "Sold": "판매됨",
+    "Broken": "고장",
+    "All Stations": "모든 스테이션",
+    "Confirm Deletion": "삭제 확인",
+    "Are you sure you want to permanently delete": "정말로 영구 삭제하시겠습니까?",
+    "This action cannot be undone": "이 작업은 취소할 수 없습니다",
+    "Cancel": "취소",
+    "Confirm Export": "내보내기 확인",
+    "Confirm Import": "가져오기 확인",
+    "Import completed": "가져오기 완료",
+    "Vehicles imported successfully.": "차량이 성공적으로 가져왔습니다.",
+    "Exported": "내보내기 완료",
+    "vehicles exported": "차량이 내보내졌습니다",
+    "Deleted All": "모두 삭제됨",
+    "vehicles deleted successfully": "차량이 성공적으로 삭제되었습니다.",
+    "Delete Failed": "삭제 실패",
+    "An error occurred while deleting vehicles.": "차량 삭제 중 오류가 발생했습니다.",
+    "Deleting...": "삭제 중..."
+  },
+
+  "apply_model_pricing_button": {
+    "Company ID not found!": "회사 ID를 찾을 수 없습니다!",
+    "Updated pricing for": "{{count}}대의 차량 가격을 업데이트했습니다.",
+    "Failed to apply pricing.": "가격 적용에 실패했습니다.",
+    "Applying...": "적용 중...",
+    "Apply Pricing from Models": "모델에서 가격 적용"
+  },
+
+  "vehicle_table": {
+    "Vehicle List": "차량 목록",
+    "Model": "모델",
+    "Serial": "시리얼",
+    "Vehicle ID": "차량 ID",
+    "QR Code": "QR 코드",
+    "Plate": "번호판",
+    "Color": "색상",
+    "ODO": "ODO",
+    "Battery": "배터리",
+    "Range": "주행 거리",
+    "Status": "상태",
+    "Location": "위치",
+    "Note": "메모",
+    "Price/Hour": "가격/시간",
+    "Price/Day": "가격/일",
+    "Price/Week": "가격/주",
+    "Price/Month": "가격/월",
+    "Station Name": "스테이션 이름",
+    "Company": "회사",
+    "Actions": "작업",
+    "Edit": "편집",
+    "Delete": "삭제",
+    "Unknown": "알 수 없음"
+  },
+
+  "vehicle_status": {
+  "Available": "사용 가능",
+  "Reserved": "예약됨",
+  "In Use": "사용 중",
+  "Under Maintenance": "정비 중",
+  "Broken": "고장",
+  "Sold": "판매됨"
+},
+"vehicle_location": "현재 위치",
+"Unknown": "알 수 없음"
+
+
+
 
 
 

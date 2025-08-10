@@ -1,4 +1,3 @@
-// 📄 components/ebikes/ApplyModelPricingButton.tsx
 'use client';
 
 import { Button } from '@/src/components/ui/button';
@@ -6,14 +5,16 @@ import { applyPricingFromModelsToVehicles } from '@/src/lib/vehicles/applyModelP
 import { useState } from 'react';
 import { useUser } from '@/src/context/AuthContext';
 import { toast } from 'react-hot-toast'; // or use your NotificationDialog
+import { useTranslation } from 'react-i18next';
 
 export default function ApplyModelPricingButton() {
+  const { t } = useTranslation('common');
   const { companyId } = useUser();
   const [loading, setLoading] = useState(false);
 
   const handleApplyPricing = async () => {
     if (!companyId) {
-      toast.error('Company ID not found!');
+      toast.error(t('apply_model_pricing_button.Company ID not found!'));
       return;
     }
 
@@ -22,9 +23,9 @@ export default function ApplyModelPricingButton() {
     setLoading(false);
 
     if (res.success) {
-      toast.success(`Updated pricing for ${res.updatedCount} vehicles.`);
+      toast.success(t('apply_model_pricing_button.Updated pricing for', { count: res.updatedCount }));
     } else {
-      toast.error('Failed to apply pricing.');
+      toast.error(t('apply_model_pricing_button.Failed to apply pricing.'));
     }
   };
 
@@ -34,7 +35,7 @@ export default function ApplyModelPricingButton() {
       disabled={loading}
       className="bg-[#00d289] text-white hover:bg-[#00b070]"
     >
-      {loading ? 'Applying...' : 'Apply Pricing from Models'}
+      {loading ? t('apply_model_pricing_button.Applying...') : t('apply_model_pricing_button.Apply Pricing from Models')}
     </Button>
   );
 }

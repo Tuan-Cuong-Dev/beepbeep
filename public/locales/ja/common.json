@@ -2871,7 +2871,125 @@
     "available": "利用可否",
     "actions": "操作"
   }
-}
+},
+
+  "Total": "合計",
+  "Available": "利用可能",
+  "Reserved": "予約済み",
+  "In Use": "使用中",
+  "Under Maintenance": "メンテナンス中",
+  "Broken": "故障",
+  "Sold": "販売済み",
+  "of_total": "合計の",
+  "vehicle_summary_card": {
+    "Total": {
+      "color": "bg-white text-black border border-gray-300",
+      "icon": "Layers"
+    },
+    "Available": {
+      "color": "bg-green-100 text-green-800",
+      "icon": "BadgeCheck"
+    },
+    "Reserved": {
+      "color": "bg-blue-100 text-blue-800",
+      "icon": "HelpCircle"
+    },
+    "In Use": {
+      "color": "bg-orange-100 text-orange-800",
+      "icon": "Car"
+    },
+    "Under Maintenance": {
+      "color": "bg-yellow-100 text-yellow-800",
+      "icon": "Wrench"
+    },
+    "Broken": {
+      "color": "bg-red-100 text-red-800",
+      "icon": "AlertTriangle"
+    },
+    "Sold": {
+      "color": "bg-gray-100 text-gray-800",
+      "icon": "Archive"
+    }
+  },
+
+   "vehicle_search_import_export": {
+    "Import": "インポート",
+    "Export": "エクスポート",
+    "Print QR Labels": "QRラベルを印刷",
+    "Delete All": "すべて削除",
+    "Search...": "検索...",
+    "All Companies": "すべての会社",
+    "All Status": "すべてのステータス",
+    "Available": "利用可能",
+    "In Use": "使用中",
+    "Under Maintenance": "メンテナンス中",
+    "Reserved": "予約済み",
+    "Sold": "販売済み",
+    "Broken": "故障",
+    "All Stations": "すべてのステーション",
+    "Confirm Deletion": "削除確認",
+    "Are you sure you want to permanently delete": "本当に削除してもよろしいですか？",
+    "This action cannot be undone": "この操作は元に戻せません",
+    "Cancel": "キャンセル",
+    "Confirm Export": "エクスポートの確認",
+    "Confirm Import": "インポートの確認",
+    "Import completed": "インポートが完了しました",
+    "Vehicles imported successfully.": "車両が正常にインポートされました。",
+    "Exported": "エクスポート完了",
+    "vehicles exported": "車両がエクスポートされました",
+    "Deleted All": "すべて削除しました",
+    "vehicles deleted successfully": "車両が正常に削除されました。",
+    "Delete Failed": "削除に失敗しました",
+    "An error occurred while deleting vehicles.": "車両の削除中にエラーが発生しました。",
+    "Deleting...": "削除中..."
+  },
+
+  "apply_model_pricing_button": {
+    "Company ID not found!": "会社IDが見つかりません！",
+    "Updated pricing for": "{{count}}台の車両の価格を更新しました。",
+    "Failed to apply pricing.": "価格の適用に失敗しました。",
+    "Applying...": "適用中...",
+    "Apply Pricing from Models": "モデルからの価格適用"
+  },
+
+   "vehicle_table": {
+    "Vehicle List": "車両リスト",
+    "Model": "モデル",
+    "Serial": "シリアル",
+    "Vehicle ID": "車両ID",
+    "QR Code": "QRコード",
+    "Plate": "ナンバープレート",
+    "Color": "色",
+    "ODO": "ODO",
+    "Battery": "バッテリー",
+    "Range": "走行距離",
+    "Status": "状態",
+    "Location": "場所",
+    "Note": "メモ",
+    "Price/Hour": "価格/時間",
+    "Price/Day": "価格/日",
+    "Price/Week": "価格/週",
+    "Price/Month": "価格/月",
+    "Station Name": "ステーション名",
+    "Company": "会社",
+    "Actions": "アクション",
+    "Edit": "編集",
+    "Delete": "削除",
+    "Unknown": "不明"
+  },
+
+  "vehicle_status": {
+  "Available": "利用可能",
+  "Reserved": "予約済み",
+  "In Use": "使用中",
+  "Under Maintenance": "メンテナンス中",
+  "Broken": "故障",
+  "Sold": "販売済み"
+},
+"vehicle_location": "現在地",
+"unknown_location": "不明"
+
+
 
 
 

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
-import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
+import { useState, useRef, useEffect } from 'react';
+import { Vehicle } from '@/src/lib/vehicles/vehicleTypes';
+import { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
-import { exportEbikesToExcel } from '@/src/lib/vehicles/exportVehicle';
-import { importEbikes } from '@/src/lib/vehicles/importVehicle';
-import { deleteAllEbikesByCompany, deleteAllEbikes } from '@/src/lib/vehicles/deleteVehicleByCompany';
+import { exportvehiclesToExcel } from '@/src/lib/vehicles/exportVehicle';
+import { importvehicles } from '@/src/lib/vehicles/importVehicle';
+import { deleteAllvehiclesByCompany, deleteAllvehicles } from '@/src/lib/vehicles/deleteVehicleByCompany';
 import {
   Dialog,
   DialogContent,
@@ -18,11 +18,12 @@ import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
 import ApplyModelPricingButton from '@/src/components/vehicles/ApplyModelPricingButton';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
-  ebikes: Ebike[];
-  models: EbikeModel[];
-  setEbikes: (ebikes: Ebike[]) => void;
+  vehicles: Vehicle[];
+  models: VehicleModel[];
+  setVehicle: (vehicles: Vehicle[]) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   statusFilter: string;
@@ -37,10 +38,10 @@ interface Props {
   companyId: string;
 }
 
-export default function EbikeSearchImportExport({
-  ebikes,
+export default function VehicleSearchImportExport({
+  vehicles = [],
   models,
-  setEbikes,
+  setVehicle,
   searchTerm,
   setSearchTerm,
   statusFilter,
@@ -49,11 +50,12 @@ export default function EbikeSearchImportExport({
   setStationFilter,
   companyFilter,
   setCompanyFilter,
-  companyMap,
-  stations,
+  companyMap = {},
+  stations = [],
   onPrintAll,
   companyId,
 }: Props) {
+  const { t } = useTranslation('common');
   const { role } = useUser();
   const isAdmin = role === 'Admin';
 
@@ -77,17 +79,17 @@ export default function EbikeSearchImportExport({
         stationMap[s.id] = s.name;
       });
 
-      await importEbikes(importFile, models, setEbikes, companyId, stationMap);
-      showNotify('success', 'Import completed', 'eBikes imported successfully.');
+      await importvehicles(importFile, models, setVehicle, companyId, stationMap);
+      showNotify('success', t('vehicle_search_import_export.Import completed'), t('vehicle_search_import_export.Vehicles imported successfully.'));
       setImportFile(null);
     }
     setOpenImportDialog(false);
   };
 
   const handleExportConfirm = async () => {
-    await exportEbikesToExcel({ ebikes, models, stations, companyId });
+    await exportvehiclesToExcel({ vehicles, models, stations, companyId });
     setOpenExportDialog(false);
-    showNotify('success', 'Exported', `${ebikes.length} eBikes exported.`);
+    showNotify('success', t('vehicle_search_import_export.Exported'), `${vehicles.length} ${t('vehicle_search_import_export.vehicles exported')}`);
   };
 
   const handleDeleteAll = async () => {
@@ -95,20 +97,28 @@ export default function EbikeSearchImportExport({
     try {
       let count = 0;
       if (isAdmin) {
-        count = await deleteAllEbikes(role);
+        count = await deleteAllvehicles(role);
       } else {
-        count = await deleteAllEbikesByCompany(companyId, role);
+        count = await deleteAllvehiclesByCompany(companyId, role);
       }
-      setEbikes([]);
-      showNotify('success', 'Deleted All', `${count} eBikes deleted successfully.`);
+      setVehicle([]);
+      showNotify('success', t('vehicle_search_import_export.Deleted All'), `${count} ${t('vehicle_search_import_export.vehicles deleted successfully')}`);
     } catch (error) {
       console.error(error);
-      showNotify('error', 'Delete Failed', 'An error occurred while deleting eBikes.');
+      showNotify('error', t('vehicle_search_import_export.Delete Failed'), t('vehicle_search_import_export.An error occurred while deleting vehicles.'));
     } finally {
       setDeleting(false);
       setOpenDeleteDialog(false);
     }
   };
+
+  // Ensure default empty arrays for vehicles, stations, and companyMap if undefined
+  useEffect(() => {
+    // Ensuring data is always available and handling the undefined case for arrays and objects
+    if (!vehicles) setVehicle([]);
+    if (!stations) stations = [];
+    if (!companyMap) companyMap = {};
+  }, [vehicles, stations, companyMap]);
 
   return (
     <>
@@ -120,16 +130,28 @@ export default function EbikeSearchImportExport({
             onChange={(e) => setCompanyFilter(e.target.value)}
             className="px-3 py-2 border rounded w-full sm:w-[33.33%]"
           >
-            <option value="">All Companies</option>
+            <option value="">{t('vehicle_search_import_export.All Companies')}</option>
             {Object.entries(companyMap).map(([id, name]) => (
               <option key={id} value={id}>{name}</option>
             ))}
           </select>
         )}
 
+        <select
+          value={stationFilter}
+          onChange={(e) => setStationFilter(e.target.value)}
+          className="px-3 py-2 border rounded w-full sm:w-[33.33%]"
+        >
+          <option value="">{t('vehicle_search_import_export.All Stations')}</option>
+          {stations.length > 0 &&
+            stations.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+        </select>
+
         <input
           type="text"
-          placeholder="Search..."
+          placeholder={t('vehicle_search_import_export.Search...')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="px-3 py-2 border rounded w-full sm:w-[33.33%]"
@@ -140,31 +162,20 @@ export default function EbikeSearchImportExport({
           onChange={(e) => setStatusFilter(e.target.value)}
           className="px-3 py-2 border rounded w-full sm:w-[33.33%]"
         >
-          <option value="All">All Status</option>
-          <option value="Available">Available</option>
-          <option value="In Use">In Use</option>
-          <option value="Under Maintenance">Under Maintenance</option>
-          <option value="Reserved">Reserved</option>
-          <option value="Sold">Sold</option>
-          <option value="Broken">Broken</option>
-        </select>
-
-        <select
-          value={stationFilter}
-          onChange={(e) => setStationFilter(e.target.value)}
-          className="px-3 py-2 border rounded w-full sm:w-[33.33%]"
-        >
-          <option value="">All Stations</option>
-          {stations.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
-          ))}
+          <option value="All">{t('vehicle_search_import_export.All Status')}</option>
+          <option value="Available">{t('vehicle_search_import_export.Available')}</option>
+          <option value="In Use">{t('vehicle_search_import_export.In Use')}</option>
+          <option value="Under Maintenance">{t('vehicle_search_import_export.Under Maintenance')}</option>
+          <option value="Reserved">{t('vehicle_search_import_export.Reserved')}</option>
+          <option value="Sold">{t('vehicle_search_import_export.Sold')}</option>
+          <option value="Broken">{t('vehicle_search_import_export.Broken')}</option>
         </select>
       </div>
 
       {/* Actions */}
-      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto mb-4">
+      <div className="hidden sm:flex grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto mb-4">
         <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full sm:w-auto">
-          Import
+          {t('vehicle_search_import_export.Import')}
         </Button>
         <input
           type="file"
@@ -180,13 +191,13 @@ export default function EbikeSearchImportExport({
           className="hidden"
         />
         <Button onClick={() => setOpenExportDialog(true)} className="w-full sm:w-auto">
-          Export
+          {t('vehicle_search_import_export.Export')}
         </Button>
         <Button variant="default" onClick={onPrintAll} className="w-full sm:w-auto">
-          Print QR Labels
+          {t('vehicle_search_import_export.Print QR Labels')}
         </Button>
         <Button variant="danger" onClick={() => setOpenDeleteDialog(true)} className="w-full sm:w-auto">
-          Delete All
+          {t('vehicle_search_import_export.Delete All')}
         </Button>
 
         <ApplyModelPricingButton />
@@ -196,12 +207,12 @@ export default function EbikeSearchImportExport({
       <Dialog open={openExportDialog} onOpenChange={setOpenExportDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Export Confirmation</DialogTitle>
+            <DialogTitle>{t('vehicle_search_import_export.Confirm Export')}</DialogTitle>
           </DialogHeader>
-          <p>You are about to export <strong>{ebikes.length}</strong> ebikes.</p>
+          <p>{t('vehicle_search_import_export.You are about to export')} <strong>{vehicles.length}</strong> {t('vehicle_search_import_export.vehicles')}</p>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpenExportDialog(false)}>Cancel</Button>
-            <Button variant="default" onClick={handleExportConfirm}>Confirm Export</Button>
+            <Button variant="ghost" onClick={() => setOpenExportDialog(false)}>{t('vehicle_search_import_export.Cancel')}</Button>
+            <Button variant="default" onClick={handleExportConfirm}>{t('vehicle_search_import_export.Confirm Export')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -209,12 +220,12 @@ export default function EbikeSearchImportExport({
       <Dialog open={openImportDialog} onOpenChange={setOpenImportDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Import Confirmation</DialogTitle>
+            <DialogTitle>{t('vehicle_search_import_export.Confirm Import')}</DialogTitle>
           </DialogHeader>
-          <p>Are you sure you want to import ebikes from the selected file?</p>
+          <p>{t('vehicle_search_import_export.Are you sure you want to import vehicles from the selected file?')}</p>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpenImportDialog(false)}>Cancel</Button>
-            <Button variant="default" onClick={handleImportConfirm}>Confirm Import</Button>
+            <Button variant="ghost" onClick={() => setOpenImportDialog(false)}>{t('vehicle_search_import_export.Cancel')}</Button>
+            <Button variant="default" onClick={handleImportConfirm}>{t('vehicle_search_import_export.Confirm Import')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -222,17 +233,17 @@ export default function EbikeSearchImportExport({
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-red-600">Confirm Deletion</DialogTitle>
+            <DialogTitle className="text-red-600">{t('vehicle_search_import_export.Confirm Deletion')}</DialogTitle>
             <p className="text-sm text-muted-foreground mt-2">
-              Are you sure you want to permanently delete <strong>{ebikes.length}</strong> eBikes?
+              {t('vehicle_search_import_export.Are you sure you want to permanently delete')} <strong>{vehicles.length}</strong> {t('vehicle_search_import_export.vehicles')}?
               <br />
-              This action <span className="font-medium text-red-500">cannot be undone</span>.
+              {t('vehicle_search_import_export.This action cannot be undone')}
             </p>
           </DialogHeader>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setOpenDeleteDialog(false)}>{t('vehicle_search_import_export.Cancel')}</Button>
             <Button variant="danger" onClick={handleDeleteAll} disabled={deleting}>
-              {deleting ? 'Deleting...' : 'Yes, Delete All'}
+              {deleting ? t('vehicle_search_import_export.Deleting...') : t('vehicle_search_import_export.Yes, Delete All')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -243,7 +254,7 @@ export default function EbikeSearchImportExport({
         type={notify.type as 'success' | 'error' | 'info'}
         title={notify.title}
         description={notify.description}
-        onClose={() => setNotify((prev) => ({ ...prev, open: false }))}
+        onClose={() => setNotify((prev) => ({ ...prev, open: false }))} 
       />
     </>
   );
