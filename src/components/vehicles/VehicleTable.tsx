@@ -211,8 +211,13 @@ export default function VehicleTable({
                 {/* Meta grid */}
                 <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                   <div className="text-gray-500">{t('vehicle_table.Serial')}</div>
-                  <div className="text-right font-medium whitespace-nowrap">
-                    {vehicle.serialNumber || '-'}
+                  <div
+                    className="text-right font-medium whitespace-nowrap"
+                    title={vehicle.serialNumber || '-'}
+                  >
+                    {vehicle.serialNumber
+                      ? `...${vehicle.serialNumber.slice(-18)}`
+                      : '-'}
                   </div>
 
                   <div className="text-gray-500">{t('vehicle_table.Vehicle ID')}</div>
