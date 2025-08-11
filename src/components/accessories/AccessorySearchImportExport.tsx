@@ -52,7 +52,7 @@ export default function AccessorySearchImportExport({
         className="w-full md:w-64"
       />
 
-      <div className="flex gap-2 items-center">
+      <div className="hidden md:flex gap-2 items-center">
         {setAccessories && (
           <>
             <label htmlFor="accessory-import">

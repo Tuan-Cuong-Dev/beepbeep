@@ -25,14 +25,13 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
         const map: Record<string, string> = {};
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          map[docSnap.id] = data.name || 'Unknown Company';
+          map[docSnap.id] = (data as any).name || 'Unknown Company';
         });
         setCompanyMap(map);
       } catch (err) {
         console.error('❌ Error fetching company names:', err);
       }
     };
-
     fetchCompanyNames();
   }, []);
 
@@ -40,8 +39,101 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
     a.name.localeCompare(b.name, 'vi', { sensitivity: 'base' })
   );
 
-  return (
-    <div className="bg-white p-6 rounded-xl shadow mt-6 overflow-x-auto">
+  // ------ MOBILE (cards) ------
+  const MobileCards = (
+    <div className="md:hidden space-y-3">
+      {sortedPackages.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-2 py-10 bg-white border border-dashed border-gray-300 rounded-xl">
+          <div className="text-3xl">📦</div>
+          <p className="text-sm text-gray-600">{t('subscription_package_table.no_packages')}</p>
+        </div>
+      ) : (
+        sortedPackages.map((pkg) => {
+          const companyName = pkg.companyId ? companyMap[pkg.companyId] || pkg.companyId : 'Unknown Company';
+          const statusBadge =
+            pkg.status === 'inactive'
+              ? 'bg-red-100 text-red-700'
+              : 'bg-green-100 text-green-700';
+
+          return (
+            <div
+              key={pkg.id}
+              className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm transition hover:shadow-md"
+            >
+              {/* Header: name + status */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-semibold text-gray-900 truncate">{pkg.name}</div>
+                  <div className="text-xs text-gray-500 mt-0.5 truncate">
+                    {t('subscription_package_table.company')}: {companyName}
+                  </div>
+                </div>
+                <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge}`}>
+                  {pkg.status
+                    ? t(`subscription_package_table.${pkg.status}`)
+                    : t('subscription_package_table.available')}
+                </span>
+              </div>
+
+              {/* Meta grid */}
+              <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <div className="rounded-lg border p-2">
+                  <div className="text-xs text-gray-500">{t('subscription_package_table.duration')}</div>
+                  <div className="text-gray-900 capitalize">
+                    {t(`subscription_package_table.duration_type.${pkg.durationType}`)}
+                  </div>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <div className="text-xs text-gray-500">{t('subscription_package_table.charging')}</div>
+                  <div className="text-gray-900 capitalize">
+                    {t(`subscription_package_table.charging_method.${pkg.chargingMethod}`)}
+                  </div>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <div className="text-xs text-gray-500">{t('subscription_package_table.km_limit')}</div>
+                  <div className="text-gray-900">
+                    {pkg.kmLimit ?? t('subscription_package_table.unlimited')}
+                  </div>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <div className="text-xs text-gray-500">{t('subscription_package_table.base_price')}</div>
+                  <div className="text-gray-900">{formatCurrency(pkg.basePrice)}</div>
+                </div>
+                <div className="rounded-lg border p-2 col-span-2">
+                  <div className="text-xs text-gray-500">{t('subscription_package_table.overage_rate')}</div>
+                  <div className="text-gray-900">
+                    {pkg.overageRate != null ? `${formatCurrency(pkg.overageRate)}/km` : '-'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Note */}
+              {pkg.note ? (
+                <div className="mt-3 text-sm text-gray-800">
+                  <span className="text-xs text-gray-500">{t('subscription_package_table.note')}</span>
+                  <div className="mt-1 whitespace-pre-line break-words">{pkg.note}</div>
+                </div>
+              ) : null}
+
+              {/* Actions */}
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Button variant="outline" className="w-full" onClick={() => onEdit(pkg)}>
+                  {t('subscription_package_table.edit')}
+                </Button>
+                <Button variant="destructive" className="w-full" onClick={() => onDelete(pkg.id!)}>
+                  {t('subscription_package_table.delete')}
+                </Button>
+              </div>
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+
+  // ------ DESKTOP (table) ------
+  const DesktopTable = (
+    <div className="hidden md:block bg-white p-6 rounded-xl shadow mt-6 overflow-x-auto">
       <h2 className="text-xl font-semibold mb-4">
         {t('subscription_package_table.title')}
       </h2>
@@ -108,7 +200,6 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
               </td>
             </tr>
           ))}
-
           {packages.length === 0 && (
             <tr>
               <td colSpan={10} className="text-center py-6 text-gray-500">
@@ -118,6 +209,15 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
           )}
         </tbody>
       </table>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      {/* Mobile cards */}
+      {MobileCards}
+      {/* Desktop table */}
+      {DesktopTable}
     </div>
   );
 }

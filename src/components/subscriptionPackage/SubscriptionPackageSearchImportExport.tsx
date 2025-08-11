@@ -117,7 +117,7 @@ export default function SubscriptionPackageSearchImportExport({
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
+        <div className="hidden sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
           <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
             {t('subscription_package_search_import_export.import_excel')}
           </Button>
