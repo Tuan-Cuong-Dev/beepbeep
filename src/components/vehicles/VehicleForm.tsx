@@ -158,25 +158,31 @@ export default function VehicleForm({
       return;
     }
 
-    const payload: Vehicle = {
+    // helper: loại bỏ các field undefined để tránh lỗi updateDoc
+    const omitUndefined = <T extends Record<string, any>>(obj: T): T =>
+      Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as T;
+
+    // Chuẩn hóa giá từ input: rỗng => undefined, có giá trị => number
+    const pricePerHour  = pricePerHourInput.trim()  === '' ? undefined : parseCurrencyString(pricePerHourInput);
+    const pricePerDay   = pricePerDayInput.trim()   === '' ? undefined : parseCurrencyString(pricePerDayInput);
+    const pricePerWeek  = pricePerWeekInput.trim()  === '' ? undefined : parseCurrencyString(pricePerWeekInput);
+    const pricePerMonth = pricePerMonthInput.trim() === '' ? undefined : parseCurrencyString(pricePerMonthInput);
+
+    const payloadRaw: Partial<Vehicle> = {
       ...newVehicle,
       companyId,
-      batteryCapacity: newVehicle.batteryCapacity,
-      range: Number(newVehicle.range),
-      odo: Number(newVehicle.odo),
-      ...(newVehicle.pricePerDay !== undefined
-        ? { pricePerDay: parseCurrencyString(pricePerDayInput) }
-        : {}),
-      ...(newVehicle.pricePerHour !== undefined
-        ? { pricePerHour: parseCurrencyString(pricePerHourInput) }
-        : {}),
-      ...(newVehicle.pricePerWeek !== undefined
-        ? { pricePerWeek: parseCurrencyString(pricePerWeekInput) }
-        : {}),
-      ...(newVehicle.pricePerMonth !== undefined
-        ? { pricePerMonth: parseCurrencyString(pricePerMonthInput) }
-        : {}),
+      // số liệu dạng number: fallback về 0 nếu nullish
+      range: Number(newVehicle.range ?? 0),
+      odo: Number(newVehicle.odo ?? 0),
+      // override giá bằng giá trị đã chuẩn hóa từ input
+      pricePerHour,
+      pricePerDay,
+      pricePerWeek,
+      pricePerMonth,
     };
+
+    // Loại bỏ mọi field undefined để không ném lỗi Firestore
+    const payload = omitUndefined(payloadRaw) as Vehicle;
 
     try {
       const { saveVehicle } = await import('@/src/lib/vehicles/vehicleService');
@@ -188,6 +194,7 @@ export default function VehicleForm({
       console.error('❌ Failed to save Vehicle:', err);
     }
   };
+
 
   // status options -> dùng key trong JSON
   const statusOptions = RAW_STATUS.map((s) => ({
