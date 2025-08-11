@@ -110,7 +110,7 @@ export default function RentalCompanyDashboard() {
           <DashboardCard title={t('rental_company_dashboard.stations')} value={stats.stations.toString()} href="/dashboard/stations" icon={<MapPin className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.vehicles')} value={stats.ebikes.toString()} href="/vehicles" icon={<Bike className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.bookings_this_month')} value={stats.bookings.toString()} href="/bookings" icon={<FileTextIcon className="w-6 h-6" />} />
-          <DashboardCard title={t('rental_company_dashboard.revenue_this_month')} value={formatCurrency(stats.revenue)} href="/dashboard/revenue" icon={<DollarSign className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.revenue_this_month')} value={formatCurrency(stats.revenue)} href="/bookings" icon={<DollarSign className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.programs')} value={t('manage')} href="/dashboard/programs" icon={<ClipboardList className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.staff')} value={stats.staffs.toString()} href="/dashboard/staff" icon={<Users className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.issues')} value={stats.issues.toString()} href="/vehicle-issues" icon={<Wrench className="w-6 h-6" />} />

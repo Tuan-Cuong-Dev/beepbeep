@@ -222,10 +222,10 @@
     "region": "Khu vực",
     "currency": "Tiền tệ",
 
-    "save": "Lưu",
+    "saved": "Lưu",
     "cancel": "Hủy",
 
-    "saving_success": "Cập nhật thành công",
+    "update_success": "Cập nhật thành công",
     "saving_success_description": "Hồ sơ của bạn đã được lưu.",
     "saving_error": "Cập nhật thất bại",
 
