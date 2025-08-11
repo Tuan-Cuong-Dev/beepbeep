@@ -190,17 +190,39 @@ export default function VehicleModelTable({ companyId, models, onEdit, onReload 
       </div>
 
       {/* Pagination */}
-      <div className="mt-4 flex justify-center gap-2 text-sm">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPage(p)}
-            className={`px-3 py-1 rounded border ${p === page ? 'bg-[#00d289] text-white border-[#00d289]' : 'hover:bg-gray-100'}`}
-          >
-            {p}
-          </button>
-        ))}
+      <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+        {/* Nút Trước */}
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          className={`px-4 py-2 rounded-md border text-gray-600 ${
+            page === 1
+              ? 'bg-gray-100 cursor-not-allowed opacity-60'
+              : 'bg-white hover:bg-gray-100'
+          }`}
+        >
+          {t('pagination.previous')}
+        </button>
+
+        {/* Số trang */}
+        <span className="text-gray-700">
+          {t('pagination.page')} {page} / {totalPages}
+        </span>
+
+        {/* Nút Sau */}
+        <button
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+          className={`px-4 py-2 rounded-md border text-gray-800 font-semibold ${
+            page === totalPages
+              ? 'bg-gray-100 cursor-not-allowed opacity-60'
+              : 'bg-white hover:bg-gray-100'
+          }`}
+        >
+          {t('pagination.next')}
+        </button>
       </div>
+
 
       <NotificationDialog
         open={dialog.open}

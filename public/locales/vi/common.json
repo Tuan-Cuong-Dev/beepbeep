@@ -1583,7 +1583,8 @@
 "pagination": {
   "previous": "Trước",
   "next": "Sau",
-  "page_info": "Trang {{current}} / {{total}}"
+  "page_info": "Trang {{current}} / {{total}}",
+  "page": "Trang"
 },
 
 "vehicle_issue_type": {
