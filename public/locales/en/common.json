@@ -2968,22 +2968,27 @@
   },
 
 "vehicle_form": {
+    "search_model_placeholder": "Search model (name/brand/type)…",
+    "search_station_placeholder": "Search station (name/address)…",
+    "no_models_hint": "No models in the catalog yet. Please contact the administrator.",
+    "items": "items",
+    "no_stations_hint": "No stations found",
     "title_add": "Add New Vehicle",
     "title_edit": "Edit Vehicle",
     "section_basic_info": "Basic Information",
     "section_specifications": "Specifications",
-    "section_pricing": "Pricing",
-    "section_note": "Additional Note",
+    "section_pricing": "Rental Pricing",
+    "section_note": "Additional Notes",
 
     "company_id": "Company ID",
     "select_model": "Select Model",
     "select_station": "Select Station",
-    "serial_number": "Serial Number",
+    "serial_number": "Chassis Number",
     "vehicle_id": "Vehicle ID (VIN)",
-    "plate_number": "Plate Number",
-    "odo": "ODO (km)",
+    "plate_number": "License Plate",
+    "odo": "Odometer (ODO)",
     "color": "Color",
-    "battery_capacity": "Battery Capacity (e.g. 72V22Ah)",
+    "battery_capacity": "Battery Capacity (e.g., 72V22Ah)",
     "range": "Range (km)",
     "select_status": "Select Status",
     "current_location": "Current Location",
@@ -2991,18 +2996,18 @@
     "price_day": "Price/Day (VND)",
     "price_week": "Price/Week (VND)",
     "price_month": "Price/Month (VND)",
-    "note_placeholder": "Note (optional)",
+    "note_placeholder": "Notes (optional)",
 
-    "status_available": "Available",
-    "status_in_use": "In Use",
+    "status_available": "Available for rental",
+    "status_in_use": "In use",
     "status_reserved": "Reserved",
-    "status_under_maintenance": "Under Maintenance",
+    "status_under_maintenance": "Under maintenance",
     "status_sold": "Sold",
     "status_broken": "Broken",
 
     "btn_add": "Add Vehicle",
     "btn_save": "Save Changes",
-    "msg_fill_required": "Please fill all required fields"
+    "msg_fill_required": "Please fill in all required fields."
   },
 
   "vehicle_management_page": {

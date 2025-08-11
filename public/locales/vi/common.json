@@ -3028,6 +3028,11 @@
 "unknown_location": "Không xác định",
 
 "vehicle_form": {
+    "search_model_placeholder": "Tìm mẫu xe (tên/hãng/loại)…",
+    "search_station_placeholder": "Tìm trạm (tên/địa chỉ)…",
+    "no_models_hint": "Chưa có mẫu xe trong catalog. Vui lòng liên hệ quản trị viên.",
+    "items": "mẫu",
+    "no_stations_hint": "Không tìm thấy trạm",
     "title_add": "Thêm xe mới",
     "title_edit": "Chỉnh sửa xe",
     "section_basic_info": "Thông tin cơ bản",
