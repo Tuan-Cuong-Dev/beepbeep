@@ -116,35 +116,68 @@ export default function StationManagementPage() {
               )}
 
               <div className="pt-6 border-t border-gray-300 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold">{t('station_management_page.existing_stations')}</h2>
-                  <Input
-                    type="text"
-                    placeholder={t('station_management_page.search_placeholder')}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-64"
-                  />
+                {/* Header + Search (mobile-first) */}
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-center justify-between md:justify-start md:gap-3">
+                    <h2 className="text-lg font-semibold">
+                      {t('station_management_page.existing_stations')}
+                    </h2>
+                    {/* Count badge (ẩn trên md vì không cần) */}
+                    <span className="md:hidden inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700">
+                      {filteredStations.length}
+                    </span>
+                  </div>
+
+                  {/* Search input — full width on mobile, fixed width on md+ */}
+                  <div className="relative w-full md:w-72">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">🔎</span>
+                    <Input
+                      type="text"
+                      placeholder={t('station_management_page.search_placeholder')}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
                 </div>
 
                 {refreshing ? (
-                  <p className="text-sm text-gray-500">{t('station_management_page.refreshing')}</p>
+                  // Refreshing skeleton
+                  <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm animate-pulse">
+                        <div className="h-4 w-40 bg-gray-200 rounded mb-2" />
+                        <div className="h-3 w-3/4 bg-gray-200 rounded mb-1.5" />
+                        <div className="h-3 w-1/2 bg-gray-200 rounded" />
+                        <div className="mt-3 h-8 w-full bg-gray-100 rounded md:hidden" />
+                      </div>
+                    ))}
+                    <p className="text-sm text-gray-500">{t('station_management_page.refreshing')}</p>
+                  </div>
                 ) : filteredStations.length === 0 ? (
-                  <p className="text-sm text-gray-500">{t('station_management_page.no_result')}</p>
+                  // Empty state
+                  <div className="flex flex-col items-center justify-center gap-2 py-10 bg-white border border-dashed border-gray-300 rounded-xl">
+                    <div className="text-3xl">🗺️</div>
+                    <p className="text-sm text-gray-600">{t('station_management_page.no_result')}</p>
+                  </div>
                 ) : (
+                  // List
                   <ul className="space-y-3">
                     {filteredStations.map((station) => (
                       <li
                         key={station.id}
-                        className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm text-sm"
+                        className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm text-sm transition hover:shadow-md"
                       >
-                        <div className="flex justify-between items-start gap-4">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                          {/* Info */}
                           <div className="flex-1">
-                            <p className="font-semibold text-gray-800">{station.name}</p>
-                            <p className="text-gray-700">{station.displayAddress}</p>
-                            <p className="text-gray-600 text-xs mt-1">📍 {station.location}</p>
+                            <p className="font-semibold text-gray-900">{station.name}</p>
+                            <p className="text-gray-700 mt-0.5">{station.displayAddress}</p>
+                            <p className="text-gray-500 text-xs mt-1">📍 {station.location}</p>
                           </div>
-                          <div className="space-x-2">
+
+                          {/* Actions */}
+                          <div className="hidden md:flex items-center gap-2">
                             <Button variant="outline" onClick={() => setEditingStation(station)}>
                               {t('station_management_page.edit')}
                             </Button>
@@ -153,11 +186,22 @@ export default function StationManagementPage() {
                             </Button>
                           </div>
                         </div>
+
+                        {/* Mobile action bar */}
+                        <div className="mt-3 grid grid-cols-2 gap-2 md:hidden">
+                          <Button variant="outline" className="w-full" onClick={() => setEditingStation(station)}>
+                            ✏️ {t('station_management_page.edit')}
+                          </Button>
+                          <Button variant="destructive" className="w-full" onClick={() => setConfirmDeleteId(station.id)}>
+                            🗑️ {t('station_management_page.delete')}
+                          </Button>
+                        </div>
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
+
             </>
           ) : (
             <p className="text-center text-red-600">{t('station_management_page.no_company')}</p>
