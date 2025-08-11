@@ -1,19 +1,19 @@
-// components/ebikes/PrintQRModal.tsx
+// components/evehicles/PrintQRModal.tsx
 
 "use client";
 
 import { useRef } from "react";
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
-import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
+import { Vehicle } from '@/src/lib/vehicles/vehicleTypes';
+import { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  ebikes: Ebike[];
-  models: EbikeModel[];
+  vehicles: Vehicle[];
+  models: VehicleModel[];
 }
 
-export default function PrintQRModal({ open, onClose, ebikes, models }: Props) {
+export default function PrintQRModal({ open, onClose, vehicles, models }: Props) {
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
@@ -128,17 +128,17 @@ export default function PrintQRModal({ open, onClose, ebikes, models }: Props) {
         </div>
 
         <div ref={printRef} className="flex flex-wrap gap-4 p-4 border-t mt-4">
-          {ebikes.map((bike) => {
-            const modelName = models.find((m) => m.id === bike.modelId)?.name || "Model";
+          {vehicles.map((vehicle) => {
+            const modelName = models.find((m) => m.id === vehicle.modelId)?.name || "Model";
             const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-              bike.vehicleID || bike.id || ""
+              vehicle.vehicleID || vehicle.id || ""
             )}`;
             return (
-              <div key={bike.id} className="label">
+              <div key={vehicle.id} className="label">
                 <img src={qrImageUrl} alt="QR Code" />
                 <div className="info"><strong>{modelName}</strong></div>
-                <div className="info">Plate: {bike.plateNumber || "N/A"}</div>
-                <div className="info">ID: {bike.vehicleID || bike.id}</div>
+                <div className="info">Plate: {vehicle.plateNumber || "N/A"}</div>
+                <div className="info">ID: {vehicle.vehicleID || vehicle.id}</div>
               </div>
             );
           })}

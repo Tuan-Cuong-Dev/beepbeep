@@ -2965,7 +2965,59 @@
     "Failed to apply pricing.": "Failed to apply pricing.",
     "Applying...": "Applying...",
     "Apply Pricing from Models": "Apply Pricing from Models"
+  },
+
+"vehicle_form": {
+    "title_add": "Add New Vehicle",
+    "title_edit": "Edit Vehicle",
+    "section_basic_info": "Basic Information",
+    "section_specifications": "Specifications",
+    "section_pricing": "Pricing",
+    "section_note": "Additional Note",
+
+    "company_id": "Company ID",
+    "select_model": "Select Model",
+    "select_station": "Select Station",
+    "serial_number": "Serial Number",
+    "vehicle_id": "Vehicle ID (VIN)",
+    "plate_number": "Plate Number",
+    "odo": "ODO (km)",
+    "color": "Color",
+    "battery_capacity": "Battery Capacity (e.g. 72V22Ah)",
+    "range": "Range (km)",
+    "select_status": "Select Status",
+    "current_location": "Current Location",
+    "price_hour": "Price/Hour (VND)",
+    "price_day": "Price/Day (VND)",
+    "price_week": "Price/Week (VND)",
+    "price_month": "Price/Month (VND)",
+    "note_placeholder": "Note (optional)",
+
+    "status_available": "Available",
+    "status_in_use": "In Use",
+    "status_reserved": "Reserved",
+    "status_under_maintenance": "Under Maintenance",
+    "status_sold": "Sold",
+    "status_broken": "Broken",
+
+    "btn_add": "Add Vehicle",
+    "btn_save": "Save Changes",
+    "msg_fill_required": "Please fill all required fields"
+  },
+
+  "vehicle_management_page": {
+    "title": "Vehicle Management",
+    "loading": "Loading...",
+    "total": "Total",
+    "model_saved": "Vehicle model saved!",
+    "vehicle_updated": "Vehicle updated!",
+    "vehicle_added": "Vehicle added!",
+    "confirm_delete_title": "Confirm Delete",
+    "confirm_delete_description": "Are you sure you want to delete \"{{serialNumber}}\"?",
+    "delete_success": "Vehicle deleted successfully!",
+    "delete_failed": "Failed to delete vehicle."
   }
+
 
 
 

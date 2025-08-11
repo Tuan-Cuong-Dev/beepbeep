@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
-import EbikeModelForm from '@/src/components/vehicleModels/EbikeModelForm';
-import EbikeModelTable from '@/src/components/vehicleModels/EbikeModelTable';
-import EbikeForm from '@/src/components/vehicles/EbikeForm';
+import VehicleForm from '@/src/components/vehicles/VehicleForm';
 import VehicleTable from '@/src/components/vehicles/VehicleTable';
 import VehicleSearchImportExport from '@/src/components/vehicles/VehicleSearchImportExport';
 import PrintQRModal from '@/src/components/vehicles/PrintQRModal';
@@ -16,8 +15,8 @@ import Pagination from '@/src/components/ui/pagination';
 import { Vehicle } from '@/src/lib/vehicles/vehicleTypes';
 import { deleteDoc, doc, Timestamp, collection, getDocs } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';
-import { useEbikeData } from '@/src/hooks/useEbikeData';
-import { useEbikeModelForm } from '@/src/hooks/useEbikeModel';
+import { useVehicleData } from '@/src/hooks/useVehicleData';
+import { useVehicleModel } from '@/src/hooks/useVehicleModel';
 import { useRentalStations } from '@/src/hooks/useRentalStations';
 import { db } from '@/src/firebaseConfig';
 import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
@@ -40,7 +39,8 @@ const emptyVehicle: Vehicle = {
   stationId: '',
 };
 
-export default function EbikeManagementPage() {
+export default function VehicleManagementPage() {
+  const { t } = useTranslation('common');
   const { companyId, stationId, role, loading: userLoading } = useUser();
   const isAdmin = role?.toLowerCase() === 'admin';
   const isCompanyOwner = role === 'company_owner';
@@ -61,30 +61,30 @@ export default function EbikeManagementPage() {
   });
 
   const {
-    ebikes,
-    setEbikes,
-    ebikeModels,
-    setEbikeModels,
-  } = useEbikeData({ companyId: companyId || '', isAdmin });
+    Vehicles,
+    setVehicles,
+    VehicleModels,
+    setVehicleModels,
+  } = useVehicleData({ companyId: companyId || '', isAdmin });
 
-  const ebikeModelForm = useEbikeModelForm({
+  const VehicleModelForm = useVehicleModel({
     companyId: companyId ?? undefined,
     isAdmin,
     onSaveComplete: () => {
-      showDialog('success', 'Ebike model saved!');
-      ebikeModelForm.fetchModels();
+      showDialog('success', t('vehicle_management_page.model_saved'));
+      VehicleModelForm.fetchModels();
     },
   });
 
   const { stations, loading: stationsLoading } = useRentalStations(companyId || '', isAdmin);
-  const [newEbike, setNewEbike] = useState<Vehicle | null>(null);
+  const [newVehicle, setNewVehicle] = useState<Vehicle | null>(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [modelPage, setModelPage] = useState(1);
   const modelPageSize = 5;
 
   useEffect(() => {
     if (companyId || isAdmin) {
-      setNewEbike({ ...emptyVehicle, companyId: companyId || '', stationId: stationId || '' });
+      setNewVehicle({ ...emptyVehicle, companyId: companyId || '', stationId: stationId || '' });
     }
   }, [companyId, stationId, isAdmin]);
 
@@ -106,20 +106,20 @@ export default function EbikeManagementPage() {
     setDialog({ open: true, type, title, description, onConfirm: undefined });
   };
 
-  const handleEbikeSaved = () => {
-    showDialog('success', isUpdateMode ? 'Vehicle updated!' : 'Vehicle added!');
+  const handleVehicleSaved = () => {
+    showDialog('success', isUpdateMode ? t('vehicle_management_page.vehicle_updated') : t('vehicle_management_page.vehicle_added'));
     setIsUpdateMode(false);
   };
 
-  const handleEbikeEdit = (vehicle: Vehicle) => {
-    const safeBike = {
+  const handleVehicleEdit = (vehicle: Vehicle) => {
+    const safVehicle = {
       ...vehicle,
       lastMaintained:
         vehicle.lastMaintained instanceof Timestamp
           ? vehicle.lastMaintained
           : Timestamp.fromDate(new Date()),
     };
-    setNewEbike(safeBike);
+    setNewVehicle(safVehicle);
     setIsUpdateMode(true);
   };
 
@@ -127,23 +127,23 @@ export default function EbikeManagementPage() {
     setDialog({
       open: true,
       type: 'confirm',
-      title: 'Confirm Delete',
-      description: `Are you sure you want to delete "${vehicle.serialNumber}"?`,
+      title: t('vehicle_management_page.confirm_delete_title'),
+      description: t('vehicle_management_page.confirm_delete_description', { serialNumber: vehicle.serialNumber }),
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'vehicles', vehicle.id));
-          setEbikes((prev) => prev.filter((b) => b.id !== vehicle.id));
+          setVehicleModels((prev) => prev.filter((b) => b.id !== vehicle.id));
           setDialog((prev) => ({ ...prev, open: false }));
-          showDialog('success', 'Ebike deleted successfully!');
+          showDialog('success', t('vehicle_management_page.delete_success'));
         } catch (err) {
-          console.error('❌ Failed to delete ebike:', err);
-          showDialog('error', 'Failed to delete ebike.');
+          console.error('❌ Failed to delete Vehicle:', err);
+          showDialog('error', t('vehicle_management_page.delete_failed'));
         }
       },
     });
   };
 
-  const filteredEbikes = ebikes.filter((bike) => {
+  const filteredVehicles = Vehicles.filter((bike) => {
     const term = searchTerm.toLowerCase();
     const matchesSearch =
       bike.serialNumber?.toLowerCase().includes(term) ||
@@ -157,27 +157,27 @@ export default function EbikeManagementPage() {
     return matchesSearch && matchesStatus && matchesStation && matchesCompany;
   });
 
-  const totalPages = Math.ceil(filteredEbikes.length / pageSize);
-  const paginatedEbikes = filteredEbikes.slice(
+  const totalPages = Math.ceil(filteredVehicles.length / pageSize);
+  const paginatedVehicles = filteredVehicles.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  const totalModelPages = Math.ceil(ebikeModelForm.models.length / modelPageSize);
-  const paginatedModels = ebikeModelForm.models.slice(
+  const totalModelPages = Math.ceil(VehicleModelForm.models.length / modelPageSize);
+  const paginatedModels = VehicleModelForm.models.slice(
     (modelPage - 1) * modelPageSize,
     modelPage * modelPageSize
   );
 
-  const ebikeStatusCount: Record<string, number> = {};
-  ebikes.forEach((bike) => {
-    ebikeStatusCount[bike.status] = (ebikeStatusCount[bike.status] || 0) + 1;
+  const VehicleStatusCount: Record<string, number> = {};
+  Vehicles.forEach((bike) => {
+    VehicleStatusCount[bike.status] = (VehicleStatusCount[bike.status] || 0) + 1;
   });
 
-  const totalEbikeCount = ebikes.length;
+  const totalVehicleCount = Vehicles.length;
 
-  if (userLoading || stationsLoading || (!companyId && !isAdmin) || !newEbike) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (userLoading || stationsLoading || (!companyId && !isAdmin) || !newVehicle) {
+    return <div className="flex justify-center items-center h-screen">{t('vehicle_management_page.loading')}</div>;
   }
 
   return (
@@ -186,19 +186,36 @@ export default function EbikeManagementPage() {
       <UserTopMenu />
 
       <main className="p-6 mt-1 flex-grow">
-        <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">Vehicle Management</h1>
+        <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">
+          {t('vehicle_management_page.title')}
+        </h1>
 
         <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-4 mb-6">
-          <VehicleSummaryCard status="Total" count={totalEbikeCount} total={totalEbikeCount} />
-          {Object.entries(ebikeStatusCount).map(([status, count]) => (
-            <VehicleSummaryCard key={status} status={status} count={count} total={totalEbikeCount} />
+          {/* Tổng số: status để icon = 'Total', title để hiển thị = bản dịch */}
+          <VehicleSummaryCard
+            status="Total"
+            title={t('vehicle_management_page.total')}
+            count={totalVehicleCount}
+            total={totalVehicleCount}
+          />
+
+          {Object.entries(VehicleStatusCount).map(([statusKey, count]) => (
+            <VehicleSummaryCard
+              key={statusKey}
+              // GIỮ statusKey gốc để VehicleSummaryCard nhận diện icon
+              status={statusKey}
+              // DÙNG title để hiển thị bản dịch
+              title={t(`vehicle_status.${statusKey}`)}
+              count={count}
+              total={totalVehicleCount}
+            />
           ))}
         </div>
 
         <VehicleSearchImportExport
-          vehicles={ebikes}
-          models={ebikeModels}
-          setVehicle={setEbikes}
+          vehicles={Vehicles}
+          models={VehicleModels}
+          setVehicle={setVehicles}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           statusFilter={statusFilter}
@@ -214,11 +231,11 @@ export default function EbikeManagementPage() {
         />
 
         <VehicleTable
-          vehicles={paginatedEbikes}
-          models={ebikeModels}
+          vehicles={paginatedVehicles}
+          models={VehicleModels}
           stations={stations}
-          setvehicles={setEbikes}
-          onEdit={handleEbikeEdit}
+          setvehicles={setVehicles}
+          onEdit={handleVehicleEdit}
           onDeleteConfirm={handleConfirmDelete}
           companyId={companyId || ''}
           showStationColumn={isCompanyOwner}
@@ -232,50 +249,25 @@ export default function EbikeManagementPage() {
           />
         )}
 
-        <EbikeForm
+        <VehicleForm
           companyId={companyId || ''}
-          newEbike={newEbike}
-          setNewEbike={setNewEbike}
-          models={ebikeModels}
+          newVehicle={newVehicle}
+          setNewVehicle={setNewVehicle}
+          models={VehicleModels}
           stations={stations}
           isUpdateMode={isUpdateMode}
           setIsUpdateMode={setIsUpdateMode}
-          setEbikes={setEbikes}
-          onSaveComplete={handleEbikeSaved}
+          setVehicles={setVehicles}
+          onSaveComplete={handleVehicleSaved}
           showStationSelect={isCompanyOwner}
         />
 
-        <EbikeModelTable
-          companyId={companyId || ''}
-          models={paginatedModels}
-          onReload={ebikeModelForm.fetchModels}
-          onEdit={ebikeModelForm.setEditModel}
-          reloadTrigger={false}
-        />
-
-        {totalModelPages > 1 && (
-          <Pagination
-            currentPage={modelPage}
-            totalPages={totalModelPages}
-            onPageChange={setModelPage}
-          />
-        )}
-
-        <EbikeModelForm
-          companyId={companyId ?? ''}
-          newEbikeModel={ebikeModelForm.newEbikeModel}
-          handleChange={ebikeModelForm.handleChange}
-          handleSave={ebikeModelForm.handleSave}
-          isUpdateModeModel={ebikeModelForm.isUpdateModeModel}
-          loading={ebikeModelForm.loading}
-        />
       </main>
-
       <PrintQRModal
         open={qrModalOpen}
         onClose={() => setQrModalOpen(false)}
-        ebikes={ebikes}
-        models={ebikeModels}
+        vehicles={Vehicles}
+        models={VehicleModels}
       />
 
       <Footer />

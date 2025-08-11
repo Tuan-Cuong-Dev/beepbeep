@@ -14,11 +14,12 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   status: string;
+  title: string;
   count: number;
   total: number;
 }
 
-export default function VehicleSummaryCard({ status, count, total }: Props) {
+export default function VehicleSummaryCard({ status, title, count, total, }: Props) {
   const { t } = useTranslation('common');
 
   const statusStyleMap: Record<

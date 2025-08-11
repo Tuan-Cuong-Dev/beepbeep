@@ -2912,11 +2912,11 @@
 },
 
   "Total": "Tổng cộng",
-  "Available": "Có sẵn",
+  "Available": "Sẵn sàng cho thuê",
   "Reserved": "Đã đặt trước",
-  "In Use": "Đang sử dụng",
-  "Under Maintenance": "Đang bảo trì",
-  "Broken": "Hư hỏng",
+  "In Use": "Đang cho thuê",
+  "Under Maintenance": "Đang bảo dưỡng",
+  "Broken": "Xe Hỏng",
   "Sold": "Đã bán",
   "of_total": "trong tổng số",
   "vehicle_summary_card": {
@@ -2958,12 +2958,12 @@
     "Search...": "Tìm kiếm...",
     "All Companies": "Tất cả công ty",
     "All Status": "Tất cả trạng thái",
-    "Available": "Có sẵn",
-    "In Use": "Đang sử dụng",
-    "Under Maintenance": "Đang bảo trì",
+    "Available": "Sẵn sàng cho thuê",
     "Reserved": "Đã đặt trước",
+    "In Use": "Đang cho thuê",
+    "Under Maintenance": "Đang bảo dưỡng",
+    "Broken": "Xe Hỏng",
     "Sold": "Đã bán",
-    "Broken": "Hỏng",
     "All Stations": "Tất cả trạm",
     "Confirm Deletion": "Xác nhận xóa",
     "Are you sure you want to permanently delete": "Bạn có chắc chắn muốn xóa vĩnh viễn",
@@ -3017,15 +3017,66 @@
   },
 
   "vehicle_status": {
-  "Available": "Sẵn sàng",
-  "Reserved": "Đã đặt",
-  "In Use": "Đang sử dụng",
-  "Under Maintenance": "Bảo dưỡng",
-  "Broken": "Hỏng",
+  "Available": "Sẵn sàng cho thuê",
+  "Reserved": "Đã đặt trước",
+  "In Use": "Đang cho thuê",
+  "Under Maintenance": "Đang bảo dưỡng",
+  "Broken": "Xe Hỏng",
   "Sold": "Đã bán"
 },
 "vehicle_location": "Vị trí hiện tại",
-"Unknown": "Không xác định"
+"unknown_location": "Không xác định",
+
+"vehicle_form": {
+    "title_add": "Thêm xe mới",
+    "title_edit": "Chỉnh sửa xe",
+    "section_basic_info": "Thông tin cơ bản",
+    "section_specifications": "Thông số kỹ thuật",
+    "section_pricing": "Giá thuê",
+    "section_note": "Ghi chú bổ sung",
+
+    "company_id": "Mã công ty",
+    "select_model": "Chọn mẫu xe",
+    "select_station": "Chọn trạm",
+    "serial_number": "Số khung",
+    "vehicle_id": "Mã xe (VIN)",
+    "plate_number": "Biển số",
+    "odo": "Số km đã đi (ODO)",
+    "color": "Màu sắc",
+    "battery_capacity": "Dung lượng pin (VD: 72V22Ah)",
+    "range": "Quãng đường (km)",
+    "select_status": "Chọn trạng thái",
+    "current_location": "Vị trí hiện tại",
+    "price_hour": "Giá/Giờ (VNĐ)",
+    "price_day": "Giá/Ngày (VNĐ)",
+    "price_week": "Giá/Tuần (VNĐ)",
+    "price_month": "Giá/Tháng (VNĐ)",
+    "note_placeholder": "Ghi chú (không bắt buộc)",
+
+    "status_available": "Sẵn sàng cho thuê",
+    "status_in_use": "Đang cho thuê",
+    "status_reserved": "Đã đặt trước",
+    "status_under_maintenance": "Đang bảo dưỡng",
+    "status_sold": "Đã bán",
+    "status_broken": "Xe Hỏng",
+
+    "btn_add": "Thêm xe",
+    "btn_save": "Lưu thay đổi",
+    "msg_fill_required": "Vui lòng điền đầy đủ các trường bắt buộc"
+  },
+
+   "vehicle_management_page": {
+    "title": "Quản lý xe",
+    "loading": "Đang tải...",
+    "total": "Tổng số",
+    "model_saved": "Mẫu xe đã được lưu!",
+    "vehicle_updated": "Phương tiện đã được cập nhật!",
+    "vehicle_added": "Phương tiện đã được thêm!",
+    "confirm_delete_title": "Xác nhận xóa",
+    "confirm_delete_description": "Bạn có chắc chắn muốn xóa \"{{serialNumber}}\"?",
+    "delete_success": "Xóa phương tiện thành công!",
+    "delete_failed": "Xóa phương tiện thất bại."
+  }
 
 
 

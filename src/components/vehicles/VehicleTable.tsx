@@ -138,7 +138,9 @@ export default function VehicleTable({
                     {t(`vehicle_status.${vehicle.status}`)}
                   </span>
                 </td>
-                <td className="px-3 py-2 border">{t(vehicle.currentLocation)}</td>
+                <td className="px-3 py-2 border">
+                  {t(`vehicle_table.${vehicle.currentLocation || 'Unknown'}`)}
+                </td>
                 <td className="px-3 py-2 border">{vehicle.note || '-'}</td>
                 <td className="px-3 py-2 border text-right whitespace-nowrap">
                   {vehicle.pricePerHour !== undefined ? formatCurrency(vehicle.pricePerHour) : '-'}
@@ -237,7 +239,9 @@ export default function VehicleTable({
 
                   <div className="text-gray-500">{t('vehicle_location')}</div>
                   <div className="text-right font-medium line-clamp-1">
-                    {t(vehicle.currentLocation)}
+                    <td className="px-3 py-2 border">
+                      {t(`vehicle_table.${vehicle.currentLocation || 'Unknown'}`)}
+                    </td>
                   </div>
                 </div>
               </div>

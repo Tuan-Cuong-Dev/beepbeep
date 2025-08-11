@@ -2987,7 +2987,58 @@
   "Sold": "販売済み"
 },
 "vehicle_location": "現在地",
-"unknown_location": "不明"
+"unknown_location": "不明",
+
+ "vehicle_form": {
+    "title_add": "新しい車両を追加",
+    "title_edit": "車両を編集",
+    "section_basic_info": "基本情報",
+    "section_specifications": "仕様",
+    "section_pricing": "料金",
+    "section_note": "追加メモ",
+
+    "company_id": "会社ID",
+    "select_model": "モデルを選択",
+    "select_station": "ステーションを選択",
+    "serial_number": "車台番号",
+    "vehicle_id": "車両ID（VIN）",
+    "plate_number": "ナンバープレート",
+    "odo": "走行距離 (km)",
+    "color": "色",
+    "battery_capacity": "バッテリー容量（例：72V22Ah）",
+    "range": "航続距離 (km)",
+    "select_status": "ステータスを選択",
+    "current_location": "現在地",
+    "price_hour": "時間単価 (VND)",
+    "price_day": "日単価 (VND)",
+    "price_week": "週単価 (VND)",
+    "price_month": "月単価 (VND)",
+    "note_placeholder": "メモ（任意）",
+
+    "status_available": "利用可能",
+    "status_in_use": "使用中",
+    "status_reserved": "予約済み",
+    "status_under_maintenance": "メンテナンス中",
+    "status_sold": "販売済み",
+    "status_broken": "故障",
+
+    "btn_add": "車両を追加",
+    "btn_save": "変更を保存",
+    "msg_fill_required": "必須項目をすべて入力してください"
+  },
+
+  "vehicle_management_page": {
+    "title": "車両管理",
+    "loading": "読み込み中...",
+    "total": "合計",
+    "model_saved": "車両モデルが保存されました！",
+    "vehicle_updated": "車両が更新されました！",
+    "vehicle_added": "車両が追加されました！",
+    "confirm_delete_title": "削除の確認",
+    "confirm_delete_description": "「{{serialNumber}}」を削除してもよろしいですか？",
+    "delete_success": "車両が正常に削除されました！",
+    "delete_failed": "車両の削除に失敗しました。"
+  }
 
 
 
