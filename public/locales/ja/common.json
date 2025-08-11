@@ -3043,6 +3043,51 @@
     "confirm_delete_description": "「{{serialNumber}}」を削除してもよろしいですか？",
     "delete_success": "車両が正常に削除されました！",
     "delete_failed": "車両の削除に失敗しました。"
+  },
+
+  "company_admin_dashboard": {
+    "title": "会社管理ダッシュボード",
+    "stations": "ステーション",
+    "vehicles": "車両",
+    "revenue_this_month": "売上（今月）",
+    "staff": "スタッフ",
+    "bookings": "予約",
+    "accessories": "アクセサリー",
+    "batteries": "バッテリー",
+    "programs": "プログラム",
+    "manage": "管理",
+    "subscription_packages": "サブスクリプションプラン",
+    "vehicle_issues": "車両不具合",
+    "quick_actions": "クイックアクション",
+    "add_new_station": "新しいステーションを追加",
+    "create_vehicle_model": "車両モデルを作成",
+    "assign_staff": "スタッフを割り当て",
+    "form_builder": "フォームビルダー",
+    "rent_a_ride": "レンタル開始",
+    "return_vehicle": "車両を返却",
+    "report_vehicle_issue": "車両不具合を報告",
+    "manage_subscription_packages": "サブスクリプションプランを管理",
+    "view_vehicle_issues": "車両不具合を表示",
+    "recent_activity": "最近のアクティビティ",
+    "activity_new_booking": "{{name}} から新しい予約を受け取りました",
+    "activity_station_added": "ステーション「{{name}}」を追加しました",
+    "activity_vehicle_under_maintenance": "車両「{{vehicle}}」をメンテナンス中に設定しました"
+  },
+
+  "extend_rental_modal": {
+    "title": "レンタル期間を延長",
+    "current_end_time": "現在の終了時刻",
+    "new_end_time": "新しい終了時刻",
+    "price_per_day": "日額料金",
+    "original_duration": "元の期間",
+    "new_duration": "新しい期間",
+    "total_amount": "合計金額",
+    "deposit": "デポジット",
+    "remaining_after_extension": "延長後の残額",
+    "cancel": "キャンセル",
+    "confirm": "確定",
+    "days_one": "{{count}}日",
+    "days_other": "{{count}}日"
   }
 
 

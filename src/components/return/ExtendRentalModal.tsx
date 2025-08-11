@@ -7,6 +7,7 @@ import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { Timestamp } from 'firebase/firestore';
 import { differenceInDays, format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface ExtendRentalModalProps {
   open: boolean;
@@ -15,7 +16,7 @@ interface ExtendRentalModalProps {
   rentalStartDate: Timestamp | string;
   oldRentalEndDate: Timestamp | string;
   pricePerDay: number;
-  deposit: number; // ✅ Thêm props này
+  deposit: number;
 }
 
 export default function ExtendRentalModal({
@@ -27,15 +28,18 @@ export default function ExtendRentalModal({
   pricePerDay,
   deposit,
 }: ExtendRentalModalProps) {
+  const { t } = useTranslation('common');
   const [newTime, setNewTime] = useState('');
 
-  const rentalStart = typeof rentalStartDate === 'string'
-    ? new Date(rentalStartDate)
-    : rentalStartDate.toDate();
+  const rentalStart =
+    typeof rentalStartDate === 'string'
+      ? new Date(rentalStartDate)
+      : rentalStartDate.toDate();
 
-  const oldEnd = typeof oldRentalEndDate === 'string'
-    ? new Date(oldRentalEndDate)
-    : oldRentalEndDate.toDate();
+  const oldEnd =
+    typeof oldRentalEndDate === 'string'
+      ? new Date(oldRentalEndDate)
+      : oldRentalEndDate.toDate();
 
   const newEnd = useMemo(() => (newTime ? new Date(newTime) : null), [newTime]);
 
@@ -55,15 +59,18 @@ export default function ExtendRentalModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Extend Rental Time</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            {t('extend_rental_modal.title')}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div>
             <p className="text-sm text-gray-600 mb-2">
-              <strong>Current End Time:</strong> {format(oldEnd, 'dd/MM/yyyy HH:mm')}
+              <strong>{t('extend_rental_modal.current_end_time')}:</strong>{' '}
+              {format(oldEnd, 'dd/MM/yyyy HH:mm')}
             </p>
-            <Label htmlFor="newEndTime">New End Time</Label>
+            <Label htmlFor="newEndTime">{t('extend_rental_modal.new_end_time')}</Label>
             <Input
               id="newEndTime"
               type="datetime-local"
@@ -74,24 +81,42 @@ export default function ExtendRentalModal({
           </div>
 
           <div className="text-sm text-gray-700 space-y-1">
-            <p><strong>Price Per Day:</strong> {pricePerDay.toLocaleString()}₫</p>
-            <p><strong>Original Duration:</strong> {oldDays} day{oldDays > 1 ? 's' : ''}</p>
-            <p><strong>New Duration:</strong> {newDays} day{newDays > 1 ? 's' : ''}</p>
-            <p><strong>Total Amount:</strong> {totalAmount.toLocaleString()}₫</p>
-            <p><strong>Deposit:</strong> {deposit.toLocaleString()}₫</p>
-            <p><strong>Remaining After Extension:</strong>{' '}
+            <p>
+              <strong>{t('extend_rental_modal.price_per_day')}:</strong>{' '}
+              {pricePerDay.toLocaleString()}₫
+            </p>
+            <p>
+              <strong>{t('extend_rental_modal.original_duration')}:</strong>{' '}
+              {t('extend_rental_modal.days', { count: oldDays })}
+            </p>
+            <p>
+              <strong>{t('extend_rental_modal.new_duration')}:</strong>{' '}
+              {t('extend_rental_modal.days', { count: newDays })}
+            </p>
+            <p>
+              <strong>{t('extend_rental_modal.total_amount')}:</strong>{' '}
+              {totalAmount.toLocaleString()}₫
+            </p>
+            <p>
+              <strong>{t('extend_rental_modal.deposit')}:</strong>{' '}
+              {deposit.toLocaleString()}₫
+            </p>
+            <p>
+              <strong>{t('extend_rental_modal.remaining_after_extension')}:</strong>{' '}
               {newDays > oldDays ? `${remainingBalance.toLocaleString()}₫` : '—'}
             </p>
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
+            <Button variant="outline" onClick={onClose}>
+              {t('extend_rental_modal.cancel')}
+            </Button>
             <Button
               className="bg-[#00d289] hover:bg-[#00b67a] text-white"
               onClick={handleSubmit}
               disabled={!newEnd || newDays <= oldDays}
             >
-              Confirm
+              {t('extend_rental_modal.confirm')}
             </Button>
           </div>
         </div>

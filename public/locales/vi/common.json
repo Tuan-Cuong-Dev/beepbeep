@@ -3081,6 +3081,51 @@
     "confirm_delete_description": "Bạn có chắc chắn muốn xóa \"{{serialNumber}}\"?",
     "delete_success": "Xóa phương tiện thành công!",
     "delete_failed": "Xóa phương tiện thất bại."
+  },
+
+  "company_admin_dashboard": {
+    "title": "Bảng điều khiển quản trị công ty",
+    "stations": "Trạm",
+    "vehicles": "Phương tiện",
+    "revenue_this_month": "Doanh thu (Tháng này)",
+    "staff": "Nhân sự",
+    "bookings": "Đơn đặt",
+    "accessories": "Phụ kiện",
+    "batteries": "Pin",
+    "programs": "Chương trình",
+    "manage": "Quản lý",
+    "subscription_packages": "Gói thuê bao",
+    "vehicle_issues": "Sự cố phương tiện",
+    "quick_actions": "Thao tác nhanh",
+    "add_new_station": "Thêm trạm mới",
+    "create_vehicle_model": "Tạo mẫu xe",
+    "assign_staff": "Phân công nhân sự",
+    "form_builder": "Trình tạo biểu mẫu",
+    "rent_a_ride": "Cho thuê xe",
+    "return_vehicle": "Trả xe",
+    "report_vehicle_issue": "Báo cáo sự cố phương tiện",
+    "manage_subscription_packages": "Quản lý gói thuê bao",
+    "view_vehicle_issues": "Xem sự cố phương tiện",
+    "recent_activity": "Hoạt động gần đây",
+    "activity_new_booking": "Nhận đơn đặt mới từ {{name}}",
+    "activity_station_added": "Đã thêm trạm \"{{name}}\"",
+    "activity_vehicle_under_maintenance": "Phương tiện \"{{vehicle}}\" được đánh dấu đang bảo dưỡng"
+  },
+
+   "extend_rental_modal": {
+    "title": "Gia hạn thời gian thuê",
+    "current_end_time": "Thời gian kết thúc hiện tại",
+    "new_end_time": "Thời gian kết thúc mới",
+    "price_per_day": "Giá theo ngày",
+    "original_duration": "Thời lượng ban đầu",
+    "new_duration": "Thời lượng mới",
+    "total_amount": "Tổng tiền",
+    "deposit": "Đặt cọc",
+    "remaining_after_extension": "Còn phải thanh toán sau khi gia hạn",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "days_one": "{{count}} ngày",
+    "days_other": "{{count}} ngày"
   }
 
 

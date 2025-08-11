@@ -20,8 +20,11 @@ import {
   Wrench,
 } from 'lucide-react';
 import { formatCurrency } from '@/src/utils/formatCurrency';
+import { JSX } from 'react/jsx-runtime';
+import { useTranslation } from 'react-i18next';
 
 export default function CompanyAdminDashboard() {
+  const { t } = useTranslation('common');
   const { companyId } = useUser();
 
   const [stats, setStats] = useState({
@@ -109,43 +112,43 @@ export default function CompanyAdminDashboard() {
       <Header />
       <main className="flex-1 px-6 py-10 space-y-10">
         <h1 className="text-3xl font-bold text-center text-gray-800">
-          🏢 Company Admin Dashboard
+          🏢 {t('company_admin_dashboard.title')}
         </h1>
 
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          <DashboardCard icon={<MapPin />} title="Stations" value={stats.stations} href="/dashboard/stations" />
-          <DashboardCard icon={<Bike />} title="Vehicles" value={stats.ebikes} href="/vehicles" />
-          <DashboardCard icon={<DollarSign />} title="Revenue (This Month)" value={formatCurrency(stats.revenue)} href="/bookings" />
-          <DashboardCard icon={<Users />} title="Staff" value={stats.staffs} href="/dashboard/staff" />
-          <DashboardCard icon={<FileText />} title="Bookings" value={stats.bookings} href="/bookings" />
-          <DashboardCard icon={<PackagePlus />} title="Accessories" value={stats.accessories} href="/accessories" />
-          <DashboardCard icon={<BatteryCharging />} title="Batteries" value={stats.batteries} href="/battery" />
-          <DashboardCard icon={<ClipboardList />} title="Programs" value="Manage" href="/dashboard/programs" />
-          <DashboardCard icon={<Boxes />} title="Subscription Packages" value={stats.subscriptionPackages} href="/subscriptionPackages" />
-          <DashboardCard icon={<Wrench />} title="Vehicle Issues" value={stats.vehicleIssues} href="/vehicle-issues" />
+          <DashboardCard icon={<MapPin />} title={t('company_admin_dashboard.stations')} value={stats.stations} href="/dashboard/stations" />
+          <DashboardCard icon={<Bike />} title={t('company_admin_dashboard.vehicles')} value={stats.ebikes} href="/vehicles" />
+          <DashboardCard icon={<DollarSign />} title={t('company_admin_dashboard.revenue_this_month')} value={formatCurrency(stats.revenue)} href="/bookings" />
+          <DashboardCard icon={<Users />} title={t('company_admin_dashboard.staff')} value={stats.staffs} href="/dashboard/staff" />
+          <DashboardCard icon={<FileText />} title={t('company_admin_dashboard.bookings')} value={stats.bookings} href="/bookings" />
+          <DashboardCard icon={<PackagePlus />} title={t('company_admin_dashboard.accessories')} value={stats.accessories} href="/accessories" />
+          <DashboardCard icon={<BatteryCharging />} title={t('company_admin_dashboard.batteries')} value={stats.batteries} href="/battery" />
+          <DashboardCard icon={<ClipboardList />} title={t('company_admin_dashboard.programs')} value={t('company_admin_dashboard.manage')} href="/dashboard/programs" />
+          <DashboardCard icon={<Boxes />} title={t('company_admin_dashboard.subscription_packages')} value={stats.subscriptionPackages} href="/subscriptionPackages" />
+          <DashboardCard icon={<Wrench />} title={t('company_admin_dashboard.vehicle_issues')} value={stats.vehicleIssues} href="/vehicle-issues" />
         </section>
 
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ {t('company_admin_dashboard.quick_actions')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <QuickAction label="Add New Station" href="/dashboard/stations" />
-            <QuickAction label="Create Vehicle Model" href="/vehicles" />
-            <QuickAction label="Assign Staff" href="/dashboard/staff" />
-            <QuickAction label="Form Builder" href="/dashboard/form-builder" />
-            <QuickAction label="Rent a Ride" href="/rent" />
-            <QuickAction label="Return Vehicle" href="/return" />
-            <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />
-            <QuickAction label="Manage Subscription Packages" href="/subscriptionPackages" />
-            <QuickAction label="View Vehicle Issues" href="/vehicle-issues" />
+            <QuickAction label={t('company_admin_dashboard.add_new_station')} href="/dashboard/stations" />
+            <QuickAction label={t('company_admin_dashboard.create_vehicle_model')} href="/vehicles" />
+            <QuickAction label={t('company_admin_dashboard.assign_staff')} href="/dashboard/staff" />
+            <QuickAction label={t('company_admin_dashboard.form_builder')} href="/dashboard/form-builder" />
+            <QuickAction label={t('company_admin_dashboard.rent_a_ride')} href="/rent" />
+            <QuickAction label={t('company_admin_dashboard.return_vehicle')} href="/return" />
+            <QuickAction label={t('company_admin_dashboard.report_vehicle_issue')} href="/vehicle-issues/report" />
+            <QuickAction label={t('company_admin_dashboard.manage_subscription_packages')} href="/subscriptionPackages" />
+            <QuickAction label={t('company_admin_dashboard.view_vehicle_issues')} href="/vehicle-issues" />
           </div>
         </section>
 
         <section className="bg-white rounded-2xl p-6 border shadow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 Recent Activity</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 {t('company_admin_dashboard.recent_activity')}</h2>
           <ul className="text-sm text-gray-700 space-y-2">
-            <RecentActivityItem text="New booking received from Jane Smith" />
-            <RecentActivityItem text='Station "Hai Chau Branch" added' />
-            <RecentActivityItem text='Vehicle "DE1023" marked as under maintenance' />
+            <RecentActivityItem text={t('company_admin_dashboard.activity_new_booking', { name: 'Jane Smith' })} />
+            <RecentActivityItem text={t('company_admin_dashboard.activity_station_added', { name: 'Hai Chau Branch' })} />
+            <RecentActivityItem text={t('company_admin_dashboard.activity_vehicle_under_maintenance', { vehicle: 'DE1023' })} />
           </ul>
         </section>
       </main>

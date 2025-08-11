@@ -3021,6 +3021,51 @@
     "confirm_delete_description": "Are you sure you want to delete \"{{serialNumber}}\"?",
     "delete_success": "Vehicle deleted successfully!",
     "delete_failed": "Failed to delete vehicle."
+  },
+
+  "company_admin_dashboard": {
+    "title": "Company Admin Dashboard",
+    "stations": "Stations",
+    "vehicles": "Vehicles",
+    "revenue_this_month": "Revenue (This Month)",
+    "staff": "Staff",
+    "bookings": "Bookings",
+    "accessories": "Accessories",
+    "batteries": "Batteries",
+    "programs": "Programs",
+    "manage": "Manage",
+    "subscription_packages": "Subscription Packages",
+    "vehicle_issues": "Vehicle Issues",
+    "quick_actions": "Quick Actions",
+    "add_new_station": "Add New Station",
+    "create_vehicle_model": "Create Vehicle Model",
+    "assign_staff": "Assign Staff",
+    "form_builder": "Form Builder",
+    "rent_a_ride": "Rent a Ride",
+    "return_vehicle": "Return Vehicle",
+    "report_vehicle_issue": "Report Vehicle Issue",
+    "manage_subscription_packages": "Manage Subscription Packages",
+    "view_vehicle_issues": "View Vehicle Issues",
+    "recent_activity": "Recent Activity",
+    "activity_new_booking": "New booking received from {{name}}",
+    "activity_station_added": "Station \"{{name}}\" added",
+    "activity_vehicle_under_maintenance": "Vehicle \"{{vehicle}}\" marked as under maintenance"
+  },
+
+  "extend_rental_modal": {
+    "title": "Extend Rental Time",
+    "current_end_time": "Current End Time",
+    "new_end_time": "New End Time",
+    "price_per_day": "Price Per Day",
+    "original_duration": "Original Duration",
+    "new_duration": "New Duration",
+    "total_amount": "Total Amount",
+    "deposit": "Deposit",
+    "remaining_after_extension": "Remaining After Extension",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days"
   }
 
 

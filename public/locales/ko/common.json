@@ -3057,6 +3057,51 @@
     "confirm_delete_description": "\"{{serialNumber}}\"을(를) 삭제하시겠습니까?",
     "delete_success": "차량이 성공적으로 삭제되었습니다!",
     "delete_failed": "차량 삭제에 실패했습니다."
+  },
+
+  "company_admin_dashboard": {
+    "title": "회사 관리자 대시보드",
+    "stations": "스테이션",
+    "vehicles": "차량",
+    "revenue_this_month": "이번 달 매출",
+    "staff": "직원",
+    "bookings": "예약",
+    "accessories": "악세서리",
+    "batteries": "배터리",
+    "programs": "프로그램",
+    "manage": "관리",
+    "subscription_packages": "구독 패키지",
+    "vehicle_issues": "차량 문제",
+    "quick_actions": "빠른 작업",
+    "add_new_station": "새 스테이션 추가",
+    "create_vehicle_model": "차량 모델 생성",
+    "assign_staff": "직원 배정",
+    "form_builder": "폼 빌더",
+    "rent_a_ride": "대여 시작",
+    "return_vehicle": "차량 반납",
+    "report_vehicle_issue": "차량 문제 신고",
+    "manage_subscription_packages": "구독 패키지 관리",
+    "view_vehicle_issues": "차량 문제 보기",
+    "recent_activity": "최근 활동",
+    "activity_new_booking": "{{name}} 님의 새 예약이 접수되었습니다",
+    "activity_station_added": "스테이션 \"{{name}}\" 이(가) 추가되었습니다",
+    "activity_vehicle_under_maintenance": "차량 \"{{vehicle}}\" 이(가) 정비 중으로 표시되었습니다"
+  },
+
+   "extend_rental_modal": {
+    "title": "대여 기간 연장",
+    "current_end_time": "현재 종료 시간",
+    "new_end_time": "새 종료 시간",
+    "price_per_day": "일일 요금",
+    "original_duration": "기존 기간",
+    "new_duration": "새 기간",
+    "total_amount": "총 금액",
+    "deposit": "보증금",
+    "remaining_after_extension": "연장 후 잔액",
+    "cancel": "취소",
+    "confirm": "확인",
+    "days_one": "{{count}}일",
+    "days_other": "{{count}}일"
   }
 
 
