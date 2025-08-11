@@ -7,7 +7,7 @@ import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { cn } from '@/src/lib/utils';
-import { useEbikeData } from '@/src/hooks/useEbikeData';
+import { useVehicleData } from '@/src/hooks/useVehicleData';
 import { useUser } from '@/src/context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +28,7 @@ export default function ReportIssueForm({
 }: ReportIssueFormProps) {
   const { t } = useTranslation('common');
   const { user, role } = useUser();
-  const { ebikes } = useEbikeData({ companyId });
+  const { Vehicles } = useVehicleData({ companyId });
 
   const [selectedEbike, setSelectedEbike] = useState<{ id: string; vin: string; plateNumber?: string } | null>(null);
   const [searchText, setSearchText] = useState('');
@@ -48,10 +48,10 @@ export default function ReportIssueForm({
   ];
 
   const filteredEbikes = useMemo(() => {
-    return ebikes.filter((bike) =>
+    return Vehicles.filter((bike) =>
       (bike.vehicleID || '').toLowerCase().includes(searchText.toLowerCase())
     );
-  }, [searchText, ebikes]);
+  }, [searchText, Vehicles]);
 
   const handleSubmit = async () => {
     const isGlobal = role === 'admin' || role === 'technician_assistant';
