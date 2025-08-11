@@ -30,6 +30,7 @@ export function useContributions() {
     repair_shop: 1,
     map_location: 1,
     issue_proposal: 3,
+    battery_charging_station: 0
   };
 
   /**

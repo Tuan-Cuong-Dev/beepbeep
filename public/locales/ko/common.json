@@ -3112,7 +3112,7 @@
 
   "contribution_types": {
     "battery_charging_station": "배터리 충전소",
-    "battery_swap_station": "배터리 교환소",
+    "battery_station": "배터리 교환소",
     "repair_station": "수리소"
   },
   "contribution_statuses": {

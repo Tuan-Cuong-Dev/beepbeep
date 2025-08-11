@@ -8,20 +8,53 @@ import { useAuth } from '@/src/hooks/useAuth';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import Image from 'next/image';
+import type { StaticImageData } from 'next/image';
 import { addPersonalVehicleWithModel } from '@/src/hooks/useAddPersonalVehicle';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  onSaved: () => void;
-}
+/** ✅ Static imports cho icon mặc định */
+import bicycleIcon from '@/public/assets/images/vehicles/bicycle.png';
+import busIcon from '@/public/assets/images/vehicles/bus.png';
+import carIcon from '@/public/assets/images/vehicles/car.png';
+import motorbikeIcon from '@/public/assets/images/vehicles/motorbike.png';
+import vanIcon from '@/public/assets/images/vehicles/van.png';
 
-// 🔧 Convert Google Drive link to direct image URL
+const placeholderIcon =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40" viewBox="0 0 60 40" fill="none">
+  <rect width="60" height="40" fill="white"/>
+  <path d="M10 30H50L45 20H15L10 30Z" stroke="%2300d289" stroke-width="2" fill="none"/>
+  <circle cx="18" cy="30" r="3" fill="%2300d289"/>
+  <circle cx="42" cy="30" r="3" fill="%2300d289"/>
+</svg>
+`);
+
+/** Map icon mặc định theo vehicleType */
+const DEFAULT_ICONS: Record<string, StaticImageData> = {
+  bicycle: bicycleIcon,
+  bus: busIcon,
+  car: carIcon,
+  motorbike: motorbikeIcon,
+  van: vanIcon,
+};
+
+/** Convert link Google Drive thành link trực tiếp */
 const getDirectImageUrl = (url?: string): string | undefined => {
   if (!url) return undefined;
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
   const id = match?.[1];
   return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
 };
+
+/** Ưu tiên ảnh model → icon type → placeholder */
+const resolveModelImage = (model: VehicleModel): string | StaticImageData => {
+  return getDirectImageUrl(model.imageUrl) || DEFAULT_ICONS[model.vehicleType] || placeholderIcon;
+};
+
+interface Props {
+  onSaved: () => void;
+}
 
 export default function SelectModelThenAddVehicleForm({ onSaved }: Props) {
   const { t } = useTranslation('common');
@@ -96,17 +129,13 @@ export default function SelectModelThenAddVehicleForm({ onSaved }: Props) {
                 className="border p-3 rounded hover:bg-gray-50 cursor-pointer flex gap-2 items-center"
                 onClick={() => setSelectedModel(model)}
               >
-                {model.imageUrl ? (
-                  <Image
-                    src={getDirectImageUrl(model.imageUrl) as string}
-                    alt={model.name}
-                    width={60}
-                    height={40}
-                    className="rounded object-cover"
-                  />
-                ) : (
-                  <span className="text-gray-400 italic">{t('select_model_then_add_vehicle_form.no_image')}</span>
-                )}
+                <Image
+                  src={resolveModelImage(model)}
+                  alt={model.name || model.vehicleType}
+                  width={60}
+                  height={40}
+                  className="rounded object-cover bg-gray-50 border w-[80px] h-[60px]"
+                />
                 <div>
                   <div className="font-medium">
                     {model.brand} {model.name}
@@ -120,9 +149,18 @@ export default function SelectModelThenAddVehicleForm({ onSaved }: Props) {
       ) : (
         <>
           <h2 className="text-lg font-semibold">🚗 {t('select_model_then_add_vehicle_form.add_title')}</h2>
-          <div className="bg-gray-100 p-3 rounded">
-            <strong>{t('select_model_then_add_vehicle_form.selected')}:</strong>{' '}
-            {selectedModel.brand} {selectedModel.name} ({selectedModel.vehicleType})
+          <div className="bg-gray-100 p-3 rounded flex items-center gap-2">
+            <Image
+              src={resolveModelImage(selectedModel)}
+              alt={selectedModel.name || selectedModel.vehicleType}
+              width={60}
+              height={40}
+              className="rounded object-cover bg-gray-50 border w-[60px] h-[40px]"
+            />
+            <div>
+              <strong>{t('select_model_then_add_vehicle_form.selected')}:</strong>{' '}
+              {selectedModel.brand} {selectedModel.name} ({selectedModel.vehicleType})
+            </div>
           </div>
 
           <Input

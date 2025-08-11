@@ -3098,7 +3098,7 @@
 
   "contribution_types": {
   "battery_charging_station": "バッテリー充電ステーション",
-  "battery_swap_station": "バッテリー交換ステーション",
+  "battery_station": "バッテリー交換ステーション",
   "repair_station": "修理ステーション"
 },
 "contribution_statuses": {

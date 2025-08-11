@@ -3138,7 +3138,7 @@
   "contribution_types": {
     "battery_charging_station": "Trạm sạc pin",
     "repair_station": "Trạm sửa chữa",
-    "Battery Swap Station": "Trạm đổi pin"
+    "battery_station": "Trạm đổi pin"
   },
   "contribution_statuses": {
     "pending": "Đang chờ",
