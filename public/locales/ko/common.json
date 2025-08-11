@@ -212,6 +212,7 @@
   "currency": "통화",
 
   "save": "저장",
+  "saved": "저장",
   "cancel": "취소",
 
   "saving_success": "프로필이 업데이트되었습니다",
@@ -3107,7 +3108,19 @@
   "simple_select": {
     "select": "선택...",
     "showing": "{{total}}개 중 {{count}}개 표시. 검색하여 범위를 좁혀주세요."
+  },
+
+  "contribution_types": {
+    "battery_charging_station": "배터리 충전소",
+    "battery_swap_station": "배터리 교환소",
+    "repair_station": "수리소"
+  },
+  "contribution_statuses": {
+    "pending": "대기 중",
+    "approved": "승인됨",
+    "rejected": "거부됨"
   }
+
 
 
 

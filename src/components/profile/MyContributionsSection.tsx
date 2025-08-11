@@ -199,29 +199,41 @@ export default function MyContributionsSection() {
             <div className="bg-white shadow rounded p-4 border mt-4">
               <h3 className="text-lg font-bold mb-4">{t('contribution_points_section.title')}</h3>
               <ul className="divide-y divide-gray-200">
-                {paginatedPoints.map((c) => (
-                  <li key={c.id} className="py-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium capitalize">
-                          {t('contribution_points_section.type', { type: c.type.replace('_', ' ') })}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          <Trans
-                            t={t}
-                            i18nKey="contribution_points_section.status"
-                            values={{ status: c.status }}
-                            components={{ strong: <strong className="capitalize" /> }}
-                          />
-                        </p>
+                {paginatedPoints.map((c) => {
+                  const humanize = (s: string) =>
+                    s?.toString().replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+
+                  const typeKey = `contribution_types.${(c.type || '').toLowerCase()}`;
+                  const statusKey = `contribution_statuses.${(c.status || '').toLowerCase()}`;
+
+                  const typeLabel = t(typeKey, { defaultValue: humanize(c.type) });
+                  const statusLabel = t(statusKey, { defaultValue: humanize(c.status) });
+
+                  return (
+                    <li key={c.id} className="py-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium capitalize">
+                            {t('contribution_points_section.type', { type: typeLabel })}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <Trans
+                              t={t}
+                              i18nKey="contribution_points_section.status"
+                              values={{ status: statusLabel }}
+                              components={{ strong: <strong className="capitalize" /> }}
+                            />
+                          </p>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {format(c.createdAt.toDate(), 'dd MMM yyyy')}
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {format(c.createdAt.toDate(), 'dd MMM yyyy')}
-                      </div>
-                    </div>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
+
               <div className="flex justify-center mt-4 space-x-2 text-sm">
                 <button
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -244,6 +256,7 @@ export default function MyContributionsSection() {
             </div>
           )}
         </TabsContent>
+
       </Tabs>
 
       <EditContributionModal

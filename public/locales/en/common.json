@@ -213,6 +213,7 @@
     "currency": "Currency",
 
     "save": "Save",
+    "saved": "Saved",
     "cancel": "Cancel",
 
     "saving_success": "Profile Updated",
@@ -3071,7 +3072,18 @@
    "simple_select": {
     "select": "Select...",
     "showing": "Showing {{count}} of {{total}}. Please search to narrow down."
+  },
+  "contribution_types": {
+    "battery_charging_station": "Battery Charging Station",
+    "battery_station": "Battery Swap Station",
+    "repair_station": "Repair Station"
+  },
+  "contribution_statuses": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
   }
+
 
 
 

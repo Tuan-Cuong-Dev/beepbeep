@@ -223,6 +223,7 @@
     "currency": "Tiền tệ",
 
     "saved": "Lưu",
+    "save": "Lưu",
     "cancel": "Hủy",
 
     "update_success": "Cập nhật thành công",
@@ -3132,7 +3133,19 @@
   "simple_select": {
     "select": "Chọn...",
     "showing": "Hiển thị {{count}}/{{total}}. Vui lòng tìm kiếm để thu hẹp kết quả."
+  },
+
+  "contribution_types": {
+    "battery_charging_station": "Trạm sạc pin",
+    "repair_station": "Trạm sửa chữa",
+    "Battery Swap Station": "Trạm đổi pin"
+  },
+  "contribution_statuses": {
+    "pending": "Đang chờ",
+    "approved": "Đã duyệt",
+    "rejected": "Từ chối"
   }
+
 
 
 
