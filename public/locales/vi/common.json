@@ -3030,7 +3030,7 @@
 "vehicle_form": {
     "search_model_placeholder": "Tìm mẫu xe (tên/hãng/loại)…",
     "search_station_placeholder": "Tìm trạm (tên/địa chỉ)…",
-    "no_models_hint": "Chưa có mẫu xe trong catalog. Vui lòng liên hệ quản trị viên.",
+    "no_models_hint": "Chưa có mẫu xe trong catalog. Vui lòng liên hệ quản trị viên. (Zalo: 0972.155.557)",
     "items": "mẫu",
     "no_stations_hint": "Không tìm thấy trạm",
     "title_add": "Thêm xe mới",
@@ -3126,6 +3126,11 @@
     "confirm": "Xác nhận",
     "days_one": "{{count}} ngày",
     "days_other": "{{count}} ngày"
+  },
+
+  "simple_select": {
+    "select": "Chọn...",
+    "showing": "Hiển thị {{count}}/{{total}}. Vui lòng tìm kiếm để thu hẹp kết quả."
   }
 
 

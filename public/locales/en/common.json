@@ -3066,6 +3066,11 @@
     "confirm": "Confirm",
     "days_one": "{{count}} day",
     "days_other": "{{count}} days"
+  },
+
+   "simple_select": {
+    "select": "Select...",
+    "showing": "Showing {{count}} of {{total}}. Please search to narrow down."
   }
 
 

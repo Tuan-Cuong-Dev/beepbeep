@@ -3088,6 +3088,11 @@
     "confirm": "確定",
     "days_one": "{{count}}日",
     "days_other": "{{count}}日"
+  },
+
+  "simple_select": {
+    "select": "選択してください...",
+    "showing": "{{total}} 件中 {{count}} 件を表示。検索して絞り込んでください。"
   }
 
 

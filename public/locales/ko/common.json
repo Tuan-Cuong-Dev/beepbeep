@@ -3102,6 +3102,11 @@
     "confirm": "확인",
     "days_one": "{{count}}일",
     "days_other": "{{count}}일"
+  },
+
+  "simple_select": {
+    "select": "선택...",
+    "showing": "{{total}}개 중 {{count}}개 표시. 검색하여 범위를 좁혀주세요."
   }
 
 

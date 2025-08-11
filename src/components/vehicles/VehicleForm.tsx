@@ -257,11 +257,13 @@ export default function VehicleForm({
                     onChange={(e) => setModelSearch(e.target.value)}
                   />
                   <SimpleSelect
-                    options={filteredModels.map((m) => ({ label: m.name, value: m.id }))}
+                    options={filteredModels.map(m => ({ label: m.name, value: m.id }))}
                     placeholder={t('vehicle_form.select_model')}
                     value={newVehicle.modelId || ''}
                     onChange={handleModelChange}
                     disabled={filteredModels.length === 0}
+                    maxVisible={10}      // có thể chỉnh
+                    maxMenuHeight={240}  // có thể chỉnh
                   />
                   {filteredModels.length === 0 && (
                     <div className="text-xs text-amber-600">
