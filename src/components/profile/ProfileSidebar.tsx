@@ -1,22 +1,30 @@
+// Bắt đầu thiết kế cái này từ 12.08.2025
+// components/profile/ProfileSidebar.tsx
+
 'use client';
 
 import {
-  FaImage,
-  FaPen,
-  FaGlobeAsia,
-  FaMapMarkerAlt,
-  FaCalendarAlt,
+  FaImage, FaPen, FaGlobeAsia, FaMapMarkerAlt, FaCalendarAlt,
 } from 'react-icons/fa';
 import { Button } from '@/src/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import BusinessAboutSection from '../my-business/about/BusinessAboutSection';
+import type { BusinessType } from '@/src/lib/my-business/businessTypes';
 
 interface ProfileSidebarProps {
+  // ✅ NEW: truyền từ parent
+  businessId?: string;
+  businessType?: BusinessType;
+
+  // existing
   location?: string;
   joinedDate?: string;
   helpfulVotes?: number;
 }
 
 export default function ProfileSidebar({
+  businessId,
+  businessType,
   location = 'Da Nang, Vietnam',
   joinedDate = 'Mar 2025',
   helpfulVotes = 0,
@@ -24,31 +32,18 @@ export default function ProfileSidebar({
   const { t } = useTranslation('common');
 
   return (
-    <div className="w-full space-y-6">
-      {/* Achievements */}
-      <div className="bg-white p-4 rounded-lg shadow-sm hidden md:block">
-        <h2 className="text-base font-semibold mb-3">{t('profile_sidebar.achievements')}</h2>
-        <p className="text-sm text-gray-500 mb-4">{t('profile_sidebar.unlock_prompt')}</p>
-        <div className="space-y-3 text-sm text-gray-700">
-          <div className="flex items-center justify-between border rounded px-3 py-2">
-            <div>
-              <p className="font-medium">{t('profile_sidebar.write_first_review')}</p>
-              <p className="text-xs text-gray-500">{t('profile_sidebar.review_milestone')}</p>
-            </div>
-            <span className="text-xl">🔒</span>
-          </div>
-          <div className="flex items-center justify-between border rounded px-3 py-2">
-            <div>
-              <p className="font-medium">{t('profile_sidebar.upload_first_photo')}</p>
-              <p className="text-xs text-gray-500">{t('profile_sidebar.photo_milestone')}</p>
-            </div>
-            <span className="text-xl">🔒</span>
-          </div>
+    <div className="w-full space-y-6 rounded-lg">
+
+      {/* Business About Section */}
+      {businessId && businessType ? (
+        <BusinessAboutSection businessId={businessId} businessType={businessType} />
+      ) : (
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <p className="text-sm text-gray-500">
+            {t('business_about.not_found') /* hoặc một câu nhắc chọn doanh nghiệp */}
+          </p>
         </div>
-        <Button className="mt-4 w-full bg-[#00d289] text-white hover:bg-[#00d289]" size="sm">
-          {t('profile_sidebar.view_all')}
-        </Button>
-      </div>
+      )}
 
       {/* Intro */}
       <div className="bg-white p-4 rounded-lg shadow-sm text-sm text-gray-700 hidden md:block">
@@ -86,6 +81,7 @@ export default function ProfileSidebar({
           </p>
         </div>
       </div>
+
     </div>
   );
 }

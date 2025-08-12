@@ -1117,11 +1117,10 @@
 "create_business_page": {
   "title": {
     "rental_company": "Create Rental Company",
-    "private_provider": "Create Private Provider",
+    "private_provider": "Create Private Vehicle Provider",
     "agent": "Create Agent",
-    "technician_mobile": "Create Mobile Technician",
-    "technician_shop": "Create Repair Shop",
-    "intercity_bus": "Create Intercity Bus Provider",
+    "technician_partner": "Create Technician Partner",
+    "intercity_bus": "Create Intercity Bus Company",
     "vehicle_transport": "Create Vehicle Transporter",
     "tour_guide": "Create Tour Guide"
   },

@@ -1110,16 +1110,15 @@
 
 "create_business_page": {
   "title": {
-    "rental_company": "렌탈 회사 등록",
-    "private_provider": "개인 제공자 등록",
-    "agent": "에이전트 등록",
-    "technician_mobile": "모바일 기술자 등록",
-    "technician_shop": "수리점 등록",
-    "intercity_bus": "시외버스 제공자 등록",
-    "vehicle_transport": "차량 운송업체 등록",
-    "tour_guide": "여행 가이드 등록"
+    "rental_company": "렌터카 회사를 생성",
+    "private_provider": "개인 차량 제공자를 생성",
+    "agent": "에이전트를 생성",
+    "technician_partner": "기술 파트너를 생성",
+    "intercity_bus": "시외버스 회사를 생성",
+    "vehicle_transport": "차량 운송업체를 생성",
+    "tour_guide": "관광 가이드를 생성"
   },
-  "subtitle": "시작하려면 아래 정보를 입력하세요."
+  "subtitle": "시작하려면 아래 정보를 입력해 주세요."
 },
 
 "create_business_form": {

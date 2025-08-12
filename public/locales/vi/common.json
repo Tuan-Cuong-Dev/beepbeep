@@ -1125,8 +1125,7 @@
     "rental_company": "Tạo Công ty cho thuê xe",
     "private_provider": "Tạo Nhà cung cấp cá nhân",
     "agent": "Tạo Cộng tác viên",
-    "technician_mobile": "Tạo Kỹ thuật viên lưu động",
-    "technician_shop": "Tạo Cửa hàng sửa xe",
+    "technician_partner": "Tạo Kỹ thuật viên đối tác", 
     "intercity_bus": "Tạo Đơn vị xe liên tỉnh",
     "vehicle_transport": "Tạo Đơn vị vận chuyển xe",
     "tour_guide": "Tạo Hướng dẫn viên"
@@ -3144,7 +3143,20 @@
     "pending": "Đang chờ",
     "approved": "Đã duyệt",
     "rejected": "Từ chối"
-  }
+  },
+
+  "business_about": {
+  "not_found": "Không tìm thấy thông tin doanh nghiệp.",
+  "address": "Địa chỉ",
+  "phone": "Điện thoại",
+  "email": "Email",
+  "website": "Website",
+  "opening_hours": "Giờ mở cửa",
+  "call_now": "Gọi ngay",
+  "get_directions": "Chỉ đường",
+  "socials": "Mạng xã hội"
+}
+
 
 
 

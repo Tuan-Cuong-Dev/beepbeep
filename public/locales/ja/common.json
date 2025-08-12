@@ -1092,13 +1092,12 @@
 "create_business_page": {
   "title": {
     "rental_company": "レンタル会社を作成",
-    "private_provider": "個人事業者を作成",
-    "agent": "エージェントを作成",
-    "technician_mobile": "出張整備士を作成",
-    "technician_shop": "修理店を作成",
+    "private_provider": "個人車両提供者を作成",
+    "agent": "代理店を作成",
+    "technician_partner": "技術パートナーを作成",
     "intercity_bus": "都市間バス会社を作成",
-    "vehicle_transport": "車両輸送業者を作成",
-    "tour_guide": "ガイドを作成"
+    "vehicle_transport": "車両運送業者を作成",
+    "tour_guide": "ツアーガイドを作成"
   },
   "subtitle": "開始するには、以下の情報を入力してください。"
 },
