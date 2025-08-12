@@ -24,12 +24,7 @@ interface Props {
   onCreateNewService: (
     category: ServiceCategoryKey,
     serviceType: SupportedServiceType,
-    data: {
-      name: string;
-      description: string;
-      vehicleTypes: string[];
-      location: string;
-    }
+    data: Record<string, any> // 👈 nhận full payload
   ) => void | Promise<void>;
 }
 
@@ -50,6 +45,20 @@ export default function AddNewServiceCard({
       ? serviceCategoriesByTechnicianSubtype[technicianSubtype]
       : serviceCategoriesByOrgType[orgType] || [];
 
+  // Xác định partnerType cho form (nếu là technician_partner)
+  const partnerType = (orgType === 'technician_partner' &&
+    (technicianSubtype === 'mobile' || technicianSubtype === 'shop'
+      ? technicianSubtype
+      : undefined)) as 'mobile' | 'shop' | undefined;
+
+  // Chuẩn hoá array: ['options.vehicleType.motorbike'] -> ['motorbike']
+  const normalizeArray = (val: unknown) =>
+    Array.isArray(val)
+      ? val.map((v) =>
+          typeof v === 'string' && v.includes('.') ? v.split('.').pop() : v
+        )
+      : val;
+
   const handleSubmit = async (formData: Record<string, any>) => {
     if (!category || !serviceType) return;
 
@@ -58,12 +67,21 @@ export default function AddNewServiceCard({
       { defaultValue: serviceType }
     );
 
-    const payload = {
-      name: formData.name || defaultName,
-      description: formData.description || '',
-      vehicleTypes: formData.vehicleTypes || [],
-      location: formData.location || '',
+    // ✅ Giữ nguyên toàn bộ field từ form + chuẩn hoá nhẹ
+    const payload: Record<string, any> = {
+      ...formData,
+      name: (formData.name?.trim?.() || defaultName) as string,
     };
+
+    // Fallback location nếu dùng storeLocation (shop)
+    if (!payload.location && typeof payload.storeLocation === 'string') {
+      payload.location = payload.storeLocation;
+    }
+
+    // Chuẩn hoá các mảng phổ biến về giá trị ngắn
+    ['vehicleTypes', 'supportedVehicles', 'insuranceTypes', 'languages'].forEach((k) => {
+      if (k in payload) payload[k] = normalizeArray(payload[k]);
+    });
 
     await onCreateNewService(category, serviceType, payload);
     setNewServiceName(payload.name);
@@ -114,7 +132,7 @@ export default function AddNewServiceCard({
         {category && serviceType && (
           <section className="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-4">
             <p className="text-sm font-medium text-gray-700 mb-2">
-              {t('my_service_list.selected')}:{' '}
+              {t('my_service_list.selected')}:&nbsp;
               <strong>
                 {t(`service_type_selector.${category}.${serviceType}.label`, {
                   defaultValue: serviceType,
@@ -124,6 +142,7 @@ export default function AddNewServiceCard({
             <DynamicServiceForm
               category={category}
               serviceType={serviceType}
+              partnerType={partnerType} 
               onSubmit={handleSubmit}
             />
           </section>

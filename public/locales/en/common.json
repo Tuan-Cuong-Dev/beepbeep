@@ -3081,6 +3081,11 @@
     "pending": "Pending",
     "approved": "Approved",
     "rejected": "Rejected"
+  },
+
+  "services_about": {
+    "title": "Services",
+    "empty": "No services yet."
   }
 
 

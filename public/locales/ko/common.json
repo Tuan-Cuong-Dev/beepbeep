@@ -3118,6 +3118,10 @@
     "pending": "대기 중",
     "approved": "승인됨",
     "rejected": "거부됨"
+  },
+  "services_about": {
+    "title": "서비스",
+    "empty": "등록된 서비스가 없습니다."
   }
 
 

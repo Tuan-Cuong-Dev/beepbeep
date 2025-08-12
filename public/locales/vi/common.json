@@ -3155,7 +3155,13 @@
   "call_now": "Gọi ngay",
   "get_directions": "Chỉ đường",
   "socials": "Mạng xã hội"
-}
+},
+
+"services_about": {
+    "title": "Dịch vụ",
+    "empty": "Chưa có dịch vụ nào."
+  }
+
 
 
 

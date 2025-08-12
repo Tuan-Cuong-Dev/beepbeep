@@ -3104,21 +3104,12 @@
   "pending": "保留中",
   "approved": "承認済み",
   "rejected": "却下"
-}
+},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+"services_about": {
+    "title": "サービス",
+    "empty": "まだサービスがありません。"
+  }
 
 
 

@@ -59,26 +59,17 @@ export default function ProfilesPageContent() {
     fetchUserData();
   }, [currentUser]);
 
-  // Map role -> BusinessType (đồng bộ CreateBusinessForm)
   const businessTypeFromRole = useMemo<BusinessType | undefined>(() => {
     const role = userData?.role as string | undefined;
     switch (role) {
-      case 'company_owner':
-        return 'rental_company';
-      case 'private_owner':
-        return 'private_provider';
-      case 'agent':
-        return 'agent';
-      case 'technician_partner':
-        return 'technician_partner';
-      case 'intercity_bus':
-        return 'intercity_bus';
-      case 'vehicle_transport':
-        return 'vehicle_transport';
-      case 'tour_guide':
-        return 'tour_guide';
-      default:
-        return undefined;
+      case 'company_owner': return 'rental_company';
+      case 'private_owner': return 'private_provider';
+      case 'agent': return 'agent';
+      case 'technician_partner': return 'technician_partner';
+      case 'intercity_bus': return 'intercity_bus';
+      case 'vehicle_transport': return 'vehicle_transport';
+      case 'tour_guide': return 'tour_guide';
+      default: return undefined;
     }
   }, [userData?.role]);
 
@@ -107,9 +98,10 @@ export default function ProfilesPageContent() {
         {/* Sidebar */}
         <aside className="w-full md:flex-[1_1_33.333%] md:max-w-[33.333%]">
           <ProfileSidebar
-            // ✅ truyền xuống để BusinessAboutSection hoạt động
             businessId={businessId}
             businessType={businessTypeFromRole}
+            /** 👇 Truyền currentUserId để ServicesAboutSection có thể query theo userId */
+            currentUserId={currentUser.uid}
             location={userData.address || t('profiles_page_content.no_address')}
             joinedDate={userData.joinedDate || '2025-01'}
             helpfulVotes={userData.helpfulVotes || 0}
