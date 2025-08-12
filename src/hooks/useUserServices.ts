@@ -1,4 +1,4 @@
-// Hooks xữ lý các dịch vụ của người dùng 
+// Hooks xử lý các dịch vụ của người dùng
 
 'use client';
 
@@ -15,12 +15,49 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { UserService, ServiceStatus } from '@/src/lib/vehicle-services/userServiceTypes';
-import { ServiceCategoryKey, SupportedServiceType } from '@/src/lib/vehicle-services/serviceTypes';
+import type { UserService } from '@/src/lib/vehicle-services/userServiceTypes';
+import type { ServiceCategoryKey, SupportedServiceType } from '@/src/lib/vehicle-services/serviceTypes';
+
+type ServiceStatus = 'pending' | 'approved' | 'rejected';
 
 interface UseUserServicesOptions {
   userId: string;
   allowedCategories?: ServiceCategoryKey[];
+}
+
+/** 🔧 Chuẩn hóa payload trước khi lưu
+ * - Ưu tiên location; nếu chưa có, map từ storeLocation
+ * - Làm phẳng mảng multi-select nếu có lỡ gửi key dịch dạng 'options.xxx.yyy'
+ * - Loại undefined để tránh ghi field rác
+ */
+function normalizeServicePayload(input: Record<string, any>) {
+  const out: Record<string, any> = {};
+
+  for (const [k, v] of Object.entries(input ?? {})) {
+    if (v === undefined) continue;
+
+    // Chuẩn hóa array: ['options.vehicleType.motorbike'] -> ['motorbike']
+    if (Array.isArray(v)) {
+      out[k] = v.map((item) => {
+        if (typeof item === 'string' && item.includes('.')) {
+          // lấy phần cuối cùng sau dấu chấm
+          const parts = item.split('.');
+          return parts[parts.length - 1];
+        }
+        return item;
+      });
+      continue;
+    }
+
+    out[k] = v;
+  }
+
+  // Ưu tiên location, fallback từ storeLocation
+  if (!out.location && typeof out.storeLocation === 'string') {
+    out.location = out.storeLocation;
+  }
+
+  return out;
 }
 
 export function useUserServices({ userId, allowedCategories }: UseUserServicesOptions) {
@@ -42,7 +79,7 @@ export function useUserServices({ userId, allowedCategories }: UseUserServicesOp
         ...docSnap.data(),
       })) as UserService[];
 
-      if (allowedCategories && allowedCategories.length > 0) {
+      if (allowedCategories?.length) {
         data = data.filter((s) => allowedCategories.includes(s.category));
       }
 
@@ -58,44 +95,48 @@ export function useUserServices({ userId, allowedCategories }: UseUserServicesOp
     fetchServices();
   }, [fetchServices]);
 
+  /** ➕ Thêm dịch vụ — nhận nguyên payload để không rơi field */
   const addService = async (
     category: ServiceCategoryKey,
     serviceType: SupportedServiceType,
-    data: {
-      name: string;
-      description?: string;
-      vehicleTypes: string[];
-      location?: string;
-    }
+    payload: Record<string, any> // nhận full formData từ DynamicServiceForm
   ) => {
     try {
+      const data = normalizeServicePayload(payload);
+
       await addDoc(collection(db, 'services'), {
-        ...data,
+        ...data, // giữ đầy đủ: workingHours, rentalTerms, ...
         category,
         serviceType,
         status: 'pending' as ServiceStatus,
         userId,
         createdAt: serverTimestamp(),
       });
+
       await fetchServices();
     } catch (err) {
       setError(err as Error);
     }
   };
 
-  const updateService = async (id: string, updatedData: Partial<UserService>) => {
+  /** ✏️ Cập nhật dịch vụ — cho phép update mọi field cần thiết */
+  const updateService = async (id: string, updatedData: Record<string, any>) => {
     try {
       const ref = doc(db, 'services', id);
+      const data = normalizeServicePayload(updatedData);
+
       await updateDoc(ref, {
-        ...updatedData,
+        ...data,
         updatedAt: serverTimestamp(),
       });
+
       await fetchServices();
     } catch (err) {
       setError(err as Error);
     }
   };
 
+  /** 🗑️ Xóa dịch vụ */
   const deleteService = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'services', id));
