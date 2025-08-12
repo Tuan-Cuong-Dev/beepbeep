@@ -511,9 +511,9 @@
   "confirm_button": "購入を確定"
 },
 "profile_main_content": {
-  "welcome_title": "プロフィールへようこそ",
-  "welcome_description": "ここでは、あなたのアクティビティ概要を確認したり、車両関連のサービスを管理できます。"
-},
+    "welcome_title": "あなたのアクティビティフィードへようこそ",
+    "welcome_description": "ここでは、アクティビティの概要を確認し、車両に関する各種サービスを管理できます。"
+  },
 "settings_dropdown": {
   "settings": "設定",
   "edit_profile": "プロフィールを編集",

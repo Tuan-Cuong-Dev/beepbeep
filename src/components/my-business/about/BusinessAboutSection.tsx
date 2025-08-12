@@ -1,4 +1,5 @@
 // src/components/business/about/BusinessAboutSection.tsx
+// Bắt đầu thiết kế cái này từ 12.08.2025
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -16,8 +17,9 @@ type BaseBusiness = {
   email?: string;
   phone?: string;
   displayAddress?: string;
-  mapAddress?: string;
-  location?: string;
+  mapAddress?: string;     // có thể là text địa chỉ hoặc URL maps
+  mapUrl?: string;         // URL Google Maps chuẩn, nếu bạn lưu trực tiếp
+  location?: unknown;      // cho phép string | [lat,lng] | {lat,lng} | {latitude,longitude}
   website?: string;
   openingHours?: string;
   description?: string;
@@ -88,15 +90,21 @@ export default function BusinessAboutSection({ businessId, businessType, classNa
     );
   }
 
+  // Chuẩn hoá đường dẫn gọi điện & bản đồ
+  const phoneHref = data.phone ? `tel:${formatPhone(data.phone)}` : '';
+  const mapsHref = buildGoogleMapsUrl({
+    mapUrl: data.mapUrl as string | undefined,
+    mapAddress: data.mapAddress ?? data.displayAddress,
+    location: data.location,
+  });
+
   return (
     <section className={cn('bg-white border border-gray-200 rounded-lg shadow-sm p-5 sm:p-6', className)}>
       {/* Title */}
       <div>
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-snug">
-          {data.name}
-        </h2>
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-snug">{data.name}</h2>
         {data.description && (
-          <p className="text-xs text-gray-600 mt-1">{data.description}</p>
+          <p className="text-sm text-gray-700 mt-1 leading-relaxed whitespace-pre-line">{data.description}</p>
         )}
       </div>
 
@@ -114,7 +122,7 @@ export default function BusinessAboutSection({ businessId, businessType, classNa
             icon={<Phone className="size-3.5" />}
             label={t('business_about.phone')}
             value={data.phone}
-            href={`tel:${data.phone}`}
+            href={phoneHref}
           />
         )}
         {data.email && (
@@ -129,8 +137,8 @@ export default function BusinessAboutSection({ businessId, businessType, classNa
           <InfoRow
             icon={<Globe className="size-3.5" />}
             label={t('business_about.website')}
-            value={data.website}
-            href={data.website}
+            value={normalizeUrl(data.website)}
+            href={normalizeUrl(data.website)}
             external
           />
         )}
@@ -143,18 +151,16 @@ export default function BusinessAboutSection({ businessId, businessType, classNa
         )}
       </div>
 
-
-
       {/* Actions */}
       <div className="mt-5 flex flex-col sm:flex-row gap-3">
-        {data.phone && (
+        {phoneHref && (
           <Button className="w-full sm:w-auto" asChild>
-            <a href={`tel:${data.phone}`}>{t('business_about.call_now')}</a>
+            <a href={phoneHref}>{t('business_about.call_now')}</a>
           </Button>
         )}
-        {data.displayAddress && data.location && (
+        {mapsHref && (
           <Button className="w-full sm:w-auto" variant="outline" asChild>
-            <a target="_blank" rel="noopener noreferrer" href={buildGoogleMapsUrl(data)}>
+            <a target="_blank" rel="noopener noreferrer" href={mapsHref}>
               {t('business_about.get_directions')}
             </a>
           </Button>
@@ -166,10 +172,10 @@ export default function BusinessAboutSection({ businessId, businessType, classNa
         <div className="mt-6 border-t pt-4">
           <p className="text-sm font-semibold text-gray-900 mb-2">{t('business_about.socials')}</p>
           <div className="flex flex-wrap gap-2 text-sm">
-            {data.socials.facebook && <SocialLink label="Facebook" href={data.socials.facebook} />}
-            {data.socials.instagram && <SocialLink label="Instagram" href={data.socials.instagram} />}
-            {data.socials.tiktok && <SocialLink label="TikTok" href={data.socials.tiktok} />}
-            {data.socials.youtube && <SocialLink label="YouTube" href={data.socials.youtube} />}
+            {data.socials.facebook && <SocialLink label="Facebook" href={normalizeUrl(data.socials.facebook)} />}
+            {data.socials.instagram && <SocialLink label="Instagram" href={normalizeUrl(data.socials.instagram)} />}
+            {data.socials.tiktok && <SocialLink label="TikTok" href={normalizeUrl(data.socials.tiktok)} />}
+            {data.socials.youtube && <SocialLink label="YouTube" href={normalizeUrl(data.socials.youtube)} />}
           </div>
         </div>
       )}
@@ -195,7 +201,7 @@ function InfoRow({
       <div className="mt-[2px] text-gray-500 shrink-0">{icon}</div>
       <div className="min-w-0">
         <p className="text-[11px] uppercase tracking-wide text-gray-500">{label}</p>
-        <p className="text-sm text-gray-900 break-words">{value}</p>
+        <p className="text-sm text-gray-900 break-words whitespace-pre-line">{value}</p>
       </div>
     </div>
   );
@@ -213,10 +219,11 @@ function InfoRow({
 }
 
 function SocialLink({ label, href }: { label: string; href: string }) {
+  const h = normalizeUrl(href);
   return (
     <a
       className="px-3 py-1.5 rounded-full border text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00d289]"
-      href={href}
+      href={h}
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -225,16 +232,88 @@ function SocialLink({ label, href }: { label: string; href: string }) {
   );
 }
 
-function buildGoogleMapsUrl(b: BaseBusiness) {
-  if (b.mapAddress) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.mapAddress)}`;
+/* ============== Helpers ============== */
+
+function isUrl(value?: string): boolean {
+  if (!value) return false;
+  try {
+    const u = new URL(value);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
   }
-  if (b.location) {
-    const nums = b.location.match(/-?\d+(\.\d+)?/g);
-    if (nums && nums.length >= 2) {
-      const [lat, lng] = nums;
-      return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+}
+
+function normalizeUrl(url?: string): string {
+  if (!url) return '';
+  if (isUrl(url)) return url;
+  // nếu thiếu protocol, thêm https://
+  return `https://${url}`;
+}
+
+function formatPhone(phone?: string): string {
+  if (!phone) return '';
+  // chỉ giữ số và dấu +
+  return phone.replace(/[^\d+]/g, '');
+}
+
+function buildGoogleMapsUrl(b: {
+  mapUrl?: string;
+  mapAddress?: string;
+  location?: unknown;
+}): string {
+  try {
+    // 1) Nếu có mapUrl là full URL -> dùng luôn
+    if (isUrl(b.mapUrl)) return b.mapUrl!;
+
+    // 2) Nếu mapAddress là URL -> dùng luôn
+    if (isUrl(b.mapAddress)) return b.mapAddress!;
+
+    // 3) mapAddress text -> query=address
+    if (typeof b.mapAddress === 'string' && b.mapAddress.trim()) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        b.mapAddress.trim()
+      )}`;
     }
+
+    // 4) location: hỗ trợ string/array/object
+    const loc = b.location as
+      | string
+      | { lat?: number | string; lng?: number | string; latitude?: number | string; longitude?: number | string }
+      | [number | string, number | string]
+      | undefined;
+
+    // 4a) string "16.07,108.2"
+    if (typeof loc === 'string') {
+      const nums = loc.match(/-?\d+(\.\d+)?/g);
+      if (nums && nums.length >= 2) {
+        const [lat, lng] = nums;
+        return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      }
+    }
+
+    // 4b) array [lat, lng]
+    if (Array.isArray(loc) && loc.length >= 2) {
+      const [lat, lng] = loc;
+      if (lat != null && lng != null) {
+        return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      }
+    }
+
+    // 4c) object {lat,lng} hoặc {latitude,longitude}
+    if (loc && typeof loc === 'object') {
+      // @ts-ignore
+      const lat = (loc.lat ?? loc.latitude) as number | string | undefined;
+      // @ts-ignore
+      const lng = (loc.lng ?? loc.longitude) as number | string | undefined;
+      if (lat != null && lng != null) {
+        return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      }
+    }
+
+    // Không build được
+    return '';
+  } catch {
+    return '';
   }
-  return '#';
 }

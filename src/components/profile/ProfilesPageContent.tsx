@@ -77,6 +77,9 @@ export default function ProfilesPageContent() {
 
   if (!currentUser || !userData) return null;
 
+  // ✅ Mobile chỉ show sidebar khi tab = activityFeed
+  const showSidebarOnMobile = activeTab === 'activityFeed';
+
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Header + Avatar */}
@@ -96,11 +99,12 @@ export default function ProfilesPageContent() {
       {/* Main layout */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:flex md:gap-6">
         {/* Sidebar */}
-        <aside className="w-full md:flex-[1_1_33.333%] md:max-w-[33.333%]">
+        <aside
+          className={`${showSidebarOnMobile ? 'block' : 'hidden'} md:block w-full md:flex-[1_1_33.333%] md:max-w-[33.333%]`}
+        >
           <ProfileSidebar
             businessId={businessId}
             businessType={businessTypeFromRole}
-            /** 👇 Truyền currentUserId để ServicesAboutSection có thể query theo userId */
             currentUserId={currentUser.uid}
             location={userData.address || t('profiles_page_content.no_address')}
             joinedDate={userData.joinedDate || '2025-01'}

@@ -208,17 +208,24 @@ export default function ServicesAboutSection({
             <div key={svc.id} className="rounded-lg border border-gray-100 p-4">
               <div className="flex items-start gap-3">
                 <div className="mt-0.5">{SERVICE_TYPE_ICONS[svc.serviceType]}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">{svc.name}</h3>
-                    {svc.status === 'active' && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">
-                        {t('my_service_list.status.active', { defaultValue: 'Active' })}
-                      </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
+                        {svc.name}
+                      </h3>
+                      {svc.status === 'active' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">
+                          {t('my_service_list.status.active', { defaultValue: 'Active' })}
+                        </span>
+                      )}
+                    </div>
+
+                    {svc.description && (
+                      <p className="mt-2 text-sm text-gray-700 leading-relaxed whitespace-pre-line break-words line-clamp-4 md:line-clamp-6">
+                        {svc.description}
+                      </p>
                     )}
                   </div>
-                  {svc.description && <p className="text-xs text-gray-600 line-clamp-2">{svc.description}</p>}
-                </div>
               </div>
 
               <div className="mt-3 grid grid-cols-1 gap-2">

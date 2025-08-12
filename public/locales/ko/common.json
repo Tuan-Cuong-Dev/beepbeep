@@ -524,9 +524,9 @@
 },
 
 "profile_main_content": {
-  "welcome_title": "프로필에 오신 것을 환영합니다",
-  "welcome_description": "여기에서 활동 요약을 확인하고 차량 관련 서비스를 관리할 수 있습니다."
-},
+    "welcome_title": "활동 피드에 오신 것을 환영합니다",
+    "welcome_description": "여기에서 활동 개요를 확인하고 차량 관련 서비스를 관리할 수 있습니다."
+  },
 
 "settings_dropdown": {
   "settings": "설정",
