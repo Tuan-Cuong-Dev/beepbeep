@@ -63,7 +63,7 @@ export default function ProfilesPageContent() {
     const role = userData?.role as string | undefined;
     switch (role) {
       case 'company_owner': return 'rental_company';
-      case 'private_owner': return 'private_provider';
+      case 'private_provider': return 'private_provider';
       case 'agent': return 'agent';
       case 'technician_partner': return 'technician_partner';
       case 'intercity_bus': return 'intercity_bus';

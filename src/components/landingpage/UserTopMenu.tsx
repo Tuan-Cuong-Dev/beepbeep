@@ -28,7 +28,7 @@ const menuItems: MenuItem[] = [
     key: 'bookings',
     path: '/bookings',
     icon: FaCalendarAlt,
-    roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'staff'],
+    roles: ['admin', 'company_owner', 'private_provider', 'company_admin', 'station_manager', 'staff'],
   },
   {
     key: 'rental_companies',
@@ -40,7 +40,7 @@ const menuItems: MenuItem[] = [
     key: 'vehicle_management',
     path: '/vehicles',
     icon: FaMotorcycle,
-    roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'staff'],
+    roles: ['admin', 'company_owner', 'private_provider', 'company_admin', 'station_manager', 'staff'],
   },
   {
     key: 'users_management',
@@ -52,7 +52,7 @@ const menuItems: MenuItem[] = [
     key: 'customers_management',
     path: '/customers',
     icon: FaUserCog,
-    roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'staff'],
+    roles: ['admin', 'company_owner', 'private_provider', 'company_admin', 'staff'],
   },
   {
     key: 'staff_management',
@@ -64,25 +64,25 @@ const menuItems: MenuItem[] = [
     key: 'battery_management',
     path: '/battery',
     icon: FaBatteryFull,
-    roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'technician'],
+    roles: ['admin', 'company_owner', 'private_provider', 'company_admin', 'station_manager', 'technician'],
   },
   {
     key: 'accessories_management',
     path: '/accessories',
     icon: FaToolbox,
-    roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'technician'],
+    roles: ['admin', 'company_owner', 'private_provider', 'company_admin', 'station_manager', 'technician'],
   },
   {
     key: 'accessory_exports',
     path: '/accessories/exports',
     icon: FaToolbox,
-    roles: ['admin', 'company_owner', 'private_owner', 'company_admin', 'station_manager', 'technician'],
+    roles: ['admin', 'company_owner', 'private_provider', 'company_admin', 'station_manager', 'technician'],
   },
   {
     key: 'subscription_packages',
     path: '/subscriptionPackages',
     icon: faFileContract,
-    roles: ['admin', 'company_owner', 'private_owner', 'company_admin'],
+    roles: ['admin', 'company_owner', 'private_provider', 'company_admin'],
   },
 ];
 
