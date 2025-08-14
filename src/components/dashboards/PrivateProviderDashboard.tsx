@@ -1,155 +1,178 @@
 'use client';
 
-import { JSX, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useUser } from '@/src/context/AuthContext';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-import Link from 'next/link';
 import {
-  Bike,
-  FileText,
-  LineChart,
-  Star,
-  Wrench,
-  ClipboardList,
-  PackagePlus,
-  Boxes,
+  DollarSign, Bike, MapPin, Users, FileText, Wrench,
+  FileTextIcon, ClipboardList, BatteryCharging, Package, User
 } from 'lucide-react';
-
-interface DashboardStats {
-  ebikes: number;
-  issues: number;
-  accessories: number;
-  subscriptionPackages: number;
-}
+import { Booking } from '@/src/lib/booking/BookingTypes';
+import { formatCurrency } from '@/src/utils/formatCurrency';
+import { useTranslation } from 'react-i18next';
+import { JSX } from 'react/jsx-runtime';
 
 export default function PrivateProviderDashboard() {
+  const { t } = useTranslation('common');
   const { user } = useUser();
-  const [stats, setStats] = useState<DashboardStats>({
+
+  const [stats, setStats] = useState({
+    // Với Private Provider thường không có stations/staffs.
     ebikes: 0,
+    bookings: 0,
+    revenue: 0,
     issues: 0,
+    batteries: 0,
     accessories: 0,
+    customers: 0,
+    programs: 0,
     subscriptionPackages: 0,
   });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       if (!user?.uid) return;
 
-      const companySnap = await getDocs(
-        query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid))
+      // 👉 Lấy providerId từ collection privateProviders
+      const providerSnap = await getDocs(
+        query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid))
       );
-      if (companySnap.empty) return;
+      if (providerSnap.empty) return;
 
-      const companyId = companySnap.docs[0].id;
+      const providerId = providerSnap.docs[0].id;
 
       const [
         ebikeSnap,
         issuesSnap,
-        accessoriesSnap,
-        packageSnap,
+        bookingsSnap,
+        batterySnap,
+        accessorySnap,
+        customerSnap,
+        programSnap,
+        subscriptionSnap,
       ] = await Promise.all([
-        getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'accessories'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'subscriptionPackages'), where('companyId', '==', companyId))),
+        getDocs(query(collection(db, 'vehicles'), where('companyId', '==', providerId))),
+        getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', providerId))),
+        getDocs(query(collection(db, 'bookings'), where('companyId', '==', providerId))),
+        getDocs(query(collection(db, 'batteries'), where('companyId', '==', providerId))),
+        getDocs(query(collection(db, 'accessories'), where('companyId', '==', providerId))),
+        getDocs(query(collection(db, 'customers'), where('companyId', '==', providerId))),
+        getDocs(query(collection(db, 'programs'), where('companyId', '==', providerId))),               // đổi nếu tên khác
+        getDocs(query(collection(db, 'subscriptionPackages'), where('companyId', '==', providerId))),
       ]);
+
+      const bookings: Booking[] = bookingsSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Booking[];
+
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      const monthlyBookings = bookings.filter(b => {
+        try {
+          const date =
+            b.createdAt instanceof Date
+              ? b.createdAt
+              : b.createdAt?.toDate?.();
+          return (
+            date?.getFullYear() === currentYear &&
+            date?.getMonth() === currentMonth
+          );
+        } catch (err) {
+          console.warn('⚠️ Invalid createdAt:', b);
+          return false;
+        }
+      });
+
+      const totalRevenue = monthlyBookings.reduce((sum, b) => {
+        const amount = typeof (b as any).totalAmount === 'number' ? (b as any).totalAmount : 0;
+        return sum + amount;
+      }, 0);
 
       setStats({
         ebikes: ebikeSnap.size,
+        bookings: monthlyBookings.length,
+        revenue: totalRevenue,
         issues: issuesSnap.size,
-        accessories: accessoriesSnap.size,
-        subscriptionPackages: packageSnap.size,
+        batteries: batterySnap.size,
+        accessories: accessorySnap.size,
+        customers: customerSnap.size,
+        programs: programSnap.size,
+        subscriptionPackages: subscriptionSnap.size,
       });
-
-      setLoading(false);
     };
 
     fetchStats();
   }, [user]);
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-
       <main className="flex-1 px-6 py-10 space-y-10">
-        <h1 className="text-3xl font-bold text-center text-gray-800">🚴 Private Provider Dashboard</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          {/* Bạn có thể đổi key sang private_provider_dashboard.title nếu đã thêm i18n */}
+          {t('rental_company_dashboard.title')}
+        </h1>
 
-        <DashboardGrid>
+        <DashboardGrid1>
+          <DashboardCard title={t('rental_company_dashboard.vehicles')} value={stats.ebikes.toString()} href="/vehicles" icon={<Bike className="w-6 h-6" />} />
+
+          {/* Customers */}
           <DashboardCard
-            title="My Vehicle"
-            value={stats.ebikes.toString()}
-            href="/vehicles"
-            icon={<Bike className="w-6 h-6" />}
+            title={t('rental_company_dashboard.customers')}
+            value={stats.customers.toString()}
+            href="/customers"
+            icon={<User className="w-6 h-6" />}
           />
+
+          <DashboardCard title={t('rental_company_dashboard.bookings_this_month')} value={stats.bookings.toString()} href="/bookings" icon={<FileTextIcon className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.revenue_this_month')} value={formatCurrency(stats.revenue)} href="/bookings" icon={<DollarSign className="w-6 h-6" />} />
+
           <DashboardCard
-            title="Vehicle Issues"
-            value={stats.issues.toString()}
-            href="/vehicle-issues"
-            icon={<Wrench className="w-6 h-6" />}
+            title={t('rental_company_dashboard.programs')}
+            value={stats.programs.toString()}
+            href="/dashboard/programs"
+            icon={<ClipboardList className="w-6 h-6" />}
           />
+
+          <DashboardCard title={t('rental_company_dashboard.issues')} value={stats.issues.toString()} href="/vehicle-issues" icon={<Wrench className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.batteries')} value={stats.batteries.toString()} href="/battery" icon={<BatteryCharging className="w-6 h-6" />} />
+          <DashboardCard title={t('rental_company_dashboard.accessories')} value={stats.accessories.toString()} href="/accessories" icon={<Package className="w-6 h-6" />} />
+
           <DashboardCard
-            title="Accessories"
-            value={stats.accessories.toString()}
-            href="/accessories"
-            icon={<PackagePlus className="w-6 h-6" />}
-          />
-          <DashboardCard
-            title="Subscription Packages"
+            title={t('rental_company_dashboard.subscription_packages')}
             value={stats.subscriptionPackages.toString()}
             href="/subscriptionPackages"
-            icon={<Boxes className="w-6 h-6" />}
-          />
-          <DashboardCard
-            title="Ratings & Reviews"
-            value="4.7/5"
-            href="/reviews"
-            icon={<Star className="w-6 h-6" />}
-          />
-          <DashboardCard
             icon={<ClipboardList className="w-6 h-6" />}
-            title="Programs"
-            value="Manage"
-            href="/dashboard/programs"
           />
-        </DashboardGrid>
+        </DashboardGrid1>
 
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <QuickAction label="Add New Vehicle" href="/ebikes" />
-            <QuickAction label="Check Reviews" href="/reviews" />
-            <QuickAction label="Form Builder" href="/dashboard/form-builder" />
-            <QuickAction label="Manage Vehicle Issues" href="/vehicle-issues" />
-            <QuickAction label="Manage Packages" href="/subscriptionPackages" />
-            <QuickAction label="Rent a Ride" href="/rent" />
-            <QuickAction label="Return Vehicle" href="/return" />
-            <QuickAction label="Report Vehicle Issue" href="/vehicle-issues/report" />
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            {t('quick_actions.title')}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <QuickAction label={t('quick_actions.create_vehicle_model')} href="/vehicles" />
+            <QuickAction label={t('quick_actions.form_builder')} href="/dashboard/form-builder" />
+            <QuickAction label={t('quick_actions.rent')} href="/rent" />
+            <QuickAction label={t('quick_actions.return')} href="/return" />
+            <QuickAction label={t('quick_actions.report_issue')} href="/vehicle-issues/report" />
           </div>
         </section>
-
-        <section className="bg-white rounded-2xl p-6 border shadow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 Recent Activity</h2>
-          <ul className="text-sm text-gray-700 space-y-2">
-            <RecentActivityItem text='eBike "VN-0123" marked as available' />
-            <RecentActivityItem text="New customer review received" />
-            <RecentActivityItem text='Maintenance log updated for eBike "VN-0088"' />
-          </ul>
-        </section>
       </main>
-
       <Footer />
     </div>
   );
 }
 
-function DashboardGrid({ children }: { children: React.ReactNode }) {
-  return <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">{children}</section>;
+function DashboardGrid1({ children }: { children: React.ReactNode }) {
+  return <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">{children}</section>;
 }
 
 function DashboardCard({
@@ -187,14 +210,5 @@ function QuickAction({ label, href }: { label: string; href: string }) {
     >
       {label}
     </Link>
-  );
-}
-
-function RecentActivityItem({ text }: { text: string }) {
-  return (
-    <li className="flex items-start gap-2">
-      <FileText className="mt-0.5 w-4 h-4 text-[#00d289]" />
-      <span>{text}</span>
-    </li>
   );
 }

@@ -24,21 +24,13 @@ interface StaffEntry {
 }
 
 export default function MyBusinessPage() {
-  const { user, role, companyId, loading } = useUser();
+  const { user, role, loading } = useUser();
   const router = useRouter();
 
   const [businessType, setBusinessType] = useState<
-    'admin' |
-    'technician_assistant' |
-    'technician_partner' |
-    'rental_company_owner' |
-    'private_provider' |
-    'agent' |
-    'company_admin' |
-    'station_manager' |
-    'staff' |
-    'technician' |
-    null
+    'admin'|'technician_assistant'|'technician_partner'|
+    'rental_company_owner'|'private_provider'|'agent'|
+    'company_admin'|'station_manager'|'staff'|'technician'|null
   >(null);
 
   const [staffRoles, setStaffRoles] = useState<StaffEntry[]>([]);
@@ -46,77 +38,54 @@ export default function MyBusinessPage() {
   useEffect(() => {
     if (loading || !user) return;
 
-    if (role === 'technician_assistant') {
-      setBusinessType('technician_assistant');
-      return;
-    }
+    const r = role?.toLowerCase();
 
-    if (role === 'technician_partner') {
-      setBusinessType('technician_partner');
-      return;
-    }
-
-    if (role === 'Admin') {
-      setBusinessType('admin');
-      return;
-    }
+    // ✅ Ưu tiên vai trò toàn cục
+    if (r === 'technician_assistant') return setBusinessType('technician_assistant');
+    if (r === 'technician_partner')  return setBusinessType('technician_partner');
+    if (r === 'admin')               return setBusinessType('admin');
+    if (r === 'private_provider')    return setBusinessType('private_provider'); // ✅ thêm
 
     const fetchData = async () => {
-      const rentalQuery = query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid));
-      const agentQuery = query(collection(db, 'agents'), where('ownerId', '==', user.uid));
-      const providerQuery = query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid));
+      // Owner của rental company
+      const rentalOwnerQ = query(
+        collection(db, 'rentalCompanies'),
+        where('ownerId', '==', user.uid)
+      );
+      // Owner của private provider
+      const providerOwnerQ = query(
+        collection(db, 'privateProviders'),
+        where('ownerId', '==', user.uid)
+      );
+      // Owner của agent
+      const agentQ = query(collection(db, 'agents'), where('ownerId', '==', user.uid));
+      
+      console.log('provider owner?', !(await getDocs(query(collection(db,'privateProviders'),where('ownerId','==',user.uid)))).empty);
 
-      const [rentalSnap, agentSnap, providerSnap] = await Promise.all([
-        getDocs(rentalQuery),
-        getDocs(agentQuery),
-        getDocs(providerQuery),
+      const [rentalSnap, providerSnap, agentSnap] = await Promise.all([
+        getDocs(rentalOwnerQ),
+        getDocs(providerOwnerQ),
+        getDocs(agentQ),
       ]);
 
-      if (!rentalSnap.empty) {
-        setBusinessType('rental_company_owner');
-        return;
-      }
+      if (!rentalSnap.empty)  return setBusinessType('rental_company_owner');
+      if (!providerSnap.empty) return setBusinessType('private_provider');   // ✅ đúng collection
+      if (!agentSnap.empty)    return setBusinessType('agent');
 
-      if (!agentSnap.empty) {
-        setBusinessType('agent');
-        return;
-      }
-
-      if (!providerSnap.empty) {
-        setBusinessType('private_provider');
-        return;
-      }
-
-      const staffQuery = query(collection(db, 'staffs'), where('userId', '==', user.uid));
-      const staffSnap = await getDocs(staffQuery);
+      // Fallback staff
+      const staffQ = query(collection(db, 'staffs'), where('userId', '==', user.uid));
+      const staffSnap = await getDocs(staffQ);
 
       if (!staffSnap.empty) {
-        const staffData: StaffEntry[] = staffSnap.docs.map(doc => {
-          const data = doc.data() as { role: string };
-          return {
-            id: doc.id,
-            ...data,
-          };
-        });
-
+        const staffData: StaffEntry[] = staffSnap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
         setStaffRoles(staffData);
 
-        const staffRole = staffData[0]?.role?.toLowerCase() || '';
-        switch (staffRole) {
-          case 'technician':
-            setBusinessType('technician');
-            break;
-          case 'station_manager':
-            setBusinessType('station_manager');
-            break;
-          case 'company_admin':
-            setBusinessType('company_admin');
-            break;
-          default:
-            setBusinessType('staff');
+        switch ((staffData[0]?.role ?? '').toLowerCase()) {
+          case 'technician':      return setBusinessType('technician');
+          case 'station_manager': return setBusinessType('station_manager');
+          case 'company_admin':   return setBusinessType('company_admin');
+          default:                return setBusinessType('staff');
         }
-
-        return;
       }
 
       router.replace('/my-business/create');
@@ -126,11 +95,7 @@ export default function MyBusinessPage() {
   }, [user, role, loading, router]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen text-gray-500">
-        Loading...
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>;
   }
 
   return (
@@ -139,15 +104,13 @@ export default function MyBusinessPage() {
       {businessType === 'technician_assistant' && <TechnicianAssistantDashboard />} 
       {businessType === 'technician_partner' && <TechnicianPartnerDashboard />}
       {businessType === 'rental_company_owner' && <RentalCompanyDashboard />}
-      {businessType === 'private_provider' && <PrivateProviderDashboard />}
+      {businessType === 'private_provider' && <PrivateProviderDashboard />}  {/* ✅ */}
       {businessType === 'agent' && <AgentDashboard />}
       {businessType === 'company_admin' && <CompanyAdminDashboard />}
       {businessType === 'station_manager' && <StationManagerDashboard />}
       {businessType === 'staff' && <StaffDashboard />}
       {businessType === 'technician' && <TechnicianDashboard />}
-      {!businessType && (
-        <div className="text-center text-gray-500">No business found.</div>
-      )}
+      {!businessType && <div className="text-center text-gray-500">No business found.</div>}
     </main>
   );
 }

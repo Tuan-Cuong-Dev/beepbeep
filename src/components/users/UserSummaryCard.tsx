@@ -10,7 +10,7 @@ export default function UserSummaryCard({ users }: Props) {
   const roleLabels: Record<string, string> = {
     admin: 'Admin',
     company_owner: 'Company Owner',
-    private_owner: 'Private Owner',
+    private_provider: 'Private Owner',
     agent: 'Agent',
     staff: 'Staff',
     investor: 'Investor',
@@ -22,7 +22,7 @@ export default function UserSummaryCard({ users }: Props) {
   const roleColors: Record<string, string> = {
     admin: 'text-red-500',
     company_owner: 'text-blue-600',
-    private_owner: 'text-orange-500',
+    private_provider: 'text-orange-500',
     agent: 'text-green-600',
     staff: 'text-purple-600',
     investor: 'text-teal-500',

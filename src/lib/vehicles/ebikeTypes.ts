@@ -15,7 +15,7 @@ export type EbikeStatus =
 export interface Ebike {
   id: string;
   modelId: string;            // 🔗 ebikeModels
-  companyId: string;          // 🔗 rentalCompanies (hoặc private_owner)
+  companyId: string;          // 🔗 rentalCompanies (hoặc private_provider)
   stationId: string;          // 🔗 rentalStations
 
   serialNumber: string;       // số series của nhà sản xuất

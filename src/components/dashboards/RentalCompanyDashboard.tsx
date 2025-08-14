@@ -50,7 +50,7 @@ export default function RentalCompanyDashboard() {
       programSnap, subscriptionSnap, // ✅ thêm
     ] = await Promise.all([
       getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', companyId))),
-      getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId))),
+      getDocs(query(collection(db, 'vehicles'), where('companyId', '==', companyId))),
       getDocs(query(collection(db, 'staffs'), where('companyId', '==', companyId))),
       getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId))),
       getDocs(query(collection(db, 'bookings'), where('companyId', '==', companyId))),

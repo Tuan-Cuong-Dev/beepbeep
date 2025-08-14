@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { useUser } from '@/src/context/AuthContext';
-import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompanyTypes';
+import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 import {
   getMyRentalCompany,
   updateRentalCompany,
@@ -49,6 +49,8 @@ export default function PrivateProviderPage() {
         ownerId: user.uid,
         createdAt: company.createdAt,
         updatedAt: Timestamp.now(),
+        supportedVehicleTypes: [],
+        supportedServiceTypes: []
       };
       await updateRentalCompany(company.id, updatedData);
       toast.success('✅ Private Provider updated successfully');
