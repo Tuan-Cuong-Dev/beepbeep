@@ -18,6 +18,7 @@ import {
   BatteryCharging,
   Boxes,
   Wrench,
+  User, // ✅ icon cho Customers
 } from 'lucide-react';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { JSX } from 'react/jsx-runtime';
@@ -37,6 +38,8 @@ export default function CompanyAdminDashboard() {
     revenue: 0,
     subscriptionPackages: 0,
     vehicleIssues: 0,
+    customers: 0, // ✅ thêm
+    programs: 0,  // ✅ thêm
   });
 
   useEffect(() => {
@@ -56,6 +59,8 @@ export default function CompanyAdminDashboard() {
           batteries: query(collection(db, 'batteries'), where('companyId', '==', companyId)),
           subscriptionPackages: query(collection(db, 'subscriptionPackages'), where('companyId', '==', companyId)),
           vehicleIssues: query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId)),
+          customers: query(collection(db, 'customers'), where('companyId', '==', companyId)),    // ✅ thêm
+          programs: query(collection(db, 'programs'), where('companyId', '==', companyId)),      // ✅ thêm (đổi tên collection nếu bạn dùng khác)
         };
 
         const [
@@ -67,6 +72,8 @@ export default function CompanyAdminDashboard() {
           batterySnap,
           packageSnap,
           issueSnap,
+          customerSnap, // ✅
+          programSnap,  // ✅
         ] = await Promise.all([
           getDocs(queries.stations),
           getDocs(queries.ebikes),
@@ -76,17 +83,19 @@ export default function CompanyAdminDashboard() {
           getDocs(queries.batteries),
           getDocs(queries.subscriptionPackages),
           getDocs(queries.vehicleIssues),
+          getDocs(queries.customers), // ✅
+          getDocs(queries.programs),  // ✅
         ]);
 
         const bookings = bookingSnap.docs.map(doc => doc.data());
         const now = new Date();
 
         const monthlyBookings = bookings.filter((b: any) => {
-          const date = b.createdAt?.toDate?.() || new Date(b.createdAt);
-          return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+          const date = b.createdAt?.toDate?.() || (b.createdAt ? new Date(b.createdAt) : null);
+          return date && date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
         });
 
-        const revenue = monthlyBookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+        const revenue = monthlyBookings.reduce((sum, b) => sum + (typeof b.totalAmount === 'number' ? b.totalAmount : 0), 0);
 
         setStats({
           stations: stationSnap.size,
@@ -98,6 +107,8 @@ export default function CompanyAdminDashboard() {
           revenue,
           subscriptionPackages: packageSnap.size,
           vehicleIssues: issueSnap.size,
+          customers: customerSnap.size, // ✅
+          programs: programSnap.size,   // ✅
         });
       } catch (error) {
         console.error('🔥 Unexpected error in fetchStats:', error);
@@ -118,12 +129,19 @@ export default function CompanyAdminDashboard() {
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <DashboardCard icon={<MapPin />} title={t('company_admin_dashboard.stations')} value={stats.stations} href="/dashboard/stations" />
           <DashboardCard icon={<Bike />} title={t('company_admin_dashboard.vehicles')} value={stats.ebikes} href="/vehicles" />
+
+          {/* ✅ Customers card */}
+          <DashboardCard icon={<User />} title={t('company_admin_dashboard.customers')} value={stats.customers} href="/customers" />
+
           <DashboardCard icon={<DollarSign />} title={t('company_admin_dashboard.revenue_this_month')} value={formatCurrency(stats.revenue)} href="/bookings" />
           <DashboardCard icon={<Users />} title={t('company_admin_dashboard.staff')} value={stats.staffs} href="/dashboard/staff" />
           <DashboardCard icon={<FileText />} title={t('company_admin_dashboard.bookings')} value={stats.bookings} href="/bookings" />
           <DashboardCard icon={<PackagePlus />} title={t('company_admin_dashboard.accessories')} value={stats.accessories} href="/accessories" />
           <DashboardCard icon={<BatteryCharging />} title={t('company_admin_dashboard.batteries')} value={stats.batteries} href="/battery" />
-          <DashboardCard icon={<ClipboardList />} title={t('company_admin_dashboard.programs')} value={t('company_admin_dashboard.manage')} href="/dashboard/programs" />
+
+          {/* ✅ Programs hiển thị số lượng thay vì "Quản lý" */}
+          <DashboardCard icon={<ClipboardList />} title={t('company_admin_dashboard.programs')} value={stats.programs} href="/dashboard/programs" />
+
           <DashboardCard icon={<Boxes />} title={t('company_admin_dashboard.subscription_packages')} value={stats.subscriptionPackages} href="/subscriptionPackages" />
           <DashboardCard icon={<Wrench />} title={t('company_admin_dashboard.vehicle_issues')} value={stats.vehicleIssues} href="/vehicle-issues" />
         </section>
