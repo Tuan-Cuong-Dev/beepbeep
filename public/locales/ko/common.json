@@ -1820,7 +1820,8 @@
   "issues": "차량 문제",
   "batteries": "배터리",
   "accessories": "액세서리",
-  "subscription_packages": "구독 패키지"
+  "subscription_packages": "구독 패키지",
+  "customers": "고객"
 },
 "quick_actions": {
   "title": "⚡ 빠른 작업",

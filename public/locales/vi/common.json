@@ -1846,7 +1846,8 @@
   "issues": "Sự cố xe",
   "batteries": "Pin",
   "accessories": "Phụ kiện",
-  "subscription_packages": "Gói thuê"
+  "subscription_packages": "Gói thuê",
+  "customers" : "Khách hàng"
 },
 "quick_actions": {
   "title": "⚡ Hành động nhanh",

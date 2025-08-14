@@ -1833,7 +1833,8 @@
   "issues": "Vehicle Issues",
   "batteries": "Batteries",
   "accessories": "Accessories",
-  "subscription_packages": "Subscription Packages"
+  "subscription_packages": "Subscription Packages",
+  "customers": "Customers"
 },
 "quick_actions": {
   "title": "⚡ Quick Actions",

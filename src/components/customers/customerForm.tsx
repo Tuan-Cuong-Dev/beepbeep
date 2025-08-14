@@ -5,6 +5,7 @@ import { Timestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUser } from '@/src/context/AuthContext'; // ✅ lấy role
 
 type Props = {
   editingCustomer: Customer | null;
@@ -24,6 +25,8 @@ export default function CustomerForm({
   companyMap,
 }: Props) {
   const { t } = useTranslation('common');
+  const { user } = useUser();
+  const isAdmin = user?.role === 'admin'; // ✅ chỉ admin mới thấy field Công ty
 
   const handleDateChange = (value: string) => {
     const date = value ? new Date(value + 'T00:00:00') : null;
@@ -39,11 +42,18 @@ export default function CustomerForm({
       : '';
   }, [newCustomer.dateOfBirth]);
 
+  // ✅ chuyển companyMap => options để admin chọn
+  const companyOptions = useMemo(
+    () => Object.entries(companyMap).map(([id, name]) => ({ id, name })),
+    [companyMap]
+  );
+
   return (
     <div className="bg-gray-100 rounded p-4 mb-6 mt-4">
       <h2 className="text-xl font-semibold mb-2">
         {editingCustomer ? t('customer_form.title_update') : t('customer_form.title_add')}
       </h2>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <input
           type="text"
@@ -52,6 +62,7 @@ export default function CustomerForm({
           onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
           className="border p-2 rounded w-full"
         />
+
         <input
           type="email"
           placeholder={t('customer_form.email')}
@@ -59,6 +70,7 @@ export default function CustomerForm({
           onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
           className="border p-2 rounded w-full"
         />
+
         <input
           type="text"
           placeholder={t('customer_form.phone')}
@@ -66,13 +78,23 @@ export default function CustomerForm({
           onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
           className="border p-2 rounded w-full"
         />
-        <input
-          type="text"
-          placeholder={t('customer_form.company_name')}
-          value={companyMap[newCustomer.companyId] || t('customer_form.company_name')}
-          disabled
-          className="border p-2 rounded w-full bg-gray-100 text-gray-700 font-medium"
-        />
+
+        {/* ✅ Chỉ admin mới thấy & chỉnh company */}
+        {isAdmin && (
+          <select
+            value={newCustomer.companyId ?? ''}
+            onChange={(e) => setNewCustomer({ ...newCustomer, companyId: e.target.value || undefined })}
+            className="border p-2 rounded w-full"
+          >
+            <option value="">{t('customer_form.company_name')}</option>
+            {companyOptions.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        )}
+
         <input
           type="text"
           placeholder={t('customer_form.address')}
@@ -80,6 +102,7 @@ export default function CustomerForm({
           onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
           className="border p-2 rounded w-full"
         />
+
         <input
           type="date"
           placeholder={t('customer_form.date_of_birth')}
@@ -87,6 +110,7 @@ export default function CustomerForm({
           onChange={(e) => handleDateChange(e.target.value)}
           className="border p-2 rounded w-full"
         />
+
         <input
           type="text"
           placeholder={t('customer_form.driver_license')}
@@ -94,6 +118,7 @@ export default function CustomerForm({
           onChange={(e) => setNewCustomer({ ...newCustomer, driverLicense: e.target.value })}
           className="border p-2 rounded w-full"
         />
+
         <input
           type="text"
           placeholder={t('customer_form.id_number')}
@@ -101,6 +126,7 @@ export default function CustomerForm({
           onChange={(e) => setNewCustomer({ ...newCustomer, idNumber: e.target.value })}
           className="border p-2 rounded w-full"
         />
+
         <input
           type="text"
           placeholder={t('customer_form.nationality')}
@@ -108,6 +134,7 @@ export default function CustomerForm({
           onChange={(e) => setNewCustomer({ ...newCustomer, nationality: e.target.value })}
           className="border p-2 rounded w-full"
         />
+
         <select
           value={newCustomer.sex ?? ''}
           onChange={(e) =>
@@ -123,6 +150,7 @@ export default function CustomerForm({
           <option value="female">{t('customer_form.sex.female')}</option>
           <option value="other">{t('customer_form.sex.other')}</option>
         </select>
+
         <input
           type="text"
           placeholder={t('customer_form.place_of_origin')}
@@ -130,6 +158,7 @@ export default function CustomerForm({
           onChange={(e) => setNewCustomer({ ...newCustomer, placeOfOrigin: e.target.value })}
           className="border p-2 rounded w-full"
         />
+
         <input
           type="text"
           placeholder={t('customer_form.place_of_residence')}
@@ -138,6 +167,7 @@ export default function CustomerForm({
           className="border p-2 rounded w-full"
         />
       </div>
+
       <div className="mt-4 flex gap-4">
         <button onClick={onSave} className="bg-[#00d289] text-white px-4 py-1 rounded">
           {editingCustomer ? t('customer_form.update') : t('customer_form.add')}

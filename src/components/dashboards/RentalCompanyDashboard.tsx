@@ -9,7 +9,7 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import {
   DollarSign, Bike, MapPin, Users, FileText, Wrench,
-  FileTextIcon, ClipboardList, BatteryCharging, Package,
+  FileTextIcon, ClipboardList, BatteryCharging, Package,User
 } from 'lucide-react';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { formatCurrency } from '@/src/utils/formatCurrency';
@@ -28,6 +28,9 @@ export default function RentalCompanyDashboard() {
     issues: 0,
     batteries: 0,
     accessories: 0,
+    customers: 0,
+    programs: 0,               
+    subscriptionPackages: 0,
   });
 
   useEffect(() => {
@@ -42,17 +45,23 @@ export default function RentalCompanyDashboard() {
       const companyId = companySnap.docs[0].id;
 
       const [
-        stationSnap, ebikeSnap, staffSnap, issuesSnap,
-        bookingsSnap, batterySnap, accessorySnap
-      ] = await Promise.all([
-        getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'staffs'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'bookings'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'batteries'), where('companyId', '==', companyId))),
-        getDocs(query(collection(db, 'accessories'), where('companyId', '==', companyId))),
-      ]);
+      stationSnap, ebikeSnap, staffSnap, issuesSnap,
+      bookingsSnap, batterySnap, accessorySnap, customerSnap,
+      programSnap, subscriptionSnap, // ✅ thêm
+    ] = await Promise.all([
+      getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', companyId))),
+      getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId))),
+      getDocs(query(collection(db, 'staffs'), where('companyId', '==', companyId))),
+      getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', companyId))),
+      getDocs(query(collection(db, 'bookings'), where('companyId', '==', companyId))),
+      getDocs(query(collection(db, 'batteries'), where('companyId', '==', companyId))),
+      getDocs(query(collection(db, 'accessories'), where('companyId', '==', companyId))),
+      getDocs(query(collection(db, 'customers'), where('companyId', '==', companyId))),
+      // 👉 Tên collection, chỉnh nếu bạn đang dùng khác:
+      getDocs(query(collection(db, 'programs'), where('companyId', '==', companyId))),               
+      getDocs(query(collection(db, 'subscriptionPackages'), where('companyId', '==', companyId))),   
+    ]);
+
 
       const bookings: Booking[] = bookingsSnap.docs.map(doc => ({
         id: doc.id,
@@ -92,6 +101,9 @@ export default function RentalCompanyDashboard() {
         issues: issuesSnap.size,
         batteries: batterySnap.size,
         accessories: accessorySnap.size,
+        customers: customerSnap.size,
+        programs: programSnap.size,                    
+        subscriptionPackages: subscriptionSnap.size,   
       });
     };
 
@@ -109,15 +121,35 @@ export default function RentalCompanyDashboard() {
         <DashboardGrid1>
           <DashboardCard title={t('rental_company_dashboard.stations')} value={stats.stations.toString()} href="/dashboard/stations" icon={<MapPin className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.vehicles')} value={stats.ebikes.toString()} href="/vehicles" icon={<Bike className="w-6 h-6" />} />
+
+          {/* ✅ Customers */}
+          <DashboardCard
+            title={t('rental_company_dashboard.customers')}
+            value={stats.customers.toString()}
+            href="/customers"
+            icon={<User className="w-6 h-6" />}
+          />
+
           <DashboardCard title={t('rental_company_dashboard.bookings_this_month')} value={stats.bookings.toString()} href="/bookings" icon={<FileTextIcon className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.revenue_this_month')} value={formatCurrency(stats.revenue)} href="/bookings" icon={<DollarSign className="w-6 h-6" />} />
-          <DashboardCard title={t('rental_company_dashboard.programs')} value={t('manage')} href="/dashboard/programs" icon={<ClipboardList className="w-6 h-6" />} />
+          <DashboardCard
+            title={t('rental_company_dashboard.programs')}
+            value={stats.programs.toString()}                // ✅ từ "Quản lý" -> số lượng
+            href="/dashboard/programs"
+            icon={<ClipboardList className="w-6 h-6" />}
+          />
           <DashboardCard title={t('rental_company_dashboard.staff')} value={stats.staffs.toString()} href="/dashboard/staff" icon={<Users className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.issues')} value={stats.issues.toString()} href="/vehicle-issues" icon={<Wrench className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.batteries')} value={stats.batteries.toString()} href="/battery" icon={<BatteryCharging className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.accessories')} value={stats.accessories.toString()} href="/accessories" icon={<Package className="w-6 h-6" />} />
-          <DashboardCard title={t('rental_company_dashboard.subscription_packages')} value={t('manage')} href="/subscriptionPackages" icon={<ClipboardList className="w-6 h-6" />} />
+          <DashboardCard
+            title={t('rental_company_dashboard.subscription_packages')}
+            value={stats.subscriptionPackages.toString()}    // ✅ từ "Quản lý" -> số lượng
+            href="/subscriptionPackages"
+            icon={<ClipboardList className="w-6 h-6" />}
+          />
         </DashboardGrid1>
+
 
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">

@@ -1804,7 +1804,8 @@
   "issues": "車両の問題",
   "batteries": "バッテリー",
   "accessories": "アクセサリー",
-  "subscription_packages": "サブスクリプションプラン"
+  "subscription_packages": "サブスクリプションプラン",
+  "customers": "顧客"
 },
 "quick_actions": {
   "title": "⚡ クイックアクション",
