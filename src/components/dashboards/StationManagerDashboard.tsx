@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, JSX } from 'react';
 import { db } from '@/src/firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useUser } from '@/src/context/AuthContext';

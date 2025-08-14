@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import Link from 'next/link';
+import { JSX } from 'react/jsx-runtime';
 
 interface StaffEntry {
   id: string;

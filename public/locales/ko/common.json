@@ -3086,7 +3086,8 @@
     "recent_activity": "최근 활동",
     "activity_new_booking": "{{name}} 님의 새 예약이 접수되었습니다",
     "activity_station_added": "스테이션 \"{{name}}\" 이(가) 추가되었습니다",
-    "activity_vehicle_under_maintenance": "차량 \"{{vehicle}}\" 이(가) 정비 중으로 표시되었습니다"
+    "activity_vehicle_under_maintenance": "차량 \"{{vehicle}}\" 이(가) 정비 중으로 표시되었습니다",
+    "customers":"고객"
   },
 
    "extend_rental_modal": {

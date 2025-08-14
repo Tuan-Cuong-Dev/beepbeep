@@ -3072,7 +3072,8 @@
     "recent_activity": "最近のアクティビティ",
     "activity_new_booking": "{{name}} から新しい予約を受け取りました",
     "activity_station_added": "ステーション「{{name}}」を追加しました",
-    "activity_vehicle_under_maintenance": "車両「{{vehicle}}」をメンテナンス中に設定しました"
+    "activity_vehicle_under_maintenance": "車両「{{vehicle}}」をメンテナンス中に設定しました",
+    "customers":"顧客"
   },
 
   "extend_rental_modal": {

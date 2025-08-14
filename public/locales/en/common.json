@@ -3050,7 +3050,8 @@
     "recent_activity": "Recent Activity",
     "activity_new_booking": "New booking received from {{name}}",
     "activity_station_added": "Station \"{{name}}\" added",
-    "activity_vehicle_under_maintenance": "Vehicle \"{{vehicle}}\" marked as under maintenance"
+    "activity_vehicle_under_maintenance": "Vehicle \"{{vehicle}}\" marked as under maintenance",
+    "customers": "Customers"
   },
 
   "extend_rental_modal": {

@@ -160,15 +160,6 @@ export default function CompanyAdminDashboard() {
             <QuickAction label={t('company_admin_dashboard.view_vehicle_issues')} href="/vehicle-issues" />
           </div>
         </section>
-
-        <section className="bg-white rounded-2xl p-6 border shadow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 {t('company_admin_dashboard.recent_activity')}</h2>
-          <ul className="text-sm text-gray-700 space-y-2">
-            <RecentActivityItem text={t('company_admin_dashboard.activity_new_booking', { name: 'Jane Smith' })} />
-            <RecentActivityItem text={t('company_admin_dashboard.activity_station_added', { name: 'Hai Chau Branch' })} />
-            <RecentActivityItem text={t('company_admin_dashboard.activity_vehicle_under_maintenance', { vehicle: 'DE1023' })} />
-          </ul>
-        </section>
       </main>
       <Footer />
     </div>

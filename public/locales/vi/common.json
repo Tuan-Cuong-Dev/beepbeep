@@ -3111,7 +3111,8 @@
     "recent_activity": "Hoạt động gần đây",
     "activity_new_booking": "Nhận đơn đặt mới từ {{name}}",
     "activity_station_added": "Đã thêm trạm \"{{name}}\"",
-    "activity_vehicle_under_maintenance": "Phương tiện \"{{vehicle}}\" được đánh dấu đang bảo dưỡng"
+    "activity_vehicle_under_maintenance": "Phương tiện \"{{vehicle}}\" được đánh dấu đang bảo dưỡng",
+    "customers": "Khách hàng"
   },
 
    "extend_rental_modal": {

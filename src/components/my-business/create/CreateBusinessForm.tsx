@@ -34,7 +34,7 @@ const BusinessTypeConfig: Record<BusinessType, {
   },
   private_provider: {
     collection: 'privateProviders',
-    role: 'private_owner',
+    role: 'private_provider',
     redirect: '/profile?tab=business',
   },
   agent: {
