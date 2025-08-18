@@ -16,49 +16,74 @@ import {
   FormSection,
 } from '@/src/lib/formConfigurations/formConfigurationTypes';
 import {
-  getFormConfigurationByCompanyId,
-  saveFormConfiguration,
+  getFormConfigurationByEntity,
+  saveFormConfigurationByEntity,
+  EntityType,
 } from '@/src/lib/services/Configirations/formConfigurationService';
 import { DEFAULT_FORM_CONFIG } from '@/src/lib/formConfigurations/defaultFormConfiguration';
 
 const fieldTypes: FormFieldType[] = ['text', 'number', 'date', 'textarea', 'checkbox', 'select', 'upload'];
 
 interface Props {
-  companyId: string;
+  /** id công ty (rentalCompany) hoặc id private provider */
+  ownerId: string;
+  /** 'rentalCompany' | 'privateProvider' */
+  entityType: EntityType;
   userId: string;
 }
 
-export default function FormBuilder({ companyId, userId }: Props) {
+export default function FormBuilder({ ownerId, entityType, userId }: Props) {
   const { t, i18n } = useTranslation('common');
   const [config, setConfig] = useState<FormConfiguration | null>(null);
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // Load cấu hình theo entity
   useEffect(() => {
-    getFormConfigurationByCompanyId(companyId).then(setConfig);
-  }, [companyId]);
+    let mounted = true;
+    (async () => {
+      const result = await getFormConfigurationByEntity(ownerId, entityType);
+      if (!mounted) return;
+      // Đảm bảo có target info để save
+      const withTarget: FormConfiguration = {
+        ...result,
+        targetId: ownerId,
+        targetType: entityType,
+        ...(entityType === 'rentalCompany' ? { companyId: ownerId } : {}),
+      } as FormConfiguration;
+      setConfig(withTarget);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [ownerId, entityType]);
 
+  // Áp bản dịch (không sửa i18n keys trong DB)
   useEffect(() => {
     if (!config) return;
-    const translatedSections = config.sections.map(section => ({
+    const translatedSections = config.sections.map((section) => ({
       ...section,
       title: t(`form_configuration.section_titles.${section.id}`, { defaultValue: section.title }),
-      fields: section.fields.map(field => ({
+      fields: section.fields.map((field) => ({
         ...field,
         label: t(`form_configuration.fields.${field.key}`, { defaultValue: field.label }),
-        options: field.options?.map(opt => t(`form_configuration.options.${opt}`, { defaultValue: opt })),
+        // Gợi ý key options có dạng: form_configuration.options.<fieldKey>.<value>
+        options: field.options?.map((opt) =>
+          t(`form_configuration.options.${field.key}.${String(opt)}`, { defaultValue: String(opt) })
+        ),
       })),
     }));
-    setConfig(prev => prev && { ...prev, sections: translatedSections });
+    setConfig((prev) => (prev ? { ...prev, sections: translatedSections } : prev));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
   const updateSection = (sectionId: string, updater: (section: FormSection) => FormSection) => {
-    setConfig(prev => prev && ({
-      ...prev,
-      sections: prev.sections.map(section =>
-        section.id === sectionId ? updater(section) : section
-      ),
-    }));
+    setConfig((prev) =>
+      prev && {
+        ...prev,
+        sections: prev.sections.map((section) => (section.id === sectionId ? updater(section) : section)),
+      }
+    );
   };
 
   const addSection = () => {
@@ -67,7 +92,7 @@ export default function FormBuilder({ companyId, userId }: Props) {
       title: t('form_builder.new_section', { defaultValue: 'New Section' }),
       fields: [],
     };
-    setConfig(prev => prev && { ...prev, sections: [...prev.sections, newSection] });
+    setConfig((prev) => prev && { ...prev, sections: [...prev.sections, newSection] });
   };
 
   const addField = (sectionId: string) => {
@@ -78,40 +103,45 @@ export default function FormBuilder({ companyId, userId }: Props) {
       required: false,
       visible: true,
     };
-    updateSection(sectionId, s => ({ ...s, fields: [...s.fields, newField] }));
+    updateSection(sectionId, (s) => ({ ...s, fields: [...s.fields, newField] }));
   };
 
   const updateField = (sectionId: string, fieldIndex: number, updates: Partial<FormField>) => {
-    updateSection(sectionId, s => ({
+    updateSection(sectionId, (s) => ({
       ...s,
       fields: s.fields.map((f, i) => (i === fieldIndex ? { ...f, ...updates } : f)),
     }));
   };
 
   const removeField = (sectionId: string, fieldIndex: number) => {
-    updateSection(sectionId, s => ({
+    updateSection(sectionId, (s) => ({
       ...s,
       fields: s.fields.filter((_, i) => i !== fieldIndex),
     }));
   };
 
   const updateSectionTitle = (sectionId: string, newTitle: string) => {
-    updateSection(sectionId, s => ({ ...s, title: newTitle }));
+    updateSection(sectionId, (s) => ({ ...s, title: newTitle }));
   };
 
   const resetToDefault = () => {
     const translated: FormConfiguration = {
       ...DEFAULT_FORM_CONFIG,
-      sections: DEFAULT_FORM_CONFIG.sections.map(section => ({
+      targetId: ownerId,
+      targetType: entityType,
+      ...(entityType === 'rentalCompany' ? { companyId: ownerId } : {}),
+      sections: DEFAULT_FORM_CONFIG.sections.map((section) => ({
         ...section,
         title: t(`form_configuration.section_titles.${section.id}`, { defaultValue: section.title }),
-        fields: section.fields.map(field => ({
+        fields: section.fields.map((field) => ({
           ...field,
           label: t(`form_configuration.fields.${field.key}`, { defaultValue: field.label }),
-          options: field.options?.map(opt => t(`form_configuration.options.${opt}`, { defaultValue: opt })),
+          options: field.options?.map((opt) =>
+            t(`form_configuration.options.${field.key}.${String(opt)}`, { defaultValue: String(opt) })
+          ),
         })),
       })),
-    };
+    } as FormConfiguration;
     setConfig(translated);
   };
 
@@ -130,8 +160,18 @@ export default function FormBuilder({ companyId, userId }: Props) {
   const save = async () => {
     if (!config) return;
     setSaving(true);
-    const cleaned = removeUndefined({ ...config, createdBy: userId, companyId });
-    await saveFormConfiguration(cleaned);
+    const cleaned = removeUndefined({
+      ...config,
+      createdBy: userId,
+      targetId: ownerId,
+      targetType: entityType,
+      // giữ companyId để tương thích ngược với luồng cũ
+      ...(entityType === 'rentalCompany' ? { companyId: ownerId } : {}),
+    });
+    await saveFormConfigurationByEntity(
+      cleaned as FormConfiguration & { targetId: string; targetType: EntityType },
+      { alsoWriteLegacyForCompany: true } // ghi kèm doc legacy nếu là company
+    );
     setSaving(false);
     setShowSuccess(true);
   };
@@ -140,34 +180,34 @@ export default function FormBuilder({ companyId, userId }: Props) {
 
   return (
     <div className="space-y-6 p-4">
-      {config.sections.map(section => (
+      {config.sections.map((section) => (
         <div key={section.id} className="border p-4 rounded bg-white space-y-4">
           <Input
             value={section.title}
-            onChange={e => updateSectionTitle(section.id, e.target.value)}
+            onChange={(e) => updateSectionTitle(section.id, e.target.value)}
             className="text-lg font-semibold"
           />
           {section.fields.map((field, index) => (
             <div key={field.key} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-end">
               <Input
                 value={field.label || ''}
-                onChange={e => updateField(section.id, index, { label: e.target.value })}
+                onChange={(e) => updateField(section.id, index, { label: e.target.value })}
                 placeholder={t('form_builder.field_label', { defaultValue: 'Field Label' })}
               />
               <SimpleSelect
-                options={fieldTypes.map(type => ({ label: type, value: type }))}
+                options={fieldTypes.map((type) => ({ label: type, value: type }))}
                 value={field.type}
-                onChange={val => updateField(section.id, index, { type: val as FormFieldType })}
+                onChange={(val) => updateField(section.id, index, { type: val as FormFieldType })}
               />
               <CheckboxWithLabel
                 label={t('form_builder.required', { defaultValue: 'Required' })}
                 checked={!!field.required}
-                onChange={val => updateField(section.id, index, { required: val })}
+                onChange={(val) => updateField(section.id, index, { required: val })}
               />
               <CheckboxWithLabel
                 label={t('form_builder.visible', { defaultValue: 'Visible' })}
                 checked={!!field.visible}
-                onChange={val => updateField(section.id, index, { visible: val })}
+                onChange={(val) => updateField(section.id, index, { visible: val })}
               />
               <Button variant="destructive" onClick={() => removeField(section.id, index)}>
                 {t('form_builder.delete', { defaultValue: 'Delete' })}
@@ -181,9 +221,7 @@ export default function FormBuilder({ companyId, userId }: Props) {
       ))}
 
       <div className="flex flex-wrap gap-4 mt-6">
-        <Button onClick={addSection}>
-          ➕ {t('form_builder.add_section', { defaultValue: 'Add Section' })}
-        </Button>
+        <Button onClick={addSection}>➕ {t('form_builder.add_section', { defaultValue: 'Add Section' })}</Button>
         <Button onClick={save} disabled={saving}>
           📎 {saving ? t('form_builder.saving', { defaultValue: 'Saving...' }) : t('form_builder.save', { defaultValue: 'Save' })}
         </Button>

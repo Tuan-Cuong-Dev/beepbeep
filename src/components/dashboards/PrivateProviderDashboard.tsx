@@ -156,12 +156,11 @@ export default function PrivateProviderDashboard() {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             {t('quick_actions.title')}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
             <QuickAction label={t('quick_actions.create_vehicle_model')} href="/vehicles" />
             <QuickAction label={t('quick_actions.form_builder')} href="/dashboard/form-builder" />
             <QuickAction label={t('quick_actions.rent')} href="/rent" />
             <QuickAction label={t('quick_actions.return')} href="/return" />
-            <QuickAction label={t('quick_actions.report_issue')} href="/vehicle-issues/report" />
           </div>
         </section>
       </main>
