@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase/firestore";
-// Dữ liệu chuẩn cho hạng mục Bookings
+// Dữ liệu chuẩn cho hạng mục Bookings chuyên cho xe máy
+
 export interface Booking {
   id: string;
   companyId: string;
@@ -47,7 +48,7 @@ export interface Booking {
 
   note?: string;
 
-  bookingStatus: 'draft' | 'confirmed' | 'completed' | 'cancelled';
+  bookingStatus: 'draft' | 'confirmed' | 'returned' | 'completed' | 'cancelled';
   createdAt: Timestamp;
   updatedAt: Timestamp;
 

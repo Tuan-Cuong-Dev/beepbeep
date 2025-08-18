@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   collection,
   getDocs,
@@ -18,34 +18,48 @@ import {
 import { db } from '@/src/firebaseConfig';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
+import { Vehicle } from '@/src/lib/vehicles/vehicleTypes';
 
-export function useBookingData(filters?: { startDate?: string; endDate?: string }) {
+type EntityType = 'rentalCompany' | 'privateProvider';
+
+export function useBookingData(
+  ownerId: string,
+  entityType: EntityType,
+  filters?: { startDate?: string; endDate?: string }
+) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [stationNames, setStationNames] = useState<Record<string, string>>({});
   const [companyNames, setCompanyNames] = useState<Record<string, string>>({});
   const [packageNames, setPackageNames] = useState<Record<string, string>>({});
   const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
-  const [ebikes, setEbikes] = useState<Ebike[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [userNames, setUserNames] = useState<Record<string, string>>({});
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAllData(filters);
-  }, [filters]);
+  // Field nhận diện chủ sở hữu tuỳ entity
+  const ownerField = useMemo(
+    () => (entityType === 'privateProvider' ? 'providerId' : 'companyId'),
+    [entityType]
+  );
 
-  const fetchAllData = async (filters?: { startDate?: string; endDate?: string }) => {
+  useEffect(() => {
+    if (!ownerId) return;
+    fetchAllData(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ownerId, entityType, JSON.stringify(filters)]);
+
+  const fetchAllData = async (fs?: { startDate?: string; endDate?: string }) => {
     setLoading(true);
     try {
       await Promise.all([
-        fetchBookings(filters),
+        fetchBookings(fs),
         fetchStations(),
         fetchCompanies(),
-        fetchPackages(),
+        fetchPackagesNameMap(),
         fetchUsers(),
         fetchPackageList(),
-        fetchEbikeList(),
+        fetchVehicleList(),
       ]);
     } catch (error) {
       console.error('❌ Error loading booking-related data:', error);
@@ -54,26 +68,19 @@ export function useBookingData(filters?: { startDate?: string; endDate?: string 
     }
   };
 
-  const fetchBookings = async (filters?: { startDate?: string; endDate?: string }) => {
+  // -------- BOOKINGS (lọc theo owner + khoảng thời gian) --------
+  const fetchBookings = async (fs?: { startDate?: string; endDate?: string }) => {
     const bookingRef = collection(db, 'bookings');
-    let bookingQuery: Query<DocumentData> = bookingRef;
 
-    if (filters?.startDate || filters?.endDate) {
-      const conditions = [];
-
-      if (filters.startDate) {
-        const start = Timestamp.fromDate(new Date(filters.startDate + 'T00:00:00'));
-        conditions.push(where('createdAt', '>=', start));
-      }
-
-      if (filters.endDate) {
-        const end = Timestamp.fromDate(new Date(filters.endDate + 'T23:59:59'));
-        conditions.push(where('createdAt', '<=', end));
-      }
-
-      bookingQuery = query(bookingRef, ...conditions);
+    const conditions: any[] = [where(ownerField, '==', ownerId)];
+    if (fs?.startDate) {
+      conditions.push(where('createdAt', '>=', Timestamp.fromDate(new Date(fs.startDate + 'T00:00:00'))));
+    }
+    if (fs?.endDate) {
+      conditions.push(where('createdAt', '<=', Timestamp.fromDate(new Date(fs.endDate + 'T23:59:59'))));
     }
 
+    const bookingQuery: Query<DocumentData> = query(bookingRef, ...conditions);
     const snap = await getDocs(bookingQuery);
 
     const toTimestamp = (val: any): Timestamp => {
@@ -86,9 +93,11 @@ export function useBookingData(filters?: { startDate?: string; endDate?: string 
 
     const list: Booking[] = snap.docs.map((docSnap) => {
       const data = docSnap.data();
+
       return {
         id: docSnap.id,
         companyId: String(data.companyId ?? ''),
+        // nếu có providerId trong schema, có thể thêm vào type Booking sau
         stationId: String(data.stationId ?? ''),
         userId: data.userId ? String(data.userId) : undefined,
         idImage: data.idImage ? String(data.idImage) : undefined,
@@ -129,8 +138,9 @@ export function useBookingData(filters?: { startDate?: string; endDate?: string 
         raincoat: Boolean(data.raincoat ?? false),
         note: data.note ? String(data.note) : undefined,
 
-        bookingStatus: (data.bookingStatus as 'draft' | 'confirmed' | 'returned' | 'completed' | 'cancelled') ?? 'draft',
-        statusComment: data.statusComment ?? '', 
+        bookingStatus:
+          (data.bookingStatus as 'draft' | 'confirmed' | 'returned' | 'completed' | 'cancelled') ?? 'draft',
+        statusComment: data.statusComment ?? '',
         createdAt: toTimestamp(data.createdAt),
         updatedAt: toTimestamp(data.updatedAt),
       };
@@ -139,8 +149,11 @@ export function useBookingData(filters?: { startDate?: string; endDate?: string 
     setBookings(list);
   };
 
+  // -------- STATIONS (lọc theo owner) --------
   const fetchStations = async () => {
-    const snap = await getDocs(collection(db, 'rentalStations'));
+    const col = collection(db, 'rentalStations');
+    const q = query(col, where(ownerField, '==', ownerId));
+    const snap = await getDocs(q);
     const map: Record<string, string> = {};
     snap.docs.forEach((docSnap) => {
       const data = docSnap.data();
@@ -149,18 +162,23 @@ export function useBookingData(filters?: { startDate?: string; endDate?: string 
     setStationNames(map);
   };
 
+  // -------- COMPANIES / PROVIDERS (tên) --------
   const fetchCompanies = async () => {
-    const snap = await getDocs(collection(db, 'rentalCompanies'));
+    // tái sử dụng state companyNames để map id → name cho cả company lẫn provider
+    const colName = entityType === 'privateProvider' ? 'privateProviders' : 'rentalCompanies';
+    const snap = await getDocs(query(collection(db, colName), where('ownerId', '!=', null)));
     const map: Record<string, string> = {};
     snap.docs.forEach((docSnap) => {
       const data = docSnap.data();
-      map[docSnap.id] = data.name || 'Unnamed Company';
+      map[docSnap.id] = data.name || (entityType === 'privateProvider' ? 'Provider' : 'Company');
     });
     setCompanyNames(map);
   };
 
-  const fetchPackages = async () => {
-    const snap = await getDocs(collection(db, 'subscriptionPackages'));
+  // -------- PACKAGES (name map theo owner) --------
+  const fetchPackagesNameMap = async () => {
+    const col = collection(db, 'subscriptionPackages');
+    const snap = await getDocs(query(col, where(ownerField, '==', ownerId)));
     const map: Record<string, string> = {};
     snap.docs.forEach((docSnap) => {
       const data = docSnap.data();
@@ -169,27 +187,35 @@ export function useBookingData(filters?: { startDate?: string; endDate?: string 
     setPackageNames(map);
   };
 
+  // -------- USERS (tuỳ rules cho phép) --------
   const fetchUsers = async () => {
-    const snap = await getDocs(collection(db, 'users'));
-    const map: Record<string, string> = {};
-    snap.docs.forEach((docSnap) => {
-      const data = docSnap.data();
-      map[docSnap.id] = data.name || 'Unnamed User';
-    });
-    setUserNames(map);
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      const map: Record<string, string> = {};
+      snap.docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        map[docSnap.id] = data.name || 'Unnamed User';
+      });
+      setUserNames(map);
+    } catch {
+      console.warn('⚠️ Cannot read users (rules may block).');
+      setUserNames({});
+    }
   };
 
-  const fetchEbikeList = async () => {
-    const snap = await getDocs(collection(db, 'ebikes'));
-    const list: Ebike[] = snap.docs.map((docSnap) => ({
-      ...(docSnap.data() as Ebike),
+  // -------- VEHICLES (lọc theo owner) --------
+  const fetchVehicleList = async () => {
+    const snap = await getDocs(query(collection(db, 'vehicles'), where(ownerField, '==', ownerId)));
+    const list: Vehicle[] = snap.docs.map((docSnap) => ({
+      ...(docSnap.data() as Vehicle),
       id: docSnap.id,
     }));
-    setEbikes(list);
+    setVehicles(list);
   };
 
+  // -------- PACKAGES (list theo owner) --------
   const fetchPackageList = async () => {
-    const snap = await getDocs(collection(db, 'subscriptionPackages'));
+    const snap = await getDocs(query(collection(db, 'subscriptionPackages'), where(ownerField, '==', ownerId)));
     const list: SubscriptionPackage[] = snap.docs.map((docSnap) => ({
       id: docSnap.id,
       ...(docSnap.data() as SubscriptionPackage),
@@ -197,34 +223,59 @@ export function useBookingData(filters?: { startDate?: string; endDate?: string 
     setPackages(list);
   };
 
+  // -------- CREATE / UPDATE / DELETE --------
   const saveBooking = async (data: Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       if (editingBooking) {
         const bookingRef = doc(db, 'bookings', editingBooking.id);
-        await updateDoc(bookingRef, {
+
+        // Giữ entity cũ (nếu có), fallback theo hook hiện tại
+        const persistedEntityType: EntityType = (editingBooking as any).entityType ?? entityType;
+        const payload: any = {
           ...data,
+          entityType: persistedEntityType,
           updatedAt: serverTimestamp(),
-        });
+        };
+        if (persistedEntityType === 'rentalCompany') {
+          payload.companyId = (editingBooking as any).companyId || (data as any).companyId || ownerId;
+          delete payload.providerId;
+        } else {
+          payload.providerId = (editingBooking as any).providerId || (data as any).providerId || ownerId;
+          delete payload.companyId;
+        }
+
+        await updateDoc(bookingRef, payload);
         setBookings((prev) =>
           prev.map((b) =>
-            b.id === editingBooking.id ? { ...b, ...data, updatedAt: Timestamp.now() } : b
+            b.id === editingBooking.id ? ({ ...b, ...payload, updatedAt: Timestamp.now() } as Booking) : b
           )
         );
         setEditingBooking(null);
       } else {
-        const newDoc = await addDoc(collection(db, 'bookings'), {
+        // Tạo mới: gắn entity đúng
+        const payload: any = {
           ...data,
+          entityType,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-        });
+        };
+        if (entityType === 'rentalCompany') {
+          payload.companyId = (data as any).companyId || ownerId;
+          delete payload.providerId;
+        } else {
+          payload.providerId = (data as any).providerId || ownerId;
+          delete payload.companyId;
+        }
+
+        const newDoc = await addDoc(collection(db, 'bookings'), payload);
         setBookings((prev) => [
           ...prev,
           {
             id: newDoc.id,
-            ...data,
+            ...payload,
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now(),
-          },
+          } as Booking,
         ]);
       }
     } catch (error) {
@@ -244,11 +295,11 @@ export function useBookingData(filters?: { startDate?: string; endDate?: string 
   return {
     bookings,
     stationNames,
-    companyNames,
+    companyNames, // map id → name (company hoặc provider tuỳ entity)
     packageNames,
     userNames,
     packages,
-    ebikes,
+    vehicles,
     editingBooking,
     setEditingBooking,
     saveBooking,

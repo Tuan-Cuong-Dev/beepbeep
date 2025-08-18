@@ -61,7 +61,7 @@ export default function PrivateProviderDashboard() {
         getDocs(query(collection(db, 'batteries'), where('companyId', '==', providerId))),
         getDocs(query(collection(db, 'accessories'), where('companyId', '==', providerId))),
         getDocs(query(collection(db, 'customers'), where('companyId', '==', providerId))),
-        getDocs(query(collection(db, 'programs'), where('companyId', '==', providerId))),               // đổi nếu tên khác
+        getDocs(query(collection(db, 'programs'), where('companyId', '==', providerId))),     
         getDocs(query(collection(db, 'subscriptionPackages'), where('companyId', '==', providerId))),
       ]);
 

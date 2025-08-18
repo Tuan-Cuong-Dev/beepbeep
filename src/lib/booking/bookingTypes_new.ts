@@ -1,6 +1,6 @@
 import { Timestamp, FieldValue } from 'firebase/firestore';
 import { VehicleType } from '../vehicle-models/vehicleModelTypes';
-import { ServiceType } from '../vehicle-services/vehicleServiceModelTypes';
+import { VehicleServiceModel } from '../vehicle-services/vehicleServiceModelTypes';
 
 export type BookingStatus = 'draft' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
 
@@ -9,12 +9,13 @@ export interface Booking_new {
   userId: string;
   customerId?: string;
   companyId: string;
+  stationId: string;
 
   vehicleId?: string;
   vehicleModelId?: string;
   vehicleType?: VehicleType;
 
-  serviceType: ServiceType;
+  serviceType: VehicleServiceModel;
 
   startDate: Timestamp;
   endDate: Timestamp;

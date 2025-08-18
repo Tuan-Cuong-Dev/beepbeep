@@ -24,12 +24,11 @@ type EntityType = 'rentalCompany' | 'privateProvider';
 
 interface UseRentalFormOptions {
   onNotify?: (message: string, type?: NotificationType) => void;
-  /** ⬇️ Mới: phân biệt công ty / người cho thuê cá nhân */
   entityType?: EntityType;
 }
 
 /**
- * @param ownerId: với rentalCompany = companyId, với privateProvider = providerId
+ * @param ownerId: rentalCompany = companyId | privateProvider = providerId
  */
 export function useRentalForm(ownerId: string, userId: string, options?: UseRentalFormOptions) {
   const entityType: EntityType = options?.entityType ?? 'rentalCompany';
@@ -40,64 +39,63 @@ export function useRentalForm(ownerId: string, userId: string, options?: UseRent
   const [allBikes, setAllBikes] = useState<(Vehicle & { modelName?: string })[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper: fetch theo owner (companyId + optional providerId)
+  const fetchByOwner = async <T extends { id?: string }>(
+    colName: string
+  ): Promise<(T & { id: string })[]> => {
+    const out: (T & { id: string })[] = [];
+
+    // Query theo companyId
+    const q1 = query(collection(db, colName), where('companyId', '==', ownerId));
+    const s1 = await getDocs(q1);
+    s1.forEach((d) => out.push({ id: d.id, ...(d.data() as any) }));
+
+    // Query theo providerId (chỉ khi privateProvider)
+    if (entityType === 'privateProvider') {
+      const q2 = query(collection(db, colName), where('providerId', '==', ownerId));
+      const s2 = await getDocs(q2);
+      s2.forEach((d) => {
+        if (!out.find((x) => x.id === d.id)) out.push({ id: d.id, ...(d.data() as any) });
+      });
+    }
+
+    return out;
+  };
+
   useEffect(() => {
+    if (!ownerId) return;
+
     const fetchData = async () => {
       setLoading(true);
       try {
-        // ---------- PACKAGES ----------
-        const pkgResults: SubscriptionPackage[] = [];
-
-        // Schema chuẩn (rentalCompany)
-        const pkgQ1 = query(collection(db, 'subscriptionPackages'), where('companyId', '==', ownerId));
-        const pkgSnap1 = await getDocs(pkgQ1);
-        pkgSnap1.forEach((d) => pkgResults.push({ id: d.id, ...(d.data() as any) }));
-
-        // Nếu là privateProvider → hỗ trợ field providerId (schema mở rộng)
-        if (entityType === 'privateProvider') {
-          const pkgQ2 = query(collection(db, 'subscriptionPackages'), where('providerId', '==', ownerId));
-          const pkgSnap2 = await getDocs(pkgQ2);
-          pkgSnap2.forEach((d) => {
-            if (!pkgResults.find((x) => x.id === d.id)) {
-              pkgResults.push({ id: d.id, ...(d.data() as any) });
-            }
-          });
-        }
+        // PACKAGES
+        const pkgResults = await fetchByOwner<SubscriptionPackage>('subscriptionPackages');
         setPackages(pkgResults);
 
-        // ---------- BIKES ----------
-        const bikeResults: Vehicle[] = [];
+        // VEHICLES
+        const vehicleResults = await fetchByOwner<Vehicle>('vehicles');
 
-        // Schema chuẩn (rentalCompany)
-        const bikeQ1 = query(collection(db, 'vehicles'), where('companyId', '==', ownerId));
-        const bikeSnap1 = await getDocs(bikeQ1);
-        bikeSnap1.forEach((d) => bikeResults.push({ id: d.id, ...(d.data() as any) }));
+        const availableVehicles = vehicleResults.filter(
+          (v: any) => String(v.status || '').toLowerCase() === 'available'
+        );
 
-        // Nếu là privateProvider → hỗ trợ field providerId (schema mở rộng)
-        if (entityType === 'privateProvider') {
-          const bikeQ2 = query(collection(db, 'vehicles'), where('providerId', '==', ownerId));
-          const bikeSnap2 = await getDocs(bikeQ2);
-          bikeSnap2.forEach((d) => {
-            if (!bikeResults.find((x) => x.id === d.id)) {
-              bikeResults.push({ id: d.id, ...(d.data() as any) });
-            }
-          });
-        }
-
-        const availablVehicles = bikeResults.filter((bike) => bike.status === 'Available');
-
+        // Enrich modelName (fallback nếu bị chặn quyền hoặc thiếu doc)
         const bikesWithModelName = await Promise.all(
-          availablVehicles.map(async (bike) => {
+          availableVehicles.map(async (bike) => {
+            if ((bike as any).modelName) return { ...bike, modelName: (bike as any).modelName };
+
             let modelName = '';
-            if ((bike as any).modelId) {
-              try {
-                const modelDoc = await getDoc(doc(db, 'vehicleModels', (bike as any).modelId));
-                if (modelDoc.exists()) {
-                  const modelData = modelDoc.data() as VehicleModel;
-                  modelName = modelData.name;
+            try {
+              if ((bike as any).modelId) {
+                const modelSnap = await getDoc(doc(db, 'vehicleModels', (bike as any).modelId));
+                if (modelSnap.exists()) {
+                  const modelData = modelSnap.data() as VehicleModel;
+                  modelName = modelData?.name || '';
                 }
-              } catch (error) {
-                console.error('❌ Error loading model for bike:', (bike as any).id, error);
               }
+            } catch (error) {
+              console.error('❌ Error loading model for bike:', (bike as any).id, error);
+              modelName = 'Unknown model';
             }
             return { ...bike, modelName };
           })
@@ -111,16 +109,16 @@ export function useRentalForm(ownerId: string, userId: string, options?: UseRent
       }
     };
 
-    if (ownerId) fetchData();
+    fetchData();
   }, [ownerId, entityType]);
 
   const handleChange = (key: string, value: any) => {
-    const processedValue = value; // không trim để giữ nguyên input
+    const processedValue = value;
 
     setFormData((prev) => {
       const updated = { ...prev, [key]: processedValue };
 
-      // Gán thông tin gói thuê nếu chọn package
+      // Chọn gói → set info
       if (key.startsWith('package')) {
         const selectedPackage = packages.find((pkg) => pkg.id === processedValue);
         if (selectedPackage) {
@@ -131,13 +129,13 @@ export function useRentalForm(ownerId: string, userId: string, options?: UseRent
         }
       }
 
-      // Auto-fill khi chọn xe
+      // Chọn xe → autofill
       if (key === 'vehicleSearch') {
-        const selectedBike = allBikes.find((bike) => bike.vehicleID === processedValue);
+        const selectedBike = allBikes.find((bike) => (bike as any).vehicleID === processedValue);
         if (selectedBike) {
           updated.stationId = (selectedBike as any).stationId || '';
-          updated.vin = selectedBike.vehicleID || '';
-          updated.vehicleModel = selectedBike.modelName || '';
+          updated.vin = (selectedBike as any).vehicleID || '';
+          updated.vehicleModel = (selectedBike as any).modelName || '';
           updated.vehicleColor = (selectedBike as any).color || '';
           updated.licensePlate = (selectedBike as any).plateNumber || '';
         }
@@ -159,7 +157,7 @@ export function useRentalForm(ownerId: string, userId: string, options?: UseRent
         updated.remainingBalance = updated.totalAmount - deposit;
       }
 
-      // Tính ngày kết thúc thuê
+      // Tính ngày kết thúc
       if (
         ['rentalStartDate', 'rentalStartHour', 'rentalDays'].includes(key) ||
         (updated.rentalStartDate && updated.rentalStartHour && updated.rentalDays)
@@ -184,22 +182,19 @@ export function useRentalForm(ownerId: string, userId: string, options?: UseRent
       return updated;
     });
 
-    // Kiểm tra battery code
+    // Kiểm tra battery
     if (key.startsWith('batteryCode')) {
       if (typeof processedValue === 'string' && processedValue.length > 4) {
         checkBatteryCode(processedValue).then((battery) => {
           if (!battery || battery.status !== 'in_stock') {
-            setFormData((current) => ({
-              ...current,
-              [key]: '',
-            }));
+            setFormData((current) => ({ ...current, [key]: '' }));
             onNotify?.(`Battery ${processedValue} is not available or already in use.`, 'error');
           }
         });
       }
     }
 
-    // Tự động tìm khách theo phone
+    // Tự động điền khách hàng theo phone
     if (key === 'phone') {
       if (typeof processedValue === 'string' && processedValue.length >= 9) {
         checkCustomerByPhone(processedValue).then((customer) => {
@@ -236,7 +231,7 @@ export function useRentalForm(ownerId: string, userId: string, options?: UseRent
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + Number(formData.rentalDays || 0));
 
-      // Đảm bảo Customer tồn tại
+      // Bảo đảm Customer
       await ensureCustomerByUserId(userId, {
         userId,
         name: formData.fullName || '',
@@ -252,11 +247,8 @@ export function useRentalForm(ownerId: string, userId: string, options?: UseRent
         placeOfResidence: formData.placeOfResidence || '',
       });
 
-      // ---------- DỮ LIỆU BOOKING ----------
-      // Giữ tương thích: vẫn set companyId,
-      // đồng thời thêm providerId và entityType khi là privateProvider
+      // Base booking (không set companyId rỗng)
       const bookingBase: Omit<Booking, 'id'> = {
-        companyId: entityType === 'rentalCompany' ? ownerId : '', // compat
         stationId: formData.stationId || '',
         userId: userId || '',
         idImage: formData.idImage || '',
@@ -295,45 +287,62 @@ export function useRentalForm(ownerId: string, userId: string, options?: UseRent
         bookingStatus: 'draft',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
+        companyId: ''
       };
 
-      // Mở rộng theo entity
       const bookingData: any =
         entityType === 'privateProvider'
           ? { ...bookingBase, providerId: ownerId, entityType: 'privateProvider' }
-          : { ...bookingBase, entityType: 'rentalCompany' };
+          : { ...bookingBase, companyId: ownerId, entityType: 'rentalCompany' };
 
-      // Lưu booking
-      const docRef = await addDoc(collection(db, 'bookings'), bookingData);
-
-      // Cập nhật trạng thái xe
-      if (bookingData.vin) {
-        const VehicleQuery = query(collection(db, 'Vehicles'), where('vehicleID', '==', bookingData.vin));
-        const VehicleSnap = await getDocs(VehicleQuery);
-        if (!VehicleSnap.empty) {
-          const VehicleDoc = VehicleSnap.docs[0];
-          await updateDoc(VehicleDoc.ref, { status: 'In Use' });
-        }
+      // 1) Tạo booking
+      let docRef;
+      try {
+        docRef = await addDoc(collection(db, 'bookings'), bookingData);
+        console.log('[OK] bookings.addDoc →', docRef.id);
+      } catch (e) {
+        console.error('[FAIL] bookings.addDoc', e);
+        return { status: 'error' };
       }
 
-      // Cập nhật trạng thái pin
-      if (bookingData.batteryCode1) {
-        const batteryQuery = query(collection(db, 'batteries'), where('batteryCode', '==', bookingData.batteryCode1));
-        const batterySnap = await getDocs(batteryQuery);
-        if (!batterySnap.empty) {
-          const batteryDoc = batterySnap.docs[0];
-          await updateDoc(batteryDoc.ref, { status: 'in_use' });
+      // 2) Cập nhật trạng thái xe
+      try {
+        if (bookingData.vin) {
+          const vehicleQuery = query(collection(db, 'vehicles'), where('vehicleID', '==', bookingData.vin));
+          const vehicleSnap = await getDocs(vehicleQuery);
+          if (!vehicleSnap.empty) {
+            const vehicleDoc = vehicleSnap.docs[0];
+            await updateDoc(vehicleDoc.ref, { status: 'In Use' });
+            console.log('[OK] vehicles.updateDoc →', vehicleDoc.id);
+          } else {
+            console.warn('[WARN] vehicles not found for VIN', bookingData.vin);
+          }
         }
+      } catch (e) {
+        console.error('[FAIL] vehicles.updateDoc', e);
+        return { status: 'error' };
+      }
+
+      // 3) Cập nhật trạng thái pin
+      try {
+        if (bookingData.batteryCode1) {
+          const batteryQuery = query(collection(db, 'batteries'), where('batteryCode', '==', bookingData.batteryCode1));
+          const batterySnap = await getDocs(batteryQuery);
+          if (!batterySnap.empty) {
+            const batteryDoc = batterySnap.docs[0];
+            await updateDoc(batteryDoc.ref, { status: 'in_use' });
+            console.log('[OK] batteries.updateDoc →', batteryDoc.id);
+          } else {
+            console.warn('[WARN] battery not found', bookingData.batteryCode1);
+          }
+        }
+      } catch (e) {
+        console.error('[FAIL] batteries.updateDoc', e);
+        return { status: 'error' };
       }
 
       resetForm();
-      return {
-        status: 'success',
-        booking: {
-          id: docRef.id,
-          ...bookingData,
-        },
-      };
+      return { status: 'success', booking: { id: docRef.id, ...bookingData } };
     } catch (error) {
       console.error('Booking failed:', error);
       return { status: 'error' };

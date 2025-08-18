@@ -83,12 +83,12 @@ export function useBookingForm(companyId: string, userId: string) {
 
       // ✅ Cập nhật trạng thái xe: In Use
       if (bookingData.vin) {
-        const ebikeSnap = await getDocs(
-          query(collection(db, 'ebikes'), where('vehicleID', '==', bookingData.vin))
+        const vehicleSnap = await getDocs(
+          query(collection(db, 'vehicles'), where('vehicleID', '==', bookingData.vin))
         );
-        if (!ebikeSnap.empty) {
-          const ebikeDoc = ebikeSnap.docs[0];
-          await updateDoc(ebikeDoc.ref, { status: 'In Use' });
+        if (!vehicleSnap.empty) {
+          const vehicleDoc = vehicleSnap.docs[0];
+          await updateDoc(vehicleDoc.ref, { status: 'In Use' });
         }
       }
 

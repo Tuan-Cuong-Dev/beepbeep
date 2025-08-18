@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBookingData } from '@/src/hooks/useBookingData';
 import { useUser } from '@/src/context/AuthContext';
@@ -20,14 +20,58 @@ import { Button } from '@/src/components/ui/button';
 import { Badge } from '@/src/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
+
+type EntityType = 'rentalCompany' | 'privateProvider';
 
 export default function BookingManagementPage() {
   const { t } = useTranslation('common', { keyPrefix: 'booking_management_page' });
+
+  const { user, role, companyId, stationId } = useUser();
+  const normalizedRole = role?.toLowerCase() ?? '';
+
+  // Xác định entityType + ownerId (companyId hoặc providerId)
+  const [entityType, setEntityType] = useState<EntityType>('rentalCompany');
+  const [ownerId, setOwnerId] = useState<string>('');
+  const [resolvingOwner, setResolvingOwner] = useState<boolean>(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setResolvingOwner(true);
+      try {
+        if (normalizedRole === 'private_provider') {
+          setEntityType('privateProvider');
+          if (user?.uid) {
+            const snap = await getDocs(
+              query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid))
+            );
+            const providerId = snap.docs[0]?.id ?? '';
+            if (mounted) setOwnerId(providerId);
+          } else {
+            if (mounted) setOwnerId('');
+          }
+        } else {
+          setEntityType('rentalCompany');
+          if (mounted) setOwnerId(companyId ?? '');
+        }
+      } finally {
+        if (mounted) setResolvingOwner(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [normalizedRole, companyId, user?.uid]);
+
+  // Lọc nâng cao
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<{ startDate?: string; endDate?: string }>({});
 
+  // Gọi hook mới (hook sẽ tự bỏ qua khi ownerId trống)
   const {
     bookings,
     stationNames,
@@ -39,11 +83,9 @@ export default function BookingManagementPage() {
     saveBooking,
     deleteBooking,
     loading,
-  } = useBookingData(filters);
+  } = useBookingData(ownerId, entityType, filters);
 
-  const { role, companyId, stationId } = useUser();
   const pageSize = 20;
-  const normalizedRole = role?.toLowerCase() ?? '';
 
   const [notification, setNotification] = useState<{
     open: boolean;
@@ -58,22 +100,20 @@ export default function BookingManagementPage() {
   });
 
   const filteredBookings = bookings.filter((b) => {
+    // Hook đã lọc theo ownerId, nên chỉ cần siết thêm cho station_manager
     const matchesRole =
-      normalizedRole === 'admin' ||
-      ((normalizedRole === 'company_owner' ||
-        normalizedRole === 'private_provider' ||
-        normalizedRole === 'company_admin') &&
-        b.companyId === companyId) ||
-      (normalizedRole === 'station_manager' && b.stationId === stationId);
+      normalizedRole === 'station_manager' && stationId
+        ? b.stationId === stationId
+        : true;
 
     const matchesSearch = searchText
-      ? b.fullName?.toLowerCase().includes(searchText.toLowerCase()) ||
-        b.phone?.includes(searchText) ||
-        b.vin?.includes(searchText)
+      ? (b.fullName || '').toLowerCase().includes(searchText.toLowerCase()) ||
+        (b.phone || '').includes(searchText) ||
+        (b.vin || '').includes(searchText)
       : true;
 
     const matchesStatus =
-      statusFilter === 'All' || b.bookingStatus?.toLowerCase() === statusFilter.toLowerCase();
+      statusFilter === 'All' || (b.bookingStatus || '').toLowerCase() === statusFilter.toLowerCase();
 
     return matchesRole && matchesSearch && matchesStatus;
   });
@@ -90,8 +130,8 @@ export default function BookingManagementPage() {
     station_manager: t('badge_roles.station_manager'),
   };
 
-  const getBadgeColor = (role: string) => {
-    switch (role) {
+  const getBadgeColor = (r: string) => {
+    switch (r) {
       case 'admin':
         return 'bg-red-100 text-red-800';
       case 'company_owner':
@@ -126,7 +166,7 @@ export default function BookingManagementPage() {
     try {
       const importedBookings = await importBookingsFromExcel(file);
       for (const booking of importedBookings) {
-        await saveBooking(booking);
+        await saveBooking(booking as Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>);
       }
       setNotification({
         open: true,
@@ -156,6 +196,14 @@ export default function BookingManagementPage() {
             {roleDisplayName[normalizedRole] || t('badge_roles.user', { defaultValue: 'Người dùng' })}
           </Badge>
         </div>
+
+        {/* Thông báo chưa xác định owner cho private provider */}
+        {resolvingOwner && <p>{t('loading')}</p>}
+        {!resolvingOwner && !ownerId && (
+          <p className="text-red-600">
+            {t('no_owner_found', { defaultValue: 'Không xác định được đơn vị quản lý cho tài khoản hiện tại.' })}
+          </p>
+        )}
 
         <BookingSearchFilter
           onSearchChange={setSearchText}
