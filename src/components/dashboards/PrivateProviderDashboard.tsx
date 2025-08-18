@@ -141,7 +141,6 @@ export default function PrivateProviderDashboard() {
             icon={<ClipboardList className="w-6 h-6" />}
           />
 
-          <DashboardCard title={t('rental_company_dashboard.issues')} value={stats.issues.toString()} href="/vehicle-issues" icon={<Wrench className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.batteries')} value={stats.batteries.toString()} href="/battery" icon={<BatteryCharging className="w-6 h-6" />} />
           <DashboardCard title={t('rental_company_dashboard.accessories')} value={stats.accessories.toString()} href="/accessories" icon={<Package className="w-6 h-6" />} />
 
@@ -172,7 +171,7 @@ export default function PrivateProviderDashboard() {
 }
 
 function DashboardGrid1({ children }: { children: React.ReactNode }) {
-  return <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">{children}</section>;
+  return <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">{children}</section>;
 }
 
 function DashboardCard({

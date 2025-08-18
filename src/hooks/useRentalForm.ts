@@ -1,51 +1,102 @@
+// /hooks/useRentalForm.ts
 import { useState, useEffect } from 'react';
-import { Timestamp, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+  Timestamp,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  doc,
+  getDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
-import { EbikeModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
+import { Vehicle } from '@/src/lib/vehicles/vehicleTypes';
+import { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 import { Booking, SubmitResult } from '@/src/lib/booking/BookingTypes';
 import { ensureCustomerByUserId, checkCustomerByPhone } from '@/src/lib/services/customers/customerService';
 import { checkBatteryCode } from '@/src/lib/services/batteries/batteryService';
 import { NotificationType } from '@/src/components/ui/NotificationDialog';
 
+type EntityType = 'rentalCompany' | 'privateProvider';
+
 interface UseRentalFormOptions {
   onNotify?: (message: string, type?: NotificationType) => void;
+  /** ⬇️ Mới: phân biệt công ty / người cho thuê cá nhân */
+  entityType?: EntityType;
 }
 
-export function useRentalForm(companyId: string, userId: string, options?: UseRentalFormOptions) {
+/**
+ * @param ownerId: với rentalCompany = companyId, với privateProvider = providerId
+ */
+export function useRentalForm(ownerId: string, userId: string, options?: UseRentalFormOptions) {
+  const entityType: EntityType = options?.entityType ?? 'rentalCompany';
+  const onNotify = options?.onNotify;
+
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
-  const [allBikes, setAllBikes] = useState<(Ebike & { modelName?: string })[]>([]);
+  const [allBikes, setAllBikes] = useState<(Vehicle & { modelName?: string })[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const onNotify = options?.onNotify;
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const packageSnap = await getDocs(query(collection(db, 'subscriptionPackages'), where('companyId', '==', companyId)));
-        const loadedPackages = packageSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as SubscriptionPackage[];
-        setPackages(loadedPackages);
+        // ---------- PACKAGES ----------
+        const pkgResults: SubscriptionPackage[] = [];
 
-        const bikeSnap = await getDocs(query(collection(db, 'ebikes'), where('companyId', '==', companyId)));
-        const bikesRaw = bikeSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Ebike[];
+        // Schema chuẩn (rentalCompany)
+        const pkgQ1 = query(collection(db, 'subscriptionPackages'), where('companyId', '==', ownerId));
+        const pkgSnap1 = await getDocs(pkgQ1);
+        pkgSnap1.forEach((d) => pkgResults.push({ id: d.id, ...(d.data() as any) }));
 
-        const availableBikes = bikesRaw.filter(bike => bike.status === 'Available');
+        // Nếu là privateProvider → hỗ trợ field providerId (schema mở rộng)
+        if (entityType === 'privateProvider') {
+          const pkgQ2 = query(collection(db, 'subscriptionPackages'), where('providerId', '==', ownerId));
+          const pkgSnap2 = await getDocs(pkgQ2);
+          pkgSnap2.forEach((d) => {
+            if (!pkgResults.find((x) => x.id === d.id)) {
+              pkgResults.push({ id: d.id, ...(d.data() as any) });
+            }
+          });
+        }
+        setPackages(pkgResults);
+
+        // ---------- BIKES ----------
+        const bikeResults: Vehicle[] = [];
+
+        // Schema chuẩn (rentalCompany)
+        const bikeQ1 = query(collection(db, 'vehicles'), where('companyId', '==', ownerId));
+        const bikeSnap1 = await getDocs(bikeQ1);
+        bikeSnap1.forEach((d) => bikeResults.push({ id: d.id, ...(d.data() as any) }));
+
+        // Nếu là privateProvider → hỗ trợ field providerId (schema mở rộng)
+        if (entityType === 'privateProvider') {
+          const bikeQ2 = query(collection(db, 'vehicles'), where('providerId', '==', ownerId));
+          const bikeSnap2 = await getDocs(bikeQ2);
+          bikeSnap2.forEach((d) => {
+            if (!bikeResults.find((x) => x.id === d.id)) {
+              bikeResults.push({ id: d.id, ...(d.data() as any) });
+            }
+          });
+        }
+
+        const availablVehicles = bikeResults.filter((bike) => bike.status === 'Available');
 
         const bikesWithModelName = await Promise.all(
-          availableBikes.map(async (bike) => {
+          availablVehicles.map(async (bike) => {
             let modelName = '';
-            if (bike.modelId) {
+            if ((bike as any).modelId) {
               try {
-                const modelDoc = await getDoc(doc(db, 'ebikeModels', bike.modelId));
+                const modelDoc = await getDoc(doc(db, 'vehicleModels', (bike as any).modelId));
                 if (modelDoc.exists()) {
-                  const modelData = modelDoc.data() as EbikeModel;
+                  const modelData = modelDoc.data() as VehicleModel;
                   modelName = modelData.name;
                 }
               } catch (error) {
-                console.error('❌ Error loading model for bike:', bike.id, error);
+                console.error('❌ Error loading model for bike:', (bike as any).id, error);
               }
             }
             return { ...bike, modelName };
@@ -60,120 +111,118 @@ export function useRentalForm(companyId: string, userId: string, options?: UseRe
       }
     };
 
-    if (companyId) fetchData();
-  }, [companyId]);
+    if (ownerId) fetchData();
+  }, [ownerId, entityType]);
 
   const handleChange = (key: string, value: any) => {
-  const processedValue = value; // ✅ Không trim ở đây để giữ nguyên input người dùng
+    const processedValue = value; // không trim để giữ nguyên input
 
-  setFormData(prev => {
-    const updated = { ...prev, [key]: processedValue };
+    setFormData((prev) => {
+      const updated = { ...prev, [key]: processedValue };
 
-    // ✅ Gán thông tin gói thuê nếu chọn package
-    if (key.startsWith('package')) {
-      const selectedPackage = packages.find(pkg => pkg.id === processedValue);
-      if (selectedPackage) {
-        updated.basePrice = selectedPackage.basePrice;
-        updated.kmLimit = selectedPackage.kmLimit ?? 'Unlimited';
-        updated.overageRate = selectedPackage.overageRate ?? '-';
-        updated.chargingMethod = selectedPackage.chargingMethod;
-      }
-    }
-
-    // ✅ Tự động gán info khi chọn xe
-    if (key === 'vehicleSearch') {
-      const selectedBike = allBikes.find(bike => bike.vehicleID === processedValue);
-      if (selectedBike) {
-        updated.stationId = selectedBike.stationId || '';
-        updated.vin = selectedBike.vehicleID || '';
-        updated.vehicleModel = selectedBike.modelName || '';
-        updated.vehicleColor = selectedBike.color || '';
-        updated.licensePlate = selectedBike.plateNumber || '';
-      }
-    }
-
-    // ✅ Tính tiền thuê
-    const rentalDays = Number(updated.rentalDays) || 0;
-    const basePrice = Number(updated.basePrice) || 0;
-    const batteryFee = Number(updated.batteryFee) || 0;
-    const deposit = Number(updated.deposit) || 0;
-
-    if (rentalDays && (basePrice || batteryFee)) {
-      const totalAmount = rentalDays * basePrice + batteryFee;
-      updated.totalAmount = totalAmount;
-      updated.remainingBalance = totalAmount - deposit;
-    }
-
-    if (key === 'deposit' && updated.totalAmount) {
-      updated.remainingBalance = updated.totalAmount - deposit;
-    }
-
-    // ✅ Tính ngày kết thúc thuê
-    if (
-      ['rentalStartDate', 'rentalStartHour', 'rentalDays'].includes(key) ||
-      (updated.rentalStartDate && updated.rentalStartHour && updated.rentalDays)
-    ) {
-      const startDateStr = updated.rentalStartDate;
-      const startHourStr = updated.rentalStartHour;
-      const days = Number(updated.rentalDays) || 0;
-
-      if (startDateStr && startHourStr && days) {
-        const start = new Date(`${startDateStr}T${startHourStr}:00`);
-        const end = new Date(start);
-        end.setDate(start.getDate() + days);
-
-        const yyyy = end.getFullYear();
-        const mm = String(end.getMonth() + 1).padStart(2, '0');
-        const dd = String(end.getDate()).padStart(2, '0');
-
-        updated.rentalEndDate = `${yyyy}-${mm}-${dd}`;
-      }
-    }
-
-    return updated;
-  });
-
-  // ✅ Kiểm tra battery code
-  if (key.startsWith('batteryCode')) {
-    if (typeof processedValue === 'string' && processedValue.length > 4) {
-      checkBatteryCode(processedValue).then((battery) => {
-        if (!battery || battery.status !== 'in_stock') {
-          setFormData(current => ({
-            ...current,
-            [key]: '',
-          }));
-          onNotify?.(`Battery ${processedValue} is not available or already in use.`, 'error');
+      // Gán thông tin gói thuê nếu chọn package
+      if (key.startsWith('package')) {
+        const selectedPackage = packages.find((pkg) => pkg.id === processedValue);
+        if (selectedPackage) {
+          updated.basePrice = selectedPackage.basePrice;
+          updated.kmLimit = selectedPackage.kmLimit ?? 'Unlimited';
+          updated.overageRate = selectedPackage.overageRate ?? '-';
+          updated.chargingMethod = selectedPackage.chargingMethod;
         }
-      });
-    }
-  }
+      }
 
-  // ✅ Kiểm tra số điện thoại tự động tìm khách hàng
-  if (key === 'phone') {
-    if (typeof processedValue === 'string' && processedValue.length >= 9) {
-      checkCustomerByPhone(processedValue).then((customer) => {
-        if (customer) {
-          setFormData(current => ({
-            ...current,
-            phone: customer.phone,
-            fullName: customer.name || '',
-            email: customer.email || '',
-            address: customer.address || '',
-            idNumber: customer.idNumber || '',
-            driverLicense: customer.driverLicense || '',
-            dateOfBirth: customer.dateOfBirth || '',
-            nationality: customer.nationality || '',
-            sex: customer.sex || '',
-            placeOfOrigin: customer.placeOfOrigin || '',
-            placeOfResidence: customer.placeOfResidence || '',
-          }));
+      // Auto-fill khi chọn xe
+      if (key === 'vehicleSearch') {
+        const selectedBike = allBikes.find((bike) => bike.vehicleID === processedValue);
+        if (selectedBike) {
+          updated.stationId = (selectedBike as any).stationId || '';
+          updated.vin = selectedBike.vehicleID || '';
+          updated.vehicleModel = selectedBike.modelName || '';
+          updated.vehicleColor = (selectedBike as any).color || '';
+          updated.licensePlate = (selectedBike as any).plateNumber || '';
         }
-      });
+      }
+
+      // Tính tiền
+      const rentalDays = Number(updated.rentalDays) || 0;
+      const basePrice = Number(updated.basePrice) || 0;
+      const batteryFee = Number(updated.batteryFee) || 0;
+      const deposit = Number(updated.deposit) || 0;
+
+      if (rentalDays && (basePrice || batteryFee)) {
+        const totalAmount = rentalDays * basePrice + batteryFee;
+        updated.totalAmount = totalAmount;
+        updated.remainingBalance = totalAmount - deposit;
+      }
+
+      if (key === 'deposit' && updated.totalAmount) {
+        updated.remainingBalance = updated.totalAmount - deposit;
+      }
+
+      // Tính ngày kết thúc thuê
+      if (
+        ['rentalStartDate', 'rentalStartHour', 'rentalDays'].includes(key) ||
+        (updated.rentalStartDate && updated.rentalStartHour && updated.rentalDays)
+      ) {
+        const startDateStr = updated.rentalStartDate;
+        const startHourStr = updated.rentalStartHour;
+        const days = Number(updated.rentalDays) || 0;
+
+        if (startDateStr && startHourStr && days) {
+          const start = new Date(`${startDateStr}T${startHourStr}:00`);
+          const end = new Date(start);
+          end.setDate(start.getDate() + days);
+
+          const yyyy = end.getFullYear();
+          const mm = String(end.getMonth() + 1).padStart(2, '0');
+          const dd = String(end.getDate()).padStart(2, '0');
+
+          updated.rentalEndDate = `${yyyy}-${mm}-${dd}`;
+        }
+      }
+
+      return updated;
+    });
+
+    // Kiểm tra battery code
+    if (key.startsWith('batteryCode')) {
+      if (typeof processedValue === 'string' && processedValue.length > 4) {
+        checkBatteryCode(processedValue).then((battery) => {
+          if (!battery || battery.status !== 'in_stock') {
+            setFormData((current) => ({
+              ...current,
+              [key]: '',
+            }));
+            onNotify?.(`Battery ${processedValue} is not available or already in use.`, 'error');
+          }
+        });
+      }
     }
-  }
-};
 
-
+    // Tự động tìm khách theo phone
+    if (key === 'phone') {
+      if (typeof processedValue === 'string' && processedValue.length >= 9) {
+        checkCustomerByPhone(processedValue).then((customer) => {
+          if (customer) {
+            setFormData((current) => ({
+              ...current,
+              phone: customer.phone,
+              fullName: customer.name || '',
+              email: customer.email || '',
+              address: customer.address || '',
+              idNumber: customer.idNumber || '',
+              driverLicense: customer.driverLicense || '',
+              dateOfBirth: customer.dateOfBirth || '',
+              nationality: customer.nationality || '',
+              sex: customer.sex || '',
+              placeOfOrigin: customer.placeOfOrigin || '',
+              placeOfResidence: customer.placeOfResidence || '',
+            }));
+          }
+        });
+      }
+    }
+  };
 
   const resetForm = () => setFormData({});
 
@@ -187,6 +236,7 @@ export function useRentalForm(companyId: string, userId: string, options?: UseRe
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + Number(formData.rentalDays || 0));
 
+      // Đảm bảo Customer tồn tại
       await ensureCustomerByUserId(userId, {
         userId,
         name: formData.fullName || '',
@@ -202,8 +252,11 @@ export function useRentalForm(companyId: string, userId: string, options?: UseRe
         placeOfResidence: formData.placeOfResidence || '',
       });
 
-      const bookingData: Omit<Booking, 'id'> = {
-        companyId,
+      // ---------- DỮ LIỆU BOOKING ----------
+      // Giữ tương thích: vẫn set companyId,
+      // đồng thời thêm providerId và entityType khi là privateProvider
+      const bookingBase: Omit<Booking, 'id'> = {
+        companyId: entityType === 'rentalCompany' ? ownerId : '', // compat
         stationId: formData.stationId || '',
         userId: userId || '',
         idImage: formData.idImage || '',
@@ -244,17 +297,26 @@ export function useRentalForm(companyId: string, userId: string, options?: UseRe
         updatedAt: Timestamp.now(),
       };
 
+      // Mở rộng theo entity
+      const bookingData: any =
+        entityType === 'privateProvider'
+          ? { ...bookingBase, providerId: ownerId, entityType: 'privateProvider' }
+          : { ...bookingBase, entityType: 'rentalCompany' };
+
+      // Lưu booking
       const docRef = await addDoc(collection(db, 'bookings'), bookingData);
 
+      // Cập nhật trạng thái xe
       if (bookingData.vin) {
-        const ebikeQuery = query(collection(db, 'ebikes'), where('vehicleID', '==', bookingData.vin));
-        const ebikeSnap = await getDocs(ebikeQuery);
-        if (!ebikeSnap.empty) {
-          const ebikeDoc = ebikeSnap.docs[0];
-          await updateDoc(ebikeDoc.ref, { status: 'In Use' });
+        const VehicleQuery = query(collection(db, 'Vehicles'), where('vehicleID', '==', bookingData.vin));
+        const VehicleSnap = await getDocs(VehicleQuery);
+        if (!VehicleSnap.empty) {
+          const VehicleDoc = VehicleSnap.docs[0];
+          await updateDoc(VehicleDoc.ref, { status: 'In Use' });
         }
       }
 
+      // Cập nhật trạng thái pin
       if (bookingData.batteryCode1) {
         const batteryQuery = query(collection(db, 'batteries'), where('batteryCode', '==', bookingData.batteryCode1));
         const batterySnap = await getDocs(batteryQuery);

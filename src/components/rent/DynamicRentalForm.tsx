@@ -1,21 +1,30 @@
 'use client';
 
-// Form này hoạt động theo company, user và cấu hình động từ Company-Owner setup cho.
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getFormConfigurationByCompanyId } from '@/src/lib/services/Configirations/formConfigurationService';
+import {
+  getFormConfigurationByEntity, // ⬅️ đổi service
+} from '@/src/lib/services/Configirations/formConfigurationService';
 import { FormConfiguration } from '@/src/lib/formConfigurations/formConfigurationTypes';
 import { useRentalForm } from '../../hooks/useRentalForm';
 import { DynamicRentalFieldRenderer } from './common/DynamicRentalFieldRenderer';
 import { Button } from '@/src/components/ui/button';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
 
+type EntityType = 'rentalCompany' | 'privateProvider';
+
 interface Props {
   companyId: string;
   userId: string;
+  /** ⬇️ Mới: cho biết form đang chạy ở công ty hay private provider */
+  entityType?: EntityType;
 }
 
-export default function DynamicRentalForm({ companyId, userId }: Props) {
+export default function DynamicRentalForm({
+  companyId,
+  userId,
+  entityType = 'rentalCompany',
+}: Props) {
   const { t } = useTranslation('common');
   const [config, setConfig] = useState<FormConfiguration | null>(null);
   const [bikeSuggestions, setBikeSuggestions] = useState<any[]>([]);
@@ -33,22 +42,30 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
     packages,
     allBikes,
     loading,
-  } = useRentalForm(companyId, userId);
+  } = useRentalForm(companyId, userId, { entityType }); // ⬅️ truyền xuống hook
 
   useEffect(() => {
     const fetchConfig = async () => {
-      const result = await getFormConfigurationByCompanyId(companyId);
-      setConfig(result);
+      if (!companyId || !entityType) return;
+
+      try {
+        const result = await getFormConfigurationByEntity(companyId, entityType);
+        setConfig(result);
+      } catch (err) {
+        console.error("❌ Failed to fetch form configuration:", err);
+      }
     };
 
     fetchConfig();
-  }, [companyId]);
+  }, [companyId, entityType]);
+
 
   const populateVehicleSuggestions = (search: string) => {
-    const suggestions = allBikes.filter(bike =>
-      bike.vehicleID?.toLowerCase().includes(search.toLowerCase()) ||
-      bike.plateNumber?.toLowerCase().includes(search.toLowerCase()) ||
-      bike.modelName?.toLowerCase().includes(search.toLowerCase())
+    const q = (search || '').toLowerCase();
+    const suggestions = allBikes.filter((bike) =>
+      bike.vehicleID?.toLowerCase().includes(q) ||
+      bike.plateNumber?.toLowerCase().includes(q) ||
+      bike.modelName?.toLowerCase().includes(q)
     );
     setBikeSuggestions(suggestions);
   };
@@ -65,7 +82,6 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
 
   const handleConfirmBooking = async () => {
     const result = await handleSubmit();
-
     if (result.status === 'success') {
       setDialog({
         open: true,
@@ -97,7 +113,7 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
   return (
     <div className="space-y-8">
       {config.sections.map((section) => {
-        const visibleFields = section.fields.filter(field => field.visible);
+        const visibleFields = section.fields.filter((field) => field.visible);
         if (!visibleFields.length) return null;
 
         return (
@@ -114,6 +130,7 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
                   populateVehicleSuggestions={populateVehicleSuggestions}
                   handleSelectBike={handleSelectBike}
                   companyId={companyId}
+                  // nếu renderer cần, có thể truyền entityType vào đây
                 />
               ))}
             </div>
@@ -135,7 +152,7 @@ export default function DynamicRentalForm({ companyId, userId }: Props) {
         type={dialog.type}
         title={dialog.title}
         description={dialog.description}
-        onClose={() => setDialog(prev => ({ ...prev, open: false }))}
+        onClose={() => setDialog((prev) => ({ ...prev, open: false }))}
       />
     </div>
   );

@@ -29,9 +29,18 @@ export interface FormSection {
   fields: FormField[];
 }
 
+export type EntityType = 'rentalCompany' | 'privateProvider';
+
 export interface FormConfiguration {
   id?: string; // Khi tạo mới thì id chưa có
-  companyId: string;
+
+  /** 🔹 Thực thể mà form thuộc về */
+  targetId: string;       // id của công ty hoặc provider
+  targetType: EntityType; // 'rentalCompany' | 'privateProvider'
+
+  /** 🔹 Giữ lại cho backward compatibility với code cũ */
+  companyId?: string;
+
   createdBy: string;
   sections: FormSection[];
   createdAt?: any;
@@ -39,7 +48,6 @@ export interface FormConfiguration {
 }
 
 // ✨ Các mẫu Section và Field cố định để chọn
-
 export interface PredefinedField {
   key: string;
   label: string;

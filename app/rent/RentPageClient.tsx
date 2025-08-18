@@ -6,77 +6,105 @@ import Footer from '@/src/components/landingpage/Footer';
 import RentBikeFormFactory from '@/src/components/rent/RentBikeFormFactory';
 import DynamicRentalForm from '@/src/components/rent/DynamicRentalForm';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { db } from '@/src/firebaseConfig';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
+
+type EntityType = 'rentalCompany' | 'privateProvider';
 
 export default function RentPageClient() {
   const { t } = useTranslation('common');
   const { user, role, loading } = useUser();
   const searchParams = useSearchParams();
-  const companyIdFromURL = searchParams?.get('companyId') ?? null;
+  const companyIdFromURL = searchParams?.get('companyId') ?? null; // vẫn ưu tiên URL
 
   const [finalCompanyId, setFinalCompanyId] = useState<string | null>(companyIdFromURL);
+  const [entityType, setEntityType] = useState<EntityType>('rentalCompany'); // 🔹 mới
   const [companyName, setCompanyName] = useState<string>('');
   const [stationId, setStationId] = useState<string | null>(null);
   const [stationName, setStationName] = useState<string>('');
 
-  // 1. Xác định companyId và stationId
+  const staffRoles = useMemo(
+    () => ['company_admin', 'station_manager', 'technician', 'support'],
+    []
+  );
+  const isStaffRole = !!role && staffRoles.includes(role);
+
+  // 1) Xác định company/provider & station
   useEffect(() => {
     const detectCompanyAndStation = async () => {
       try {
         if (companyIdFromURL) {
           setFinalCompanyId(companyIdFromURL);
+          setEntityType('rentalCompany'); // URL hiện đang dành cho company
           return;
         }
 
-        const staffRoles = ['company_admin', 'station_manager', 'technician', 'support'];
-        if (user?.uid && staffRoles.includes(role)) {
-          const snap = await getDocs(query(collection(db, 'staffs'), where('userId', '==', user.uid)));
+        // a) Staff: lấy từ staffs
+        if (user?.uid && isStaffRole) {
+          const snap = await getDocs(
+            query(collection(db, 'staffs'), where('userId', '==', user.uid))
+          );
           if (!snap.empty) {
-            const staffData = snap.docs[0].data();
-            setFinalCompanyId(staffData.companyId || null);
-            setStationId(staffData.stationId || null);
+            const d = snap.docs[0].data() as any;
+            setFinalCompanyId(d.companyId || null);
+            setStationId(d.stationId || null);
+            setEntityType('rentalCompany');
             return;
           }
         }
 
+        // b) Company owner: lấy rentalCompanies theo ownerId
         if (user?.uid && role === 'company_owner') {
-          const snap = await getDocs(query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid)));
+          const snap = await getDocs(
+            query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid))
+          );
           if (!snap.empty) {
             setFinalCompanyId(snap.docs[0].id);
+            setEntityType('rentalCompany');
             return;
           }
         }
-      } catch (error) {
-        console.error('🔥 Error detecting company and station:', error);
+
+        // c) 🔸 Private provider: lấy từ privateProviders theo ownerId
+        if (user?.uid && role === 'private_provider') {
+          const snap = await getDocs(
+            query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid))
+          );
+          if (!snap.empty) {
+            setFinalCompanyId(snap.docs[0].id);
+            setEntityType('privateProvider');
+            // hầu hết không có station mặc định
+            return;
+          }
+        }
+
+      } catch (e) {
+        console.error('🔥 Error detecting company/provider & station:', e);
       }
     };
 
     detectCompanyAndStation();
-  }, [user?.uid, companyIdFromURL, role]);
+  }, [user?.uid, role, isStaffRole, companyIdFromURL]);
 
-  // 2. Lấy CompanyName
+  // 2) Lấy tên đơn vị (companyName) theo entityType
   useEffect(() => {
-    const fetchCompanyName = async () => {
+    const fetchName = async () => {
       if (!finalCompanyId) return;
-      const snap = await getDoc(doc(db, 'rentalCompanies', finalCompanyId));
-      if (snap.exists()) {
-        setCompanyName(snap.data().name || '');
-      }
+      const col = entityType === 'privateProvider' ? 'privateProviders' : 'rentalCompanies';
+      const snap = await getDoc(doc(db, col, finalCompanyId));
+      if (snap.exists()) setCompanyName((snap.data() as any).name || '');
     };
-    fetchCompanyName();
-  }, [finalCompanyId]);
+    fetchName();
+  }, [finalCompanyId, entityType]);
 
-  // 3. Lấy StationName
+  // 3) Lấy StationName nếu có
   useEffect(() => {
     const fetchStationName = async () => {
       if (!stationId) return;
       const snap = await getDoc(doc(db, 'rentalStations', stationId));
-      if (snap.exists()) {
-        setStationName(snap.data().name || '');
-      }
+      if (snap.exists()) setStationName((snap.data() as any).name || '');
     };
     fetchStationName();
   }, [stationId]);
@@ -93,10 +121,18 @@ export default function RentPageClient() {
           {t('rent_page_client.title')}
         </h1>
 
-        {role === 'staff' ? (
-          <DynamicRentalForm companyId={finalCompanyId} userId={user.uid} />
+        {isStaffRole ? (
+          <DynamicRentalForm
+            companyId={finalCompanyId}
+            userId={user.uid}
+            entityType={entityType}  // 🔹 truyền xuống để đọc đúng collection
+          />
         ) : (
-          <RentBikeFormFactory role={role} companyId={finalCompanyId} />
+          <RentBikeFormFactory
+            role={role}
+            companyId={finalCompanyId}
+            entityType={entityType}  // 🔹 truyền xuống để factory chọn form phù hợp
+          />
         )}
       </main>
       <Footer />
