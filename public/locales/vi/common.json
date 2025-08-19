@@ -1342,11 +1342,11 @@
   "quick_actions": {
     "my_issues": "Sự cố được giao",
     "proposal_history": "Lịch sử đề xuất",
-    "suggest_error_fix": "Đóng góp phương án sửa lỗi",
-    "error_codes": "Tham chiếu bộ mã lỗi",
+    "suggest_error_fix": "Đề xuất phương án sửa lỗi",
+    "error_codes": "Tra cứu mã lỗi",
     "service_pricing": "Bảng giá dịch vụ chuẩn"
   },
-  "assigned_issues": "🚧 Sự cố đã giao",
+  "assigned_issues": "Sự cố đã giao",
   "table_headers": {
     "vin": "Số khung (VIN)",
     "plate": "Biển số",

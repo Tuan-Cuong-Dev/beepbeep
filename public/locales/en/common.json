@@ -1340,7 +1340,7 @@
     "error_codes": "Error Code Reference",
     "service_pricing": "Standard Service Pricing"
   },
-  "assigned_issues": "🚧 Assigned Issues",
+  "assigned_issues": "Assigned Issues",
   "table_headers": {
     "vin": "VIN",
     "plate": "Plate Number",

@@ -110,7 +110,7 @@ export default function TechnicianDashboard() {
           <DashboardCard icon={<CheckCircle />} title={t('technician_partner_dashboard.summary.resolved')} value={issues.filter(i => i.status === 'resolved').length.toString()} />
         </section>
 
-        <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/vehicle-issues" />
             <QuickAction label={t('technician_partner_dashboard.quick_actions.proposal_history')} href="/vehicle-issues/proposals" />
             <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/vehicle-issues/suggest-error" />

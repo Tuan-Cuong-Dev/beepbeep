@@ -1,31 +1,37 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
-import ViewProposalDialog from '@/src/components/vehicle-issues/ViewProposalDialog';
-import ApproveProposalDialog from '@/src/components/vehicle-issues/ApproveProposalDialog';
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
+import { JSX } from 'react';
+import { CheckCircle2, XCircle, UserPlus, FileText, Send } from 'lucide-react';
 
 interface Props {
   issues: ExtendedVehicleIssue[];
   technicianMap: Record<string, string>;
   onEdit: (issue: ExtendedVehicleIssue) => void;
+
   updateIssue: (id: string, data: Partial<ExtendedVehicleIssue>) => Promise<void>;
+
   setClosingIssue: (issue: ExtendedVehicleIssue | null) => void;
   setCloseDialogOpen: (open: boolean) => void;
   setEditingIssue: (issue: ExtendedVehicleIssue | null) => void;
   setShowForm: (open: boolean) => void;
+
   normalizedRole: string;
   isAdmin: boolean;
   isTechnician?: boolean;
+  isTechnicianPartner?: boolean;
+
   setProposingIssue?: (issue: ExtendedVehicleIssue | null) => void;
   setUpdatingActualIssue?: (issue: ExtendedVehicleIssue | null) => void;
+
   searchTerm: string;
   statusFilter: string;
   stationFilter: string;
   refetchIssues: () => Promise<void>;
+
   setViewingProposal: (issue: ExtendedVehicleIssue | null) => void;
   setApprovingProposal: (issue: ExtendedVehicleIssue | null) => void;
 }
@@ -38,29 +44,30 @@ export default function VehicleIssueTable({
   setEditingIssue,
   setShowForm,
   isTechnician,
+  isTechnicianPartner,
   setProposingIssue,
   setUpdatingActualIssue,
   setViewingProposal,
   setApprovingProposal,
 }: Props) {
   const { t } = useTranslation('common');
-  const [viewingProposal, setViewingProposalState] = useState<ExtendedVehicleIssue | null>(null);
-  const [approvingProposal, setApprovingProposalState] = useState<ExtendedVehicleIssue | null>(null);
+  const isTechOrPartner = !!isTechnician || !!isTechnicianPartner;
 
+  // ======= UI helpers =======
   const renderStatusBadge = (status: VehicleIssueStatus) => {
     const colorMap: Record<VehicleIssueStatus, string> = {
-      pending: 'bg-gray-400',
-      assigned: 'bg-blue-500',
-      proposed: 'bg-yellow-500',
-      confirmed: 'bg-green-500',
-      rejected: 'bg-red-500',
-      in_progress: 'bg-indigo-500',
-      resolved: 'bg-purple-500',
-      closed: 'bg-black',
+      pending: 'bg-gray-500',
+      assigned: 'bg-blue-600',
+      proposed: 'bg-amber-500',
+      confirmed: 'bg-emerald-600',
+      rejected: 'bg-rose-600',
+      in_progress: 'bg-indigo-600',
+      resolved: 'bg-violet-600',
+      closed: 'bg-zinc-900',
     };
-
     return (
-      <span className={`px-2 py-1 text-white rounded ${colorMap[status]}`}>
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-white ${colorMap[status]}`}>
+        <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
         {t(`status.${status}`, { defaultValue: status.replace('_', ' ') })}
       </span>
     );
@@ -70,94 +77,193 @@ export default function VehicleIssueTable({
     const normalized = rawType.toLowerCase().replace(/\s+/g, '_');
     return t(`vehicle_issue_type.${normalized}`, { defaultValue: rawType });
   };
-  
-  const renderActions = (issue: ExtendedVehicleIssue) => {
-    const buttons = [];
 
-    if (isTechnician) {
+  // A tiny button system for consistent colors/icons
+  type ActionVariant =
+    | 'assign'
+    | 'approve'
+    | 'close'
+    | 'submitProposal'
+    | 'submitActual'
+    | 'view';
+
+  const variantStyles: Record<ActionVariant, { className: string; icon?: JSX.Element }> = {
+    assign: {
+      className:
+        'border-[#00d289] text-[#00d289] hover:bg-[#00d289]/10',
+      icon: <UserPlus className="size-4" />,
+    },
+    approve: {
+      className:
+        'border-blue-500 text-blue-600 hover:bg-blue-50',
+      icon: <CheckCircle2 className="size-4" />,
+    },
+    close: {
+      className:
+        'bg-rose-600 text-white hover:bg-rose-700',
+      icon: <XCircle className="size-4" />,
+    },
+    submitProposal: {
+      className:
+        'bg-amber-500 text-white hover:bg-amber-600',
+      icon: <Send className="size-4" />,
+    },
+    submitActual: {
+      className:
+        'bg-violet-600 text-white hover:bg-violet-700',
+      icon: <Send className="size-4" />,
+    },
+    view: {
+      className:
+        'text-[#00d289] hover:text-[#00b574] hover:underline',
+      icon: <FileText className="size-4" />,
+    },
+  };
+
+  const ActionButton = ({
+    variant,
+    children,
+    onClick,
+    outline,
+  }: {
+    variant: ActionVariant;
+    children: React.ReactNode;
+    onClick: () => void;
+    outline?: boolean;
+  }) => {
+    const v = variantStyles[variant];
+    const base =
+      'h-8 px-2.5 sm:px-3 text-xs sm:text-sm rounded-md whitespace-nowrap inline-flex items-center gap-1.5';
+    // use `variant="outline"` from shadcn for border-only cases if needed
+    if (variant === 'approve' || variant === 'assign') {
+      return (
+        <Button
+          size="sm"
+          variant="outline"
+          className={`${base} ${v.className}`}
+          onClick={onClick}
+        >
+          {v.icon}
+          {children}
+        </Button>
+      );
+    }
+    if (variant === 'view') {
+      return (
+        <Button
+          size="sm"
+          variant="ghost"
+          className={`${base} ${v.className}`}
+          onClick={onClick}
+        >
+          {v.icon}
+          {children}
+        </Button>
+      );
+    }
+    return (
+      <Button size="sm" className={`${base} ${v.className}`} onClick={onClick}>
+        {v.icon}
+        {children}
+      </Button>
+    );
+  };
+
+  const renderActions = (issue: ExtendedVehicleIssue) => {
+    const buttons: JSX.Element[] = [];
+
+    if (isTechOrPartner) {
+      // 👨‍🔧 Tech / Partner: chỉ submit theo trạng thái
       if (issue.status === 'assigned') {
         buttons.push(
-          <Button key="submitProposal" size="sm" onClick={() => setProposingIssue?.(issue)}>
+          <ActionButton
+            key="submitProposal"
+            variant="submitProposal"
+            onClick={() => setProposingIssue?.(issue)}
+          >
             {t('vehicle_issue_table.submit_proposal')}
-          </Button>
+          </ActionButton>
         );
       }
       if (issue.status === 'confirmed') {
         buttons.push(
-          <Button key="submitActual" size="sm" onClick={() => setUpdatingActualIssue?.(issue)}>
+          <ActionButton
+            key="submitActual"
+            variant="submitActual"
+            onClick={() => setUpdatingActualIssue?.(issue)}
+          >
             {t('vehicle_issue_table.submit_actual')}
-          </Button>
+          </ActionButton>
         );
       }
     } else {
+      // 👩‍💼 Managerial roles
       if (issue.status === 'proposed') {
         buttons.push(
-          <Button
+          <ActionButton
             key="approve"
-            size="sm"
-            variant="outline"
+            variant="approve"
             onClick={() => setApprovingProposal(issue)}
           >
             {t('vehicle_issue_table.approve_proposal')}
-          </Button>
+          </ActionButton>
         );
       }
       if (issue.status === 'resolved') {
         buttons.push(
-          <Button
+          <ActionButton
             key="close"
-            size="sm"
-            variant="destructive"
+            variant="close"
             onClick={() => {
               setClosingIssue(issue);
               setCloseDialogOpen(true);
             }}
           >
             {t('vehicle_issue_table.close')}
-          </Button>
+          </ActionButton>
         );
       }
-    }
-
-    // ✅ "Xem đề xuất"
-    if (issue.proposedSolution) {
+      // 🧑‍💼 Assign technician (thay cho Edit)
       buttons.push(
-        <Button
-          key="viewProposal"
-          size="sm"
-          className="text-[#00d289] font-semibold hover:underline"
-          variant="ghost"
-          onClick={() => setViewingProposal(issue)}
+        <ActionButton
+          key="assign"
+          variant="assign"
+          onClick={() => {
+            setEditingIssue(issue);
+            setShowForm(true);
+          }}
         >
-          {t('vehicle_issue_table.view_proposal')}
-        </Button>
+          {t('vehicle_issue_table.assign')}
+        </ActionButton>
       );
     }
 
-    // ✅ "Chỉnh sửa"
-    buttons.push(
-      <Button
-        key="edit"
-        size="sm"
-        className="border-[#00d289] text-[#00d289] hover:bg-[#00d289]/10"
-        variant="outline"
-        onClick={() => {
-          setEditingIssue(issue);
-          setShowForm(true);
-        }}
-      >
-        {t('vehicle_issue_table.edit')}
-      </Button>
-    );
+    // 👀 View proposal: ai cũng xem được
+    if (issue.proposedSolution) {
+      buttons.push(
+        <ActionButton
+          key="viewProposal"
+          variant="view"
+          onClick={() => setViewingProposal(issue)}
+        >
+          {t('vehicle_issue_table.view_proposal')}
+        </ActionButton>
+      );
+    }
 
     return buttons.length > 0 ? (
-      <div className="flex flex-nowrap gap-2 overflow-x-auto max-w-full">{buttons}</div>
+      <div
+        className="flex flex-row flex-wrap gap-2 max-w-full items-center"
+        style={{ rowGap: '0.5rem' }}
+      >
+        {buttons}
+      </div>
     ) : (
-      <span className="text-gray-400 italic">{t('vehicle_issue_table.no_actions')}</span>
+      <span className="text-gray-400 italic">
+        {t('vehicle_issue_table.no_actions')}
+      </span>
     );
   };
-
-
 
   return (
     <>
@@ -215,29 +321,6 @@ export default function VehicleIssueTable({
           </tbody>
         </table>
       </div>
-
-      {/* 🔍 Proposal Dialogs */}
-      <ViewProposalDialog open={!!viewingProposal} issue={viewingProposal} onClose={() => setViewingProposalState(null)} />
-      <ApproveProposalDialog
-        open={!!approvingProposal}
-        issue={approvingProposal}
-        onClose={() => setApprovingProposalState(null)}
-        onApprove={async () => {
-          if (approvingProposal) {
-            await updateIssue(approvingProposal.id, { status: 'confirmed' });
-            setApprovingProposalState(null);
-          }
-        }}
-        onReject={async (reason) => {
-          if (approvingProposal) {
-            await updateIssue(approvingProposal.id, {
-              status: 'rejected',
-              closeComment: reason,
-            });
-            setApprovingProposalState(null);
-          }
-        }}
-      />
     </>
   );
 }

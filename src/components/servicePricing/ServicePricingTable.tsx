@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/src/context/AuthContext';
-import { ServicePricing } from '@/src/lib/servicePricing/servicePricingTypes';
+import type { ServicePricing } from '@/src/lib/servicePricing/servicePricingTypes';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import * as XLSX from 'xlsx';
@@ -24,30 +24,47 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
   const [categoryFilter, setCategoryFilter] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
-  const uniqueCategories = Array.from(
-    new Set(servicePricings.map((s) => s.category).filter(Boolean))
+  // ---- helpers ----
+  const formatPrice = (n: number) =>
+    new Intl.NumberFormat('vi-VN').format(n) + ' VND';
+
+  // Dùng chính file dịch bạn đã có: service_pricing_form.categories.<RawCategory>
+  const getCategoryLabel = (raw?: string) =>
+    raw ? t(`service_pricing_form.categories.${raw}`, { defaultValue: raw }) : '-';
+
+  // ---- memoized data ----
+  const uniqueCategories = useMemo(
+    () =>
+      Array.from(new Set(servicePricings.map((s) => s.category).filter(Boolean))).sort(),
+    [servicePricings]
   );
 
-  const filtered = servicePricings.filter((item) => {
-    const matchTitle = item.title.toLowerCase().includes(search.toLowerCase());
-    const matchCategory = categoryFilter ? item.category === categoryFilter : true;
-    const matchActive =
-      activeFilter === 'all'
-        ? true
-        : activeFilter === 'active'
-        ? item.isActive
-        : !item.isActive;
-    return matchTitle && matchCategory && matchActive;
-  });
+  const filtered = useMemo(() => {
+    const s = search.toLowerCase().trim();
+    return servicePricings.filter((item) => {
+      const matchTitle = item.title.toLowerCase().includes(s);
+      const matchCategory = categoryFilter ? item.category === categoryFilter : true;
+      const matchActive =
+        activeFilter === 'all'
+          ? true
+          : activeFilter === 'active'
+          ? item.isActive
+          : !item.isActive;
+      return matchTitle && matchCategory && matchActive;
+    });
+  }, [servicePricings, search, categoryFilter, activeFilter]);
 
+  // ---- export ----
   const handleExport = () => {
     const exportData = filtered.map((item) => ({
       [t('service_pricing_table.title')]: item.title,
-      [t('service_pricing_table.category')]: item.category,
-      [t('service_pricing_table.duration')]: item.durationEstimate,
-      [t('service_pricing_table.price')]: item.price,
-      [t('service_pricing_table.active')]: item.isActive ? t('service_pricing_table.active') : t('service_pricing_table.inactive'),
-      [t('service_pricing_table.features')]: item.features.join(', '),
+      [t('service_pricing_table.category')]: getCategoryLabel(item.category),
+      [t('service_pricing_table.duration')]: item.durationEstimate ?? '',
+      [t('service_pricing_table.price')]: item.price ?? 0,
+      [t('service_pricing_table.active')]: item.isActive
+        ? t('service_pricing_table.active')
+        : t('service_pricing_table.inactive'),
+      [t('service_pricing_table.features')]: item.features?.join(', ') ?? '',
     }));
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
@@ -74,14 +91,16 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
           <option value="">{t('service_pricing_table.all_categories')}</option>
           {uniqueCategories.map((cat) => (
             <option key={cat} value={cat}>
-              {cat}
+              {getCategoryLabel(cat)}
             </option>
           ))}
         </select>
 
         <select
           value={activeFilter}
-          onChange={(e) => setActiveFilter(e.target.value as 'all' | 'active' | 'inactive')}
+          onChange={(e) =>
+            setActiveFilter(e.target.value as 'all' | 'active' | 'inactive')
+          }
           className="border px-3 py-2 rounded w-full sm:w-auto"
         >
           <option value="all">{t('service_pricing_table.all_status')}</option>
@@ -96,15 +115,26 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
         )}
       </div>
 
+      {/* Empty state */}
+      {filtered.length === 0 && (
+        <div className="text-sm text-gray-500 bg-white border rounded-lg p-4">
+          {t('service_pricing_table.empty', 'Chưa có gói dịch vụ phù hợp.')}
+        </div>
+      )}
+
       {/* Mobile View */}
       <div className="grid gap-4 sm:hidden">
         {filtered.map((item) => (
           <div key={item.id} className="border rounded-lg p-4 bg-white shadow">
             <div className="font-semibold text-base mb-1">{item.title}</div>
-            <div className="text-sm text-gray-600">{t('service_pricing_table.category')}: {item.category || '-'}</div>
-            <div className="text-sm text-gray-600">{t('service_pricing_table.duration')}: {item.durationEstimate || '-'}</div>
             <div className="text-sm text-gray-600">
-              {t('service_pricing_table.price')}: {item.price.toLocaleString('vi-VN')} VND
+              {t('service_pricing_table.category')}: {getCategoryLabel(item.category)}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('service_pricing_table.duration')}: {item.durationEstimate || '-'}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('service_pricing_table.price')}: {formatPrice(item.price ?? 0)}
             </div>
             <div className="text-sm text-gray-600">
               {t('service_pricing_table.active')}:{' '}
@@ -113,7 +143,9 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
                   item.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
                 }`}
               >
-                {item.isActive ? t('service_pricing_table.active') : t('service_pricing_table.inactive')}
+                {item.isActive
+                  ? t('service_pricing_table.active')
+                  : t('service_pricing_table.inactive')}
               </span>
             </div>
             <div className="text-sm text-gray-600 mt-2">
@@ -153,16 +185,18 @@ export default function ServicePricingTable({ servicePricings, onEdit, onDelete 
             {filtered.map((item) => (
               <tr key={item.id} className="border-b hover:bg-gray-50">
                 <td className="p-2 font-medium">{item.title}</td>
-                <td className="p-2">{item.category || '-'}</td>
+                <td className="p-2">{getCategoryLabel(item.category)}</td>
                 <td className="p-2">{item.durationEstimate || '-'}</td>
-                <td className="p-2 text-right">{item.price.toLocaleString('vi-VN')} VND</td>
+                <td className="p-2 text-right">{formatPrice(item.price ?? 0)}</td>
                 <td className="p-2">
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${
                       item.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
                     }`}
                   >
-                    {item.isActive ? t('service_pricing_table.active') : t('service_pricing_table.inactive')}
+                    {item.isActive
+                      ? t('service_pricing_table.active')
+                      : t('service_pricing_table.inactive')}
                   </span>
                 </td>
                 <td className="p-2">{item.features?.join(', ') || '-'}</td>

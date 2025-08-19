@@ -1325,7 +1325,7 @@
   "error_codes": "오류 코드 참조",
   "service_pricing": "표준 서비스 요금표"
   },
-  "assigned_issues": "🚧 할당된 문제",
+  "assigned_issues": "할당된 문제",
   "table_headers": {
     "vin": "차대번호 (VIN)",
     "plate": "번호판",
