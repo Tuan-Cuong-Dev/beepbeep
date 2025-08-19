@@ -826,7 +826,8 @@
 
   "my_business_section": {
   "services_title": "🔧 Services You Offer",
-  "organization_title": "🏢 Your Business or Affiliated Organization"
+  "organization_title": "🏢 Your Business or Affiliated Organization",
+  "staff_orgs_title": "Your Staff Organization"
   },
 
 "my_service_list": {

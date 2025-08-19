@@ -803,7 +803,8 @@
 
   "my_business_section": {
   "services_title": "🔧 提供しているサービス",
-  "organization_title": "🏢 所属する事業または組織"
+  "organization_title": "🏢 所属する事業または組織",
+  "staff_orgs_title": "所属している組織"
 },
 
 "my_service_list": {

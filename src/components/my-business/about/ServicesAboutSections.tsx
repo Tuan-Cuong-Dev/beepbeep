@@ -3,7 +3,16 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  getDoc,
+  type FirestoreDataConverter,
+  type QuerySnapshot,
+} from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import type { UserService, ServiceStatus } from '@/src/lib/vehicle-services/userServiceTypes';
 import { SERVICE_TYPE_ICONS } from '@/src/lib/vehicle-services/serviceTypes';
@@ -15,11 +24,10 @@ import { serviceFieldConfig } from '@/src/lib/vehicle-services/serviceFieldConfi
 type ServiceDoc = UserService & { id: string };
 
 interface Props {
-  businessId?: string;    // nếu services gắn business/company
-  userId?: string;        // nếu services gắn user
+  businessId?: string;  // nếu services gắn business/company
+  userId?: string;      // nếu services gắn user
   className?: string;
-  /** Mặc định: hiển thị active + pending để thấy dịch vụ mới tạo */
-  statusIn?: ServiceStatus[];
+  statusIn?: ServiceStatus[]; // mặc định: active + pending
   limit?: number;
 }
 
@@ -41,14 +49,13 @@ const META_KEYS = new Set<string>([
   'partnerType', 'description', 'name',
 ]);
 
+// ---------- helpers ----------
 function mapOptionValue(t: TFunction<'common'>, v: string): string {
   const SHORT_MAP: Record<string, string> = {
-    // vehicle
     motorbike: 'options.vehicleType.motorbike',
     car: 'options.vehicleType.car',
     van: 'options.vehicleType.van',
     bus: 'options.vehicleType.bus',
-    // insurance
     accident: 'options.insuranceType.accident',
     liability: 'options.insuranceType.liability',
     theft: 'options.insuranceType.theft',
@@ -79,6 +86,28 @@ function InfoRow({ icon, label, value }: { icon?: React.ReactNode; label: string
   );
 }
 
+// Firestore converter cho services → đảm bảo .data() có kiểu UserService
+const serviceConverter: FirestoreDataConverter<UserService> = {
+  toFirestore(svc: UserService) {
+    // Không dùng để write ở đây
+    const { id, ...rest } = svc as any;
+    return rest;
+  },
+  fromFirestore(snapshot, options) {
+    return snapshot.data(options) as UserService;
+  },
+};
+
+// lấy ownerId từ company (nếu cần)
+async function getOwnerIdFromCompany(companyId?: string): Promise<string | undefined> {
+  if (!companyId) return undefined;
+  const snap = await getDoc(doc(db, 'rentalCompanies', companyId));
+  if (!snap.exists()) return undefined;
+  const data = snap.data() as { ownerId?: string };
+  return data?.ownerId;
+}
+
+// ---------- component ----------
 export default function ServicesAboutSection({
   businessId,
   userId,
@@ -90,50 +119,68 @@ export default function ServicesAboutSection({
   const [services, setServices] = useState<ServiceDoc[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const statusKey = useMemo(
+    () => (statusIn && statusIn.length ? [...statusIn].sort().join('|') : ''),
+    [statusIn]
+  );
+
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       setLoading(true);
       try {
-        const col = collection(db, 'services');
-        const queries: Promise<any>[] = [];
+        const col = collection(db, 'services').withConverter(serviceConverter);
+
+        // đồng nhất generic: mọi getDocs trả về QuerySnapshot<UserService>
+        const tasks: Array<Promise<QuerySnapshot<UserService>>> = [];
 
         if (businessId) {
-          queries.push(getDocs(query(col, where('businessId', '==', businessId))));
-          queries.push(getDocs(query(col, where('companyId', '==', businessId))));
-        }
-        if (userId) {
-          queries.push(getDocs(query(col, where('userId', '==', userId))));
+          tasks.push(getDocs(query(col, where('businessId', '==', businessId))));
+          tasks.push(getDocs(query(col, where('companyId', '==', businessId))));
         }
 
-        if (queries.length === 0) {
-          if (mounted) { setServices([]); setLoading(false); }
+        let userIdToUse = userId;
+        if (!userIdToUse && businessId) {
+          userIdToUse = await getOwnerIdFromCompany(businessId);
+        }
+        if (userIdToUse) {
+          tasks.push(getDocs(query(col, where('userId', '==', userIdToUse))));
+        }
+
+        if (tasks.length === 0) {
+          if (mounted) {
+            setServices([]);
+            setLoading(false);
+          }
           return;
         }
 
-        const snapshots = await Promise.all(queries);
+        const snapshots = await Promise.all(tasks);
+
+        // map + dedup theo id
         const docs = snapshots.flatMap(s =>
-          s.docs.map((d: { id: any; data: () => any; }) => ({ id: d.id, ...(d.data() as any) } as ServiceDoc))
+          s.docs.map(d => ({ ...d.data(), id: d.id } as ServiceDoc))
         );
+        const uniq = Array.from(new Map(docs.map(d => [d.id, d])).values());
 
-        // dedup theo id
-        const map = new Map(docs.map(d => [d.id, d]));
-        let list = Array.from(map.values());
+        // lọc status an toàn (thiếu status => coi như active)
+        const filtered = statusKey
+          ? uniq.filter(s => (statusIn as ServiceStatus[]).includes((s.status ?? 'active') as ServiceStatus))
+          : uniq;
 
-        // lọc status (nếu được cấu hình)
-        if (statusIn?.length) {
-          list = list.filter(s => statusIn.includes(s.status));
-        }
-
-        if (mounted) setServices(list);
+        if (mounted) setServices(filtered);
       } catch {
         if (mounted) setServices([]);
       } finally {
         if (mounted) setLoading(false);
       }
     })();
-    return () => { mounted = false; };
-  }, [businessId, userId, statusIn]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [businessId, userId, statusKey]);
 
   const items = useMemo(() => services.slice(0, limit), [services, limit]);
 
@@ -207,25 +254,27 @@ export default function ServicesAboutSection({
           return (
             <div key={svc.id} className="rounded-lg border border-gray-100 p-4">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5">{SERVICE_TYPE_ICONS[svc.serviceType]}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
-                        {svc.name}
-                      </h3>
-                      {svc.status === 'active' && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">
-                          {t('my_service_list.status.active', { defaultValue: 'Active' })}
-                        </span>
-                      )}
-                    </div>
-
-                    {svc.description && (
-                      <p className="mt-2 text-sm text-gray-700 leading-relaxed whitespace-pre-line break-words line-clamp-4 md:line-clamp-6">
-                        {svc.description}
-                      </p>
+                <div className="mt-0.5">
+                  {SERVICE_TYPE_ICONS[svc.serviceType] ?? <FileText className="size-4" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
+                      {svc.name}
+                    </h3>
+                    {svc.status === 'active' && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">
+                        {t('my_service_list.status.active', { defaultValue: 'Active' })}
+                      </span>
                     )}
                   </div>
+
+                  {svc.description && (
+                    <p className="mt-2 text-sm text-gray-700 leading-relaxed whitespace-pre-line break-words line-clamp-4 md:line-clamp-6">
+                      {svc.description}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="mt-3 grid grid-cols-1 gap-2">

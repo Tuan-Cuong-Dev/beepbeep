@@ -21,7 +21,6 @@ import { useUserPreferences } from '@/src/hooks/useUserPreferences';
 import { useUserLocation } from '@/src/hooks/useUserLocation';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
 import { UserLocation } from '@/src/lib/users/userTypes';
-import { generateReferralCode } from '@/src/lib/users/generateReferralCode'; // hoặc file bạn để hàm đó
 
 export default function AccountPage() {
   const { t } = useTranslation('common');

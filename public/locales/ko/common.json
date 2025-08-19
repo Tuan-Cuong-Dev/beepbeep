@@ -823,7 +823,8 @@
 
 "my_business_section": {
   "services_title": "🔧 제공 중인 서비스",
-  "organization_title": "🏢 귀하의 비즈니스 또는 소속 조직"
+  "organization_title": "🏢 귀하의 비즈니스 또는 소속 조직",
+  "staff_orgs_title": "소속된 조직"
 },
 
 "my_service_list": {
