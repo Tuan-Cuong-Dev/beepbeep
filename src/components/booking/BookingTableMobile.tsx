@@ -129,8 +129,6 @@ export default function BookingTableMobile({
             {/* Station + Company */}
             <div className="text-xs text-gray-600">
               {t('booking_table.station')}: {stationNames[b.stationId ?? ''] || 'N/A'}
-              <br />
-              {t('created_by')}: {companyNames[b.companyId ?? ''] || 'N/A'}
             </div>
 
             {/* Created Info */}

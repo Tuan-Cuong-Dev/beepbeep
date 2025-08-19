@@ -8,23 +8,23 @@ import { useUser } from '@/src/context/AuthContext';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import {
-  DollarSign, Bike, MapPin, Users, FileText, Wrench,
-  FileTextIcon, ClipboardList, BatteryCharging, Package, User
+  DollarSign, Bike, FileTextIcon, ClipboardList, BatteryCharging, Package, User
 } from 'lucide-react';
 import { Booking } from '@/src/lib/booking/BookingTypes';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { useTranslation } from 'react-i18next';
 import { JSX } from 'react/jsx-runtime';
 
+type AnyDoc = { id: string; [k: string]: any };
+
 export default function PrivateProviderDashboard() {
   const { t } = useTranslation('common');
   const { user } = useUser();
 
   const [stats, setStats] = useState({
-    // Với Private Provider thường không có stations/staffs.
-    ebikes: 0,
-    bookings: 0,
-    revenue: 0,
+    vehicles: 0,
+    bookings: 0,            // Đơn thuê trong tháng hiện tại
+    revenue: 0,             // Doanh thu trong tháng hiện tại
     issues: 0,
     batteries: 0,
     accessories: 0,
@@ -37,74 +37,77 @@ export default function PrivateProviderDashboard() {
     const fetchStats = async () => {
       if (!user?.uid) return;
 
-      // 👉 Lấy providerId từ collection privateProviders
+      // 1) Lấy providerId theo ownerId
       const providerSnap = await getDocs(
         query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid))
       );
       if (providerSnap.empty) return;
-
       const providerId = providerSnap.docs[0].id;
 
+      // Helper: lấy docs theo owner, gộp cả 2 schema (providerId hoặc companyId = providerId)
+      const queryByOwner = async (colName: string): Promise<AnyDoc[]> => {
+        const [snapA, snapB] = await Promise.all([
+          getDocs(query(collection(db, colName), where('providerId', '==', providerId))),
+          getDocs(query(collection(db, colName), where('companyId', '==', providerId))),
+        ]);
+        const map = new Map<string, AnyDoc>();
+        snapA.docs.forEach(d => map.set(d.id, { id: d.id, ...d.data() }));
+        snapB.docs.forEach(d => map.set(d.id, { id: d.id, ...d.data() }));
+        return Array.from(map.values());
+      };
+
+      // 2) Lấy dữ liệu cần đếm
       const [
-        ebikeSnap,
-        issuesSnap,
-        bookingsSnap,
-        batterySnap,
-        accessorySnap,
-        customerSnap,
-        programSnap,
-        subscriptionSnap,
+        vehiclesDocs,
+        issuesDocs,
+        bookingsDocs,
+        batteryDocs,
+        accessoryDocs,
+        customerDocs,
+        programDocs,
+        subscriptionDocs,
       ] = await Promise.all([
-        getDocs(query(collection(db, 'vehicles'), where('companyId', '==', providerId))),
-        getDocs(query(collection(db, 'vehicleIssues'), where('companyId', '==', providerId))),
-        getDocs(query(collection(db, 'bookings'), where('companyId', '==', providerId))),
-        getDocs(query(collection(db, 'batteries'), where('companyId', '==', providerId))),
-        getDocs(query(collection(db, 'accessories'), where('companyId', '==', providerId))),
-        getDocs(query(collection(db, 'customers'), where('companyId', '==', providerId))),
-        getDocs(query(collection(db, 'programs'), where('companyId', '==', providerId))),     
-        getDocs(query(collection(db, 'subscriptionPackages'), where('companyId', '==', providerId))),
+        queryByOwner('vehicles'),
+        queryByOwner('vehicleIssues'),
+        queryByOwner('bookings'),
+        queryByOwner('batteries'),
+        queryByOwner('accessories'),
+        queryByOwner('customers'),
+        queryByOwner('programs'),
+        queryByOwner('subscriptionPackages'),
       ]);
 
-      const bookings: Booking[] = bookingsSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Booking[];
-
+      // 3) Tính Đơn thuê & Doanh thu trong THÁNG HIỆN TẠI
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
 
-      const monthlyBookings = bookings.filter(b => {
-        try {
-          const date =
-            b.createdAt instanceof Date
-              ? b.createdAt
-              : b.createdAt?.toDate?.();
-          return (
-            date?.getFullYear() === currentYear &&
-            date?.getMonth() === currentMonth
-          );
-        } catch (err) {
-          console.warn('⚠️ Invalid createdAt:', b);
-          return false;
-        }
+      // cast bookings
+      const bookings = bookingsDocs as Booking[];
+
+      const monthlyBookings = bookings.filter((b) => {
+        const createdAt: any = (b as any).createdAt;
+        const date: Date | undefined =
+          createdAt?.toDate?.() || (createdAt instanceof Date ? createdAt : undefined);
+        if (!date) return false;
+        return date.getFullYear() === currentYear && date.getMonth() === currentMonth;
       });
 
-      const totalRevenue = monthlyBookings.reduce((sum, b) => {
-        const amount = typeof (b as any).totalAmount === 'number' ? (b as any).totalAmount : 0;
-        return sum + amount;
+      const totalRevenue = monthlyBookings.reduce((sum, b: any) => {
+        const amt = typeof b.totalAmount === 'number' ? b.totalAmount : Number(b.totalAmount || 0);
+        return sum + (isFinite(amt) ? amt : 0);
       }, 0);
 
       setStats({
-        ebikes: ebikeSnap.size,
+        vehicles: vehiclesDocs.length,
         bookings: monthlyBookings.length,
         revenue: totalRevenue,
-        issues: issuesSnap.size,
-        batteries: batterySnap.size,
-        accessories: accessorySnap.size,
-        customers: customerSnap.size,
-        programs: programSnap.size,
-        subscriptionPackages: subscriptionSnap.size,
+        issues: issuesDocs.length,
+        batteries: batteryDocs.length,
+        accessories: accessoryDocs.length,
+        customers: customerDocs.length,
+        programs: programDocs.length,
+        subscriptionPackages: subscriptionDocs.length,
       });
     };
 
@@ -116,14 +119,17 @@ export default function PrivateProviderDashboard() {
       <Header />
       <main className="flex-1 px-6 py-10 space-y-10">
         <h1 className="text-3xl font-bold text-center text-gray-800">
-          {/* Bạn có thể đổi key sang private_provider_dashboard.title nếu đã thêm i18n */}
           {t('rental_company_dashboard.title')}
         </h1>
 
         <DashboardGrid1>
-          <DashboardCard title={t('rental_company_dashboard.vehicles')} value={stats.ebikes.toString()} href="/vehicles" icon={<Bike className="w-6 h-6" />} />
+          <DashboardCard
+            title={t('rental_company_dashboard.vehicles')}
+            value={stats.vehicles.toString()}
+            href="/vehicles"
+            icon={<Bike className="w-6 h-6" />}
+          />
 
-          {/* Customers */}
           <DashboardCard
             title={t('rental_company_dashboard.customers')}
             value={stats.customers.toString()}
@@ -131,8 +137,18 @@ export default function PrivateProviderDashboard() {
             icon={<User className="w-6 h-6" />}
           />
 
-          <DashboardCard title={t('rental_company_dashboard.bookings_this_month')} value={stats.bookings.toString()} href="/bookings" icon={<FileTextIcon className="w-6 h-6" />} />
-          <DashboardCard title={t('rental_company_dashboard.revenue_this_month')} value={formatCurrency(stats.revenue)} href="/bookings" icon={<DollarSign className="w-6 h-6" />} />
+          <DashboardCard
+            title={t('rental_company_dashboard.bookings_this_month')}
+            value={stats.bookings.toString()}
+            href="/bookings"
+            icon={<FileTextIcon className="w-6 h-6" />}
+          />
+          <DashboardCard
+            title={t('rental_company_dashboard.revenue_this_month')}
+            value={formatCurrency(stats.revenue)}
+            href="/bookings"
+            icon={<DollarSign className="w-6 h-6" />}
+          />
 
           <DashboardCard
             title={t('rental_company_dashboard.programs')}
@@ -141,8 +157,18 @@ export default function PrivateProviderDashboard() {
             icon={<ClipboardList className="w-6 h-6" />}
           />
 
-          <DashboardCard title={t('rental_company_dashboard.batteries')} value={stats.batteries.toString()} href="/battery" icon={<BatteryCharging className="w-6 h-6" />} />
-          <DashboardCard title={t('rental_company_dashboard.accessories')} value={stats.accessories.toString()} href="/accessories" icon={<Package className="w-6 h-6" />} />
+          <DashboardCard
+            title={t('rental_company_dashboard.batteries')}
+            value={stats.batteries.toString()}
+            href="/battery"
+            icon={<BatteryCharging className="w-6 h-6" />}
+          />
+          <DashboardCard
+            title={t('rental_company_dashboard.accessories')}
+            value={stats.accessories.toString()}
+            href="/accessories"
+            icon={<Package className="w-6 h-6" />}
+          />
 
           <DashboardCard
             title={t('rental_company_dashboard.subscription_packages')}

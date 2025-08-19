@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 import { Button } from '@/src/components/ui/button';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where, documentId } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { useTranslation } from 'react-i18next';
@@ -14,30 +14,86 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
+/** Chunk an array into fixed-size batches (Firestore `in` supports up to 10 values). */
+const chunk = <T,>(arr: T[], size = 10) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size)
+  );
+
 export default function SubscriptionPackageTable({ packages, onEdit, onDelete }: Props) {
   const { t } = useTranslation('common');
-  const [companyMap, setCompanyMap] = useState<Record<string, string>>({});
+
+  /**
+   * nameMap: id -> displayName for both rentalCompanies and privateProviders.
+   * We only fetch the IDs we actually need from `packages`, and do it in batches.
+   */
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
+
+  const idsToFetch = useMemo(() => {
+    const ids = new Set<string>();
+    for (const p of packages) {
+      if ((p as any).companyId) ids.add((p as any).companyId as string);
+      if ((p as any).providerId) ids.add((p as any).providerId as string);
+    }
+    return Array.from(ids);
+  }, [packages]);
 
   useEffect(() => {
-    const fetchCompanyNames = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, 'rentalCompanies'));
-        const map: Record<string, string> = {};
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          map[docSnap.id] = (data as any).name || 'Unknown Company';
-        });
-        setCompanyMap(map);
-      } catch (err) {
-        console.error('❌ Error fetching company names:', err);
-      }
-    };
-    fetchCompanyNames();
-  }, []);
+    let isMounted = true;
+    if (idsToFetch.length === 0) {
+      setNameMap({});
+      return;
+    }
 
-  const sortedPackages = [...packages].sort((a, b) =>
-    a.name.localeCompare(b.name, 'vi', { sensitivity: 'base' })
+    const fetchNames = async () => {
+      const result: Record<string, string> = {};
+
+      // Helper to fetch doc names from a collection by IDs
+      const fetchFrom = async (colName: 'rentalCompanies' | 'privateProviders', ids: string[]) => {
+        for (const group of chunk(ids, 10)) {
+          const snap = await getDocs(
+            query(collection(db, colName), where(documentId(), 'in', group))
+          );
+          snap.forEach((d) => {
+            const data = d.data() as any;
+            result[d.id] = data?.name || d.id;
+          });
+        }
+      };
+
+      // Try both collections — whichever contains an ID will resolve it.
+      await Promise.all([fetchFrom('rentalCompanies', idsToFetch), fetchFrom('privateProviders', idsToFetch)]);
+
+      if (isMounted) setNameMap(result);
+    };
+
+    fetchNames().catch((err) => {
+      console.error('❌ Error fetching names:', err);
+      if (isMounted) setNameMap({});
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [idsToFetch]);
+
+  const sortedPackages = useMemo(
+    () =>
+      [...packages].sort((a, b) =>
+        (a.name || '').localeCompare(b.name || '', 'vi', { sensitivity: 'base' })
+      ),
+    [packages]
   );
+
+  const resolveOwnerName = (pkg: SubscriptionPackage) => {
+    const companyId = (pkg as any).companyId as string | undefined;
+    const providerId = (pkg as any).providerId as string | undefined;
+    return (
+      (companyId && (nameMap[companyId] || companyId)) ||
+      (providerId && (nameMap[providerId] || providerId)) ||
+      t('subscription_package_table.unknown_company', { defaultValue: 'Unknown' })
+    );
+  };
 
   // ------ MOBILE (cards) ------
   const MobileCards = (
@@ -49,7 +105,7 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
         </div>
       ) : (
         sortedPackages.map((pkg) => {
-          const companyName = pkg.companyId ? companyMap[pkg.companyId] || pkg.companyId : 'Unknown Company';
+          const ownerName = resolveOwnerName(pkg);
           const statusBadge =
             pkg.status === 'inactive'
               ? 'bg-red-100 text-red-700'
@@ -65,7 +121,7 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
                 <div className="min-w-0">
                   <div className="font-semibold text-gray-900 truncate">{pkg.name}</div>
                   <div className="text-xs text-gray-500 mt-0.5 truncate">
-                    {t('subscription_package_table.company')}: {companyName}
+                    {t('subscription_package_table.company')}: {ownerName}
                   </div>
                 </div>
                 <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge}`}>
@@ -80,13 +136,17 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
                 <div className="rounded-lg border p-2">
                   <div className="text-xs text-gray-500">{t('subscription_package_table.duration')}</div>
                   <div className="text-gray-900 capitalize">
-                    {t(`subscription_package_table.duration_type.${pkg.durationType}`)}
+                    {pkg.durationType
+                      ? t(`subscription_package_table.duration_type.${pkg.durationType}`)
+                      : '-'}
                   </div>
                 </div>
                 <div className="rounded-lg border p-2">
                   <div className="text-xs text-gray-500">{t('subscription_package_table.charging')}</div>
                   <div className="text-gray-900 capitalize">
-                    {t(`subscription_package_table.charging_method.${pkg.chargingMethod}`)}
+                    {pkg.chargingMethod
+                      ? t(`subscription_package_table.charging_method.${pkg.chargingMethod}`)
+                      : '-'}
                   </div>
                 </div>
                 <div className="rounded-lg border p-2">
@@ -97,7 +157,7 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
                 </div>
                 <div className="rounded-lg border p-2">
                   <div className="text-xs text-gray-500">{t('subscription_package_table.base_price')}</div>
-                  <div className="text-gray-900">{formatCurrency(pkg.basePrice)}</div>
+                  <div className="text-gray-900">{formatCurrency(pkg.basePrice || 0)}</div>
                 </div>
                 <div className="rounded-lg border p-2 col-span-2">
                   <div className="text-xs text-gray-500">{t('subscription_package_table.overage_rate')}</div>
@@ -156,19 +216,23 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
           {sortedPackages.map((pkg) => (
             <tr key={pkg.id} className="hover:bg-gray-50">
               <td className="px-3 py-2 border text-gray-700 font-semibold">
-                {pkg.companyId ? (companyMap[pkg.companyId] || pkg.companyId) : 'Unknown Company'}
+                {resolveOwnerName(pkg)}
               </td>
               <td className="px-3 py-2 border font-medium">{pkg.name}</td>
               <td className="px-3 py-2 border capitalize">
-                {t(`subscription_package_table.duration_type.${pkg.durationType}`)}
+                {pkg.durationType
+                  ? t(`subscription_package_table.duration_type.${pkg.durationType}`)
+                  : '-'}
               </td>
               <td className="px-3 py-2 border text-center">
                 {pkg.kmLimit ?? t('subscription_package_table.unlimited')}
               </td>
               <td className="px-3 py-2 border capitalize">
-                {t(`subscription_package_table.charging_method.${pkg.chargingMethod}`)}
+                {pkg.chargingMethod
+                  ? t(`subscription_package_table.charging_method.${pkg.chargingMethod}`)
+                  : '-'}
               </td>
-              <td className="px-3 py-2 border text-right">{formatCurrency(pkg.basePrice)}</td>
+              <td className="px-3 py-2 border text-right">{formatCurrency(pkg.basePrice || 0)}</td>
               <td className="px-3 py-2 border text-right">
                 {pkg.overageRate !== undefined && pkg.overageRate !== null
                   ? `${formatCurrency(pkg.overageRate)}/km`
@@ -200,7 +264,7 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
               </td>
             </tr>
           ))}
-          {packages.length === 0 && (
+          {sortedPackages.length === 0 && (
             <tr>
               <td colSpan={10} className="text-center py-6 text-gray-500">
                 {t('subscription_package_table.no_packages')}
@@ -214,9 +278,7 @@ export default function SubscriptionPackageTable({ packages, onEdit, onDelete }:
 
   return (
     <div className="space-y-4">
-      {/* Mobile cards */}
       {MobileCards}
-      {/* Desktop table */}
       {DesktopTable}
     </div>
   );

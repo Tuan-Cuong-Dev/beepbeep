@@ -6,79 +6,130 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/componen
 import { Button } from '@/src/components/ui/button';
 import { ScrollArea } from '@/src/components/ui/scroll-area';
 import { Input } from '@/src/components/ui/input';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, Query, DocumentData } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
+import { Vehicle } from '@/src/lib/vehicles/vehicleTypes';
 
 interface SwitchBikeModalProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (selectedBike: Ebike) => void;
-  companyId: string;
+  onConfirm: (selectedBike: Vehicle) => void;
+  /** companyId hoặc providerId */
+  ownerId?: string;
+  /** để hiển thị đúng label – nhưng truy vấn sẽ luôn hỗ trợ cả 2 field để tương thích dữ liệu cũ */
+  entityType: 'rentalCompany' | 'privateProvider';
 }
 
 export default function SwitchBikeModal({
   open,
   onClose,
   onConfirm,
-  companyId,
+  ownerId,
 }: SwitchBikeModalProps) {
   const { t } = useTranslation('common');
-  const [selectedBike, setSelectedBike] = useState<Ebike | null>(null);
+  const [selectedBike, setSelectedBike] = useState<Vehicle | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [options, setOptions] = useState<Ebike[]>([]);
+  const [options, setOptions] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(false);
 
+  // reset khi mở lại
   useEffect(() => {
-    // Reset khi mở lại modal
     if (open) {
-      setSearchTerm('');
       setSelectedBike(null);
+      setSearchTerm('');
     }
   }, [open]);
 
-  useEffect(() => {
-    const fetchAvailableBikes = async () => {
-      console.log('🔍 Fetching bikes for companyId:', companyId, '| searchTerm:', searchTerm);
+  // Helper: chuyển doc -> Vehicle với default an toàn
+  const toVehicle = (docId: string, data: any): Vehicle => ({
+    id: docId,
+    modelId: String(data.modelId ?? ''),
+    companyId: String(data.companyId ?? ''),
+    stationId: String(data.stationId ?? ''),
+    serialNumber: String(data.serialNumber ?? ''),
+    vehicleID: String(data.vehicleID ?? ''),
+    plateNumber: String(data.plateNumber ?? ''),
+    odo: Number(data.odo ?? 0),
+    color: String(data.color ?? ''),
+    status: (data.status as Vehicle['status']) ?? 'Available',
+    currentLocation: String(data.currentLocation ?? ''),
+    lastMaintained: data.lastMaintained ?? null,
+    batteryCapacity: String(data.batteryCapacity ?? ''),
+    range: Number(data.range ?? 0),
+    pricePerHour: data.pricePerHour ?? undefined,
+    pricePerDay: Number(data.pricePerDay ?? 0),
+    pricePerWeek: data.pricePerWeek ?? undefined,
+    pricePerMonth: data.pricePerMonth ?? undefined,
+    note: data.note ?? undefined,
+    createdAt: data.createdAt ?? undefined,
+    updatedAt: data.updatedAt ?? undefined,
+  });
 
-      if (!companyId) {
-        console.warn('⛔ Skip fetch: Missing companyId');
+  // Query an toàn: thử (status + owner) → nếu thiếu index thì fallback (owner) rồi lọc status ở client
+  const safeFetch = async (qTry: Query<DocumentData>, qFallback: Query<DocumentData>) => {
+    try {
+      return await getDocs(qTry);
+    } catch {
+      return await getDocs(qFallback);
+    }
+  };
+
+  useEffect(() => {
+    const fetchAvailables = async () => {
+      if (!open) return;
+      if (!ownerId) {
         setOptions([]);
         return;
       }
-
+      setLoading(true);
       try {
-        const q = query(
-          collection(db, 'ebikes'),
-          where('status', '==', 'Available'),
-          where('companyId', '==', companyId)
-        );
+        const col = collection(db, 'vehicles');
 
-        const snap = await getDocs(q);
-        const allBikes: Ebike[] = [];
+        // Nhánh companyId
+        const qCompanyTry = query(col, where('status', '==', 'Available'), where('companyId', '==', ownerId));
+        const qCompanyFallback = query(col, where('companyId', '==', ownerId));
+        const snapC = await safeFetch(qCompanyTry, qCompanyFallback);
 
-        snap.forEach((doc) => {
-          const bike = doc.data() as Ebike;
+        // Nhánh providerId
+        const qProviderTry = query(col, where('status', '==', 'Available'), where('providerId', '==', ownerId));
+        const qProviderFallback = query(col, where('providerId', '==', ownerId));
+        const snapP = await safeFetch(qProviderTry, qProviderFallback);
 
-          const matchesSearch =
-            !searchTerm ||
-            bike.vehicleID?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            bike.plateNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+        // Gộp & lọc trùng
+        const byId = new Map<string, Vehicle>();
+        const push = (id: string, data: any) => {
+          // nếu fallback: đảm bảo chỉ lấy xe Available
+          if (data.status !== 'Available') return;
+          byId.set(id, toVehicle(id, data));
+        };
+        snapC.forEach(d => push(d.id, d.data()));
+        snapP.forEach(d => push(d.id, d.data()));
 
-          if (matchesSearch) {
-            allBikes.push({ ...bike, id: doc.id });
-          }
-        });
+        // Lọc theo search
+        const term = searchTerm.trim().toLowerCase();
+        let list = Array.from(byId.values());
+        if (term) {
+          list = list.filter(
+            v =>
+              (v.vehicleID || '').toLowerCase().includes(term) ||
+              (v.plateNumber || '').toLowerCase().includes(term)
+          );
+        }
 
-        console.log(`✅ Found ${allBikes.length} bikes`);
-        setOptions(allBikes.sort((a, b) => a.vehicleID.localeCompare(b.vehicleID)));
-      } catch (error) {
-        console.error('❌ Error fetching bikes:', error);
+        // Sắp xếp cho dễ nhìn
+        list.sort((a, b) => (a.vehicleID || '').localeCompare(b.vehicleID || ''));
+
+        setOptions(list);
+      } catch (e) {
+        console.error('fetchAvailables failed:', e);
         setOptions([]);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchAvailableBikes();
-  }, [searchTerm, companyId]);
+    fetchAvailables();
+  }, [open, ownerId, searchTerm]);
 
   const handleConfirm = () => {
     if (!selectedBike) return;
@@ -104,37 +155,45 @@ export default function SwitchBikeModal({
         </div>
 
         <ScrollArea className="h-60 space-y-3 pr-2 mt-2">
-          {options.map((bike) => (
-            <div
-              key={bike.id}
-              className={`border p-4 rounded-xl cursor-pointer transition-all ${
-                selectedBike?.id === bike.id ? 'border-[#00d289] bg-[#e6fff6]' : 'hover:bg-gray-50'
-              }`}
-              onClick={() => setSelectedBike(bike)}
-            >
-              <div className="font-semibold text-sm">
-                {bike.vehicleID} – {bike.plateNumber || t('switch_bike_modal.no_plate')}
-              </div>
-              <div className="text-xs text-gray-600">
-                📏 {bike.odo?.toLocaleString() || '0'} km • ⚡ {bike.batteryCapacity || '—'}Ah • 🎨{' '}
-                {bike.color || '—'}
-              </div>
-              {bike.note && (
-                <div className="text-xs text-gray-500 italic mt-1">📝 {bike.note}</div>
-              )}
+          {loading && (
+            <div className="text-sm text-gray-500 px-2">
+              {t('common.loading', { defaultValue: 'Đang tải...' })}
             </div>
-          ))}
+          )}
+
+          {!loading && options.length === 0 && (
+            <div className="text-sm text-gray-500 px-2">
+              {t('switch_bike_modal.no_available', { defaultValue: 'Không có xe sẵn sàng.' })}
+            </div>
+          )}
+
+          {!loading &&
+            options.map((bike) => (
+              <div
+                key={bike.id}
+                className={`border p-4 rounded-xl cursor-pointer transition-all ${
+                  selectedBike?.id === bike.id ? 'border-[#00d289] bg-[#e6fff6]' : 'hover:bg-gray-50'
+                }`}
+                onClick={() => setSelectedBike(bike)}
+              >
+                <div className="font-semibold text-sm">
+                  {bike.vehicleID} – {bike.plateNumber || t('switch_bike_modal.no_plate')}
+                </div>
+                <div className="text-xs text-gray-600">
+                  📏 {bike.odo?.toLocaleString() || '0'} km • ⚡ {bike.batteryCapacity || '—'}Ah • 🎨 {bike.color || '—'}
+                </div>
+                {bike.note && <div className="text-xs text-gray-500 italic mt-1">📝 {bike.note}</div>}
+              </div>
+            ))}
         </ScrollArea>
 
         {selectedBike && (
           <div className="mt-4 p-3 border rounded-md bg-gray-50 text-sm space-y-1">
             <div>
-              ✅ <strong>{selectedBike.vehicleID}</strong> –{' '}
-              {selectedBike.plateNumber || t('switch_bike_modal.no_plate')}
+              ✅ <strong>{selectedBike.vehicleID}</strong> – {selectedBike.plateNumber || t('switch_bike_modal.no_plate')}
             </div>
             <div>
-              📏 {selectedBike.odo?.toLocaleString()} km • ⚡ {selectedBike.batteryCapacity}Ah • 🎨{' '}
-              {selectedBike.color || '—'}
+              📏 {selectedBike.odo?.toLocaleString()} km • ⚡ {selectedBike.batteryCapacity}Ah • 🎨 {selectedBike.color || '—'}
             </div>
             {selectedBike.note && <div>📝 {selectedBike.note}</div>}
           </div>
