@@ -320,11 +320,17 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       </div>
 
       <div className="flex items-center gap-2">
-        <input type="checkbox" className="form-checkbox" />
+        <input
+          type="checkbox"
+          className="form-checkbox"
+          checked={!!formData.isActive}
+          onChange={(e) => updateField('isActive', e.target.checked)}
+        />
         <label className="text-sm font-medium">
-          {t('technician_partner_form.agree_terms')}
+          {t('technician_partner_form.is_active')}
         </label>
       </div>
+
 
       <Button type="submit" disabled={!canSubmit}>
         {submitting

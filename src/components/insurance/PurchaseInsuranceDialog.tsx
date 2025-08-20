@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/src/components/ui/dialog';
 import { Button } from '@/src/components/ui/button';
-import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
+import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 import { useUserPersonalVehicles } from '@/src/hooks/useUserPersonalVehicles';
 import { useTranslation } from 'react-i18next';
 

@@ -157,6 +157,7 @@
   },
 
   "user_sidebar": {
+  "quick_hint": "Báo nhanh • Hỗ trợ 24/7",
   "points": "Điểm đóng góp",
   "welcome": "Chào mừng",
   "account_disabled": "Tài khoản đã bị vô hiệu hóa",
@@ -3329,7 +3330,7 @@
     "search_placeholder": "Tìm theo tên, email, điện thoại, tên cửa hàng, hoặc địa chỉ",
     "export_excel": "Xuất EXCEL",
     "col": {
-      "name": "Tên",
+      "name": "Tên kỹ thuật viên",
       "phone": "Điện thoại",
       "email": "Email",
       "type": "Loại",
@@ -3364,7 +3365,7 @@
   "common_actions": { "edit": "Sửa", "delete": "Xóa", "actions": "Hành động" },
 
   "technician_partner_form": {
-    "name": "Tên",
+    "name": "Tên kỹ thuật viên",
     "phone": "Số điện thoại",
     "email_for_login": "Email (dùng để đăng nhập)",
     "password_for_login": "Mật khẩu (dùng để đăng nhập)",
@@ -3395,7 +3396,8 @@
     "working_time_note": "Vui lòng chọn giờ bắt đầu và kết thúc làm việc trong ngày",
     "agree_terms": "Đồng ý trở thành đối tác kỹ thuật viên Bíp Bíp.",
     "create_btn": "Tạo tài khoản đối tác kỹ thuật viên",
-    "update_btn": "Cập nhật đối tác kỹ thuật viên"
+    "update_btn": "Cập nhật đối tác kỹ thuật viên",
+    "is_active":"Đang hoạt động"
   },
 
    "public_issue_form": {
@@ -3434,7 +3436,48 @@
       "title": "Gửi thất bại",
       "desc": "Vui lòng thử lại hoặc liên hệ hỗ trợ."
     }
-  }
+  },
+
+"report_issue": {
+  "title": "Báo Hỏng Xe",
+  "name": "Họ tên",
+  "name_placeholder": "Nguyễn Văn A",
+  "phone": "Số điện thoại",
+  "phone_placeholder": "090...",
+  "select_vehicle": "Chọn xe gặp sự cố",
+  "choose_vehicle": "Chọn xe",
+  "loading_vehicles": "Đang tải danh sách xe…",
+  "no_vehicle": "Bạn chưa có xe cá nhân nào.",
+  "vehicle_fallback": "Xe của tôi",
+  "issue_description": "Mô tả ngắn lỗi",
+  "issue_placeholder": "VD: Xe không đề được, có tiếng kêu bất thường...",
+  "issue_address": "Địa chỉ/ghi chú vị trí (tuỳ chọn)",
+  "issue_address_placeholder": "Số nhà/điểm mốc gần nhất...",
+  "geo": {
+    "loading": "Đang lấy vị trí hiện tại...",
+    "coordinates": "Vĩ độ, kinh độ",
+    "error": "Không lấy được vị trí",
+    "unavailable": "Không lấy được vị trí tự động."
+  },
+  "errors": {
+    "need_login": "Bạn cần đăng nhập để báo hỏng.",
+    "no_vehicle": "Vui lòng chọn xe gặp sự cố.",
+    "no_description": "Vui lòng nhập mô tả ngắn về lỗi.",
+    "submit_failed": "Gửi báo hỏng thất bại. Vui lòng thử lại."
+  },
+  "customer_default": "Khách hàng",
+  "location": {
+    "current": "Vị trí hiện tại"
+  },
+  "cancel": "Hủy",
+  "submit": "Gửi báo hỏng",
+  "submitting": "Đang gửi..."
+},
+
+"report_vehicle_issue_button": {
+  "label": "Báo Hỏng Xe"
+}
+
 
 
 

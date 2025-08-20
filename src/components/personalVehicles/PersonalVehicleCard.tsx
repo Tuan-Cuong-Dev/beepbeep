@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
+import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 import { Button } from '@/src/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
+import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 import { useAuth } from './useAuth';
 
 export function useUserPersonalVehicles() {

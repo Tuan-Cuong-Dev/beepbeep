@@ -156,6 +156,7 @@
 },
 
 "user_sidebar": {
+  "quick_hint": "빠른 신고 • 24시간 지원",
   "points": "포인트",
   "welcome": "환영합니다",
   "account_disabled": "계정 비활성화됨",
@@ -3361,7 +3362,8 @@
   "working_time_note": "하루의 근무 시작 및 종료 시간을 선택하세요",
   "agree_terms": "Bíp Bíp 기술자 파트너가 되는 것에 동의합니다.",
   "create_btn": "기술자 파트너 계정 생성",
-  "update_btn": "기술자 파트너 업데이트"
+  "update_btn": "기술자 파트너 업데이트",
+  "is_active":"운영 중"
 },
 
 "public_issue_form": {
@@ -3400,7 +3402,49 @@
       "title": "제출 실패",
       "desc": "다시 시도하시거나 지원팀에 문의하세요."
     }
-  }
+  },
+
+  "report_issue": {
+  "title": "차량 고장 신고",
+  "name": "이름",
+  "name_placeholder": "홍길동",
+  "phone": "전화번호",
+  "phone_placeholder": "010...",
+  "select_vehicle": "고장 난 차량 선택",
+  "choose_vehicle": "차량 선택",
+  "loading_vehicles": "차량 목록 불러오는 중…",
+  "no_vehicle": "등록된 차량이 없습니다.",
+  "vehicle_fallback": "내 차량",
+  "issue_description": "고장 간단 설명",
+  "issue_placeholder": "예: 시동이 걸리지 않음, 이상한 소음 발생...",
+  "issue_address": "주소/위치 메모 (선택 사항)",
+  "issue_address_placeholder": "가까운 건물 번호 또는 랜드마크...",
+  "geo": {
+    "loading": "현재 위치 가져오는 중...",
+    "coordinates": "위도, 경도",
+    "error": "위치를 가져올 수 없습니다",
+    "unavailable": "자동 위치 확인 불가"
+  },
+  "errors": {
+    "need_login": "고장을 신고하려면 로그인해야 합니다.",
+    "no_vehicle": "고장 난 차량을 선택하세요.",
+    "no_description": "고장에 대한 간단한 설명을 입력하세요.",
+    "submit_failed": "신고 전송 실패. 다시 시도해주세요."
+  },
+  "customer_default": "고객",
+  "location": {
+    "current": "현재 위치"
+  },
+  "cancel": "취소",
+  "submit": "신고 제출",
+  "submitting": "전송 중..."
+},
+
+"report_vehicle_issue_button": {
+  "label": "차량 고장 신고"
+}
+
+
 
 
 

@@ -1,7 +1,7 @@
 // 📁 hooks/personalVehicles/useAddPersonalVehicle.ts
 import { addDoc, collection, doc, getDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
+import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 import { VehicleType } from '@/src/lib/vehicle-models/vehicleModelTypes';
 
 /**

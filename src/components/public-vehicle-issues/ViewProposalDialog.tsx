@@ -9,12 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/components/ui/dialog';
-import { PublicIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+import {PublicVehicleIssue}  from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 
 interface Props {
   open: boolean;
-  issue: PublicIssue | null;
+  issue: PublicVehicleIssue | null;
   onClose: () => void;
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useAuth } from '@/src/hooks/useAuth';
-import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
+import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 
 export function useMyPersonalVehicles() {
   const { currentUser } = useAuth();

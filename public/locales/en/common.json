@@ -156,6 +156,7 @@
   },
 
   "user_sidebar": {
+    "quick_hint": "Quick report • 24/7 support",
     "points": "Points",
     "welcome": "Welcome",
     "account_disabled": "Account Disabled",
@@ -3324,7 +3325,8 @@
   "working_time_note": "Please select the start and end working hours of the day",
   "agree_terms": "Agree to become a Bíp Bíp technician partner.",
   "create_btn": "Create Technician Partner Account",
-  "update_btn": "Update Technician Partner"
+  "update_btn": "Update Technician Partner",
+  "is_active":"Active"
 },
 
  "public_issue_form": {
@@ -3363,7 +3365,48 @@
       "title": "Submission failed",
       "desc": "Please try again or contact support."
     }
-  }
+  },
+
+  "report_issue": {
+  "title": "Report Vehicle Issue",
+  "name": "Full Name",
+  "name_placeholder": "John Doe",
+  "phone": "Phone Number",
+  "phone_placeholder": "090...",
+  "select_vehicle": "Select the vehicle with the issue",
+  "choose_vehicle": "Choose vehicle",
+  "loading_vehicles": "Loading vehicle list…",
+  "no_vehicle": "You don’t have any registered vehicles.",
+  "vehicle_fallback": "My vehicle",
+  "issue_description": "Short issue description",
+  "issue_placeholder": "E.g.: The engine won’t start, unusual noise...",
+  "issue_address": "Address/Location note (optional)",
+  "issue_address_placeholder": "Nearest house number or landmark...",
+  "geo": {
+    "loading": "Getting current location...",
+    "coordinates": "Latitude, Longitude",
+    "error": "Unable to get location",
+    "unavailable": "Automatic location unavailable."
+  },
+  "errors": {
+    "need_login": "You must be logged in to report an issue.",
+    "no_vehicle": "Please select the vehicle with the issue.",
+    "no_description": "Please provide a short description of the issue.",
+    "submit_failed": "Failed to submit issue. Please try again."
+  },
+  "customer_default": "Customer",
+  "location": {
+    "current": "Current location"
+  },
+  "cancel": "Cancel",
+  "submit": "Submit Issue",
+  "submitting": "Submitting..."
+},
+
+"report_vehicle_issue_button": {
+  "label": "Report Vehicle Issue"
+}
+
 
 
 

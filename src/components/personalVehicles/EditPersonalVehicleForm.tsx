@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
-import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes_new';
+import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useTranslation } from 'react-i18next';
