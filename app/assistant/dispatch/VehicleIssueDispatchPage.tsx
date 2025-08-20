@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
@@ -36,7 +36,7 @@ export default function PublicIssueDispatchPage() {
   const [showForm, setShowForm] = useState(false);
   const [dialog, setDialog] = useState({
     open: false,
-    type: 'info' as 'success' | 'error' | 'info',
+    type: 'success' as 'success' | 'error' | 'info',
     title: '',
     description: ''
   });
@@ -61,14 +61,46 @@ export default function PublicIssueDispatchPage() {
     }
   }, [dialog.open]);
 
-  // ⬇️ nhận thêm 'name' và lưu assignedToName
+  // ===== Filtered data (đồng bộ với table)
+  const filteredIssues = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+
+    const matchStr = (s?: string) =>
+      (s || '').toLowerCase().includes(q);
+
+    return issues.filter((i) => {
+      const matchStatus = statusFilter === 'All' ? true : i.status === statusFilter;
+      const matchStation = stationFilter
+        ? (i.stationId || i.location?.stationId || i.assignedRegion) === stationFilter
+        : true;
+
+      const matchSearch = q
+        ? [
+            i.vin,
+            i.vehicleLicensePlate,
+            i.customerName,
+            i.issueDescription,
+            i.location?.issueAddress,
+            i.vehicleBrand,
+            i.vehicleModel,
+            i.phone,
+            i.assignedToName,
+            i.location?.coordinates
+          ].some((x) => matchStr(String(x ?? '')))
+        : true;
+
+      return matchStatus && matchStation && matchSearch;
+    });
+  }, [issues, searchTerm, statusFilter, stationFilter]);
+
+  // nhận thêm 'name' và lưu assignedToName
   const handleAssignTechnician = async (userId: string, name: string) => {
     if (!editingIssue?.id) return;
     try {
       await updateIssue(editingIssue.id, {
         assignedTo: userId,
         assignedToName: name,
-        assignedAt: new Date() as any,
+        assignedAt: Timestamp.fromDate(new Date()),
         status: 'assigned'
       });
       showDialog('success', t('messages.assign_success'));
@@ -142,6 +174,8 @@ export default function PublicIssueDispatchPage() {
       <UserTopMenu />
       <main className="flex-1 p-6 space-y-6">
         <h1 className="text-2xl font-bold">{t('title')}</h1>
+
+        {/* Tổng quan vẫn dùng toàn bộ issues */}
         <VehicleIssuesSummaryCard issues={issues} />
 
         <VehicleIssuesSearchFilter
@@ -156,7 +190,6 @@ export default function PublicIssueDispatchPage() {
         {showForm && editingIssue && (
           <div className="bg-white border rounded-xl shadow p-6 space-y-6">
             <h2 className="text-2xl font-bold">{t('assign_title')}</h2>
-            {/* ⬇️ onAssign trả (id, name) từ AssignTechnicianForm */}
             <AssignTechnicianForm onAssign={handleAssignTechnician} />
             <div className="flex justify-end">
               <Button variant="ghost" onClick={() => { setShowForm(false); setEditingIssue(null); }}>
@@ -166,8 +199,9 @@ export default function PublicIssueDispatchPage() {
           </div>
         )}
 
+        {/* Truyền filteredIssues để đồng bộ với filter */}
         <PublicIssueTable
-          issues={issues}
+          issues={filteredIssues}
           updateIssue={updateIssue}
           onEdit={setEditingIssue}
           setClosingIssue={setClosingIssue}
