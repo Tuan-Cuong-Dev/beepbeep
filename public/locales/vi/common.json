@@ -3195,7 +3195,13 @@
   "cards": {
     "unassigned_issues": "Vấn đề chưa phân công",
     "technician_partners": "Đối tác kỹ thuật",
-    "assigned_today": "Đã phân công hôm nay"
+    "assigned_today": "Đã phân công hôm nay",
+    "partners_by_type": "KTV Lưu động / Cửa hàng",
+    "partners_by_status": "KTV Đang hoạt động / Không hoạt động",
+      "hint": {
+        "mobile_shop": "Lưu động / Cửa hàng",
+        "active_inactive": "Đang hoạt động / Không hoạt động"
+      }
   },
   "quick_actions": "⚡ Hành động nhanh",
   "quick": {

@@ -3144,7 +3144,15 @@
   "cards": {
     "unassigned_issues": "未割り当ての問題",
     "technician_partners": "技術パートナー",
-    "assigned_today": "本日割り当て済み"
+    "assigned_today": "本日割り当て済み",
+     "cards": {
+      "partners_by_type": "출장 기술자 / 매장 기술자",
+      "partners_by_status": "활성 / 비활성",
+      "hint": {
+        "mobile_shop": "출장 / 매장",
+        "active_inactive": "활성 / 비활성"
+      }
+    }
   },
   "quick_actions": "⚡ クイックアクション",
   "quick": {

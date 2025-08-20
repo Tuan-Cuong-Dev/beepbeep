@@ -3157,7 +3157,15 @@
   "cards": {
     "unassigned_issues": "미배정 문제",
     "technician_partners": "기술 파트너",
-    "assigned_today": "오늘 배정됨"
+    "assigned_today": "오늘 배정됨",
+    "cards": {
+      "partners_by_type": "출장 기술자 / 매장 기술자",
+      "partners_by_status": "활성 / 비활성",
+      "hint": {
+        "mobile_shop": "출장 / 매장",
+        "active_inactive": "활성 / 비활성"
+      }
+    }
   },
   "quick_actions": "⚡ 빠른 작업",
   "quick": {

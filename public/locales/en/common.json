@@ -3121,7 +3121,13 @@
     "cards": {
       "unassigned_issues": "Unassigned Issues",
       "technician_partners": "Technician Partners",
-      "assigned_today": "Assigned Today"
+      "assigned_today": "Assigned Today",
+      "partners_by_type": "Mobile Techs / Shop Techs",
+      "partners_by_status": "Active Techs / Inactive Techs",
+      "hint": {
+        "mobile_shop": "Mobile / Shop",
+        "active_inactive": "Active / Inactive"
+      }
     },
     "quick_actions": "⚡ Quick Actions",
     "quick": {

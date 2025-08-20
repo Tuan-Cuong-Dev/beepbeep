@@ -11,14 +11,22 @@ import Footer from '@/src/components/landingpage/Footer';
 import Link from 'next/link';
 import { ClipboardList, FileText, Wrench } from 'lucide-react';
 
+type PartnerStats = {
+  mobile: number;
+  shop: number;
+  active: number;
+  inactive: number;
+  total: number;
+};
+
 export default function TechnicianAssistantDashboard() {
   const { user } = useUser();
   const { t } = useTranslation('common', { keyPrefix: 'technician_dashboard' });
 
   const [stats, setStats] = useState({
     unassignedIssues: 0,
-    technicianPartners: '0/0',
     assignedToday: 0,
+    partners: { mobile: 0, shop: 0, active: 0, inactive: 0, total: 0 } as PartnerStats,
   });
 
   useEffect(() => {
@@ -33,24 +41,35 @@ export default function TechnicianAssistantDashboard() {
         const allIssuesSnap = await getDocs(collection(db, 'vehicleIssues'));
 
         const unassignedIssuesCount = allIssuesSnap.docs.filter((d) => {
-          const data = d.data();
+          const data = d.data() as any;
           return data.status === 'pending' && !data.assignedTo;
         }).length;
 
         const assignedTodayCount = allIssuesSnap.docs.filter((d) => {
-          const data = d.data();
+          const data = d.data() as any;
           return data.assignedBy === user.uid && data.assignedAt?.toDate?.() >= todayStart;
         }).length;
 
         // Technician Partners
         const partnersSnap = await getDocs(collection(db, 'technicianPartners'));
         const total = partnersSnap.size;
-        const active = partnersSnap.docs.filter((d) => d.data().isActive === true).length;
+        let mobile = 0;
+        let shop = 0;
+        let active = 0;
+
+        partnersSnap.docs.forEach((doc) => {
+          const p = doc.data() as any;
+          if (p?.type === 'mobile') mobile += 1;
+          if (p?.type === 'shop') shop += 1;
+          if (p?.isActive === true) active += 1;
+        });
+
+        const inactive = total - active;
 
         setStats({
           unassignedIssues: unassignedIssuesCount,
-          technicianPartners: `${active}/${total}`,
           assignedToday: assignedTodayCount,
+          partners: { mobile, shop, active, inactive, total },
         });
       } catch (err) {
         console.error('Error fetching stats for technician assistant:', err);
@@ -69,19 +88,35 @@ export default function TechnicianAssistantDashboard() {
           {t('title')}
         </h1>
 
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        {/* Cards */}
+        <section className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           <DashboardCard
             icon={<ClipboardList aria-hidden className="w-5 h-5" />}
             title={t('cards.unassigned_issues')}
             value={stats.unassignedIssues}
             href="/assistant/dispatch"
           />
+
+          {/* ✅ Card 1: Mobile / Shop */}
           <DashboardCard
             icon={<Wrench aria-hidden className="w-5 h-5" />}
-            title={t('cards.technician_partners')}
-            value={stats.technicianPartners}
+            title={t('cards.partners_by_type')}
+            // ví dụ: "12 / 8"
+            value={`${stats.partners.mobile} / ${stats.partners.shop}`}
+            hint={t('cards.hint.mobile_shop')}
             href="/assistant/add-technician-partner"
           />
+
+          {/* ✅ Card 2: Active / Inactive */}
+          <DashboardCard
+            icon={<Wrench aria-hidden className="w-5 h-5" />}
+            title={t('cards.partners_by_status')}
+            // ví dụ: "15 / 5"
+            value={`${stats.partners.active} / ${stats.partners.inactive}`}
+            hint={t('cards.hint.active_inactive')}
+            href="/assistant/add-technician-partner"
+          />
+
           <DashboardCard
             icon={<FileText aria-hidden className="w-5 h-5" />}
             title={t('cards.assigned_today')}
@@ -107,7 +142,19 @@ export default function TechnicianAssistantDashboard() {
   );
 }
 
-function DashboardCard({ icon, title, value, href }: { icon: JSX.Element; title: string; value: string | number; href: string }) {
+function DashboardCard({
+  icon,
+  title,
+  value,
+  href,
+  hint,
+}: {
+  icon: JSX.Element;
+  title: string;
+  value: string | number;
+  href: string;
+  hint?: string;
+}) {
   return (
     <Link
       href={href}
@@ -119,6 +166,7 @@ function DashboardCard({ icon, title, value, href }: { icon: JSX.Element; title:
       <div>
         <p className="text-xs sm:text-sm text-gray-500">{title}</p>
         <h3 className="text-base sm:text-lg font-bold text-gray-800">{value}</h3>
+        {hint && <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5">{hint}</p>}
       </div>
     </Link>
   );
