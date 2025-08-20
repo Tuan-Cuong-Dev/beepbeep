@@ -50,14 +50,10 @@ export default function ErrorCodeManagementPage() {
 
         {/* Add / Edit form */}
         <section className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow border border-gray-200">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-700">
-            ➕ {t('error_code_management_page.add_edit')}
-          </h2>
-
           <ErrorCodeForm
             key={selected?.id || 'new'}
             existing={selected}
-            onSaved={async () => {
+            onSaved={async () => { 
               setSelected(null);
               await refetch();
             }}

@@ -22,6 +22,9 @@ export interface PublicIssue {
   reportedBy?: string;
   status: PublicIssueStatus;
   assignedTo?: string;
+  // ⬇️ thêm dòng này
+  assignedToName?: string; // hiển thị tên kỹ thuật viên để dễ hiển thị trên table lỗi
+
   assignedBy?: string;
   assignedAt?: Timestamp; 
   createdAt: Timestamp;

@@ -1400,7 +1400,8 @@
   "search": "Tìm kiếm",
   "status": "Trạng thái",
   "station": "Trạm",
-  "all": "Tất cả"
+  "all": "Tất cả",
+  "placeholder": "🔍 Số khung, Biển số, Mô tả"
 },
 
 "vehicle_issue_table": {
@@ -3163,27 +3164,142 @@
 "services_about": {
     "title": "Dịch vụ",
     "empty": "Chưa có dịch vụ nào."
+  },
+
+"error_code_form_new": {
+    "title_add": "➕ Thêm mã lỗi mới",
+    "title_edit": "✏️ Chỉnh sửa mã lỗi",
+    "ph_code": "Mã lỗi (vd: E01)",
+    "ph_description": "Mô tả",
+    "ph_solution": "Giải pháp đề xuất",
+    "ph_brand": "Hãng (vd: Selex)",
+    "ph_model": "Tên mẫu xe (vd: Camel 2)",
+    "ph_video": "URL video hướng dẫn (YouTube)",
+    "suggestions_heading": "💡 Gợi ý từ kỹ thuật viên",
+    "references_heading": "🔧 Người tham chiếu",
+    "ph_ref_name": "Tên",
+    "ph_ref_phone": "Số điện thoại",
+    "add_reference": "Thêm người tham chiếu",
+    "btn_save": "Lưu mã lỗi",
+    "btn_update": "Cập nhật mã lỗi",
+    "saved_success_title": "Lưu thành công",
+    "saved_success_desc": "Mã lỗi \"{{code}}\" đã được thêm.",
+    "updated_success_title": "Cập nhật thành công",
+    "updated_success_desc": "Mã lỗi \"{{code}}\" đã được cập nhật.",
+    "save_failed_title": "Lưu thất bại",
+    "save_failed_desc": "Đã xảy ra lỗi khi lưu mã lỗi."
+  },
+
+  "technician_dashboard": {
+  "title": "🛠️ Bảng điều khiển Trợ lý Kỹ thuật viên",
+  "cards": {
+    "unassigned_issues": "Vấn đề chưa phân công",
+    "technician_partners": "Đối tác kỹ thuật",
+    "assigned_today": "Đã phân công hôm nay"
+  },
+  "quick_actions": "⚡ Hành động nhanh",
+  "quick": {
+    "dispatch": "Phân công việc",
+    "error_codes": "Quản lý mã lỗi",
+    "service_pricing": "Giá dịch vụ",
+    "add_partner": "Thêm đối tác kỹ thuật",
+    "report_issue": "Báo cáo sự cố"
   }
+},
 
+"public_issue_dispatch_page": {
+    "title": "🛠️ Điều phối & Quản lý sự cố khách lẻ đã mua bảo hiểm",
+    "assign_title": "Giao kỹ thuật viên",
+    "cancel": "Hủy",
+    "close_dialog": {
+      "title": "Đóng sự cố phương tiện",
+      "desc": "Vui lòng nhập ghi chú hoặc lý do để đóng sự cố này:",
+      "ph_reason": "Lý do đóng...",
+      "btn_cancel": "Hủy",
+      "btn_close": "Đóng sự cố"
+    },
+    "messages": {
+      "assign_success": "Giao kỹ thuật viên thành công",
+      "assign_failed": "Giao kỹ thuật viên thất bại",
+      "close_success": "Đã đóng sự cố thành công",
+      "proposal_success": "Đề xuất đã được gửi để phê duyệt",
+      "actual_success": "Kết quả thực tế đã được gửi",
+      "approve_success": "Đề xuất đã được phê duyệt",
+      "reject_success": "Đề xuất đã bị từ chối"
+    },
+    "loading": "⏳ Đang tải...",
+    "no_permission": "🚫 Bạn không có quyền truy cập trang này."
+  },
 
+  "public_issues_summary_card": {
+    "total": "Tổng số sự cố",
+    "pending": "Đang chờ",
+    "assigned": "Đã giao",
+    "proposed": "Đề xuất",
+    "confirmed": "Đã xác nhận",
+    "rejected": "Bị từ chối",
+    "in_progress": "Đang xử lý",
+    "resolved": "Đã xử lý",
+    "closed": "Đã đóng"
+  },
 
+  "public_issues_search_filter": {
+    "search_label": "Tìm kiếm",
+    "search_placeholder": "🔍 VIN, Biển số, Mô tả",
+    "status_label": "Trạng thái",
+    "status": {
+      "all": "Tất cả",
+      "pending": "Đang chờ",
+      "assigned": "Đã giao",
+      "proposed": "Đề xuất",
+      "confirmed": "Đã xác nhận",
+      "rejected": "Bị từ chối",
+      "in_progress": "Đang xử lý",
+      "resolved": "Đã xử lý",
+      "closed": "Đã đóng"
+    }
+  },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "public_issue_table": {
+    "col_customer": "Khách hàng",
+    "col_phone": "Số điện thoại",
+    "col_plate": "Biển số",
+    "col_brand": "Hãng xe",
+    "col_model": "Mẫu xe",
+    "col_description": "Mô tả",
+    "col_coordinates": "Tọa độ",
+    "col_address": "Địa chỉ sự cố",
+    "col_status": "Trạng thái",
+    "col_assigned": "Người được phân công",
+    "col_proposal": "Đề xuất",
+    "col_proposed_cost": "Chi phí đề xuất",
+    "col_approve_status": "Trạng thái phê duyệt",
+    "col_actual": "Thực tế",
+    "col_actual_cost": "Chi phí thực tế",
+    "col_reported": "Thời gian báo cáo",
+    "col_updated": "Cập nhật",
+    "col_closed_by": "Đóng bởi",
+    "col_closed_at": "Đóng lúc",
+    "col_close_comment": "Lý do đóng",
+    "col_actions": "Hành động",
+    "btn_submit_proposal": "Gửi đề xuất",
+    "btn_mark_in_progress": "Đánh dấu đang xử lý",
+    "btn_submit_actual": "Gửi kết quả thực tế",
+    "btn_assign": "Phân công",
+    "btn_view_proposal": "Xem đề xuất",
+    "btn_approve_reject": "Phê duyệt / Từ chối",
+    "btn_close": "Đóng sự cố",
+    "status": {
+      "pending": "Đang chờ",
+      "assigned": "Đã phân công",
+      "proposed": "Đã đề xuất",
+      "confirmed": "Đã xác nhận",
+      "rejected": "Đã từ chối",
+      "in_progress": "Đang xử lý",
+      "resolved": "Đã xử lý",
+      "closed": "Đã đóng"
+    }
+  }
 
 
 

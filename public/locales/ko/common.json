@@ -1379,7 +1379,8 @@
   "search": "검색",
   "status": "상태",
   "station": "스테이션",
-  "all": "전체"
+  "all": "전체",
+  "placeholder": "🔍 차량번호, 번호판, 설명"
 },
 
 "vehicle_issue_table": {
@@ -3125,40 +3126,142 @@
   "services_about": {
     "title": "서비스",
     "empty": "등록된 서비스가 없습니다."
+  },
+
+  "error_code_form_new": {
+  "title_add": "➕ 새로운 오류 코드 추가",
+  "title_edit": "✏️ 오류 코드 수정",
+  "ph_code": "오류 코드 (예: E01)",
+  "ph_description": "설명",
+  "ph_solution": "권장 해결 방법",
+  "ph_brand": "브랜드 (예: Selex)",
+  "ph_model": "모델명 (예: Camel 2)",
+  "ph_video": "튜토리얼 영상 URL (YouTube)",
+  "suggestions_heading": "💡 기술자 제안",
+  "references_heading": "🔧 참고인",
+  "ph_ref_name": "이름",
+  "ph_ref_phone": "전화번호",
+  "add_reference": "참고인 추가",
+  "btn_save": "오류 코드 저장",
+  "btn_update": "오류 코드 업데이트",
+  "saved_success_title": "저장 완료",
+  "saved_success_desc": "오류 코드 \"{{code}}\"가 추가되었습니다.",
+  "updated_success_title": "업데이트 완료",
+  "updated_success_desc": "오류 코드 \"{{code}}\"가 업데이트되었습니다.",
+  "save_failed_title": "저장 실패",
+  "save_failed_desc": "오류 코드를 저장하는 중 오류가 발생했습니다."
+},
+
+"technician_dashboard": {
+  "title": "🛠️ 기술 보조 대시보드",
+  "cards": {
+    "unassigned_issues": "미배정 문제",
+    "technician_partners": "기술 파트너",
+    "assigned_today": "오늘 배정됨"
+  },
+  "quick_actions": "⚡ 빠른 작업",
+  "quick": {
+    "dispatch": "문제 배정",
+    "error_codes": "오류 코드 관리",
+    "service_pricing": "서비스 요금",
+    "add_partner": "기술 파트너 추가",
+    "report_issue": "문제 보고"
   }
+},
 
+ "public_issue_dispatch_page": {
+    "title": "🛠️ 공공 문제 배정 및 관리",
+    "assign_title": "기술자 배정",
+    "cancel": "취소",
+    "close_dialog": {
+      "title": "차량 문제 닫기",
+      "desc": "이 문제를 닫는 이유나 코멘트를 입력해주세요:",
+      "ph_reason": "닫는 이유...",
+      "btn_cancel": "취소",
+      "btn_close": "문제 닫기"
+    },
+    "messages": {
+      "assign_success": "기술자가 성공적으로 배정되었습니다",
+      "assign_failed": "기술자 배정에 실패했습니다",
+      "close_success": "문제가 성공적으로 종료되었습니다",
+      "proposal_success": "승인 대기 중으로 제안이 제출되었습니다",
+      "actual_success": "실제 결과가 제출되었습니다",
+      "approve_success": "제안이 승인되었습니다",
+      "reject_success": "제안이 거절되었습니다"
+    },
+    "loading": "⏳ 불러오는 중...",
+    "no_permission": "🚫 이 페이지를 볼 권한이 없습니다."
+  },
 
+  "public_issues_summary_card": {
+    "total": "총 이슈",
+    "pending": "대기 중",
+    "assigned": "배정됨",
+    "proposed": "제안됨",
+    "confirmed": "확인됨",
+    "rejected": "거절됨",
+    "in_progress": "진행 중",
+    "resolved": "해결됨",
+    "closed": "종료됨"
+  },
 
+   "public_issues_search_filter": {
+    "search_label": "검색",
+    "search_placeholder": "🔍 VIN, 차량 번호판, 설명",
+    "status_label": "상태",
+    "status": {
+      "all": "전체",
+      "pending": "대기 중",
+      "assigned": "배정됨",
+      "proposed": "제안됨",
+      "confirmed": "확인됨",
+      "rejected": "거절됨",
+      "in_progress": "진행 중",
+      "resolved": "해결됨",
+      "closed": "종료됨"
+    }
+  },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "public_issue_table": {
+    "col_customer": "고객",
+    "col_phone": "전화번호",
+    "col_plate": "차량 번호판",
+    "col_brand": "브랜드",
+    "col_model": "모델",
+    "col_description": "설명",
+    "col_coordinates": "좌표",
+    "col_address": "문제 주소",
+    "col_status": "상태",
+    "col_assigned": "배정된 담당자",
+    "col_proposal": "제안",
+    "col_proposed_cost": "제안 비용",
+    "col_approve_status": "승인 상태",
+    "col_actual": "실제 결과",
+    "col_actual_cost": "실제 비용",
+    "col_reported": "보고 시간",
+    "col_updated": "업데이트 시간",
+    "col_closed_by": "닫은 사람",
+    "col_closed_at": "닫은 시간",
+    "col_close_comment": "닫은 사유",
+    "col_actions": "작업",
+    "btn_submit_proposal": "제안 제출",
+    "btn_mark_in_progress": "진행 중으로 표시",
+    "btn_submit_actual": "실제 결과 제출",
+    "btn_assign": "배정",
+    "btn_view_proposal": "제안 보기",
+    "btn_approve_reject": "승인 / 거부",
+    "btn_close": "닫기",
+    "status": {
+      "pending": "대기 중",
+      "assigned": "배정됨",
+      "proposed": "제안됨",
+      "confirmed": "확인됨",
+      "rejected": "거부됨",
+      "in_progress": "진행 중",
+      "resolved": "해결됨",
+      "closed": "닫힘"
+    }
+  }
 
 
 

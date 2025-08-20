@@ -1,6 +1,3 @@
-// 📁 components/report-public-issue/PublicIssuesSummaryCard.tsx
-// OK rồi
-
 'use client';
 
 import { PublicIssue } from '@/src/lib/publicIssue/publicIssueTypes';
@@ -16,12 +13,15 @@ import {
   ShieldCheck,
   XCircle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   issues: PublicIssue[];
 }
 
 export default function PublicIssuesSummaryCard({ issues }: Props) {
+  const { t } = useTranslation('common', { keyPrefix: 'public_issues_summary_card' });
+
   const total = issues.length;
   const statusCounts = {
     pending: issues.filter((i) => i.status === 'pending').length,
@@ -36,63 +36,63 @@ export default function PublicIssuesSummaryCard({ issues }: Props) {
 
   const items = [
     {
-      title: 'Total Issues',
+      title: t('total'),
       value: total,
       color: 'text-black',
       icon: <Bug className="w-6 h-6 text-gray-500" />,
       bg: 'bg-gray-100',
     },
     {
-      title: 'Pending',
+      title: t('pending'),
       value: statusCounts.pending,
       color: 'text-yellow-600',
       icon: <ClipboardCheck className="w-6 h-6 text-yellow-600" />,
       bg: 'bg-yellow-50',
     },
     {
-      title: 'Assigned',
+      title: t('assigned'),
       value: statusCounts.assigned,
       color: 'text-blue-600',
       icon: <Wrench className="w-6 h-6 text-blue-600" />,
       bg: 'bg-blue-50',
     },
     {
-      title: 'Proposed',
+      title: t('proposed'),
       value: statusCounts.proposed,
       color: 'text-yellow-700',
       icon: <Lightbulb className="w-6 h-6 text-yellow-700" />,
       bg: 'bg-yellow-100',
     },
     {
-      title: 'Confirmed',
+      title: t('confirmed'),
       value: statusCounts.confirmed,
       color: 'text-green-700',
       icon: <ShieldCheck className="w-6 h-6 text-green-700" />,
       bg: 'bg-green-100',
     },
     {
-      title: 'Rejected',
+      title: t('rejected'),
       value: statusCounts.rejected,
       color: 'text-red-600',
       icon: <XCircle className="w-6 h-6 text-red-600" />,
       bg: 'bg-red-100',
     },
     {
-      title: 'In Progress',
+      title: t('in_progress'),
       value: statusCounts.in_progress,
       color: 'text-indigo-600',
       icon: <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />,
       bg: 'bg-indigo-50',
     },
     {
-      title: 'Resolved',
+      title: t('resolved'),
       value: statusCounts.resolved,
       color: 'text-green-600',
       icon: <CheckCircle className="w-6 h-6 text-green-600" />,
       bg: 'bg-green-50',
     },
     {
-      title: 'Closed',
+      title: t('closed'),
       value: statusCounts.closed,
       color: 'text-gray-500',
       icon: <Ban className="w-6 h-6 text-gray-500" />,

@@ -1,27 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ErrorCode, TechnicianSuggestion } from '@/src/lib/errorCodes/errorCodeTypes';
-import { db } from '@/src/firebaseConfig';
+import { useEffect, useMemo, useState } from 'react';
 import { collection, addDoc, updateDoc, doc, Timestamp } from 'firebase/firestore';
+import { useTranslation } from 'react-i18next';
+
+import { db } from '@/src/firebaseConfig';
+import { useUser } from '@/src/context/AuthContext';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
-import { useUser } from '@/src/context/AuthContext';
-import TechnicianSuggestionList from './TechnicianSuggestionList';
-import TechnicianSuggestionForm from './TechnicianSuggestionForm';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
-export default function ErrorCodeForm({
-  onSaved,
-  existing,
-}: {
+import TechnicianSuggestionList from './TechnicianSuggestionList';
+import TechnicianSuggestionForm from './TechnicianSuggestionForm';
+
+import type { ErrorCode, TechnicianSuggestion } from '@/src/lib/errorCodes/errorCodeTypes';
+
+interface Props {
   onSaved?: () => void;
   existing?: ErrorCode | null;
-}) {
+}
+
+export default function ErrorCodeForm({ onSaved, existing }: Props) {
+  const { t } = useTranslation('common', { keyPrefix: 'error_code_form_new' });
   const { user, role } = useUser();
+
   const isTechnician = role === 'technician';
   const isTechnicianPartner = role === 'technician_partner';
+  const isReadonlyRole = isTechnician || isTechnicianPartner;
 
   const [code, setCode] = useState('');
   const [description, setDescription] = useState('');
@@ -30,10 +36,10 @@ export default function ErrorCodeForm({
   const [modelName, setModelName] = useState('');
   const [tutorialVideoUrl, setTutorialVideoUrl] = useState('');
   const [technicianSuggestions, setTechnicianSuggestions] = useState<TechnicianSuggestion[]>([]);
-  const [supportTechnicians, setSupportTechnicians] = useState<string[]>([]);
   const [technicianReferences, setTechnicianReferences] = useState<{ name?: string; phone?: string }[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [supportTechnicians, setSupportTechnicians] = useState<string[]>([]);
 
+  const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({
     open: false,
     type: 'success' as 'success' | 'error',
@@ -41,17 +47,12 @@ export default function ErrorCodeForm({
     description: '',
   });
 
+  const requiredMissing = useMemo(() => {
+    return !code.trim() || !description.trim() || !recommendedSolution.trim();
+  }, [code, description, recommendedSolution]);
+
   useEffect(() => {
-    if (existing) {
-      setCode(existing.code);
-      setDescription(existing.description);
-      setRecommendedSolution(existing.recommendedSolution);
-      setBrand(existing.brand || '');
-      setModelName(existing.modelName || '');
-      setTutorialVideoUrl(existing.tutorialVideoUrl || '');
-      setTechnicianSuggestions(existing.technicianSuggestions || []);
-      setTechnicianReferences(existing.technicianReferences || []);
-    } else {
+    if (!existing) {
       setCode('');
       setDescription('');
       setRecommendedSolution('');
@@ -60,62 +61,84 @@ export default function ErrorCodeForm({
       setTutorialVideoUrl('');
       setTechnicianSuggestions([]);
       setTechnicianReferences([]);
+      return;
     }
+
+    setCode(existing.code || '');
+    setDescription(existing.description || '');
+    setRecommendedSolution(existing.recommendedSolution || '');
+    setBrand(existing.brand || '');
+    setModelName(existing.modelName || '');
+    setTutorialVideoUrl(existing.tutorialVideoUrl || '');
+    setTechnicianSuggestions(existing.technicianSuggestions || []);
+    setTechnicianReferences(existing.technicianReferences || []);
   }, [existing]);
 
   const handleAddSuggestion = (comment: string) => {
-    if (!user?.uid) return;
+    if (!user?.uid || !comment.trim()) return;
     const suggestion: TechnicianSuggestion = {
       userId: user.uid,
-      name: user.name || 'Unknown',
-      comment,
+      name: (user as any).name || user.email || 'Unknown',
+      comment: comment.trim(),
       timestamp: Timestamp.now(),
     };
     setTechnicianSuggestions((prev) => [...prev, suggestion]);
   };
 
+  const normalizeYouTube = (url: string) => url.trim();
+
+  const updateReference = (index: number, field: 'name' | 'phone', value: string) => {
+    setTechnicianReferences((prev) => {
+      const clone = [...prev];
+      clone[index] = { ...clone[index], [field]: value };
+      return clone;
+    });
+  };
+
+  const addReference = () => setTechnicianReferences((prev) => [...prev, { name: '', phone: '' }]);
+  const removeReference = (index: number) => setTechnicianReferences((prev) => prev.filter((_, i) => i !== index));
+
   const handleSubmit = async () => {
-    const isReadonlyRole = isTechnician || isTechnicianPartner;
-    if (!code || !description || !recommendedSolution || !user?.uid || isReadonlyRole) return;
+    if (isReadonlyRole || !user?.uid || requiredMissing) return;
 
     setLoading(true);
-
     try {
-      const data = {
-        code,
-        description,
-        recommendedSolution,
-        brand,
-        modelName,
-        tutorialVideoUrl,
+      const payload = {
+        code: code.trim(),
+        description: description.trim(),
+        recommendedSolution: recommendedSolution.trim(),
+        brand: brand.trim(),
+        modelName: modelName.trim(),
+        tutorialVideoUrl: tutorialVideoUrl ? normalizeYouTube(tutorialVideoUrl) : '',
         technicianSuggestions,
+        technicianReferences: technicianReferences.map((r) => ({
+          name: r.name?.trim() || undefined,
+          phone: r.phone?.trim() || undefined,
+        })),
         supportTechnicians,
-        technicianReferences,
         updatedAt: Timestamp.now(),
-      };
+      } as Partial<ErrorCode> & { updatedAt: Timestamp };
 
       if (existing?.id) {
-        const ref = doc(db, 'errorCodes', existing.id);
-        await updateDoc(ref, data);
+        await updateDoc(doc(db, 'errorCodes', existing.id), payload);
         setNotification({
           open: true,
           type: 'success',
-          title: 'Updated Successfully',
-          description: `Error code "${code}" has been updated.`,
+          title: t('updated_success_title'),
+          description: t('updated_success_desc', { code: code.trim() }),
         });
       } else {
         await addDoc(collection(db, 'errorCodes'), {
-          ...data,
+          ...payload,
           createdBy: user.uid,
           createdAt: Timestamp.now(),
         });
         setNotification({
           open: true,
           type: 'success',
-          title: 'Saved Successfully',
-          description: `New error code "${code}" has been added.`,
+          title: t('saved_success_title'),
+          description: t('saved_success_desc', { code: code.trim() }),
         });
-
         setCode('');
         setDescription('');
         setRecommendedSolution('');
@@ -126,96 +149,95 @@ export default function ErrorCodeForm({
         setTechnicianReferences([]);
       }
 
-      if (onSaved) onSaved();
-    } catch (error) {
-      console.error('Error saving error code:', error);
+      onSaved?.();
+    } catch (e) {
+      console.error('Error saving error code:', e);
       setNotification({
         open: true,
         type: 'error',
-        title: 'Save Failed',
-        description: 'An error occurred while saving the error code.',
+        title: t('save_failed_title'),
+        description: t('save_failed_desc'),
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const updateReference = (index: number, field: 'name' | 'phone', value: string) => {
-    const updated = [...technicianReferences];
-    updated[index][field] = value;
-    setTechnicianReferences(updated);
-  };
-
-  const addReference = () => {
-    setTechnicianReferences([...technicianReferences, { name: '', phone: '' }]);
-  };
-
-  const removeReference = (index: number) => {
-    const updated = [...technicianReferences];
-    updated.splice(index, 1);
-    setTechnicianReferences(updated);
-  };
-
-  if (isTechnician || isTechnicianPartner) return null;
+  if (isReadonlyRole) return null;
 
   return (
     <>
-      <div className="space-y-4 w-full sm:max-w-xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
-          {existing ? '✏️ Edit Error Code' : '➕ Add New Error Code'}
-        </h2>
-
-        <Input placeholder="Error Code (e.g. E01)" value={code} onChange={(e) => setCode(e.target.value)} />
-        <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-        <Textarea
-          placeholder="Recommended Solution"
-          value={recommendedSolution}
-          onChange={(e) => setRecommendedSolution(e.target.value)}
-        />
-        <Input placeholder="Brand (e.g. Selex)" value={brand} onChange={(e) => setBrand(e.target.value)} />
-        <Input placeholder="Model Name (e.g. Camel 2)" value={modelName} onChange={(e) => setModelName(e.target.value)} />
-        <Input
-          placeholder="Tutorial Video URL (YouTube)"
-          value={tutorialVideoUrl}
-          onChange={(e) => setTutorialVideoUrl(e.target.value)}
-        />
-
-        <div className="space-y-2">
-          <h3 className="font-semibold">💡 Technician Suggestions</h3>
-          <TechnicianSuggestionForm onSubmit={handleAddSuggestion} />
-          <TechnicianSuggestionList suggestions={technicianSuggestions} />
+      <div className="w-full max-w-5xl mx-auto px-2 sm:px-6">
+        <div className="mb-4 flex items-start justify-between gap-4 px-1 sm:px-0">
+          <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">
+            {existing ? t('title_edit') : t('title_add')}
+          </h2>
+          <div className="hidden md:block">
+            <Button onClick={handleSubmit} disabled={loading || requiredMissing} loading={loading}>
+              {existing ? t('btn_update') : t('btn_save')}
+            </Button>
+          </div>
         </div>
 
-        <div className="space-y-2">
-          <h3 className="font-semibold">🔧 Technician References</h3>
-          {technicianReferences.map((ref, idx) => (
-            <div key={idx} className="flex gap-2 items-center">
-              <Input
-                placeholder="Name"
-                value={ref.name || ''}
-                onChange={(e) => updateReference(idx, 'name', e.target.value)}
-                className="w-1/2"
-              />
-              <Input
-                placeholder="Phone"
-                value={ref.phone || ''}
-                onChange={(e) => updateReference(idx, 'phone', e.target.value)}
-                className="w-1/2"
-              />
-              <Button type="button" variant="ghost" size="sm" onClick={() => removeReference(idx)} className="text-red-500">
-                ✕
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow p-2 sm:p-5">
+              <div className="grid grid-cols-1 gap-3">
+                <Input placeholder={t('ph_code')} value={code} onChange={(e) => setCode(e.target.value)} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Input placeholder={t('ph_brand')} value={brand} onChange={(e) => setBrand(e.target.value)} />
+                  <Input placeholder={t('ph_model')} value={modelName} onChange={(e) => setModelName(e.target.value)} />
+                </div>
+                <Textarea rows={4} placeholder={t('ph_description')} value={description} onChange={(e) => setDescription(e.target.value)} />
+                <Textarea rows={5} placeholder={t('ph_solution')} value={recommendedSolution} onChange={(e) => setRecommendedSolution(e.target.value)} />
+                <Input placeholder={t('ph_video')} value={tutorialVideoUrl} onChange={(e) => setTutorialVideoUrl(e.target.value)} />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow p-2 sm:p-5">
+              <h3 className="text-base font-semibold mb-2">{t('suggestions_heading')}</h3>
+              <div className="space-y-3">
+                <TechnicianSuggestionForm onSubmit={handleAddSuggestion} />
+                <TechnicianSuggestionList suggestions={technicianSuggestions} />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-2 sm:p-5">
+              <h3 className="text-base font-semibold mb-3">{t('references_heading')}</h3>
+              <div className="space-y-2">
+                {technicianReferences.map((ref, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <Input
+                      placeholder={t('ph_ref_name')}
+                      value={ref.name || ''}
+                      onChange={(e) => updateReference(idx, 'name', e.target.value)}
+                      className="w-1/2"
+                    />
+                    <Input
+                      placeholder={t('ph_ref_phone')}
+                      value={ref.phone || ''}
+                      onChange={(e) => updateReference(idx, 'phone', e.target.value)}
+                      className="w-1/2"
+                    />
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeReference(idx)} className="text-red-500">
+                      ✕
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" onClick={addReference} className="text-[#00d289]">
+                  ➕ {t('add_reference')}
+                </Button>
+              </div>
+            </div>
+
+            <div className="md:hidden">
+              <Button className="w-full" onClick={handleSubmit} disabled={loading || requiredMissing} loading={loading}>
+                {existing ? t('btn_update') : t('btn_save')}
               </Button>
             </div>
-          ))}
-          <Button type="button" variant="outline" onClick={addReference} className="text-[#00d289]">
-            ➕ Add Reference
-          </Button>
-        </div>
-
-        <div className="pt-2">
-          <Button className="w-full sm:w-auto" onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Saving...' : existing ? 'Update Code' : 'Save Error Code'}
-          </Button>
+          </div>
         </div>
       </div>
 
@@ -224,7 +246,7 @@ export default function ErrorCodeForm({
         type={notification.type}
         title={notification.title}
         description={notification.description}
-        onClose={() => setNotification((prev) => ({ ...prev, open: false }))}
+        onClose={() => setNotification((p) => ({ ...p, open: false }))}
       />
     </>
   );

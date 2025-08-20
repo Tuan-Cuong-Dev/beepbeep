@@ -8,7 +8,8 @@ import { SimpleSelect } from '../ui/select';
 import Image from 'next/image';
 
 interface Props {
-  onAssign: (userId: string) => void;
+  // chấp nhận cả sync/async
+  onAssign: (userId: string, name: string) => void | Promise<void>;
   filterCategory?: string;
   filterRegion?: string;
 }
@@ -28,48 +29,55 @@ export default function AssignTechnicianForm({
 }: Props) {
   const [technicians, setTechnicians] = useState<TechnicianPartner[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchPartners = async () => {
-      const q = query(collection(db, 'technicianPartners'), where('isActive', '==', true));
-      const snap = await getDocs(q);
+      setLoading(true);
+      try {
+        const q = query(
+          collection(db, 'technicianPartners'),
+          where('isActive', '==', true)
+        );
+        const snap = await getDocs(q);
 
-      const partners: TechnicianPartner[] = snap.docs
-        .map((doc) => {
-          const data = doc.data();
-          if (!data.userId) return null;
+        const partners: TechnicianPartner[] = snap.docs
+          .map((doc) => {
+            const data = doc.data();
+            return {
+              userId: doc.id, // ✅ thay vì data.userId
+              name: data.name || '(Unnamed Partner)',
+              avatarUrl: data.avatarUrl || '/assets/images/technician.png',
+              serviceCategories: data.serviceCategories || [],
+              assignedRegions: data.assignedRegions || [],
+            } as TechnicianPartner;
+          })
+          .filter(Boolean) as TechnicianPartner[];
 
-          return {
-            userId: data.userId,
-            name: data.name || '(Unnamed Partner)',
-            avatarUrl: data.avatarUrl || '/assets/images/technician.png',
-            serviceCategories: data.serviceCategories || [],
-            assignedRegions: data.assignedRegions || [],
-          };
-        })
-        .filter(Boolean) as TechnicianPartner[];
+        const filtered = partners.filter((p) => {
+          const matchCategory = filterCategory
+            ? p.serviceCategories?.includes(filterCategory)
+            : true;
+          const matchRegion = filterRegion
+            ? p.assignedRegions?.includes(filterRegion)
+            : true;
+          return matchCategory && matchRegion;
+        });
 
-      const filtered = partners.filter((partner) => {
-        const matchCategory = filterCategory
-          ? partner.serviceCategories?.includes(filterCategory)
-          : true;
-        const matchRegion = filterRegion
-          ? partner.assignedRegions?.includes(filterRegion)
-          : true;
-        return matchCategory && matchRegion;
-      });
+        setTechnicians(filtered);
 
-      setTechnicians(filtered);
+        // ✅ auto-chọn kỹ thuật viên đầu tiên nếu chưa chọn
+        if (filtered.length > 0 && !selectedUserId) {
+          setSelectedUserId(filtered[0].userId);
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchPartners();
+    // chỉ phụ thuộc bộ lọc; không phụ thuộc selectedUserId để tránh loop
   }, [filterCategory, filterRegion]);
-
-  useEffect(() => {
-    if (technicians.length > 0 && !selectedUserId) {
-      setSelectedUserId(technicians[0].userId);
-    }
-  }, [technicians]);
 
   const options = technicians.map((tech) => ({
     value: tech.userId,
@@ -77,6 +85,11 @@ export default function AssignTechnicianForm({
   }));
 
   const selectedTech = technicians.find((t) => t.userId === selectedUserId);
+
+  const handleAssignClick = async () => {
+    if (!selectedUserId) return;
+    await onAssign(selectedUserId, selectedTech?.name ?? '');
+  };
 
   return (
     <div className="space-y-4">
@@ -98,22 +111,30 @@ export default function AssignTechnicianForm({
           />
           <div>
             <div className="font-semibold">{selectedTech.name}</div>
-            {selectedTech?.serviceCategories?.length ? (
+            {!!selectedTech?.serviceCategories?.length && (
               <div className="text-sm text-gray-500">
                 {selectedTech.serviceCategories.join(', ')}
               </div>
-            ) : null}
+            )}
           </div>
         </div>
       )}
 
       <Button
-        disabled={!selectedUserId}
-        onClick={() => onAssign(selectedUserId)}
+        disabled={loading || !selectedUserId}
+        onClick={handleAssignClick}
         className="w-full"
       >
-        Assign Technician
+        {loading ? 'Loading...' : 'Assign Technician'}
       </Button>
+
+      {/* Gợi ý debug nhanh nếu vẫn không có ai để chọn */}
+      {(!loading && technicians.length === 0) && (
+        <p className="text-sm text-gray-500">
+          No active technician partners match the current filters.
+          {/* Kiểm tra: isActive=true? userId hay doc.id? filterCategory/Region có khớp không? */}
+        </p>
+      )}
     </div>
   );
 }

@@ -1362,7 +1362,8 @@
   "search": "検索",
   "status": "ステータス",
   "station": "ステーション",
-  "all": "すべて"
+  "all": "すべて",
+  "placeholder": "🔍 VIN、ナンバー、説明"
 },
 
 "vehicle_issue_table": {
@@ -3112,34 +3113,142 @@
 "services_about": {
     "title": "サービス",
     "empty": "まだサービスがありません。"
+  },
+
+  "error_code_form_new": {
+  "title_add": "➕ 新しいエラーコードを追加",
+  "title_edit": "✏️ エラーコードを編集",
+  "ph_code": "エラーコード（例: E01）",
+  "ph_description": "説明",
+  "ph_solution": "推奨される解決方法",
+  "ph_brand": "ブランド（例: Selex）",
+  "ph_model": "モデル名（例: Camel 2）",
+  "ph_video": "チュートリアル動画URL（YouTube）",
+  "suggestions_heading": "💡 技術者からの提案",
+  "references_heading": "🔧 参考情報",
+  "ph_ref_name": "名前",
+  "ph_ref_phone": "電話番号",
+  "add_reference": "参考情報を追加",
+  "btn_save": "エラーコードを保存",
+  "btn_update": "エラーコードを更新",
+  "saved_success_title": "保存完了",
+  "saved_success_desc": "エラーコード「{{code}}」が追加されました。",
+  "updated_success_title": "更新完了",
+  "updated_success_desc": "エラーコード「{{code}}」が更新されました。",
+  "save_failed_title": "保存に失敗しました",
+  "save_failed_desc": "エラーコードの保存中にエラーが発生しました。"
+},
+
+"technician_dashboard": {
+  "title": "🛠️ テクニシャンアシスタントダッシュボード",
+  "cards": {
+    "unassigned_issues": "未割り当ての問題",
+    "technician_partners": "技術パートナー",
+    "assigned_today": "本日割り当て済み"
+  },
+  "quick_actions": "⚡ クイックアクション",
+  "quick": {
+    "dispatch": "問題を割り当て",
+    "error_codes": "エラーコード管理",
+    "service_pricing": "サービス料金",
+    "add_partner": "技術パートナーを追加",
+    "report_issue": "問題を報告"
   }
+},
 
+"public_issue_dispatch_page": {
+    "title": "🛠️ 公共問題の配車と管理",
+    "assign_title": "技術者を割り当てる",
+    "cancel": "キャンセル",
+    "close_dialog": {
+      "title": "車両問題を閉じる",
+      "desc": "この問題を閉じる理由またはコメントを入力してください:",
+      "ph_reason": "閉じる理由...",
+      "btn_cancel": "キャンセル",
+      "btn_close": "問題を閉じる"
+    },
+    "messages": {
+      "assign_success": "技術者を正常に割り当てました",
+      "assign_failed": "技術者の割り当てに失敗しました",
+      "close_success": "問題が正常に閉じられました",
+      "proposal_success": "提案が承認待ちとして送信されました",
+      "actual_success": "実際の結果が送信されました",
+      "approve_success": "提案が承認されました",
+      "reject_success": "提案が却下されました"
+    },
+    "loading": "⏳ 読み込み中...",
+    "no_permission": "🚫 このページを表示する権限がありません。"
+  },
 
+   "public_issues_summary_card": {
+    "total": "総件数",
+    "pending": "保留中",
+    "assigned": "割り当て済み",
+    "proposed": "提案済み",
+    "confirmed": "確認済み",
+    "rejected": "却下",
+    "in_progress": "進行中",
+    "resolved": "解決済み",
+    "closed": "クローズ"
+  },
 
+   "public_issues_search_filter": {
+    "search_label": "検索",
+    "search_placeholder": "🔍 VIN、ナンバー、説明",
+    "status_label": "ステータス",
+    "status": {
+      "all": "すべて",
+      "pending": "保留中",
+      "assigned": "割り当て済み",
+      "proposed": "提案済み",
+      "confirmed": "確認済み",
+      "rejected": "却下",
+      "in_progress": "進行中",
+      "resolved": "解決済み",
+      "closed": "クローズ"
+    }
+  },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   "public_issue_table": {
+    "col_customer": "顧客",
+    "col_phone": "電話番号",
+    "col_plate": "ナンバー",
+    "col_brand": "ブランド",
+    "col_model": "モデル",
+    "col_description": "説明",
+    "col_coordinates": "座標",
+    "col_address": "問題の住所",
+    "col_status": "ステータス",
+    "col_assigned": "担当者",
+    "col_proposal": "提案",
+    "col_proposed_cost": "提案費用",
+    "col_approve_status": "承認状況",
+    "col_actual": "実際の結果",
+    "col_actual_cost": "実際の費用",
+    "col_reported": "報告日時",
+    "col_updated": "更新日時",
+    "col_closed_by": "閉鎖者",
+    "col_closed_at": "閉鎖日時",
+    "col_close_comment": "閉鎖理由",
+    "col_actions": "操作",
+    "btn_submit_proposal": "提案を送信",
+    "btn_mark_in_progress": "進行中にする",
+    "btn_submit_actual": "実際の結果を送信",
+    "btn_assign": "担当者を割り当てる",
+    "btn_view_proposal": "提案を見る",
+    "btn_approve_reject": "承認 / 却下",
+    "btn_close": "閉じる",
+    "status": {
+      "pending": "保留中",
+      "assigned": "割り当て済み",
+      "proposed": "提案済み",
+      "confirmed": "確認済み",
+      "rejected": "却下",
+      "in_progress": "進行中",
+      "resolved": "解決済み",
+      "closed": "閉鎖済み"
+    }
+  }
 
 
 

@@ -1394,7 +1394,8 @@
   "search": "Search",
   "status": "Status",
   "station": "Station",
-  "all": "All"
+  "all": "All",
+  "placeholder": "🔍 VIN, Plate, Description"
 },
 
 "vehicle_issue_table": {
@@ -3089,22 +3090,142 @@
   "services_about": {
     "title": "Services",
     "empty": "No services yet."
+  },
+
+  "error_code_form_new": {
+  "title_add": "➕ Add New Error Code",
+  "title_edit": "✏️ Edit Error Code",
+  "ph_code": "Error Code (e.g. E01)",
+  "ph_description": "Description",
+  "ph_solution": "Recommended Solution",
+  "ph_brand": "Brand (e.g. Selex)",
+  "ph_model": "Model Name (e.g. Camel 2)",
+  "ph_video": "Tutorial Video URL (YouTube)",
+  "suggestions_heading": "💡 Technician Suggestions",
+  "references_heading": "🔧 References",
+  "ph_ref_name": "Name",
+  "ph_ref_phone": "Phone Number",
+  "add_reference": "Add Reference",
+  "btn_save": "Save Error Code",
+  "btn_update": "Update Error Code",
+  "saved_success_title": "Saved Successfully",
+  "saved_success_desc": "Error code \"{{code}}\" has been added.",
+  "updated_success_title": "Updated Successfully",
+  "updated_success_desc": "Error code \"{{code}}\" has been updated.",
+  "save_failed_title": "Save Failed",
+  "save_failed_desc": "An error occurred while saving the error code."
+},
+
+"technician_dashboard": {
+    "title": "🛠️ Technician Assistant Dashboard",
+    "cards": {
+      "unassigned_issues": "Unassigned Issues",
+      "technician_partners": "Technician Partners",
+      "assigned_today": "Assigned Today"
+    },
+    "quick_actions": "⚡ Quick Actions",
+    "quick": {
+      "dispatch": "Dispatch Issues",
+      "error_codes": "Manage Error Codes",
+      "service_pricing": "Service Pricing",
+      "add_partner": "Add Technician Partner",
+      "report_issue": "Report Issue"
+    }
+  },
+
+  "public_issue_dispatch_page": {
+    "title": "🛠️ Dispatch & Manage Public Issues",
+    "assign_title": "Assign Technician",
+    "cancel": "Cancel",
+    "close_dialog": {
+      "title": "Close Vehicle Issue",
+      "desc": "Please enter a comment or reason for closing this issue:",
+      "ph_reason": "Reason for closing...",
+      "btn_cancel": "Cancel",
+      "btn_close": "Close Issue"
+    },
+    "messages": {
+      "assign_success": "Technician assigned successfully",
+      "assign_failed": "Failed to assign technician",
+      "close_success": "Issue closed successfully",
+      "proposal_success": "Proposal submitted for approval",
+      "actual_success": "Actual result submitted",
+      "approve_success": "Proposal approved",
+      "reject_success": "Proposal rejected"
+    },
+    "loading": "⏳ Loading...",
+    "no_permission": "🚫 You do not have permission to view this page."
+  },
+
+  "public_issues_summary_card": {
+    "total": "Total Issues",
+    "pending": "Pending",
+    "assigned": "Assigned",
+    "proposed": "Proposed",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "in_progress": "In Progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+
+  "public_issues_search_filter": {
+    "search_label": "Search",
+    "search_placeholder": "🔍 VIN, Plate, Description",
+    "status_label": "Status",
+    "status": {
+      "all": "All",
+      "pending": "Pending",
+      "assigned": "Assigned",
+      "proposed": "Proposed",
+      "confirmed": "Confirmed",
+      "rejected": "Rejected",
+      "in_progress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    }
+  },
+
+  "public_issue_table": {
+    "col_customer": "Customer",
+    "col_phone": "Phone",
+    "col_plate": "Plate",
+    "col_brand": "Brand",
+    "col_model": "Model",
+    "col_description": "Description",
+    "col_coordinates": "Coordinates",
+    "col_address": "Issue Address",
+    "col_status": "Status",
+    "col_assigned": "Assigned",
+    "col_proposal": "Proposal",
+    "col_proposed_cost": "Proposed Cost",
+    "col_approve_status": "Approve Status",
+    "col_actual": "Actual",
+    "col_actual_cost": "Actual Cost",
+    "col_reported": "Reported",
+    "col_updated": "Updated",
+    "col_closed_by": "Closed By",
+    "col_closed_at": "Closed At",
+    "col_close_comment": "Close Comment",
+    "col_actions": "Actions",
+    "btn_submit_proposal": "Submit Proposal",
+    "btn_mark_in_progress": "Mark In Progress",
+    "btn_submit_actual": "Submit Actual",
+    "btn_assign": "Assign",
+    "btn_view_proposal": "View Proposal",
+    "btn_approve_reject": "Approve / Reject",
+    "btn_close": "Close",
+    "status": {
+      "pending": "Pending",
+      "assigned": "Assigned",
+      "proposed": "Proposed",
+      "confirmed": "Confirmed",
+      "rejected": "Rejected",
+      "in_progress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

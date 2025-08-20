@@ -14,13 +14,14 @@ export function usePublicIssuesToDispatch() {
   const [loading, setLoading] = useState(true);
   const [technicianMap, setTechnicianMap] = useState<Record<string, string>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
+  const [partnerMap, setPartnerMap] = useState<Record<string, string>>({}); // ⬅️ NEW
 
-  // Load map kỹ thuật viên từ staffs collection
+  // staffs: map userId -> name (trường hợp bạn còn dùng staffs ở nơi khác)
   const loadTechnicianMap = async () => {
     const snapshot = await getDocs(collection(db, 'staffs'));
     const map: Record<string, string> = {};
-    snapshot.docs.forEach((doc) => {
-      const data = doc.data();
+    snapshot.docs.forEach((d) => {
+      const data = d.data() as any;
       if (data.userId) {
         map[data.userId] = data.name || 'Unnamed';
       }
@@ -28,39 +29,58 @@ export function usePublicIssuesToDispatch() {
     return map;
   };
 
-  // Load map người dùng từ users collection
+  // users: map doc.id -> name/email
   const loadUserMap = async () => {
     const snapshot = await getDocs(collection(db, 'users'));
     const map: Record<string, string> = {};
-    snapshot.docs.forEach((doc) => {
-      const data = doc.data();
-      map[doc.id] = data.name || data.email || 'Unknown';
+    snapshot.docs.forEach((d) => {
+      const data = d.data() as any;
+      map[d.id] = data.name || data.email || 'Unknown';
     });
     return map;
   };
 
-  // Load toàn bộ public issues và enrich dữ liệu
+  // technicianPartners: map doc.id -> name  ⬅️ NEW (khớp với assignedTo bạn đang lưu)
+  const loadTechnicianPartnerMap = async () => {
+    const snapshot = await getDocs(collection(db, 'technicianPartners'));
+    const map: Record<string, string> = {};
+    snapshot.docs.forEach((d) => {
+      const data = d.data() as any;
+      map[d.id] = data.name || 'Unnamed Partner';
+    });
+    return map;
+  };
+
+  // Load và enrich
   const fetchVehicleIssues = async () => {
     setLoading(true);
     try {
-      const [techMap, usrMap] = await Promise.all([
+      const [techMap, usrMap, partnerNameMap] = await Promise.all([
         loadTechnicianMap(),
         loadUserMap(),
+        loadTechnicianPartnerMap(), // ⬅️ NEW
       ]);
 
       const snap = await getDocs(collection(db, 'publicVehicleIssues'));
       const rawIssues = snap.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as PublicIssue)
+        (d) => ({ id: d.id, ...d.data() } as PublicIssue)
       );
 
       const enriched = rawIssues.map((issue) => ({
         ...issue,
-        assignedToName: issue.assignedTo ? techMap[issue.assignedTo] : undefined,
-        closedByName: issue.closedBy ? usrMap[issue.closedBy] : undefined,
+        // ⬇️ ƯU TIÊN GIỮ field đã lưu trong Firestore
+        assignedToName:
+          issue.assignedToName ??
+          (issue.assignedTo ? partnerNameMap[issue.assignedTo] : undefined) ??
+          (issue.assignedTo ? techMap[issue.assignedTo] : undefined),
+        closedByName:
+          issue.closedByName ??
+          (issue.closedBy ? usrMap[issue.closedBy] : undefined),
       }));
 
       setTechnicianMap(techMap);
       setUserMap(usrMap);
+      setPartnerMap(partnerNameMap);
       setIssues(enriched);
     } catch (error) {
       console.error('❌ Failed to fetch public vehicle issues:', error);
@@ -73,7 +93,6 @@ export function usePublicIssuesToDispatch() {
     fetchVehicleIssues();
   }, []);
 
-  // Cập nhật issue
   const updateIssue = async (id: string, data: Partial<PublicIssue>) => {
     await updateDoc(doc(db, 'publicVehicleIssues', id), data);
   };

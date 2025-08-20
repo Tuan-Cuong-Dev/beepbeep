@@ -81,9 +81,6 @@ export default function ServicePricingManagementPage() {
 
         {canEditServicePricing(role) && (
           <section className="bg-white p-6 rounded-2xl shadow border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">
-              {t('service_pricing_management_page.add_edit_pricing')}
-            </h2>
             <ServicePricingForm
               key={selected?.id || 'new'}
               existing={selected}

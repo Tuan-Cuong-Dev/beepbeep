@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil, Trash, ExternalLink } from 'lucide-react';
 import { ErrorCode } from '@/src/lib/errorCodes/errorCodeTypes';
@@ -14,11 +14,12 @@ interface Props {
   errorCodes: ErrorCode[];
   onEdit: (item: ErrorCode) => void;
   onDelete: (item: ErrorCode) => void;
+  pageSize?: number;
 }
 
-const ITEMS_PER_PAGE = 10;
+const DEFAULT_ITEMS_PER_PAGE = 10;
 
-export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) {
+export default function ErrorCodeTable({ errorCodes, onEdit, onDelete, pageSize = DEFAULT_ITEMS_PER_PAGE }: Props) {
   const { role } = useUser();
   const isTechnician = role === 'technician';
   const isTechnicianPartner = role === 'technician_partner';
@@ -28,44 +29,64 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
 
   // --- Local states
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
   const [selectedForSuggestion, setSelectedForSuggestion] = useState<ErrorCode | null>(null);
   const [page, setPage] = useState(1);
 
+  // --- Debounce search for smoother UX
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(searchTerm.trim().toLowerCase()), 200);
+    return () => clearTimeout(id);
+  }, [searchTerm]);
+
   // --- Derived values
-  const uniqueBrands = useMemo(
-    () => Array.from(new Set(errorCodes.map(e => e.brand).filter(Boolean))) as string[],
-    [errorCodes]
-  );
+  const uniqueBrands = useMemo(() => {
+    const set = new Set<string>();
+    for (const e of errorCodes) if (e.brand) set.add(e.brand);
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [errorCodes]);
 
   const filtered = useMemo(() => {
-    const s = searchTerm.trim().toLowerCase();
     return errorCodes.filter((e) => {
-      const matchesSearch = s
-        ? `${e.code} ${e.description ?? ''} ${e.recommendedSolution ?? ''}`.toLowerCase().includes(s)
-        : true;
+      const searchable = `${e.code ?? ''} ${e.description ?? ''} ${e.recommendedSolution ?? ''}`.toLowerCase();
+      const matchesSearch = debouncedSearch ? searchable.includes(debouncedSearch) : true;
       const matchesBrand = brandFilter ? e.brand === brandFilter : true;
       return matchesSearch && matchesBrand;
     });
-  }, [errorCodes, searchTerm, brandFilter]);
+  }, [errorCodes, debouncedSearch, brandFilter]);
 
-  // Reset về trang 1 khi nguồn dữ liệu hoặc filter/tìm kiếm thay đổi
+  // Reset page when filters/search/data change
   useEffect(() => {
     setPage(1);
-  }, [searchTerm, brandFilter, errorCodes]);
+  }, [debouncedSearch, brandFilter, errorCodes]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const paginatedItems = useMemo(
-    () => filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE),
-    [filtered, page]
+    () => filtered.slice((page - 1) * pageSize, page * pageSize),
+    [filtered, page, pageSize]
   );
 
-  const renderReferences = (refs?: { name?: string; phone?: string }[]) => {
+  function renderReferences(refs?: { name?: string; phone?: string }[]) {
     if (!refs?.length) return '—';
     return refs
-      .map((r) => `${r?.name || 'N/A'} – ${r?.phone || 'N/A'}`)
+      .map((r) => {
+        const nm = r?.name || 'N/A';
+        const ph = r?.phone || 'N/A';
+        return ph && ph !== 'N/A' ? `${nm} – ${ph}` : `${nm}`;
+      })
       .join(', ');
-  };
+  }
+
+  function formatDate(val: any) {
+    try {
+      // Supports Firebase Timestamp, Date, ISO string
+      const d = typeof val?.toDate === 'function' ? val.toDate() : val instanceof Date ? val : val ? new Date(val) : null;
+      return d ? d.toLocaleString(undefined, { hour12: false }) : '—';
+    } catch {
+      return '—';
+    }
+  }
 
   const EmptyState = (
     <div className="border border-dashed rounded-xl py-12 text-center text-sm text-gray-600 bg-white">
@@ -74,20 +95,35 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
     </div>
   );
 
+  const resetFilters = () => {
+    setSearchTerm('');
+    setBrandFilter('');
+  };
+
   return (
     <div className="space-y-6">
       {/* Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <Input
-          placeholder={t('search_placeholder')}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full sm:w-64"
-        />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Input
+            placeholder={t('search_placeholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-64"
+            aria-label={t('search_placeholder')}
+          />
+          {(searchTerm || brandFilter) && (
+            <Button variant="ghost" size="sm" onClick={resetFilters} aria-label={t('clear_filters')}>
+              {t('clear_filters')}
+            </Button>
+          )}
+        </div>
+
         <select
           value={brandFilter}
           onChange={(e) => setBrandFilter(e.target.value)}
-          className="border rounded px-3 py-2 text-sm text-gray-700"
+          className="border rounded px-3 py-2 text-sm text-gray-700 min-w-40"
+          aria-label={t('brand_filter_label')}
         >
           <option value="">{t('all_brands')}</option>
           {uniqueBrands.map((brand) => (
@@ -109,10 +145,10 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                 <h3 className="text-base font-bold text-[#00d289] line-clamp-2">{item.description}</h3>
                 {!isTechOrPartner && (
                   <div className="flex gap-2 shrink-0">
-                    <Button size="sm" variant="outline" onClick={() => onEdit(item)} aria-label={t('edit')}>
+                    <Button size="sm" variant="outline" onClick={() => onEdit(item)} aria-label={t('edit')} title={t('edit')}>
                       <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => onDelete(item)} aria-label={t('delete')}>
+                    <Button size="sm" variant="destructive" onClick={() => onDelete(item)} aria-label={t('delete')} title={t('delete')}>
                       <Trash className="w-4 h-4" />
                     </Button>
                   </div>
@@ -120,13 +156,14 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
               </div>
 
               <div className="text-sm text-gray-800 grid gap-1">
-                <p>{t('code')}: <span className="font-medium">{item.code}</span></p>
+                <p>
+                  {t('code')}: <span className="font-medium">{item.code}</span>
+                </p>
                 <p className="text-gray-700 italic">💡 {item.recommendedSolution}</p>
                 <p className="text-gray-500">📦 {t('brand')}: {item.brand || '-'}</p>
                 <p className="text-gray-500">🚗 {t('model')}: {item.modelName || '-'}</p>
                 <p className="text-gray-500">
-                  🎥 {t('video')}:{" "}
-                  {item.tutorialVideoUrl ? (
+                  🎥 {t('video')}: {item.tutorialVideoUrl ? (
                     <a
                       href={item.tutorialVideoUrl}
                       target="_blank"
@@ -140,8 +177,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                   )}
                 </p>
                 <p className="text-gray-500">
-                  🛠 {t('suggestions')}:{" "}
-                  {(item.technicianSuggestions?.length ?? 0) > 0 ? (
+                  🛠 {t('suggestions')}: {(item.technicianSuggestions?.length ?? 0) > 0 ? (
                     <button
                       onClick={() => setSelectedForSuggestion(item)}
                       className="text-[#00d289] underline"
@@ -155,9 +191,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                 <p className="text-gray-500">
                   📞 {t('reference')}: {renderReferences(item.technicianReferences)}
                 </p>
-                <p className="text-gray-500">
-                  🕒 {t('created_at')}: {item.createdAt?.toDate().toLocaleString()}
-                </p>
+                <p className="text-gray-500">🕒 {t('created_at')}: {formatDate(item.createdAt)}</p>
               </div>
             </div>
           ))
@@ -184,9 +218,7 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
           <tbody>
             {paginatedItems.length === 0 ? (
               <tr>
-                <td colSpan={isTechOrPartner ? 9 : 10} className="py-10">
-                  {EmptyState}
-                </td>
+                <td colSpan={isTechOrPartner ? 9 : 10} className="py-10">{EmptyState}</td>
               </tr>
             ) : (
               paginatedItems.map((item) => (
@@ -223,14 +255,14 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
                     )}
                   </td>
                   <td className="p-2 text-sm">{renderReferences(item.technicianReferences)}</td>
-                  <td className="p-2">{item.createdAt?.toDate().toLocaleString()}</td>
+                  <td className="p-2">{formatDate(item.createdAt)}</td>
                   {!isTechOrPartner && (
                     <td className="p-2">
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => onEdit(item)} aria-label={t('edit')}>
+                        <Button size="sm" variant="outline" onClick={() => onEdit(item)} aria-label={t('edit')} title={t('edit')}>
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button size="sm" variant="destructive" onClick={() => onDelete(item)} aria-label={t('delete')}>
+                        <Button size="sm" variant="destructive" onClick={() => onDelete(item)} aria-label={t('delete')} title={t('delete')}>
                           <Trash className="w-4 h-4" />
                         </Button>
                       </div>
@@ -246,43 +278,40 @@ export default function ErrorCodeTable({ errorCodes, onEdit, onDelete }: Props) 
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-8 py-2">
-          {/* Trước */}
+          {/* Prev */}
           <button
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
             disabled={page === 1}
             className={[
-              "min-w-[84px] px-4 py-2 rounded-lg",
-              "bg-gray-100 ",
-              page === 1
-                ? "text-gray-400 cursor-not-allowed"
-                : "text-gray-800 hover:bg-gray-200"
-            ].join(" ")}
+              'min-w-[84px] px-4 py-2 rounded-md',
+              'bg-gray-100',
+              page === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-800 hover:bg-gray-200',
+            ].join(' ')}
+            aria-label={t('pagination.prev_short', { defaultValue: 'Trước' })}
           >
             {t('pagination.prev_short', { defaultValue: 'Trước' })}
           </button>
 
-          {/* Trang X / Y */}
+          {/* X / Y */}
           <span className="text-sm text-gray-700">
             {t('pagination.page_label', { defaultValue: 'Trang' })} {page} / {totalPages}
           </span>
 
-          {/* Sau */}
+          {/* Next */}
           <button
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
             disabled={page === totalPages}
             className={[
-              "min-w-[84px] px-4 py-2 rounded-lg",
-              "bg-gray-100 ",
-              page === totalPages
-                ? "text-gray-400 cursor-not-allowed"
-                : "text-gray-900 font-semibold hover:bg-gray-200"
-            ].join(" ")}
+              'min-w-[84px] px-4 py-2 rounded-md',
+              'bg-gray-100',
+              page === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-gray-900 hover:bg-gray-200',
+            ].join(' ')}
+            aria-label={t('pagination.next_short', { defaultValue: 'Sau' })}
           >
             {t('pagination.next_short', { defaultValue: 'Sau' })}
           </button>
         </div>
       )}
-
 
       {/* Technician Suggestions Dialog */}
       {selectedForSuggestion && (

@@ -32,7 +32,7 @@ export default function VehicleIssuesSearchFilter({
           {t('vehicle_issues_search_filter.search')}
         </label>
         <Input
-          placeholder="🔍 VIN, Plate, Description"
+          placeholder={t('vehicle_issues_search_filter.placeholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
