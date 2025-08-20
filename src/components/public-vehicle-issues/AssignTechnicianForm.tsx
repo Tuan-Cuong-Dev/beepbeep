@@ -1,3 +1,7 @@
+// Cần thiết kế thông minh hơn dựa vào nhiều yếu tố để cho Trợ lý có thể 
+// giao việc cho đúng kỹ thuật viên phù hợp với lỗi của khách hàng
+
+
 'use client';
 
 import { useEffect, useState } from 'react';

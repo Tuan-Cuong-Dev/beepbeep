@@ -6,17 +6,17 @@ import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
-import { PublicIssue } from '@/src/lib/publicIssue/publicIssueTypes';
+import { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@/src/components/ui/dialog';
-import AssignTechnicianForm from '@/src/components/report-public-issue/AssignTechnicianForm';
-import VehicleIssuesSummaryCard from '@/src/components/report-public-issue/PublicIssueSummaryCard';
-import VehicleIssuesSearchFilter from '@/src/components/report-public-issue/PublicIssueSearchFilter';
-import PublicIssueTable from '@/src/components/report-public-issue/PublicIssueTable';
-import ProposalPopup from '@/src/components/report-public-issue/ProposalPopup';
-import ActualResultPopup from '@/src/components/report-public-issue/ActualResultPopup';
-import ViewProposalDialog from '@/src/components/report-public-issue/ViewProposalDialog';
-import ApproveProposalDialog from '@/src/components/report-public-issue/ApproveProposalDialog';
+import AssignTechnicianForm from '@/src/components/public-vehicle-issues/AssignTechnicianForm';
+import VehicleIssuesSummaryCard from '@/src/components/public-vehicle-issues/PublicIssueSummaryCard';
+import VehicleIssuesSearchFilter from '@/src/components/public-vehicle-issues/PublicIssueSearchFilter';
+import PublicIssueTable from '@/src/components/public-vehicle-issues/PublicIssueTable';
+import ProposalPopup from '@/src/components/public-vehicle-issues/ProposalPopup';
+import ActualResultPopup from '@/src/components/public-vehicle-issues/ActualResultPopup';
+import ViewProposalDialog from '@/src/components/public-vehicle-issues/ViewProposalDialog';
+import ApproveProposalDialog from '@/src/components/public-vehicle-issues/ApproveProposalDialog';
 import { usePublicIssuesToDispatch } from '@/src/hooks/usePublicIssuesToDispatch';
 import { Timestamp } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
@@ -32,21 +32,21 @@ export default function PublicIssueDispatchPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [stationFilter, setStationFilter] = useState('');
-  const [editingIssue, setEditingIssue] = useState<PublicIssue | null>(null);
+  const [editingIssue, setEditingIssue] = useState<PublicVehicleIssue | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [dialog, setDialog] = useState({
     open: false,
-    type: 'success' as 'success' | 'error' | 'info',
+    type: 'info' as 'success' | 'error' | 'info',
     title: '',
-    description: ''
+    description: '',
   });
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
-  const [closingIssue, setClosingIssue] = useState<PublicIssue | null>(null);
+  const [closingIssue, setClosingIssue] = useState<PublicVehicleIssue | null>(null);
   const [closeComment, setCloseComment] = useState('');
-  const [proposingIssue, setProposingIssue] = useState<PublicIssue | null>(null);
-  const [updatingActualIssue, setUpdatingActualIssue] = useState<PublicIssue | null>(null);
-  const [viewingProposal, setViewingProposal] = useState<PublicIssue | null>(null);
-  const [approvingProposal, setApprovingProposal] = useState<PublicIssue | null>(null);
+  const [proposingIssue, setProposingIssue] = useState<PublicVehicleIssue | null>(null);
+  const [updatingActualIssue, setUpdatingActualIssue] = useState<PublicVehicleIssue | null>(null);
+  const [viewingProposal, setViewingProposal] = useState<PublicVehicleIssue | null>(null);
+  const [approvingProposal, setApprovingProposal] = useState<PublicVehicleIssue | null>(null);
 
   const { issues, loading, fetchVehicleIssues, updateIssue } = usePublicIssuesToDispatch();
 
@@ -61,20 +61,25 @@ export default function PublicIssueDispatchPage() {
     }
   }, [dialog.open]);
 
-  // ===== Filtered data (đồng bộ với table)
+  // ===== Lọc dữ liệu để đổ vào bảng (KHÔNG yêu cầu stationId trong type)
   const filteredIssues = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
-
-    const matchStr = (s?: string) =>
-      (s || '').toLowerCase().includes(q);
+    const matchStr = (s?: string) => (s || '').toLowerCase().includes(q);
 
     return issues.filter((i) => {
-      const matchStatus = statusFilter === 'All' ? true : i.status === statusFilter;
-      const matchStation = stationFilter
-        ? (i.stationId || i.location?.stationId || i.assignedRegion) === stationFilter
-        : true;
+      // 1) Status
+      const okStatus = statusFilter === 'All' ? true : i.status === statusFilter;
 
-      const matchSearch = q
+      // 2) Station (nếu có trong dữ liệu)
+      //   - chấp nhận nhiều vị trí có thể xuất hiện station: root, trong location, hoặc assignedRegion.
+      const stationId =
+        (i as any).stationId ||
+        (i.location as any)?.stationId ||
+        (i as any).assignedRegion; // fallback tuỳ schema của bạn
+      const okStation = stationFilter ? stationId === stationFilter : true;
+
+      // 3) Search
+      const okSearch = q
         ? [
             i.vin,
             i.vehicleLicensePlate,
@@ -84,16 +89,16 @@ export default function PublicIssueDispatchPage() {
             i.vehicleBrand,
             i.vehicleModel,
             i.phone,
-            i.assignedToName,
-            i.location?.coordinates
+            (i as any).assignedToName, // enrich từ hook
+            i.location?.coordinates,
           ].some((x) => matchStr(String(x ?? '')))
         : true;
 
-      return matchStatus && matchStation && matchSearch;
+      return okStatus && okStation && okSearch;
     });
   }, [issues, searchTerm, statusFilter, stationFilter]);
 
-  // nhận thêm 'name' và lưu assignedToName
+  // nhận (userId, name) từ form và lưu cả assignedToName (field phụ trợ hiển thị)
   const handleAssignTechnician = async (userId: string, name: string) => {
     if (!editingIssue?.id) return;
     try {
@@ -101,7 +106,7 @@ export default function PublicIssueDispatchPage() {
         assignedTo: userId,
         assignedToName: name,
         assignedAt: Timestamp.fromDate(new Date()),
-        status: 'assigned'
+        status: 'assigned',
       });
       showDialog('success', t('messages.assign_success'));
       setShowForm(false);
@@ -118,7 +123,7 @@ export default function PublicIssueDispatchPage() {
       status: 'closed',
       closedAt: Timestamp.fromDate(new Date()),
       closedBy: user?.uid || '',
-      closeComment
+      closeComment,
     });
     showDialog('success', t('messages.close_success'));
     setCloseDialogOpen(false);
@@ -131,7 +136,7 @@ export default function PublicIssueDispatchPage() {
     await updateIssue(proposingIssue.id, {
       status: 'proposed',
       proposedSolution: solution,
-      proposedCost: cost
+      proposedCost: cost,
     });
     showDialog('success', t('messages.proposal_success'));
     setProposingIssue(null);
@@ -142,7 +147,7 @@ export default function PublicIssueDispatchPage() {
     await updateIssue(updatingActualIssue.id, {
       status: 'resolved',
       actualSolution: solution,
-      actualCost: cost
+      actualCost: cost,
     });
     showDialog('success', t('messages.actual_success'));
     setUpdatingActualIssue(null);
@@ -159,7 +164,7 @@ export default function PublicIssueDispatchPage() {
     if (!approvingProposal?.id) return;
     await updateIssue(approvingProposal.id, {
       status: 'rejected',
-      closeComment: reason
+      closeComment: reason,
     });
     showDialog('success', t('messages.reject_success'));
     setApprovingProposal(null);
@@ -175,7 +180,7 @@ export default function PublicIssueDispatchPage() {
       <main className="flex-1 p-6 space-y-6">
         <h1 className="text-2xl font-bold">{t('title')}</h1>
 
-        {/* Tổng quan vẫn dùng toàn bộ issues */}
+        {/* Tổng quan: vẫn dùng toàn bộ issues */}
         <VehicleIssuesSummaryCard issues={issues} />
 
         <VehicleIssuesSearchFilter
@@ -190,16 +195,23 @@ export default function PublicIssueDispatchPage() {
         {showForm && editingIssue && (
           <div className="bg-white border rounded-xl shadow p-6 space-y-6">
             <h2 className="text-2xl font-bold">{t('assign_title')}</h2>
+            {/* onAssign trả (id, name) từ AssignTechnicianForm */}
             <AssignTechnicianForm onAssign={handleAssignTechnician} />
             <div className="flex justify-end">
-              <Button variant="ghost" onClick={() => { setShowForm(false); setEditingIssue(null); }}>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingIssue(null);
+                }}
+              >
                 {t('cancel')}
               </Button>
             </div>
           </div>
         )}
 
-        {/* Truyền filteredIssues để đồng bộ với filter */}
+        {/* Bảng hiển thị danh sách đã lọc */}
         <PublicIssueTable
           issues={filteredIssues}
           updateIssue={updateIssue}
@@ -250,9 +262,21 @@ export default function PublicIssueDispatchPage() {
         </DialogContent>
       </Dialog>
 
-      <ProposalPopup open={!!proposingIssue} onClose={() => setProposingIssue(null)} onSubmit={handlePropose} />
-      <ActualResultPopup open={!!updatingActualIssue} onClose={() => setUpdatingActualIssue(null)} onSubmit={handleActualSubmit} />
-      <ViewProposalDialog open={!!viewingProposal} issue={viewingProposal} onClose={() => setViewingProposal(null)} />
+      <ProposalPopup
+        open={!!proposingIssue}
+        onClose={() => setProposingIssue(null)}
+        onSubmit={handlePropose}
+      />
+      <ActualResultPopup
+        open={!!updatingActualIssue}
+        onClose={() => setUpdatingActualIssue(null)}
+        onSubmit={handleActualSubmit}
+      />
+      <ViewProposalDialog
+        open={!!viewingProposal}
+        issue={viewingProposal}
+        onClose={() => setViewingProposal(null)}
+      />
       <ApproveProposalDialog
         open={!!approvingProposal}
         issue={approvingProposal}

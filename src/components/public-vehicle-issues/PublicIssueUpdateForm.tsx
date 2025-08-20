@@ -4,7 +4,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PublicIssue, VehicleIssueStatus } from '@/src/lib/publicIssue/publicIssueTypes';
+import { PublicIssue, VehicleIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';

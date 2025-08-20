@@ -1,6 +1,6 @@
 'use client';
 
-import { PublicIssue } from '@/src/lib/publicIssue/publicIssueTypes';
+import { PublicIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Card } from '@/src/components/ui/card';
 import {
   Bug,

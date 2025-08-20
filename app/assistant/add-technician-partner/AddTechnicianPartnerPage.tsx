@@ -18,8 +18,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/src/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
 
 export default function AddTechnicianPartnerPage() {
+  const { t } = useTranslation('common');
+
   const {
     partners,
     loading,
@@ -68,7 +71,7 @@ export default function AddTechnicianPartnerPage() {
 
     if (isEditing) {
       await updatePartner(editingPartner.id, finalData);
-      setSuccessMessage('Technician partner updated successfully!');
+      setSuccessMessage(t('add_technician_partner_page.updated_success'));
     } else {
       const hasLogin = !!data.email && !!data.password;
       await addPartner({
@@ -79,7 +82,7 @@ export default function AddTechnicianPartnerPage() {
         }),
         createdAt: serverTimestamp(),
       });
-      setSuccessMessage('Technician partner created successfully!');
+      setSuccessMessage(t('add_technician_partner_page.created_success'));
     }
 
     fetchPartners();
@@ -95,11 +98,13 @@ export default function AddTechnicianPartnerPage() {
       <main className="flex-1 p-4 md:p-8 space-y-10">
         <h1 className="text-2xl font-bold text-center flex items-center justify-center gap-2">
           <Wrench className="w-6 h-6" />
-          Manage Technician Partners
+          {t('add_technician_partner_page.title')}
         </h1>
 
         <div>
-          <h2 className="text-xl font-bold mb-4">Existing Technician Partners</h2>
+          <h2 className="text-xl font-bold mb-4">
+            {t('add_technician_partner_page.existing')}
+          </h2>
           <TechnicianPartnerTable
             partners={partners}
             onEdit={handleEdit}
@@ -109,7 +114,9 @@ export default function AddTechnicianPartnerPage() {
 
         <div className="hidden md:block">
           <h2 className="text-xl font-bold mb-4">
-            {editingPartner ? 'Edit Technician Partner' : 'Add New Technician Partner'}
+            {editingPartner
+              ? t('add_technician_partner_page.edit')
+              : t('add_technician_partner_page.add')}
           </h2>
           <TechnicianPartnerForm
             initialData={editingPartner || undefined}
@@ -124,9 +131,9 @@ export default function AddTechnicianPartnerPage() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>{t('add_technician_partner_page.delete_title')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this technician partner? This action cannot be undone.
+              {t('add_technician_partner_page.delete_confirm')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -134,13 +141,13 @@ export default function AddTechnicianPartnerPage() {
               className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
               onClick={() => setShowDeleteDialog(false)}
             >
-              Cancel
+              {t('add_technician_partner_page.cancel')}
             </button>
             <button
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
               onClick={confirmDelete}
             >
-              Delete
+              {t('add_technician_partner_page.delete')}
             </button>
           </DialogFooter>
         </DialogContent>
@@ -150,7 +157,7 @@ export default function AddTechnicianPartnerPage() {
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Success</DialogTitle>
+            <DialogTitle>{t('add_technician_partner_page.success')}</DialogTitle>
             <DialogDescription>{successMessage}</DialogDescription>
           </DialogHeader>
           <DialogFooter>

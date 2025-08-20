@@ -7,7 +7,7 @@ import {
   doc,
   updateDoc,
 } from 'firebase/firestore';
-import { PublicIssue } from '@/src/lib/publicIssue/publicIssueTypes';
+import { PublicIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 
 export function usePublicIssuesToDispatch() {
   const [issues, setIssues] = useState<PublicIssue[]>([]);

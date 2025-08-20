@@ -1,5 +1,5 @@
-import VehicleIssueDispatchPage from './VehicleIssueDispatchPage'
+import PublicIssueDispatchPage from './PublicIssueDispatchPage'
 
 export default function Page() {
-  return <VehicleIssueDispatchPage />;
+  return <PublicIssueDispatchPage />;
 }

@@ -14,6 +14,35 @@ import { db } from '@/src/firebaseConfig';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import { useUser } from '@/src/context/AuthContext';
 
+// ---- Legacy type để đọc dữ liệu cũ (có workingHours) ----
+type LegacyWorking = { isWorking?: boolean; startTime?: string; endTime?: string };
+type LegacyPartner = TechnicianPartner & {
+  workingHours?: LegacyWorking[];
+  workingStartTime?: string;
+  workingEndTime?: string;
+};
+
+// Chuẩn hoá 1 record: lấy workingStart/EndTime từ trường mới,
+// nếu thiếu thì fallback từ phần tử đầu tiên isWorking=true trong workingHours cũ.
+function normalizePartner(docId: string, raw: LegacyPartner): TechnicianPartner {
+  const firstWorking = raw.workingHours?.find?.((d) => d?.isWorking);
+  const workingStartTime = raw.workingStartTime ?? firstWorking?.startTime ?? '';
+  const workingEndTime = raw.workingEndTime ?? firstWorking?.endTime ?? '';
+
+  // Trả về object theo schema mới; không để workingHours trong object
+  const {
+    workingHours: _deprecated,
+    ...rest
+  } = raw as any;
+
+  return {
+    ...rest,
+    id: docId,
+    workingStartTime,
+    workingEndTime,
+  } as TechnicianPartner;
+}
+
 export function useTechnicianPartners() {
   const { user } = useUser();
   const [partners, setPartners] = useState<TechnicianPartner[]>([]);
@@ -25,8 +54,8 @@ export function useTechnicianPartners() {
       const colRef = collection(db, 'technicianPartners');
       const snapshot = await getDocs(colRef);
       const data = snapshot.docs.map((docSnap) => {
-        const raw = docSnap.data() as TechnicianPartner;
-        return { ...raw, id: docSnap.id };
+        const raw = docSnap.data() as LegacyPartner;
+        return normalizePartner(docSnap.id, raw);
       });
       setPartners(data);
     } catch (error) {
@@ -55,9 +84,7 @@ export function useTechnicianPartners() {
     const isJson = contentType?.includes('application/json');
 
     if (!res.ok) {
-      const errorMessage = isJson
-        ? (await res.json()).error
-        : await res.text();
+      const errorMessage = isJson ? (await res.json()).error : await res.text();
       console.error('❌ API /createUser error:', errorMessage);
       throw new Error(errorMessage || 'Unknown error');
     }
@@ -74,12 +101,22 @@ export function useTechnicianPartners() {
       if (!user?.uid) throw new Error('Missing creator userId');
 
       const now = Timestamp.now();
+
+      // Không lưu workingHours cũ
+      const {
+        workingHours: _deprecated,
+        ...clean
+      } = partner as any;
+
       const newDoc = await addDoc(collection(db, 'technicianPartners'), {
-        ...partner,
+        ...clean,
         userId: '',
         createdBy: user.uid,
         isActive: partner.isActive ?? true,
         avatarUrl: partner.avatarUrl || '/assets/images/technician.png',
+        // đảm bảo 2 trường mới tồn tại (string)
+        workingStartTime: partner.workingStartTime ?? '',
+        workingEndTime: partner.workingEndTime ?? '',
         createdAt: now,
         updatedAt: now,
       });
@@ -108,6 +145,7 @@ export function useTechnicianPartners() {
 
       let userId = updates.userId || existingPartner?.userId;
 
+      // Nếu chưa có userId mà form cung cấp email/password -> tạo Firebase user
       if (!userId && updates.email?.trim() && updates.password?.trim()) {
         try {
           userId = await createFirebaseUser({
@@ -132,20 +170,26 @@ export function useTechnicianPartners() {
             { merge: true }
           );
         } catch (err: any) {
-          if (err.message.includes('email-already-in-use')) {
+          if (typeof err?.message === 'string' && err.message.includes('email-already-in-use')) {
             alert('❌ Email đã được sử dụng cho tài khoản khác.');
           } else {
-            alert('❌ Lỗi tạo tài khoản: ' + err.message);
+            alert('❌ Lỗi tạo tài khoản: ' + (err?.message || 'Unknown error'));
           }
           throw err;
         }
       }
 
+      // Không lưu workingHours cũ trong cập nhật
+      const { workingHours: _deprecated, ...cleanUpdates } = updates as any;
+
       await updateDoc(partnerRef, {
-        ...updates,
+        ...cleanUpdates,
         ...(userId ? { userId } : {}),
         isActive: updates.isActive ?? existingPartner?.isActive ?? true,
         avatarUrl: updates.avatarUrl || existingPartner?.avatarUrl || '/assets/images/technician.png',
+        // đảm bảo 2 trường mới luôn là string
+        workingStartTime: updates.workingStartTime ?? existingPartner?.workingStartTime ?? '',
+        workingEndTime: updates.workingEndTime ?? existingPartner?.workingEndTime ?? '',
         updatedAt: Timestamp.now(),
       });
 

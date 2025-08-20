@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/src/components/ui/dialog';
-import { PublicIssue } from '@/src/lib/publicIssue/publicIssueTypes';
+import { PublicIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 
 interface Props {

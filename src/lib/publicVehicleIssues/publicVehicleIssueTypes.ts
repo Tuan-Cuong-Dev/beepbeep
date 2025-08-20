@@ -13,7 +13,7 @@ export type PublicIssueStatus =
 
 export type PublicIssueID = string;
 
-export interface PublicIssue {
+export interface PublicVehicleIssue {
   id?: PublicIssueID;
   customerName: string;
   phone: string;

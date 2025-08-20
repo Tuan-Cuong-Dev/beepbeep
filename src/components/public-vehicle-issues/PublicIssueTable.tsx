@@ -1,26 +1,26 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { PublicIssue, PublicIssueStatus } from '@/src/lib/publicIssue/publicIssueTypes';
+import { PublicVehicleIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  issues: PublicIssue[];
-  onEdit: (issue: PublicIssue) => void;
-  updateIssue: (id: string, data: Partial<PublicIssue>) => Promise<void>;
-  setClosingIssue: (issue: PublicIssue | null) => void;
+  issues: PublicVehicleIssue[];
+  onEdit: (issue: PublicVehicleIssue) => void;
+  updateIssue: (id: string, data: Partial<PublicVehicleIssue>) => Promise<void>;
+  setClosingIssue: (issue: PublicVehicleIssue | null) => void;
   setCloseDialogOpen: (open: boolean) => void;
-  setEditingIssue: (issue: PublicIssue | null) => void;
+  setEditingIssue: (issue: PublicVehicleIssue | null) => void;
   setShowForm: (open: boolean) => void;
   normalizedRole: string;
   isAdmin: boolean;
   isTechnician?: boolean;
-  setProposingIssue?: (issue: PublicIssue | null) => void;
-  setUpdatingActualIssue?: (issue: PublicIssue | null) => void;
-  setViewingProposal: (issue: PublicIssue | null) => void;
-  setApprovingProposal: (issue: PublicIssue | null) => void;
+  setProposingIssue?: (issue: PublicVehicleIssue | null) => void;
+  setUpdatingActualIssue?: (issue: PublicVehicleIssue | null) => void;
+  setViewingProposal: (issue: PublicVehicleIssue | null) => void;
+  setApprovingProposal: (issue: PublicVehicleIssue | null) => void;
 }
 
 function PublicIssueTableBase({
@@ -78,7 +78,7 @@ function PublicIssueTableBase({
     </div>
   );
 
-  const renderActions = (issue: PublicIssue) => {
+  const renderActions = (issue: PublicVehicleIssue) => {
     if (isTechnician) {
       return (
         <div className="flex gap-2">

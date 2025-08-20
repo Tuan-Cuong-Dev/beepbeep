@@ -1,17 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
-import { WorkingHours } from '@/src/lib/technicianPartners/workingHoursTypes';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { Textarea } from '@/src/components/ui/textarea';
 import { SimpleSelect } from '@/src/components/ui/select';
-import { Checkbox } from '@/src/components/ui/checkbox';
 import dynamic from 'next/dynamic';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
+import { useTranslation } from 'react-i18next';
 
 const Select = dynamic(() => import('react-select'), { ssr: false });
+
+// ===== Legacy type để đọc dữ liệu cũ (có workingHours) =====
+type LegacyData = TechnicianPartner & {
+  workingHours?: { isWorking?: boolean; startTime?: string; endTime?: string }[];
+  workingStartTime?: string;
+  workingEndTime?: string;
+};
 
 interface Props {
   initialData?: Partial<TechnicianPartner>;
@@ -20,73 +26,90 @@ interface Props {
   ) => Promise<void>;
 }
 
-const daysOfWeek: WorkingHours['day'][] = [
-  'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
-];
-
-const defaultWorkingHours: WorkingHours[] = daysOfWeek.map((day) => ({
-  day,
-  isWorking: false,
-  startTime: '',
-  endTime: '',
-}));
-
-const serviceOptions = [
-  { label: 'Battery', value: 'battery' },
-  { label: 'Brake', value: 'brake' },
-  { label: 'Flat Tire', value: 'flat_tire' },
-  { label: 'Motor', value: 'motor' },
-  { label: 'Electrical', value: 'electrical' },
-];
-
 export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
+  const { t } = useTranslation<'common'>('common');
+
   const isEditMode = !!initialData?.id;
+  const [submitting, setSubmitting] = useState(false);
+
   const [formData, setFormData] = useState<
-    Partial<TechnicianPartner & { email: string; password: string; role: 'technician_partner' }>
+    Partial<TechnicianPartner & {
+      email: string;
+      password: string;
+      role: 'technician_partner';
+      workingStartTime?: string; // HH:mm
+      workingEndTime?: string;   // HH:mm
+    }>
   >({});
 
-  const { geocode, coords, error: geoError, loading: geoLoading } = useGeocodeAddress();
+  const { geocode, coords } = useGeocodeAddress();
 
+  // Options dịch qua i18n
+  const serviceOptions = useMemo(
+    () => [
+      { label: t('technician_partner_form.service.battery', { defaultValue: 'Battery' }), value: 'battery' },
+      { label: t('technician_partner_form.service.brake', { defaultValue: 'Brake' }), value: 'brake' },
+      { label: t('technician_partner_form.service.flat_tire', { defaultValue: 'Flat Tire' }), value: 'flat_tire' },
+      { label: t('technician_partner_form.service.motor', { defaultValue: 'Motor' }), value: 'motor' },
+      { label: t('technician_partner_form.service.electrical', { defaultValue: 'Electrical' }), value: 'electrical' },
+    ],
+    [t]
+  );
+
+  // ===== Khởi tạo formData (legacy-safe) =====
   useEffect(() => {
+    const legacy = (initialData || {}) as LegacyData;
+    const firstWorking = legacy.workingHours?.find?.((d) => d?.isWorking);
+
     setFormData({
-      ...initialData,
-      workingHours: initialData?.workingHours ?? defaultWorkingHours,
-      assignedRegions: initialData?.assignedRegions ?? [],
-      type: initialData?.type ?? 'mobile',
-      mapAddress: initialData?.mapAddress ?? '',
-      coordinates: initialData?.coordinates ?? undefined,
-      isActive: initialData?.isActive ?? true,
+      ...legacy,
+      assignedRegions: legacy.assignedRegions ?? [],
+      type: legacy.type ?? 'mobile',
+      mapAddress: legacy.mapAddress ?? '',
+      coordinates: legacy.coordinates ?? undefined,
+      isActive: legacy.isActive ?? true,
+      // Ưu tiên trường mới; fallback từ workingHours cũ
+      workingStartTime: legacy.workingStartTime ?? firstWorking?.startTime ?? '',
+      workingEndTime: legacy.workingEndTime ?? firstWorking?.endTime ?? '',
     });
   }, [initialData]);
 
+  // Update toạ độ khi geocode xong
   useEffect(() => {
-    if (coords) {
-      setFormData((prev) => ({ ...prev, coordinates: coords }));
-    }
+    if (coords) setFormData((prev) => ({ ...prev, coordinates: coords }));
   }, [coords]);
 
-  const updateField = (field: keyof typeof formData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  const updateField = useCallback(
+    (field: keyof typeof formData, value: unknown) => {
+      setFormData((prev) => ({ ...prev, [field]: value as any }));
+    },
+    []
+  );
 
-  const updateWorkingHours = (index: number, field: keyof WorkingHours, value: any) => {
-    const updated = [...(formData.workingHours || [])];
-    updated[index] = { ...updated[index], [field]: value };
-    updateField('workingHours', updated);
-  };
+  const handleRegionInput = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const regions = e.target.value.split('\n').map((r) => r.trim()).filter(Boolean);
+      updateField('assignedRegions', regions);
+    },
+    [updateField]
+  );
 
-  const handleRegionInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const regions = e.target.value.split('\n').map((r) => r.trim()).filter(Boolean);
-    updateField('assignedRegions', regions);
-  };
+  const handleGeocode = useCallback(() => {
+    const addr = (formData.mapAddress || '').trim();
+    if (addr) geocode(addr);
+  }, [formData.mapAddress, geocode]);
 
-  const handleGeocode = () => {
-    if (formData.mapAddress?.trim()) geocode(formData.mapAddress);
-  };
+  const parseCoordinates = useCallback((raw: string) => {
+    const [latStr, lngStr] = raw.split(',').map((p) => p.trim());
+    const lat = Number(latStr);
+    const lng = Number(lngStr);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      updateField('coordinates', { lat, lng });
+    }
+  }, [updateField]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({
-      workingHours: defaultWorkingHours,
       assignedRegions: [],
       type: 'mobile',
       mapAddress: '',
@@ -99,82 +122,112 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       shopName: '',
       shopAddress: '',
       isActive: true,
+      workingStartTime: '',
+      workingEndTime: '',
     });
-  };
+  }, []);
+
+  const canSubmit = useMemo(() => {
+    const nameOk = (formData.name || '').trim().length > 0;
+    const phoneOk = (formData.phone || '').trim().length > 0;
+    return nameOk && phoneOk && !submitting;
+  }, [formData.name, formData.phone, submitting]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+
+    try {
+      setSubmitting(true);
+      const payload: any = {
+        ...formData,
+        name: (formData.name || '').trim(),
+        phone: (formData.phone || '').trim(),
+        email: (formData.email || '').trim(),
+        shopName: (formData.shopName || '').trim(),
+        shopAddress: (formData.shopAddress || '').trim(),
+        mapAddress: (formData.mapAddress || '').trim(),
+        role: 'technician_partner',
+        workingStartTime: formData.workingStartTime || '',
+        workingEndTime: formData.workingEndTime || '',
+      };
+
+      // Không lưu field cũ
+      delete payload.workingHours;
+
+      await onSave(payload);
+      if (!isEditMode) resetForm();
+    } finally {
+      setSubmitting(false);
+    }
+  }, [canSubmit, formData, isEditMode, onSave, resetForm]);
 
   return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        await onSave({ ...formData, role: 'technician_partner' });
-        if (!isEditMode) resetForm();
-      }}
-      className="space-y-6"
-    >
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          placeholder="Name"
+          placeholder={t('technician_partner_form.name')}
           value={formData.name || ''}
           onChange={(e) => updateField('name', e.target.value)}
         />
         <Input
-          placeholder="Phone"
+          placeholder={t('technician_partner_form.phone')}
           value={formData.phone || ''}
           onChange={(e) => updateField('phone', e.target.value)}
         />
         <Input
-          placeholder="Email (for login)"
+          placeholder={t('technician_partner_form.email_for_login')}
           value={formData.email || ''}
           onChange={(e) => updateField('email', e.target.value)}
         />
         <Input
-          placeholder="Password (for login) "
+          placeholder={t('technician_partner_form.password_for_login')}
           type="password"
           value={formData.password || ''}
           onChange={(e) => updateField('password', e.target.value)}
         />
 
         <div>
-          <label className="block text-sm font-medium mb-1">Technician Type</label>
+          <label className="block text-sm font-medium mb-1">
+            {t('technician_partner_form.technician_type')}
+          </label>
           <SimpleSelect
-            placeholder="Select technician type"
+            placeholder={t('technician_partner_form.select_type')}
             options={[
-              { label: 'Shop-based Technician', value: 'shop' },
-              { label: 'Mobile Technician', value: 'mobile' },
+              { label: t('technician_partner_form.type.shop'), value: 'shop' },
+              { label: t('technician_partner_form.type.mobile'), value: 'mobile' },
             ]}
             value={formData.type || ''}
             onChange={(val: string) => updateField('type', val)}
           />
         </div>
 
+        {/* 🏪 Shop-only fields */}
         {formData.type === 'shop' && (
           <>
             <Input
-              placeholder="Shop Name"
+              placeholder={t('technician_partner_form.shop_name')}
               value={formData.shopName || ''}
               onChange={(e) => updateField('shopName', e.target.value)}
             />
             <Textarea
-              placeholder="Map Address (Google Maps link with coordinates)"
+              placeholder={t('technician_partner_form.map_address_hint')}
               value={formData.mapAddress || ''}
               onChange={(e) => updateField('mapAddress', e.target.value)}
               onBlur={handleGeocode}
             />
             <Input
-              placeholder="Coordinates (lat,lng)"
-              value={formData.coordinates ? `${formData.coordinates.lat}, ${formData.coordinates.lng}` : ''}
+              placeholder={t('technician_partner_form.coordinates_placeholder')}
+              value={
+                formData.coordinates
+                  ? `${formData.coordinates.lat}, ${formData.coordinates.lng}`
+                  : ''
+              }
               readOnly={!!coords}
-              onChange={(e) => {
-                const parts = e.target.value.split(',');
-                const lat = parseFloat(parts[0]);
-                const lng = parseFloat(parts[1]);
-                if (!isNaN(lat) && !isNaN(lng)) {
-                  updateField('coordinates', { lat, lng });
-                }
-              }}
+              onChange={(e) => parseCoordinates(e.target.value)}
             />
             <Input
-              placeholder="Shop Address"
+              placeholder={t('technician_partner_form.shop_address')}
               value={formData.shopAddress || ''}
               onChange={(e) => updateField('shopAddress', e.target.value)}
             />
@@ -185,7 +238,10 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       {formData.type === 'shop' && formData.coordinates && (
         <>
           <p className="text-sm text-gray-600">
-            📌 Detected: {formData.coordinates.lat}° N, {formData.coordinates.lng}° E
+            {t('technician_partner_form.detected_coords', {
+              lat: String(formData.coordinates.lat),   // 👈 ép về string
+              lng: String(formData.coordinates.lng),   // 👈 ép về string
+            })}
           </p>
           <iframe
             title="Map Preview"
@@ -200,18 +256,19 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         </>
       )}
 
+
       <div>
-        <label className="font-medium">Assigned Regions (one per line)</label>
+        <label className="font-medium">{t('technician_partner_form.assigned_regions_label')}</label>
         <Textarea
           rows={4}
-          placeholder="DaNang/ThanhKhe/ThanhKheTay \nDaNang/HaiChau/BinhHien"
+          placeholder={t('technician_partner_form.assigned_regions_placeholder')}
           value={(formData.assignedRegions || []).join('\n')}
           onChange={handleRegionInput}
         />
       </div>
 
       <div>
-        <label className="font-medium block mb-1">Service Categories</label>
+        <label className="font-medium block mb-1">{t('technician_partner_form.service_categories')}</label>
         <Select
           isMulti
           options={serviceOptions}
@@ -219,7 +276,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
             (formData.serviceCategories || []).includes(opt.value)
           )}
           onChange={(selected) => {
-            const selectedOptions = selected as { label: string; value: string }[];
+            const selectedOptions = (selected || []) as { label: string; value: string }[];
             updateField(
               'serviceCategories',
               selectedOptions.map((s) => s.value)
@@ -228,60 +285,53 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         />
       </div>
 
+      {/* ⏰ Working time: simplified (global start/end) */}
       <div>
-        <label className="font-medium block mb-2">Working Hours</label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {(formData.workingHours || []).map((item, idx) => (
-            <div key={item.day} className="border p-2 rounded">
-              <div className="flex items-center justify-between mb-1">
-                <span className="capitalize font-semibold">{item.day}</span>
-                <Checkbox
-                  checked={item.isWorking}
-                  onCheckedChange={(val) => updateWorkingHours(idx, 'isWorking', !!val)}
-                />
-              </div>
-              {item.isWorking && (
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium">Start</label>
-                    <input
-                      type="time"
-                      step="60"
-                      value={item.startTime}
-                      className="w-full border rounded px-2 py-1"
-                      onChange={(e) =>
-                        updateWorkingHours(idx, 'startTime', e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium">End</label>
-                    <input
-                      type="time"
-                      step="60"
-                      value={item.endTime}
-                      className="w-full border rounded px-2 py-1"
-                      onChange={(e) =>
-                        updateWorkingHours(idx, 'endTime', e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+        <label className="font-medium block mb-2">{t('technician_partner_form.working_time')}</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="flex-1">
+            <label className="block text-xs font-medium">
+              {t('technician_partner_form.start_time')}
+            </label>
+            <input
+              type="time"
+              step="60"
+              value={formData.workingStartTime || ''}
+              className="w-full border rounded px-2 py-1"
+              onChange={(e) => updateField('workingStartTime', e.target.value)}
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-xs font-medium">
+              {t('technician_partner_form.end_time')}
+            </label>
+            <input
+              type="time"
+              step="60"
+              value={formData.workingEndTime || ''}
+              className="w-full border rounded px-2 py-1"
+              onChange={(e) => updateField('workingEndTime', e.target.value)}
+            />
+          </div>
         </div>
+        <p className="text-xs text-gray-500 mt-1">
+          {t('technician_partner_form.working_time_note')}
+        </p>
       </div>
 
       <div className="flex items-center gap-2">
         <input type="checkbox" className="form-checkbox" />
         <label className="text-sm font-medium">
-          Agree to become a Bíp Bíp technician partner.
+          {t('technician_partner_form.agree_terms')}
         </label>
       </div>
 
-      <Button type="submit">
-        {isEditMode ? 'Update Technician Partner' : 'Create Technician Partner Account'}
+      <Button type="submit" disabled={!canSubmit}>
+        {submitting
+          ? t('common_actions.processing', { defaultValue: 'Processing…' })
+          : isEditMode
+          ? t('technician_partner_form.update_btn')
+          : t('technician_partner_form.create_btn')}
       </Button>
     </form>
   );

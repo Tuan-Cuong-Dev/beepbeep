@@ -3261,17 +3261,138 @@
       "resolved": "해결됨",
       "closed": "닫힘"
     }
+  },
+
+  "add_technician_partner_page": {
+  "title": "기술 파트너 관리",
+  "existing": "기존 기술 파트너",
+  "add": "새 기술 파트너 추가",
+  "edit": "기술 파트너 편집",
+  "delete_title": "삭제 확인",
+  "delete_confirm": "이 기술 파트너를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+  "cancel": "취소",
+  "delete": "삭제",
+  "success": "성공",
+  "created_success": "기술 파트너가 성공적으로 생성되었습니다!",
+  "updated_success": "기술 파트너가 성공적으로 업데이트되었습니다!"
+},
+
+"technician_partner_table": {
+    "filter_by_type": "유형으로 필터",
+    "sort_by": "정렬 기준",
+    "sort": { "name": "이름", "rating": "평점", "assigned_regions": "담당 지역" },
+    "type": { "shop": "매장형", "mobile": "출장형" },
+    "search_placeholder": "이름, 이메일, 전화번호, 매장명 또는 주소로 검색",
+    "export_excel": "EXCEL 내보내기",
+    "col": {
+      "name": "이름",
+      "phone": "전화번호",
+      "email": "이메일",
+      "type": "유형",
+      "shop_name": "매장명",
+      "shop_address": "매장 주소",
+      "coordinates": "좌표",
+      "assigned_regions": "담당 지역",
+      "working_days": "근무일",
+      "service_categories": "서비스",
+      "rating": "평점",
+      "active": "상태",
+      "actions": "작업",
+      "working_time": "근무 시간"
+    },
+    "export": {
+      "sheet_name": "Technicians",
+      "name": "이름",
+      "phone": "전화번호",
+      "email": "이메일",
+      "type": "유형",
+      "shop_name": "매장명",
+      "shop_address": "매장 주소",
+      "map_address": "지도 주소",
+      "coordinates": "좌표",
+      "assigned_regions": "담당 지역",
+      "working_days": "근무일",
+      "services": "서비스",
+      "rating": "평점",
+      "active": "활성",
+      "working_time": "근무 시간"
+    }
+  },
+  "common_labels": { "all": "전체", "active": "활성", "inactive": "비활성", "yes": "예", "no": "아니오" },
+  "common_actions": { "edit": "수정", "delete": "삭제", "actions": "작업" },
+
+  "technician_partner_form": {
+  "name": "이름",
+  "phone": "전화번호",
+  "email_for_login": "이메일 (로그인용)",
+  "password_for_login": "비밀번호 (로그인용)",
+  "technician_type": "기술자 유형",
+  "select_type": "유형 선택",
+  "type": {
+    "shop": "매장 상주 기술자",
+    "mobile": "출장 기술자"
+  },
+  "shop_name": "매장 이름",
+  "map_address_hint": "지도 주소 (좌표가 포함된 Google 지도 링크)",
+  "coordinates_placeholder": "좌표 (위도,경도)",
+  "shop_address": "매장 주소",
+  "detected_coords": "📌 감지된 좌표: {{lat}}° N, {{lng}}° E",
+  "assigned_regions_label": "담당 지역 (한 줄당 하나)",
+  "assigned_regions_placeholder": "DaNang/ThanhKhe/ThanhKheTay \nDaNang/HaiChau/BinhHien",
+  "service_categories": "서비스 카테고리",
+  "service": {
+    "battery": "배터리",
+    "brake": "브레이크",
+    "flat_tire": "펑크",
+    "motor": "모터",
+    "electrical": "전기"
+  },
+  "working_time": "근무 시간",
+  "start_time": "시작",
+  "end_time": "종료",
+  "working_time_note": "하루의 근무 시작 및 종료 시간을 선택하세요",
+  "agree_terms": "Bíp Bíp 기술자 파트너가 되는 것에 동의합니다.",
+  "create_btn": "기술자 파트너 계정 생성",
+  "update_btn": "기술자 파트너 업데이트"
+},
+
+"public_issue_form": {
+    "title": "시스템 외 차량 문제 신고",
+    "section": {
+      "customer": "고객 정보",
+      "vehicle": "차량 정보",
+      "issue": "문제 설명",
+      "location": "문제 발생 위치"
+    },
+    "placeholder": {
+      "customer_name": "고객 이름",
+      "phone": "전화번호",
+      "vehicle_model": "차량 모델 (선택 사항)",
+      "vehicle_brand": "제조사 (선택 사항)",
+      "license_plate": "차량 번호판 (선택 사항)",
+      "issue_description": "문제 설명",
+      "map_address": "지도 주소 (Google Maps 링크 또는 설명)",
+      "coordinates": "좌표 (위도,경도)",
+      "issue_address": "문제가 발생한 실제 주소"
+    },
+    "detected_coords": "📌 감지된 좌표: {{lat}}° N, {{lng}}° E",
+    "btn": {
+      "submit": "문제 신고",
+      "processing": "위치 처리 중..."
+    },
+    "error": {
+      "missing_title": "필수 항목 누락",
+      "missing_desc": "문제 설명과 발생 주소를 입력해주세요."
+    },
+    "success": {
+      "title": "신고 완료",
+      "desc": "문제가 성공적으로 신고되었습니다."
+    },
+    "submit_fail": {
+      "title": "제출 실패",
+      "desc": "다시 시도하시거나 지원팀에 문의하세요."
+    }
   }
-
-
-
-
-
-
-
-
-
-
 
 
 

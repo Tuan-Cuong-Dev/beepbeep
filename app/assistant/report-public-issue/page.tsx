@@ -1,5 +1,5 @@
-import PublicIssuePage from './PublicIssuePage';
+import ReportPublicIssuePage from './ReportPublicIssuePage';
 
 export default function Page() {
-  return <PublicIssuePage />;
+  return <ReportPublicIssuePage />;
 }

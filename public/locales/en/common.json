@@ -3225,7 +3225,141 @@
       "resolved": "Resolved",
       "closed": "Closed"
     }
+  },
+
+
+  "add_technician_partner_page": {
+  "title": "Manage Technician Partners",
+  "existing": "Existing Technician Partners",
+  "add": "Add New Technician Partner",
+  "edit": "Edit Technician Partner",
+  "delete_title": "Confirm Deletion",
+  "delete_confirm": "Are you sure you want to delete this technician partner? This action cannot be undone.",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "success": "Success",
+  "created_success": "Technician partner created successfully!",
+  "updated_success": "Technician partner updated successfully!"
+},
+
+"technician_partner_table": {
+    "filter_by_type": "Filter by type",
+    "sort_by": "Sort by",
+    "sort": { "name": "Name", "rating": "Rating", "assigned_regions": "Assigned Regions" },
+    "type": { "shop": "Shop-based", "mobile": "Mobile" },
+    "search_placeholder": "Search by name, email, phone, shop name, or address",
+    "export_excel": "Export EXCEL",
+    "col": {
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "type": "Type",
+      "shop_name": "Shop Name",
+      "shop_address": "Shop Address",
+      "coordinates": "Coordinates",
+      "assigned_regions": "Assigned Regions",
+      "working_days": "Working Days",
+      "service_categories": "Service Categories",
+      "rating": "Rating",
+      "active": "Active",
+      "actions": "Actions",
+      "working_time": "Working Time"
+    },
+    "export": {
+      "sheet_name": "Technicians",
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "type": "Type",
+      "shop_name": "Shop Name",
+      "shop_address": "Shop Address",
+      "map_address": "Map Address",
+      "coordinates": "Coordinates",
+      "assigned_regions": "Assigned Regions",
+      "working_days": "Working Days",
+      "services": "Services",
+      "rating": "Rating",
+      "active": "Active",
+      "working_time": "Working Time"
+    }
+  },
+  "common_labels": { "all": "All", "active": "Active", "inactive": "Inactive", "yes": "Yes", "no": "No" },
+  "common_actions": { "edit": "Edit", "delete": "Delete", "actions": "Actions" },
+
+  "technician_partner_form": {
+  "name": "Name",
+  "phone": "Phone",
+  "email_for_login": "Email (for login)",
+  "password_for_login": "Password (for login)",
+  "technician_type": "Technician Type",
+  "select_type": "Select type",
+  "type": {
+    "shop": "Shop-based Technician",
+    "mobile": "Mobile Technician"
+  },
+  "shop_name": "Shop Name",
+  "map_address_hint": "Map Address (Google Maps link with coordinates)",
+  "coordinates_placeholder": "Coordinates (lat,lng)",
+  "shop_address": "Shop Address",
+  "detected_coords": "📌 Detected: {{lat}}° N, {{lng}}° E",
+  "assigned_regions_label": "Assigned Regions (one per line)",
+  "assigned_regions_placeholder": "DaNang/ThanhKhe/ThanhKheTay \nDaNang/HaiChau/BinhHien",
+  "service_categories": "Service Categories",
+  "service": {
+    "battery": "Battery",
+    "brake": "Brake",
+    "flat_tire": "Flat Tire",
+    "motor": "Motor",
+    "electrical": "Electrical"
+  },
+  "working_time": "Working Hours",
+  "start_time": "Start",
+  "end_time": "End",
+  "working_time_note": "Please select the start and end working hours of the day",
+  "agree_terms": "Agree to become a Bíp Bíp technician partner.",
+  "create_btn": "Create Technician Partner Account",
+  "update_btn": "Update Technician Partner"
+},
+
+ "public_issue_form": {
+    "title": "Report an Off-System Vehicle Issue",
+    "section": {
+      "customer": "Customer Information",
+      "vehicle": "Vehicle Information",
+      "issue": "Issue Description",
+      "location": "Issue Location"
+    },
+    "placeholder": {
+      "customer_name": "Customer Name",
+      "phone": "Phone Number",
+      "vehicle_model": "Vehicle Model (optional)",
+      "vehicle_brand": "Vehicle Brand (optional)",
+      "license_plate": "License Plate (optional)",
+      "issue_description": "Issue Description",
+      "map_address": "Map Address (Google Maps link or description)",
+      "coordinates": "Coordinates (lat,lng)",
+      "issue_address": "Physical Address where the issue occurs"
+    },
+    "detected_coords": "📌 Detected: {{lat}}° N, {{lng}}° E",
+    "btn": {
+      "submit": "Submit Issue",
+      "processing": "Processing location..."
+    },
+    "error": {
+      "missing_title": "Missing required fields",
+      "missing_desc": "Please provide issue description and physical address."
+    },
+    "success": {
+      "title": "Issue reported",
+      "desc": "The issue has been reported successfully."
+    },
+    "submit_fail": {
+      "title": "Submission failed",
+      "desc": "Please try again or contact support."
+    }
   }
+
+
 
 
 

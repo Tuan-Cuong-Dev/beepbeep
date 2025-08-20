@@ -3,7 +3,7 @@
 
 'use client';
 
-import { PublicIssue, PublicIssueStatus } from '@/src/lib/publicIssue/publicIssueTypes';
+import { PublicIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 
 interface Props {

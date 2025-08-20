@@ -13,7 +13,7 @@ import {
 } from '@/src/components/ui/dialog';
 import { Button } from '@/src/components/ui/button';
 import { Textarea } from '@/src/components/ui/textarea';
-import { PublicIssue } from '@/src/lib/publicIssue/publicIssueTypes';
+import { PublicIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Props {
