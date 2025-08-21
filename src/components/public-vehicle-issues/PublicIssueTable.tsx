@@ -55,6 +55,20 @@ function PublicIssueTableBase({
   const safe = (v?: string | number | null) => (v !== null && v !== undefined && v !== '' ? v : '-');
   const fmt = (d?: any) => (d?.toDate ? format(d.toDate(), 'Pp') : '-');
 
+  /** Lấy chuỗi tọa độ "lat,lng" dù bạn lưu string hay object {lat,lng} */
+  const getCoordString = (loc?: any): string => {
+    if (!loc) return '';
+    // Ưu tiên location.coordinates dạng string
+    if (typeof loc.coordinates === 'string' && loc.coordinates.trim()) return loc.coordinates.trim();
+    // Hỗ trợ dạng object { lat, lng }
+    if (typeof loc.lat === 'number' && typeof loc.lng === 'number') return `${loc.lat},${loc.lng}`;
+    return '';
+  };
+
+  /** Build link mở Google Maps từ chuỗi tọa độ */
+  const mapsHref = (coordStr: string) =>
+    coordStr ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coordStr)}` : '';
+
   const StatusChip = ({ status }: { status: PublicIssueStatus }) => (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorMap[status]}`}>
       {t(`status.${status}`)}
@@ -200,7 +214,7 @@ function PublicIssueTableBase({
                   <td className="px-3 py-3 whitespace-nowrap">{safe(issue.vehicleModel)}</td>
 
                   <td className="px-3 py-3">
-                    <CellText className="max-w-[220px]">{safe(issue.issueDescription)}</CellText>
+                    <CellText className="text-red-500 max-w-[220px]">{safe(issue.issueDescription)}</CellText>
                   </td>
 
                   <td className="px-3 py-3">
@@ -255,50 +269,79 @@ function PublicIssueTableBase({
       <div className="lg:hidden divide-y divide-gray-100">
         {issues.length === 0 && Empty}
 
-        {issues.map((issue) => (
-          <div key={issue.id} className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="font-semibold text-gray-900">{safe(issue.customerName)}</div>
-                <div className="text-xs text-gray-500">{safe(issue.phone)}</div>
+        {issues.map((issue) => {
+          const coordStr = getCoordString(issue.location);
+
+          return (
+            <div key={issue.id} className="p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="font-semibold text-gray-900">{safe(issue.customerName)}</div>
+                  <div className="text-xs text-gray-500">{safe(issue.phone)}</div>
+                </div>
+                <StatusChip status={issue.status} />
               </div>
-              <StatusChip status={issue.status} />
+
+              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                <div>
+                  <dt className="text-gray-500">{t('col_plate')}</dt>
+                  <dd className="font-medium">{safe(issue.vehicleLicensePlate)}</dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">{t('col_brand')}</dt>
+                  <dd className="font-medium">{safe(issue.vehicleBrand)}</dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">{t('col_model')}</dt>
+                  <dd className="font-medium">{safe(issue.vehicleModel)}</dd>
+                </div>
+
+                <div className="col-span-2">
+                  <dt className="text-gray-500">{t('col_description')}</dt>
+                  <dd className="text-red-500 font-medium">{safe(issue.issueDescription)}</dd>
+                </div>
+
+                <div className="col-span-2">
+                  <dt className="text-gray-500">{t('col_address')}</dt>
+                  <dd className="font-medium">{safe(issue.location?.issueAddress)}</dd>
+                </div>
+
+                {/* NEW: tọa độ + link Google Maps */}
+                <div className="col-span-2">
+                  <dt className="text-gray-500">{t('col_coordinates')}</dt>
+                  <dd className="font-medium">
+                    {coordStr ? (
+                      <a
+                        href={mapsHref(coordStr)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline decoration-dotted underline-offset-2"
+                      >
+                        <span className="font-mono">{coordStr}</span>
+                        <span className="ml-2 text-xs text-blue-600">
+                          {t('open_in_maps', { defaultValue: 'Open in Maps' })}
+                        </span>
+                      </a>
+                    ) : (
+                      '-'
+                    )}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt className="text-gray-500">{t('col_assigned')}</dt>
+                  <dd className="font-medium">{safe(issue.assignedToName)}</dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">{t('col_reported')}</dt>
+                  <dd className="font-medium">{fmt(issue.createdAt)}</dd>
+                </div>
+              </dl>
+
+              <div className="mt-3 flex flex-wrap gap-2">{renderActions(issue)}</div>
             </div>
-
-            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              <div>
-                <dt className="text-gray-500">{t('col_plate')}</dt>
-                <dd className="font-medium">{safe(issue.vehicleLicensePlate)}</dd>
-              </div>
-              <div>
-                <dt className="text-gray-500">{t('col_brand')}</dt>
-                <dd className="font-medium">{safe(issue.vehicleBrand)}</dd>
-              </div>
-              <div>
-                <dt className="text-gray-500">{t('col_model')}</dt>
-                <dd className="font-medium">{safe(issue.vehicleModel)}</dd>
-              </div>
-              <div className="col-span-2">
-                <dt className="text-gray-500">{t('col_description')}</dt>
-                <dd className="font-medium">{safe(issue.issueDescription)}</dd>
-              </div>
-              <div className="col-span-2">
-                <dt className="text-gray-500">{t('col_address')}</dt>
-                <dd className="font-medium">{safe(issue.location?.issueAddress)}</dd>
-              </div>
-              <div>
-                <dt className="text-gray-500">{t('col_assigned')}</dt>
-                <dd className="font-medium">{safe(issue.assignedToName)}</dd>
-              </div>
-              <div>
-                <dt className="text-gray-500">{t('col_reported')}</dt>
-                <dd className="font-medium">{fmt(issue.createdAt)}</dd>
-              </div>
-            </dl>
-
-            <div className="mt-3 flex flex-wrap gap-2">{renderActions(issue)}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -18,8 +18,33 @@ import ActualResultPopup from '@/src/components/public-vehicle-issues/ActualResu
 import ViewProposalDialog from '@/src/components/public-vehicle-issues/ViewProposalDialog';
 import ApproveProposalDialog from '@/src/components/public-vehicle-issues/ApproveProposalDialog';
 import { usePublicIssuesToDispatch } from '@/src/hooks/usePublicIssuesToDispatch';
+import NearbySupportMap from '@/src/components/public-vehicle-issues/NearbySupportMap';
 import { Timestamp } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
+
+type LatLng = { lat: number; lng: number };
+
+/** ✅ Chuẩn hoá mọi kiểu toạ độ thành {lat,lng} hoặc null */
+function normalizeCoords(coords: any): LatLng | null {
+  if (!coords) return null;
+
+  // TH1: object { lat, lng }
+  if (typeof coords === 'object' && 'lat' in coords && 'lng' in coords) {
+    const lat = Number((coords as any).lat);
+    const lng = Number((coords as any).lng);
+    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+  }
+
+  // TH2: string "lat,lng"
+  if (typeof coords === 'string' && coords.includes(',')) {
+    const [latStr, lngStr] = coords.split(',').map((s) => s.trim());
+    const lat = Number(latStr);
+    const lng = Number(lngStr);
+    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+  }
+
+  return null;
+}
 
 export default function PublicIssueDispatchPage() {
   const { t } = useTranslation('common', { keyPrefix: 'public_issue_dispatch_page' });
@@ -61,24 +86,20 @@ export default function PublicIssueDispatchPage() {
     }
   }, [dialog.open]);
 
-  // ===== Lọc dữ liệu để đổ vào bảng (KHÔNG yêu cầu stationId trong type)
+  // ===== Lọc dữ liệu để đổ vào bảng (Hook luôn ở trên, không đặt sau return có điều kiện)
   const filteredIssues = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
     const matchStr = (s?: string) => (s || '').toLowerCase().includes(q);
 
     return issues.filter((i) => {
-      // 1) Status
       const okStatus = statusFilter === 'All' ? true : i.status === statusFilter;
 
-      // 2) Station (nếu có trong dữ liệu)
-      //   - chấp nhận nhiều vị trí có thể xuất hiện station: root, trong location, hoặc assignedRegion.
       const stationId =
         (i as any).stationId ||
         (i.location as any)?.stationId ||
-        (i as any).assignedRegion; // fallback tuỳ schema của bạn
+        (i as any).assignedRegion; // tuỳ schema
       const okStation = stationFilter ? stationId === stationFilter : true;
 
-      // 3) Search
       const okSearch = q
         ? [
             i.vin,
@@ -89,8 +110,11 @@ export default function PublicIssueDispatchPage() {
             i.vehicleBrand,
             i.vehicleModel,
             i.phone,
-            (i as any).assignedToName, // enrich từ hook
-            i.location?.coordinates,
+            (i as any).assignedToName,
+            // stringify coordinates để search
+            typeof i.location?.coordinates === 'string'
+              ? i.location?.coordinates
+              : JSON.stringify(i.location?.coordinates ?? ''),
           ].some((x) => matchStr(String(x ?? '')))
         : true;
 
@@ -98,7 +122,26 @@ export default function PublicIssueDispatchPage() {
     });
   }, [issues, searchTerm, statusFilter, stationFilter]);
 
-  // nhận (userId, name) từ form và lưu cả assignedToName (field phụ trợ hiển thị)
+  /** ✅ Chọn issue để hiển thị trên bản đồ (Hook trước mọi return) */
+  const mapIssue = useMemo(() => {
+    const eCoord = normalizeCoords(editingIssue?.location?.coordinates as any);
+    if (editingIssue && eCoord) return editingIssue;
+
+    return (
+      filteredIssues.find((i) => !!normalizeCoords((i.location as any)?.coordinates)) || null
+    );
+  }, [editingIssue, filteredIssues]);
+
+  /** ✅ Tính center map theo normalizeCoords (Hook trước mọi return) */
+  const mapCenter = useMemo<LatLng | null>(() => {
+    return normalizeCoords((mapIssue?.location as any)?.coordinates);
+  }, [mapIssue]);
+
+  // ✅ Sau khi mọi Hook đã được gọi theo thứ tự ổn định, mới return có điều kiện
+  if (loading) return <div className="text-center py-10">{t('loading')}</div>;
+  if (!canView) return <div className="text-center py-10 text-red-500">{t('no_permission')}</div>;
+
+  // ===== Handlers =====
   const handleAssignTechnician = async (userId: string, name: string) => {
     if (!editingIssue?.id) return;
     try {
@@ -170,9 +213,7 @@ export default function PublicIssueDispatchPage() {
     setApprovingProposal(null);
   };
 
-  if (loading) return <div className="text-center py-10">{t('loading')}</div>;
-  if (!canView) return <div className="text-center py-10 text-red-500">{t('no_permission')}</div>;
-
+  // ===== Render =====
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -192,6 +233,10 @@ export default function PublicIssueDispatchPage() {
           setStationFilter={setStationFilter}
         />
 
+        {/* ✅ Bản đồ hỗ trợ (khách + 5 shop + 5 mobile) */}
+        {mapCenter && <NearbySupportMap issueCoords={mapCenter} limitPerType={5} />}
+
+        {/* Form phân công */}
         {showForm && editingIssue && (
           <div className="bg-white border rounded-xl shadow p-6 space-y-6">
             <h2 className="text-2xl font-bold">{t('assign_title')}</h2>
