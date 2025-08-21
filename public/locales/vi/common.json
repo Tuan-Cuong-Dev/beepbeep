@@ -763,14 +763,17 @@
   "vehicle_car": "Ô tô",
   "update_error": "Cập nhật thông tin tiệm sửa xe thất bại."
 },
+
 "common": {
-  "cancel": "Hủy",
-  "save": "Lưu",
-  "saving": "Đang lưu...",
-  "loading": "Đang tải...",
-  "edit": "Chỉnh sửa",
-  "delete": "Xóa"
-},
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "loading": "Đang tải...",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "error": "Lỗi"
+  },
+
 "edit_contribution_modal": {
   "title": "Chỉnh sửa {{typeLabel}}",
   "not_found": "Không tìm thấy biểu mẫu phù hợp.",

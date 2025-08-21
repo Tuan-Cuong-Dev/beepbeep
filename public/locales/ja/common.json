@@ -733,14 +733,16 @@
   "vehicle_car": "自動車",
   "update_error": "修理店の更新に失敗しました。"
 },
+
 "common": {
-  "cancel": "キャンセル",
-  "save": "保存",
-  "saving": "保存中...",
-  "loading": "読み込み中...",
-  "edit": "編集",
-  "delete": "削除"
-},
+    "cancel": "キャンセル",
+    "save": "保存",
+    "saving": "保存中...",
+    "loading": "読み込み中...",
+    "edit": "編集",
+    "delete": "削除",
+    "error": "エラー"
+  },
 
 "edit_contribution_modal": {
   "title": "{{typeLabel}}を編集する",

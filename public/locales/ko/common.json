@@ -754,13 +754,14 @@
 },
 
 "common": {
-  "cancel": "취소",
-  "save": "저장",
-  "saving": "저장 중...",
-  "loading": "로딩 중...",
-  "edit": "편집",
-  "delete": "삭제"
-},
+    "cancel": "취소",
+    "save": "저장",
+    "saving": "저장 중...",
+    "loading": "로딩 중...",
+    "edit": "수정",
+    "delete": "삭제",
+    "error": "오류"
+  },
 
 "edit_contribution_modal": {
   "title": "{{typeLabel}} 편집",

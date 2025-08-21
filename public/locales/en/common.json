@@ -756,14 +756,16 @@
   "vehicle_car": "Car",
   "update_error": "Failed to update repair shop."
 },
+
 "common": {
-  "cancel": "Cancel",
-  "save": "Save",
-  "saving": "Saving...",
-  "loading": "Loading...",
-  "edit": "Edit",
-  "delete": "Delete"
-},
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "loading": "Loading...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "error": "Error"
+  },
 
 "edit_contribution_modal": {
   "title": "Edit {{typeLabel}}",

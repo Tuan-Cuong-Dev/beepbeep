@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/src/i18n';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp, collection, getDocs, query, updateDoc, where, serverTimestamp } from 'firebase/firestore';
 import { auth } from '@/src/firebaseConfig';
+import { db } from '@/src/firebaseConfig';
 import { format } from 'date-fns';
 
 import Header from '@/src/components/landingpage/Header';
@@ -22,8 +23,11 @@ import { useUserLocation } from '@/src/hooks/useUserLocation';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
 import { UserLocation } from '@/src/lib/users/userTypes';
 
-// ⬇️ thêm hook lấy vị trí hiện tại
+// ✅ Lấy vị trí trình duyệt
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
+
+// ======================= Config =======================
+const TP_COLLECTION = 'technicianPartners'; // đổi nếu DB đang dùng tên khác
 
 export default function AccountPage() {
   const { t } = useTranslation('common');
@@ -44,8 +48,10 @@ export default function AccountPage() {
   const [notifyTitle, setNotifyTitle] = useState('');
   const [notifyDescription, setNotifyDescription] = useState('');
 
-  // refresh thủ công (không sửa hook)
   const [manualRefreshing, setManualRefreshing] = useState(false);
+
+  // tiện: có role ngay từ user profile
+  const role = localUser?.role as string | undefined;
 
   useEffect(() => {
     setLocalUser(user);
@@ -55,22 +61,35 @@ export default function AccountPage() {
     setLocalPrefs(preferences);
   }, [preferences]);
 
-  // Đồng bộ vị trí từ Firestore
+  // Đồng bộ vị trí từ Firestore (profile.locations collection của bạn)
   useEffect(() => {
     setLocalLoc(location ?? null);
   }, [location]);
 
-  // Khi hook lấy được vị trí trình duyệt → ghi vào localLoc (giữ nguyên address cũ nếu có)
+  // Khi trình duyệt cho phép vị trí → cập nhật UI + (nếu cần) đẩy vào technicianPartners
   useEffect(() => {
-    if (currentLoc) {
-      setLocalLoc(prev => ({
-        lat: currentLoc[0],
-        lng: currentLoc[1],
-        address: prev?.address ?? '',
-        updatedAt: Timestamp.now(),
-      }));
+    if (!currentLoc) return;
+    const [lat, lng] = currentLoc;
+
+    // cập nhật form
+    setLocalLoc(prev => ({
+      lat,
+      lng,
+      address: prev?.address ?? '',
+      updatedAt: Timestamp.now(),
+    }));
+
+    // nếu là technician_partner → đẩy vào bảng technicianPartners
+    if (role === 'technician_partner') {
+      // không chờ bấm Lưu — cập nhật luôn
+      void upsertTechnicianPartnerCoordinates({
+        userId: user?.uid,
+        lat,
+        lng,
+        mapAddress: undefined, // hoặc dùng localLoc?.address nếu bạn muốn
+      });
     }
-  }, [currentLoc]);
+  }, [currentLoc, role, user?.uid]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && localUser?.dateOfBirth) {
@@ -122,10 +141,10 @@ export default function AccountPage() {
         referralCode,
       };
 
-      // Lọc bỏ undefined/null
+      // Lọc undefined/null
       const userDataToSave = Object.fromEntries(
         Object.entries(cleanedUserData).filter(
-          ([_, value]) => value !== undefined && value !== null
+          ([, value]) => value !== undefined && value !== null
         )
       );
 
@@ -137,8 +156,18 @@ export default function AccountPage() {
           lat: localLoc.lat,
           lng: localLoc.lng,
           address: localLoc.address || '',
-          updatedAt: Timestamp.now(),
+          updatedAt: localLoc.updatedAt ?? Timestamp.now(),
         });
+
+        // Nếu là technician_partner → cố gắng ghi thêm vào technicianPartners (1 lần nữa khi user bấm Lưu)
+        if (role === 'technician_partner') {
+          await upsertTechnicianPartnerCoordinates({
+            userId: user.uid,
+            lat: localLoc.lat,
+            lng: localLoc.lng,
+            mapAddress: localLoc.address || undefined,
+          });
+        }
       }
 
       showNotification('success', t('account.update_success'), t('account.saved'));
@@ -148,7 +177,7 @@ export default function AccountPage() {
     }
   };
 
-  // Nút "Lấy lại vị trí hiện tại" (gọi trực tiếp Geolocation API)
+  // Nút “Lấy lại vị trí hiện tại”
   const refreshCurrentLocation = () => {
     if (!navigator.geolocation) {
       showNotification('error', t('common.error'), 'Geolocation is not supported by your browser.');
@@ -156,13 +185,24 @@ export default function AccountPage() {
     }
     setManualRefreshing(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
         setLocalLoc(prev => ({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
+          lat: latitude,
+          lng: longitude,
           address: prev?.address ?? '',
           updatedAt: Timestamp.now(),
         }));
+
+        // Ghi ngay vào technicianPartners nếu cần
+        if (role === 'technician_partner') {
+          await upsertTechnicianPartnerCoordinates({
+            userId: user?.uid,
+            lat: latitude,
+            lng: longitude,
+            mapAddress: undefined,
+          });
+        }
         setManualRefreshing(false);
       },
       (err) => {
@@ -371,7 +411,7 @@ export default function AccountPage() {
             <Input value={localUser.country ?? ''} onChange={(e) => handleFieldChange('country', e.target.value)} />
           </div>
 
-          {/* ✅ LOCATION: tự động lấy lat/lng, cho sửa address + nút refresh */}
+          {/* LOCATION */}
           <div className="md:col-span-2">
             <div className="flex items-center justify-between">
               <Label>{t('account.last_known_address')}</Label>
@@ -436,4 +476,53 @@ export default function AccountPage() {
       <Footer />
     </>
   );
+}
+
+/**
+ * ✅ Cập nhật vị trí cho technicianPartners nếu:
+ * - Có record technicianPartner ứng với userId
+ * - role === 'technician_partner'
+ * - type === 'mobile'
+ *
+ * Ghi fields:
+ * - coordinates: { lat, lng }
+ * - mapAddress: optional
+ * - updatedAt: serverTimestamp()
+ */
+async function upsertTechnicianPartnerCoordinates(params: {
+  userId?: string;
+  lat: number;
+  lng: number;
+  mapAddress?: string;
+}) {
+  const { userId, lat, lng, mapAddress } = params;
+  if (!userId) return;
+
+  try {
+    const q = query(
+      collection(db, TP_COLLECTION),
+      where('userId', '==', userId),
+      where('role', '==', 'technician_partner'),
+      where('type', '==', 'mobile')
+    );
+
+    const snap = await getDocs(q);
+    if (snap.empty) return;
+
+    // thường 1 user ↔ 1 doc; nếu nhiều, cập nhật tất cả doc match
+    await Promise.all(
+      snap.docs.map((d) =>
+        updateDoc(d.ref, {
+          coordinates: { lat, lng },
+          // nếu muốn đồng bộ thêm geo:
+          // geo: { lat, lng },
+          ...(mapAddress ? { mapAddress } : {}),
+          updatedAt: serverTimestamp(),
+        })
+      )
+    );
+  } catch (err) {
+    // Không chặn UI; bạn có thể log nếu cần
+    console.error('Failed to update technician partner coordinates:', err);
+  }
 }
