@@ -183,7 +183,6 @@
   },
 
   "account": {
-    "title": "Account Info",
     "first_name": "First Name",
     "last_name": "Last Name",
     "full_name": "Full Name",
@@ -193,38 +192,35 @@
     "other": "Other",
     "date_of_birth": "Date of Birth",
     "id_number": "ID Number",
-    "referral_code": "Referral Code",
-    "referral_hint": "Your ID number will be used as your referral code on the Bíp Bíp system. Please enter it if it's missing.",
+    "referral_hint": "Referral code will be generated from ID Number",
     "phone": "Phone",
     "email": "Email",
-    "email_note": "* This email is your login email.",
+    "login_email_note": "This is your login email",
     "password": "Password",
-    "reset_password": "Reset your password",
+    "reset_password": "Reset Password",
+    "reset_success": "Password reset request sent",
+    "reset_notice": "Please check your email to change your password",
+    "reset_failed": "Password reset failed",
+    "language": "Language",
+    "region": "Region",
+    "currency": "Currency",
     "address": "Address",
     "city": "City",
-    "state": "State",
-    "zip": "ZIP",
+    "state": "State/Province",
+    "zip": "ZIP/Postal Code",
     "country": "Country",
     "last_known_address": "Last Known Address",
     "latitude": "Latitude",
     "longitude": "Longitude",
-
-    "language": "Language",
-    "region": "Region",
-    "currency": "Currency",
-
     "save": "Save",
-    "saved": "Saved",
     "cancel": "Cancel",
+    "update_success": "Update successful",
+    "saved": "Information saved",
+    "update_failed": "Update failed",
 
-    "saving_success": "Profile Updated",
-    "saving_success_description": "Your profile was saved successfully.",
-    "saving_error": "Update Failed",
-
-    "reset_sent": "Password Reset",
-    "reset_sent_description": "A password reset email has been sent.",
-    "reset_failed": "Reset Failed",
-    "login_email_note": "This is the email you used to sign in. If you want to change it, please contact support."
+    "fetching_location": "Fetching location...",
+    "refresh_location": "Refresh current location",
+    "address_placeholder": "Enter detailed address"
   },
 
 "contribute": {

@@ -20,7 +20,7 @@ export interface TechnicianPartner {
 
   // Map / location
   mapAddress?: string; // e.g. Google Maps link or address string
-  coordinates?: { lat: number; lng: number };
+  coordinates?: { lat: number; lng: number }| null;
   geo?: { lat: number; lng: number };
 
   // Coverage

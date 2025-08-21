@@ -11,6 +11,8 @@ import Footer from '@/src/components/landingpage/Footer';
 import Link from 'next/link';
 import { ClipboardList, FileText, Wrench } from 'lucide-react';
 
+import type { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+
 type PartnerStats = {
   mobile: number;
   shop: number;
@@ -29,6 +31,18 @@ export default function TechnicianAssistantDashboard() {
     partners: { mobile: 0, shop: 0, active: 0, inactive: 0, total: 0 } as PartnerStats,
   });
 
+  // Helper: convert mọi kiểu (Timestamp | number | string) -> Date | null
+  const toDateSafe = (v: any): Date | null => {
+    if (!v) return null;
+    if (typeof v?.toDate === 'function') return v.toDate(); // Firestore Timestamp
+    if (typeof v === 'number') return new Date(v);
+    if (typeof v === 'string') {
+      const d = new Date(v);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+  };
+
   useEffect(() => {
     if (!user?.uid) return;
 
@@ -37,25 +51,24 @@ export default function TechnicianAssistantDashboard() {
 
     const fetchStats = async () => {
       try {
-        // Vehicle issues
-        const allIssuesSnap = await getDocs(collection(db, 'vehicleIssues'));
+        // ---------- Public issues (1 lần fetch) ----------
+        const issuesSnap = await getDocs(collection(db, 'publicVehicleIssues'));
+        const issues: PublicVehicleIssue[] = issuesSnap.docs.map((d) => d.data() as PublicVehicleIssue);
 
-        const unassignedIssuesCount = allIssuesSnap.docs.filter((d) => {
-          const data = d.data() as any;
-          return data.status === 'pending' && !data.assignedTo;
+        const unassignedIssuesCount = issues.filter(
+          (it) => it.status === 'pending' && !it.assignedTo
+        ).length;
+
+        const assignedTodayCount = issues.filter((it) => {
+          if (it.assignedBy !== user.uid) return false;
+          const dt = toDateSafe(it.assignedAt);
+          return !!dt && dt >= todayStart;
         }).length;
 
-        const assignedTodayCount = allIssuesSnap.docs.filter((d) => {
-          const data = d.data() as any;
-          return data.assignedBy === user.uid && data.assignedAt?.toDate?.() >= todayStart;
-        }).length;
-
-        // Technician Partners
+        // ---------- Technician Partners ----------
         const partnersSnap = await getDocs(collection(db, 'technicianPartners'));
         const total = partnersSnap.size;
-        let mobile = 0;
-        let shop = 0;
-        let active = 0;
+        let mobile = 0, shop = 0, active = 0;
 
         partnersSnap.docs.forEach((doc) => {
           const p = doc.data() as any;
@@ -63,7 +76,6 @@ export default function TechnicianAssistantDashboard() {
           if (p?.type === 'shop') shop += 1;
           if (p?.isActive === true) active += 1;
         });
-
         const inactive = total - active;
 
         setStats({
@@ -93,25 +105,23 @@ export default function TechnicianAssistantDashboard() {
           <DashboardCard
             icon={<ClipboardList aria-hidden className="w-5 h-5" />}
             title={t('cards.unassigned_issues')}
-            value={stats.unassignedIssues}
+            value={stats.unassignedIssues}   // ✅ lấy từ publicVehicleIssues (pending + chưa assignedTo)
             href="/assistant/dispatch"
           />
 
-          {/* ✅ Card 1: Mobile / Shop */}
+          {/* Mobile / Shop */}
           <DashboardCard
             icon={<Wrench aria-hidden className="w-5 h-5" />}
             title={t('cards.partners_by_type')}
-            // ví dụ: "12 / 8"
             value={`${stats.partners.mobile} / ${stats.partners.shop}`}
             hint={t('cards.hint.mobile_shop')}
             href="/assistant/add-technician-partner"
           />
 
-          {/* ✅ Card 2: Active / Inactive */}
+          {/* Active / Inactive */}
           <DashboardCard
             icon={<Wrench aria-hidden className="w-5 h-5" />}
             title={t('cards.partners_by_status')}
-            // ví dụ: "15 / 5"
             value={`${stats.partners.active} / ${stats.partners.inactive}`}
             hint={t('cards.hint.active_inactive')}
             href="/assistant/add-technician-partner"
@@ -120,7 +130,7 @@ export default function TechnicianAssistantDashboard() {
           <DashboardCard
             icon={<FileText aria-hidden className="w-5 h-5" />}
             title={t('cards.assigned_today')}
-            value={stats.assignedToday}
+            value={stats.assignedToday}      // ✅ lấy từ publicVehicleIssues (assignedBy = bạn & assignedAt >= hôm nay)
             href="/assistant/dispatch"
           />
         </section>

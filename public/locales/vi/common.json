@@ -193,7 +193,6 @@
   },
 
   "account": {
-    "title": "Thông tin tài khoản",
     "first_name": "Tên",
     "last_name": "Họ",
     "full_name": "Họ và tên",
@@ -202,39 +201,36 @@
     "female": "Nữ",
     "other": "Khác",
     "date_of_birth": "Ngày sinh",
-    "id_number": "CMND/CCCD",
-    "referral_code": "Mã giới thiệu",
-    "referral_hint": "Số CCCD của bạn sẽ được dùng làm mã giới thiệu trên hệ thống Bíp Bíp. Vui lòng nhập nếu để trống.",
+    "id_number": "Số CMND/CCCD",
+    "referral_hint": "Mã giới thiệu sẽ được tạo từ số CMND/CCCD",
     "phone": "Số điện thoại",
     "email": "Email",
-    "email_note": "* Đây là email đăng nhập của bạn.",
+    "login_email_note": "Đây là email đăng nhập của bạn",
     "password": "Mật khẩu",
     "reset_password": "Đặt lại mật khẩu",
+    "reset_success": "Yêu cầu đặt lại mật khẩu thành công",
+    "reset_notice": "Vui lòng kiểm tra email để thay đổi mật khẩu",
+    "reset_failed": "Không thể đặt lại mật khẩu",
+    "language": "Ngôn ngữ",
+    "region": "Khu vực",
+    "currency": "Tiền tệ",
     "address": "Địa chỉ",
     "city": "Thành phố",
-    "state": "Tỉnh/Thành",
-    "zip": "Mã ZIP",
+    "state": "Tỉnh/Quận",
+    "zip": "Mã bưu điện",
     "country": "Quốc gia",
     "last_known_address": "Địa chỉ gần nhất",
     "latitude": "Vĩ độ",
     "longitude": "Kinh độ",
-
-    "language": "Ngôn ngữ",
-    "region": "Khu vực",
-    "currency": "Tiền tệ",
-
-    "saved": "Lưu",
     "save": "Lưu",
     "cancel": "Hủy",
-
     "update_success": "Cập nhật thành công",
-    "saving_success_description": "Hồ sơ của bạn đã được lưu.",
-    "saving_error": "Cập nhật thất bại",
+    "saved": "Thông tin đã được lưu",
+    "update_failed": "Cập nhật thất bại",
 
-    "reset_sent": "Đặt lại mật khẩu",
-    "reset_sent_description": "Email đặt lại mật khẩu đã được gửi.",
-    "reset_failed": "Lỗi đặt lại mật khẩu",
-    "login_email_note": "Đây là email bạn đã dùng để đăng nhập. Nếu bạn muốn thay đổi, vui lòng liên hệ hỗ trợ."
+    "fetching_location": "Đang lấy vị trí...",
+    "refresh_location": "Lấy lại vị trí hiện tại",
+    "address_placeholder": "Nhập địa chỉ chi tiết"
   },
 
   "contribute": {

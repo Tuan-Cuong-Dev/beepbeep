@@ -22,11 +22,16 @@ import { useUserLocation } from '@/src/hooks/useUserLocation';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
 import { UserLocation } from '@/src/lib/users/userTypes';
 
+// ⬇️ thêm hook lấy vị trí hiện tại
+import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
+
 export default function AccountPage() {
   const { t } = useTranslation('common');
   const { user, loading, update } = useUserProfile();
   const { preferences, updatePreferences } = useUserPreferences(user?.uid ?? '');
   const { location, updateLocation } = useUserLocation(user?.uid ?? '');
+
+  const { location: currentLoc, error: locError, loading: locLoading } = useCurrentLocation();
 
   const [localUser, setLocalUser] = useState(user);
   const [localPrefs, setLocalPrefs] = useState(preferences);
@@ -39,6 +44,9 @@ export default function AccountPage() {
   const [notifyTitle, setNotifyTitle] = useState('');
   const [notifyDescription, setNotifyDescription] = useState('');
 
+  // refresh thủ công (không sửa hook)
+  const [manualRefreshing, setManualRefreshing] = useState(false);
+
   useEffect(() => {
     setLocalUser(user);
   }, [user]);
@@ -47,9 +55,22 @@ export default function AccountPage() {
     setLocalPrefs(preferences);
   }, [preferences]);
 
+  // Đồng bộ vị trí từ Firestore
   useEffect(() => {
-    setLocalLoc(location);
+    setLocalLoc(location ?? null);
   }, [location]);
+
+  // Khi hook lấy được vị trí trình duyệt → ghi vào localLoc (giữ nguyên address cũ nếu có)
+  useEffect(() => {
+    if (currentLoc) {
+      setLocalLoc(prev => ({
+        lat: currentLoc[0],
+        lng: currentLoc[1],
+        address: prev?.address ?? '',
+        updatedAt: Timestamp.now(),
+      }));
+    }
+  }, [currentLoc]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && localUser?.dateOfBirth) {
@@ -90,52 +111,90 @@ export default function AccountPage() {
   };
 
   const handleSaveAll = async () => {
-  if (!user?.uid || !localUser) return;
+    if (!user?.uid || !localUser) return;
 
-  try {
-    // Tạo referralCode từ idNumber nếu có
-    const referralCode = localUser.idNumber?.trim().toUpperCase();
+    try {
+      // referralCode từ idNumber nếu có
+      const referralCode = localUser.idNumber?.trim().toUpperCase();
 
-    const cleanedUserData = {
-      ...localUser,
-      referralCode, // ✅ Gán vào nếu hợp lệ
-    };
+      const cleanedUserData = {
+        ...localUser,
+        referralCode,
+      };
 
-    // Lọc bỏ các trường undefined/null
-    const userDataToSave = Object.fromEntries(
-      Object.entries(cleanedUserData).filter(
-        ([_, value]) => value !== undefined && value !== null
-      )
-    );
+      // Lọc bỏ undefined/null
+      const userDataToSave = Object.fromEntries(
+        Object.entries(cleanedUserData).filter(
+          ([_, value]) => value !== undefined && value !== null
+        )
+      );
 
-    await update(userDataToSave);
-    await updatePreferences(localPrefs);
+      await update(userDataToSave);
+      await updatePreferences(localPrefs);
 
-    if (localLoc?.lat !== undefined && localLoc?.lng !== undefined) {
-      await updateLocation({
-        lat: localLoc.lat,
-        lng: localLoc.lng,
-        address: localLoc.address || '',
-        updatedAt: localLoc.updatedAt ?? Timestamp.now(),
-      });
+      if (localLoc?.lat !== undefined && localLoc?.lng !== undefined) {
+        await updateLocation({
+          lat: localLoc.lat,
+          lng: localLoc.lng,
+          address: localLoc.address || '',
+          updatedAt: Timestamp.now(),
+        });
+      }
+
+      showNotification('success', t('account.update_success'), t('account.saved'));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      showNotification('error', t('account.update_failed'), msg);
     }
+  };
 
-    showNotification('success', t('account.update_success'), t('account.saved'));
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Unknown error';
-    showNotification('error', t('account.update_failed'), msg);
+  // Nút "Lấy lại vị trí hiện tại" (gọi trực tiếp Geolocation API)
+  const refreshCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      showNotification('error', t('common.error'), 'Geolocation is not supported by your browser.');
+      return;
+    }
+    setManualRefreshing(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocalLoc(prev => ({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          address: prev?.address ?? '',
+          updatedAt: Timestamp.now(),
+        }));
+        setManualRefreshing(false);
+      },
+      (err) => {
+        showNotification('error', t('common.error'), err.message || 'Unable to retrieve your location.');
+        setManualRefreshing(false);
+      },
+      { enableHighAccuracy: true }
+    );
+  };
+
+  if (loading || !user || !localUser) {
+    return <div className="p-6">{t('landing.loading')}</div>;
   }
-};
 
+  const latText =
+    locLoading || manualRefreshing
+      ? t('account.fetching_location')
+      : (localLoc?.lat !== undefined ? String(localLoc.lat) : '');
 
-  if (loading || !user || !localUser) return <div className="p-6">{t('landing.loading')}</div>;
+  const lngText =
+    locLoading || manualRefreshing
+      ? t('account.fetching_location')
+      : (localLoc?.lng !== undefined ? String(localLoc.lng) : '');
 
   return (
     <>
       <Header />
       <UserTopMenu />
       <main className="max-w-4xl mx-auto p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b-2 border-[#00d289] pb-2">{t('user_sidebar.menu.account_info')}</h2>
+        <h2 className="text-2xl font-semibold mb-6 border-b-2 border-[#00d289] pb-2">
+          {t('user_sidebar.menu.account_info')}
+        </h2>
 
         <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-6 rounded shadow-lg bg-white">
           {/* First Name */}
@@ -286,7 +345,6 @@ export default function AccountPage() {
             />
           </div>
 
-
           {/* Address Info */}
           <div className="md:col-span-2">
             <Label>{t('account.address')}</Label>
@@ -313,10 +371,22 @@ export default function AccountPage() {
             <Input value={localUser.country ?? ''} onChange={(e) => handleFieldChange('country', e.target.value)} />
           </div>
 
-          {/* Location */}
+          {/* ✅ LOCATION: tự động lấy lat/lng, cho sửa address + nút refresh */}
           <div className="md:col-span-2">
-            <Label>{t('account.last_known_address')}</Label>
+            <div className="flex items-center justify-between">
+              <Label>{t('account.last_known_address')}</Label>
+              <Button
+                type="button"
+                onClick={refreshCurrentLocation}
+                disabled={locLoading || manualRefreshing}
+                className="h-8"
+                variant="secondary"
+              >
+                {manualRefreshing ? t('account.fetching_location') : t('account.refresh_location')}
+              </Button>
+            </div>
             <Input
+              className="mt-2"
               value={localLoc?.address ?? ''}
               onChange={(e) =>
                 setLocalLoc((prev) => ({
@@ -324,35 +394,26 @@ export default function AccountPage() {
                   address: e.target.value,
                 }))
               }
+              placeholder={t('account.address_placeholder')}
             />
+            {locError && (
+              <p className="text-sm text-red-500 mt-2">
+                {locError}
+              </p>
+            )}
           </div>
 
           <div>
             <Label>{t('account.latitude')}</Label>
-            <Input
-              value={localLoc?.lat?.toString() ?? ''}
-              onChange={(e) =>
-                setLocalLoc((prev) => ({
-                  ...(prev ?? { address: '', lng: 0, updatedAt: Timestamp.now() }),
-                  lat: parseFloat(e.target.value) || 0,
-                }))
-              }
-            />
+            <Input value={latText} readOnly />
           </div>
 
           <div>
             <Label>{t('account.longitude')}</Label>
-            <Input
-              value={localLoc?.lng?.toString() ?? ''}
-              onChange={(e) =>
-                setLocalLoc((prev) => ({
-                  ...(prev ?? { address: '', lat: 0, updatedAt: Timestamp.now() }),
-                  lng: parseFloat(e.target.value) || 0,
-                }))
-              }
-            />
+            <Input value={lngText} readOnly />
           </div>
 
+          {/* Actions */}
           <div className="md:col-span-2 flex gap-4 mt-6">
             <Button type="button" onClick={handleSaveAll}>
               {t('account.save')}
