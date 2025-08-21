@@ -23,6 +23,7 @@ import CompanyAdminDashboard from '@/src/components/dashboards/CompanyAdminDashb
 import StationManagerDashboard from '@/src/components/dashboards/StationManagerDashboard';
 import TechnicianAssistantDashboard from '@/src/components/dashboards/TechnicianAssistantDashboard';
 import TechnicianPartnerDashboard from '@/src/components/dashboards/TechnicianPartnerDashboard';
+import { useTechnicianPartnerLiveLocation } from '@/src/hooks/useTechnicianPartnerLiveLocation';
 
 type PageBusinessType =
   | 'admin' | 'technician_assistant' | 'technician_partner'
@@ -49,12 +50,10 @@ export default function MyBusinessPage() {
 
   const mounted = useRef(true);
   useEffect(() => {
-    return () => {
-      mounted.current = false;
-    };
+    return () => { mounted.current = false; };
   }, []);
 
-  // ===== 1) Xác định businessType theo vai trò người dùng =====
+  // 1) Xác định businessType theo vai trò người dùng
   useEffect(() => {
     if (loading || !user) return;
 
@@ -68,16 +67,15 @@ export default function MyBusinessPage() {
 
     (async () => {
       // Chủ sở hữu
-      const rentalOwnerQ   = query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid));
+      const rentalOwnerQ   = query(collection(db, 'rentalCompanies'),  where('ownerId', '==', user.uid));
       const providerOwnerQ = query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid));
-      const agentOwnerQ    = query(collection(db, 'agents'),          where('ownerId', '==', user.uid));
+      const agentOwnerQ    = query(collection(db, 'agents'),           where('ownerId', '==', user.uid));
 
       const [rentalSnap, providerSnap, agentSnap] = await Promise.all([
         getDocs(rentalOwnerQ),
         getDocs(providerOwnerQ),
         getDocs(agentOwnerQ),
       ]);
-
       if (!mounted.current) return;
 
       if (!rentalSnap.empty)   return setBusinessType('rental_company_owner');
@@ -87,7 +85,6 @@ export default function MyBusinessPage() {
       // Fallback: staff
       const staffQ = query(collection(db, 'staffs'), where('userId', '==', user.uid));
       const staffSnap = await getDocs(staffQ);
-
       if (!mounted.current) return;
 
       if (!staffSnap.empty) {
@@ -106,7 +103,7 @@ export default function MyBusinessPage() {
     })();
   }, [loading, user, role, router]);
 
-  // ===== 2) Nếu là technician_partner → lấy type & id cho quyết định tracking =====
+  // 2) Nếu là technician_partner → lấy type & id cho quyết định tracking
   useEffect(() => {
     if (businessType !== 'technician_partner' || !user?.uid) return;
 
@@ -115,6 +112,7 @@ export default function MyBusinessPage() {
         query(collection(db, 'technicianPartners'), where('userId', '==', user.uid))
       );
       if (!mounted.current) return;
+
       if (!snap.empty) {
         const d0 = snap.docs[0];
         const data = d0.data() as any;
@@ -127,29 +125,31 @@ export default function MyBusinessPage() {
     })();
   }, [businessType, user?.uid]);
 
-  // ===== 3) Chuẩn bị ngữ cảnh live-location & kích hoạt cập nhật khi vào dashboard =====
+  // 3) Chuẩn bị ngữ cảnh live-location & kích hoạt cập nhật khi vào dashboard
   const { businessType: btForLive, companyId, entityId } = useMemo(
-    () =>
-      resolveBusinessContext({
-        pageBusinessType: businessType,
-        staffRoles,
-        technicianPartnerId,
-      }),
+    () => resolveBusinessContext({
+      pageBusinessType: businessType,
+      staffRoles,
+      technicianPartnerId,
+    }),
     [businessType, staffRoles, technicianPartnerId]
   );
 
+  // Chặn technician_partner vì đã có hook riêng ghi thẳng vào technicianPartners
   const enableLive = useMemo(
     () =>
+      businessType !== 'technician_partner' &&
       shouldTrackLiveLocation({
         businessType: btForLive,
         pageBusinessType: businessType,
         staffRoles,
-        technicianPartnerType,     // chỉ 'mobile' mới true cho technician_partner
+        technicianPartnerType,
         privateProviderIsMobile: false,
       }),
     [btForLive, businessType, staffRoles, technicianPartnerType]
   );
 
+  // Ghi vào liveLocations cho các nhóm khác (nếu nên track)
   useAutoUpdateLocation({
     enabled: !!user?.uid && enableLive,
     uid: user?.uid ?? null,
@@ -158,10 +158,17 @@ export default function MyBusinessPage() {
     companyId,
     entityId,
     ttlMinutes: 15,
-    watch: false, // chỉ cập nhật 1 lần khi user vào dashboard
+    watch: false,
   });
 
-  // ===== 4) UI =====
+  // TechnicianPartner (mobile) → ghi trực tiếp vào collection technicianPartners
+  useTechnicianPartnerLiveLocation({
+    enabled: businessType === 'technician_partner' && technicianPartnerType === 'mobile',
+    technicianPartnerId,
+    userId: user?.uid ?? null,
+  });
+
+  // 4) UI
   if (loading) {
     return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>;
   }
@@ -178,9 +185,7 @@ export default function MyBusinessPage() {
       {businessType === 'station_manager'      && <StationManagerDashboard />}
       {businessType === 'staff'                && <StaffDashboard />}
       {businessType === 'technician'           && <TechnicianDashboard />}
-      {!businessType && (
-        <div className="text-center text-gray-500">No business found.</div>
-      )}
+      {!businessType && <div className="text-center text-gray-500">No business found.</div>}
     </main>
   );
 }
