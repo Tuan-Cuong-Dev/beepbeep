@@ -16,7 +16,7 @@ import { useUser } from '@/src/context/AuthContext';
 import { usePersonalVehicles } from '@/src/hooks/usePersonalVehicles';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 
-import type { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+import type { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes'; 
 import type { PersonalVehicle } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 import { useTranslation } from 'react-i18next';
 
@@ -27,7 +27,7 @@ interface Props {
 
 export default function ReportVehicleIssueModal({ open, onClose }: Props) {
   const { t } = useTranslation('common', { keyPrefix: 'report_issue' });
-  const { user } = useUser(); 
+  const { user } = useUser();
   const uid = user?.uid;
 
   const { vehicles, loading: loadingVehicles } = usePersonalVehicles(uid);
@@ -68,6 +68,7 @@ export default function ReportVehicleIssueModal({ open, onClose }: Props) {
   const handleSubmit = async () => {
     try {
       setErrorMsg(null);
+
       if (!uid) {
         setErrorMsg(t('errors.need_login'));
         return;
@@ -83,38 +84,40 @@ export default function ReportVehicleIssueModal({ open, onClose }: Props) {
 
       const selected = vehicleOptions.find(o => o.value === vehicleId)?.raw;
 
+      // ✅ Tạo payload KHÔNG chứa undefined; chỉ spread khi có giá trị
       const payload: PublicVehicleIssue = {
+        // Bắt buộc
         customerName: customerName || t('customer_default'),
         phone: phone || '',
         issueDescription: issueDescription.trim(),
-        vehicleId: selected?.id,
-        reportedBy: uid,
-
         status: 'pending',
-        assignedTo: undefined,
-        assignedToName: undefined,
-        assignedBy: undefined,
-        assignedAt: undefined,
-
         createdAt: serverTimestamp() as any,
+
+        // Khuyến nghị có:
+        reportedBy: uid,
+        ...(selected?.id ? { vehicleId: selected.id } : {}),
         updatedAt: serverTimestamp() as any,
 
-        vehicleBrand: selected?.brand,
-        vehicleModel: selected?.model,
-        vehicleLicensePlate: selected?.licensePlate,
-
+        // Thông tin vị trí
         location: {
           mapAddress: issueAddress || t('location.current'),
-          coordinates: toCoordString,
-          issueAddress: issueAddress || undefined,
+          ...(toCoordString ? { coordinates: toCoordString } : {}),
+          ...(issueAddress ? { issueAddress } : {}),
         },
 
-        closeComment: undefined,
+        // Trạng thái duyệt (optional): đặt pending ngay từ đầu
         approveStatus: 'pending',
+
+        // Thông tin xe (optional)
+        ...(selected?.brand ? { vehicleBrand: selected.brand } : {}),
+        ...(selected?.model ? { vehicleModel: selected.model } : {}),
+        ...(selected?.licensePlate ? { vehicleLicensePlate: selected.licensePlate } : {}),
+
+        // ❌ KHÔNG thêm các field assigned*, closed*, proposed/actual nếu chưa có
       };
 
       setSubmitting(true);
-      await addDoc(collection(db, 'publicVehicleIssues'), payload as any);
+      await addDoc(collection(db, 'publicVehicleIssues'), payload);
       setSubmitting(false);
       resetForm();
       onClose();
