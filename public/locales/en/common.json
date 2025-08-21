@@ -3405,7 +3405,35 @@
 
 "report_vehicle_issue_button": {
   "label": "Report Vehicle Issue"
+},
+
+"map": {
+  "title": "Nearby Support Map",
+  "loading_partners": "Loading partners…",
+  "no_location_data": "No location data to display the map.",
+  "focus_issue": "Customer issue (viewing)",
+  "open_on_maps": "Open in Google Maps",
+  "phone_short": "Tel",
+  "shop_fallback": "Repair shop",
+  "mobile_fallback": "Mobile technician",
+  "distance_km": "Distance: {{val}} km",
+  "legend": {
+    "viewing_issue": "Viewing issue",
+    "nearest_shop": "Nearest shop",
+    "nearest_mobile": "Nearest mobile tech"
+  },
+  "status": {
+    "pending": "Pending",
+    "assigned": "Assigned",
+    "proposed": "Proposed",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "in_progress": "In progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  }
 }
+
 
 
 

@@ -3429,7 +3429,35 @@
 
 "report_vehicle_issue_button": {
   "label": "車両故障を報告"
+},
+
+"map": {
+  "title": "近隣サポートマップ",
+  "loading_partners": "パートナーを読み込み中…",
+  "no_location_data": "地図を表示する位置情報がありません。",
+  "focus_issue": "通報中の故障（閲覧中）",
+  "open_on_maps": "Googleマップで開く",
+  "phone_short": "TEL",
+  "shop_fallback": "修理工場",
+  "mobile_fallback": "出張メカニック",
+  "distance_km": "距離: {{val}} km",
+  "legend": {
+    "viewing_issue": "閲覧中の故障",
+    "nearest_shop": "最寄りの店舗",
+    "nearest_mobile": "最寄りの出張メカ"
+  },
+  "status": {
+    "pending": "保留",
+    "assigned": "担当割り当て済み",
+    "proposed": "提案済み",
+    "confirmed": "確定",
+    "rejected": "却下",
+    "in_progress": "対応中",
+    "resolved": "解決",
+    "closed": "クローズ"
+  }
 }
+
 
 
 

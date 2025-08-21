@@ -3476,7 +3476,35 @@
 
 "report_vehicle_issue_button": {
   "label": "Báo Hỏng Xe"
+},
+
+"map": {
+  "title": "Bản đồ hỗ trợ gần khách hàng",
+  "loading_partners": "Đang tải đối tác…",
+  "no_location_data": "Không có dữ liệu vị trí để hiển thị bản đồ.",
+  "focus_issue": "Khách hàng báo lỗi (đang xem)",
+  "open_on_maps": "Mở trên Google Maps",
+  "phone_short": "ĐT",
+  "shop_fallback": "Cửa hàng sửa xe",
+  "mobile_fallback": "Kỹ thuật viên lưu động",
+  "distance_km": "Khoảng cách: {{val}} km",
+  "legend": {
+    "viewing_issue": "Sự cố đang xem",
+    "nearest_shop": "Cửa hàng gần nhất",
+    "nearest_mobile": "Kỹ thuật viên lưu động gần nhất"
+  },
+  "status": {
+    "pending": "Chờ xử lý",
+    "assigned": "Đã phân công",
+    "proposed": "Đề xuất",
+    "confirmed": "Xác nhận",
+    "rejected": "Từ chối",
+    "in_progress": "Đang xử lý",
+    "resolved": "Đã giải quyết",
+    "closed": "Đã đóng"
+  }
 }
+
 
 
 

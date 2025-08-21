@@ -86,6 +86,15 @@ export default function PublicIssueDispatchPage() {
     }
   }, [dialog.open]);
 
+  // Lọc tất cả pending có toạ độ
+  const pendingIssuesWithCoords = useMemo(
+    () =>
+      issues.filter(
+        (i) => i.status === 'pending' && !!(i.location?.coordinates)
+      ),
+    [issues]
+  );
+
   // ===== Lọc dữ liệu để đổ vào bảng (Hook luôn ở trên, không đặt sau return có điều kiện)
   const filteredIssues = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
@@ -219,7 +228,7 @@ export default function PublicIssueDispatchPage() {
       <Header />
       <UserTopMenu />
       <main className="flex-1 p-6 space-y-6">
-        <h1 className="text-2xl font-bold">{t('title')}</h1>
+        <h1 className="text-2xl font-bold text-center flex items-center justify-center gap-2">{t('title')}</h1>
 
         {/* Tổng quan: vẫn dùng toàn bộ issues */}
         <VehicleIssuesSummaryCard issues={issues} />
@@ -234,7 +243,7 @@ export default function PublicIssueDispatchPage() {
         />
 
         {/* ✅ Bản đồ hỗ trợ (khách + 5 shop + 5 mobile) */}
-        {mapCenter && <NearbySupportMap issueCoords={mapCenter} limitPerType={5} />}
+        {mapCenter && <NearbySupportMap issueCoords={mapCenter} issues={issues}  limitPerType={5} />}
 
         {/* Form phân công */}
         {showForm && editingIssue && (
