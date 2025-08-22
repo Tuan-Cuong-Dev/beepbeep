@@ -30,8 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files (do not commit secrets)
+.env
+.env.*
+!.env.example   # keep example env file if needed
 
 # vercel
 .vercel
@@ -40,18 +42,16 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Không push file nhạy cảm
-serviceAccountKey.json
-.env.local.env.local
-.env
-.env.local
+# ==== Không push file nhạy cảm ====
+# Firebase & API keys
+**/serviceAccount*.json
+**/service-account*.json
+**/*ServiceKey*.json
+**/*serviceKey*.json
+**/*-key.json
 ocrServiceKey.json
-# Firebase service account
+
+# Thư mục chứa secrets tạm
+secret/
+.secrets/
 src/admin_tools/serviceAccountKey.json
-service-account.json
-
-
-
-
-service-account.json
-service-account.json

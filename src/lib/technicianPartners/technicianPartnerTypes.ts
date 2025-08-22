@@ -1,5 +1,6 @@
 // lib/technicianPartners/technicianPartnerTypes.ts
 import { Timestamp, FieldValue } from 'firebase/firestore';
+import { LocationCore } from '../locations/locationTypes';
 
 export type VehicleType = 'car' | 'motorbike' | 'bike';
 
@@ -18,21 +19,19 @@ export interface TechnicianPartner {
   shopName?: string;
   shopAddress?: string;
 
-  // Map / location
-  mapAddress?: string; // e.g. Google Maps link or address string
-  coordinates?: { lat: number; lng: number }| null;
-  geo?: { lat: number; lng: number };
+  // Map / location (CHUẨN MỚI)
+  location?: LocationCore;        // ✅ chuẩn duy nhất
 
-  // Coverage
-  assignedRegions: string[]; // ["DaNang/ThanhKhe/...", ...]
-
-  // Optional geo box
+  // Nếu vẫn cần ô vùng phủ (tuỳ chọn)
   geoBox?: {
     latMin: number;
     latMax: number;
     lngMin: number;
     lngMax: number;
   };
+
+  // Coverage
+  assignedRegions: string[]; // ["DaNang/ThanhKhe/...", ...]
 
   // Services / vehicle type
   serviceCategories?: string[]; // ["battery", "brake", ...]

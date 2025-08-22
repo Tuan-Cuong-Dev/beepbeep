@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/src/i18n';
 import { sendPasswordResetEmail } from 'firebase/auth';
@@ -20,46 +20,78 @@ import { useUserProfile } from '@/src/hooks/useUserProfile';
 import { useUserPreferences } from '@/src/hooks/useUserPreferences';
 import { useUserLocation } from '@/src/hooks/useUserLocation';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
-import { UserLocation } from '@/src/lib/users/userTypes';
-// ⬇️ thêm hook lấy vị trí hiện tại
+import type { User as AppUser } from '@/src/lib/users/userTypes';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
+
+// ===== Helpers =====
+const sanitizeReferral = (idNumber?: string) =>
+  idNumber ? idNumber.trim().replace(/\s+/g, '').toUpperCase() : undefined;
+
+const toISODateOrEmpty = (value?: string) => {
+  if (!value) return '';
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? '' : format(d, 'yyyy-MM-dd');
+};
+
+// State cục bộ cho UI (không dùng type có GeoPoint)
+type EditableUserLocation = {
+  lat: number;
+  lng: number;
+  address?: string;
+  updatedAt: Timestamp;
+};
 
 export default function AccountPage() {
   const { t } = useTranslation('common');
+
+  // Core data
   const { user, loading, update } = useUserProfile();
   const { preferences, updatePreferences } = useUserPreferences(user?.uid ?? '');
-  const { location, updateLocation } = useUserLocation(user?.uid ?? '');
+  // ⚠️ Đổi tên để tránh "đè": hook trả về bản từ DB (có geo)
+  const { location: dbLocation, updateLocation } = useUserLocation(user?.uid ?? '');
 
+  // Browser location
   const { location: currentLoc, error: locError, loading: locLoading } = useCurrentLocation();
 
-  const [localUser, setLocalUser] = useState(user);
+  // Local editable states
+  const [localUser, setLocalUser] = useState<Partial<AppUser> | null>(null);
   const [localPrefs, setLocalPrefs] = useState(preferences);
-  const [localLoc, setLocalLoc] = useState<UserLocation | null>(null);
-
+  const [localLoc, setLocalLoc] = useState<EditableUserLocation | null>(null);
   const [formattedDateOfBirth, setFormattedDateOfBirth] = useState('');
 
+  // Notifications
   const [notifyOpen, setNotifyOpen] = useState(false);
   const [notifyType, setNotifyType] = useState<NotificationType>('success');
   const [notifyTitle, setNotifyTitle] = useState('');
   const [notifyDescription, setNotifyDescription] = useState('');
 
-  // refresh thủ công (không sửa hook)
+  // Manual refresh state
   const [manualRefreshing, setManualRefreshing] = useState(false);
 
+  // ===== Sync remote → local =====
   useEffect(() => {
-    setLocalUser(user);
+    setLocalUser(user ?? null);
   }, [user]);
 
   useEffect(() => {
     setLocalPrefs(preferences);
   }, [preferences]);
 
-  // Đồng bộ vị trí từ Firestore
+  // Map DB location (có geo) → editable state
   useEffect(() => {
-    setLocalLoc(location ?? null);
-  }, [location]);
+    if (!dbLocation) {
+      setLocalLoc(null);
+      return;
+    }
+    setLocalLoc({
+      lat: dbLocation.geo.latitude,
+      lng: dbLocation.geo.longitude,
+      address: dbLocation.address ?? '',
+      updatedAt: dbLocation.updatedAt ?? Timestamp.now(),
+    });
+  }, [dbLocation]);
 
-  // Khi hook lấy được vị trí trình duyệt → ghi vào localLoc (giữ nguyên address cũ nếu có)
+  // Khi browser định vị được → cập nhật editable state (giữ address cũ)
   useEffect(() => {
     if (currentLoc) {
       setLocalLoc(prev => ({
@@ -71,33 +103,38 @@ export default function AccountPage() {
     }
   }, [currentLoc]);
 
+  // Seed DOB input
   useEffect(() => {
-    if (typeof window !== 'undefined' && localUser?.dateOfBirth) {
-      const parsed = new Date(localUser.dateOfBirth);
-      if (!isNaN(parsed.getTime())) {
-        setFormattedDateOfBirth(format(parsed, 'yyyy-MM-dd'));
-      }
-    }
+    setFormattedDateOfBirth(toISODateOrEmpty(localUser?.dateOfBirth));
   }, [localUser?.dateOfBirth]);
 
-  const handleFieldChange = (field: string, value: string) => {
-    setLocalUser((prev: any) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  // ===== Derived UI states =====
+  const isBusy = loading || !user || !localUser;
+  const isSavingDisabled = !localUser || !user?.uid;
 
-  const showNotification = (
-    type: NotificationType,
-    title: string,
-    description?: string
-  ) => {
+  const latText = useMemo(() => {
+    if (locLoading || manualRefreshing) return t('account.fetching_location');
+    return localLoc?.lat !== undefined ? String(localLoc.lat) : '';
+  }, [locLoading, manualRefreshing, localLoc?.lat, t]);
+
+  const lngText = useMemo(() => {
+    if (locLoading || manualRefreshing) return t('account.fetching_location');
+    return localLoc?.lng !== undefined ? String(localLoc.lng) : '';
+  }, [locLoading, manualRefreshing, localLoc?.lng, t]);
+
+  // ===== UI helpers =====
+  const showNotification = (type: NotificationType, title: string, description?: string) => {
     setNotifyType(type);
     setNotifyTitle(title);
     setNotifyDescription(description ?? '');
     setNotifyOpen(true);
   };
 
+  const handleFieldChange = <K extends keyof AppUser>(field: K, value: AppUser[K]) => {
+    setLocalUser(prev => (prev ? { ...prev, [field]: value } : { [field]: value } as Partial<AppUser>));
+  };
+
+  // ===== Actions =====
   const handleResetPassword = async () => {
     if (!user?.email) return;
     try {
@@ -113,30 +150,23 @@ export default function AccountPage() {
     if (!user?.uid || !localUser) return;
 
     try {
-      // referralCode từ idNumber nếu có
-      const referralCode = localUser.idNumber?.trim().toUpperCase();
+      // Build user payload
+      const referralCode = sanitizeReferral(localUser.idNumber);
+      const cleanedUserData: Partial<AppUser> = { ...localUser, referralCode };
 
-      const cleanedUserData = {
-        ...localUser,
-        referralCode,
-      };
-
-      // Lọc bỏ undefined/null
       const userDataToSave = Object.fromEntries(
-        Object.entries(cleanedUserData).filter(
-          ([_, value]) => value !== undefined && value !== null
-        )
+        Object.entries(cleanedUserData).filter(([, value]) => value !== undefined && value !== null)
       );
 
       await update(userDataToSave);
       await updatePreferences(localPrefs);
 
+      // Map editable → hook updater (hook sẽ convert sang GeoPoint)
       if (localLoc?.lat !== undefined && localLoc?.lng !== undefined) {
         await updateLocation({
           lat: localLoc.lat,
           lng: localLoc.lng,
           address: localLoc.address || '',
-          updatedAt: Timestamp.now(),
         });
       }
 
@@ -147,7 +177,7 @@ export default function AccountPage() {
     }
   };
 
-  // Nút "Lấy lại vị trí hiện tại" (gọi trực tiếp Geolocation API)
+  // Manual refresh via Geolocation API
   const refreshCurrentLocation = () => {
     if (!navigator.geolocation) {
       showNotification('error', t('common.error'), 'Geolocation is not supported by your browser.');
@@ -155,7 +185,7 @@ export default function AccountPage() {
     }
     setManualRefreshing(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      pos => {
         setLocalLoc(prev => ({
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
@@ -164,27 +194,17 @@ export default function AccountPage() {
         }));
         setManualRefreshing(false);
       },
-      (err) => {
+      err => {
         showNotification('error', t('common.error'), err.message || 'Unable to retrieve your location.');
         setManualRefreshing(false);
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   };
 
-  if (loading || !user || !localUser) {
+  if (isBusy) {
     return <div className="p-6">{t('landing.loading')}</div>;
   }
-
-  const latText =
-    locLoading || manualRefreshing
-      ? t('account.fetching_location')
-      : (localLoc?.lat !== undefined ? String(localLoc.lat) : '');
-
-  const lngText =
-    locLoading || manualRefreshing
-      ? t('account.fetching_location')
-      : (localLoc?.lng !== undefined ? String(localLoc.lng) : '');
 
   return (
     <>
@@ -195,23 +215,35 @@ export default function AccountPage() {
           {t('user_sidebar.menu.account_info')}
         </h2>
 
-        <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-6 rounded shadow-lg bg-white">
+        <form onSubmit={e => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-6 rounded shadow-lg bg-white">
           {/* First Name */}
           <div>
             <Label>{t('account.first_name')}</Label>
-            <Input value={localUser.firstName ?? ''} onChange={(e) => handleFieldChange('firstName', e.target.value)} />
+            <Input
+              value={localUser.firstName ?? ''}
+              onChange={e => handleFieldChange('firstName', e.target.value)}
+              autoComplete="given-name"
+            />
           </div>
 
           {/* Last Name */}
           <div>
             <Label>{t('account.last_name')}</Label>
-            <Input value={localUser.lastName ?? ''} onChange={(e) => handleFieldChange('lastName', e.target.value)} />
+            <Input
+              value={localUser.lastName ?? ''}
+              onChange={e => handleFieldChange('lastName', e.target.value)}
+              autoComplete="family-name"
+            />
           </div>
 
           {/* Full Name */}
           <div className="md:col-span-2">
             <Label>{t('account.full_name')}</Label>
-            <Input value={localUser.name ?? ''} onChange={(e) => handleFieldChange('name', e.target.value)} />
+            <Input
+              value={localUser.name ?? ''}
+              onChange={e => handleFieldChange('name', e.target.value)}
+              autoComplete="name"
+            />
           </div>
 
           {/* Gender */}
@@ -219,7 +251,7 @@ export default function AccountPage() {
             <Label>{t('account.gender')}</Label>
             <SimpleSelect
               value={localUser.gender ?? ''}
-              onChange={(val) => handleFieldChange('gender', val)}
+              onChange={val => handleFieldChange('gender', val as AppUser['gender'])}
               options={[
                 { label: t('account.male'), value: 'male' },
                 { label: t('account.female'), value: 'female' },
@@ -235,7 +267,7 @@ export default function AccountPage() {
             <Input
               type="date"
               value={formattedDateOfBirth}
-              onChange={(e) => {
+              onChange={e => {
                 setFormattedDateOfBirth(e.target.value);
                 handleFieldChange('dateOfBirth', e.target.value);
               }}
@@ -247,17 +279,19 @@ export default function AccountPage() {
             <Label>{t('account.id_number')}</Label>
             <Input
               value={localUser.idNumber ?? ''}
-              onChange={(e) => handleFieldChange('idNumber', e.target.value)}
+              onChange={e => handleFieldChange('idNumber', e.target.value)}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              {t('account.referral_hint')}
-            </p>
+            <p className="text-xs text-gray-500 mt-1">{t('account.referral_hint')}</p>
           </div>
 
           {/* Phone */}
           <div>
             <Label>{t('account.phone')}</Label>
-            <Input value={localUser.phone ?? ''} onChange={(e) => handleFieldChange('phone', e.target.value)} />
+            <Input
+              value={localUser.phone ?? ''}
+              onChange={e => handleFieldChange('phone', e.target.value)}
+              autoComplete="tel"
+            />
           </div>
 
           {/* Email */}
@@ -271,7 +305,11 @@ export default function AccountPage() {
           <div className="md:col-span-1">
             <Label>{t('account.password')}</Label>
             <Input type="password" value="********" disabled />
-            <button type="button" onClick={handleResetPassword} className="text-sm text-[#00d289] mt-2 hover:underline">
+            <button
+              type="button"
+              onClick={handleResetPassword}
+              className="text-sm text-[#00d289] mt-2 hover:underline"
+            >
               {t('account.reset_password')}
             </button>
           </div>
@@ -281,9 +319,9 @@ export default function AccountPage() {
             <Label>{t('account.language')}</Label>
             <SimpleSelect
               value={localPrefs.language ?? ''}
-              onChange={(val) => {
+              onChange={val => {
                 i18n.changeLanguage(val);
-                setLocalPrefs((prev) => ({ ...prev, language: val }));
+                setLocalPrefs(prev => ({ ...prev, language: val }));
               }}
               options={[
                 { label: 'Vietnamese', value: 'vi' },
@@ -307,7 +345,7 @@ export default function AccountPage() {
             <Label>{t('account.region')}</Label>
             <SimpleSelect
               value={localPrefs.region ?? ''}
-              onChange={(val) => setLocalPrefs((prev) => ({ ...prev, region: val }))}
+              onChange={val => setLocalPrefs(prev => ({ ...prev, region: val }))}
               options={[
                 { label: 'Vietnam', value: 'VN' },
                 { label: 'United Kingdom', value: 'GB' },
@@ -330,7 +368,7 @@ export default function AccountPage() {
             <Label>{t('account.currency')}</Label>
             <SimpleSelect
               value={localPrefs.currency ?? ''}
-              onChange={(val) => setLocalPrefs((prev) => ({ ...prev, currency: val }))}
+              onChange={val => setLocalPrefs(prev => ({ ...prev, currency: val }))}
               options={[
                 { label: 'VND - Vietnamese Dong', value: 'VND' },
                 { label: 'GBP - British Pound Sterling', value: 'GBP' },
@@ -347,30 +385,34 @@ export default function AccountPage() {
           {/* Address Info */}
           <div className="md:col-span-2">
             <Label>{t('account.address')}</Label>
-            <Input value={localUser.address ?? ''} onChange={(e) => handleFieldChange('address', e.target.value)} />
+            <Input
+              value={localUser.address ?? ''}
+              onChange={e => handleFieldChange('address', e.target.value)}
+              autoComplete="street-address"
+            />
           </div>
 
           <div>
             <Label>{t('account.city')}</Label>
-            <Input value={localUser.city ?? ''} onChange={(e) => handleFieldChange('city', e.target.value)} />
+            <Input value={localUser.city ?? ''} onChange={e => handleFieldChange('city', e.target.value)} />
           </div>
 
           <div>
             <Label>{t('account.state')}</Label>
-            <Input value={localUser.state ?? ''} onChange={(e) => handleFieldChange('state', e.target.value)} />
+            <Input value={localUser.state ?? ''} onChange={e => handleFieldChange('state', e.target.value)} />
           </div>
 
           <div>
             <Label>{t('account.zip')}</Label>
-            <Input value={localUser.zip ?? ''} onChange={(e) => handleFieldChange('zip', e.target.value)} />
+            <Input value={localUser.zip ?? ''} onChange={e => handleFieldChange('zip', e.target.value)} />
           </div>
 
           <div>
             <Label>{t('account.country')}</Label>
-            <Input value={localUser.country ?? ''} onChange={(e) => handleFieldChange('country', e.target.value)} />
+            <Input value={localUser.country ?? ''} onChange={e => handleFieldChange('country', e.target.value)} />
           </div>
 
-          {/* ✅ LOCATION: tự động lấy lat/lng, cho sửa address + nút refresh */}
+          {/* LOCATION */}
           <div className="md:col-span-2">
             <div className="flex items-center justify-between">
               <Label>{t('account.last_known_address')}</Label>
@@ -384,22 +426,20 @@ export default function AccountPage() {
                 {manualRefreshing ? t('account.fetching_location') : t('account.refresh_location')}
               </Button>
             </div>
+
             <Input
               className="mt-2"
               value={localLoc?.address ?? ''}
-              onChange={(e) =>
-                setLocalLoc((prev) => ({
+              onChange={e =>
+                setLocalLoc(prev => ({
                   ...(prev ?? { lat: 0, lng: 0, updatedAt: Timestamp.now() }),
                   address: e.target.value,
                 }))
               }
               placeholder={t('account.address_placeholder')}
             />
-            {locError && (
-              <p className="text-sm text-red-500 mt-2">
-                {locError}
-              </p>
-            )}
+
+            {locError && <p className="text-sm text-red-500 mt-2">{locError}</p>}
           </div>
 
           <div>
@@ -414,7 +454,7 @@ export default function AccountPage() {
 
           {/* Actions */}
           <div className="md:col-span-2 flex gap-4 mt-6">
-            <Button type="button" onClick={handleSaveAll}>
+            <Button type="button" onClick={handleSaveAll} disabled={isSavingDisabled}>
               {t('account.save')}
             </Button>
             <Button type="button" variant="ghost">

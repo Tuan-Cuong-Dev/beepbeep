@@ -1,5 +1,5 @@
 // 📁 lib/users/userTypes.ts
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp, GeoPoint } from 'firebase/firestore';
 
 export interface UserPreferences {
   language: string;
@@ -8,10 +8,11 @@ export interface UserPreferences {
 }
 
 export interface UserLocation {
-  lat: number;
-  lng: number;
+  geo: GeoPoint;                 // ⬅️ thay thế lat/lng number
   address?: string;
   updatedAt: Timestamp;
+  // Optional tiện lợi:
+  location?: string;             // "lat,lng"
 }
 
 export interface User {

@@ -1,65 +1,61 @@
+// hooks/useUserLocation.ts
+// Chuẩn hóa dựa vào types mới định nghĩa : locationType.ts ngày 22/08/2025.
+
 'use client';
-
 import { useEffect, useState } from 'react';
-import { Timestamp } from 'firebase/firestore';
-import { getUserLocation, updateUserLocation } from '@/src/lib/users/locationService'; // bạn cần tạo file này
+import { db } from '@/src/firebaseConfig';
+import { doc, onSnapshot, updateDoc, serverTimestamp, GeoPoint, Timestamp } from 'firebase/firestore';
+import type { UserLocation as AppUserLocation } from '@/src/lib/users/userTypes';
 
-export interface UserLocation {
-  lat: number;
-  lng: number;
-  address?: string;
-  updatedAt: Timestamp;
-}
+export function useUserLocation(uid: string) {
+  const [location, setLocation] = useState<AppUserLocation | null>(null);
 
-export function useUserLocation(userId: string | null | undefined) {
-  const [location, setLocation] = useState<UserLocation | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  // Lấy dữ liệu ban đầu
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
+    if (!uid) return;
+    const ref = doc(db, 'users', uid);
+    return onSnapshot(ref, (snap) => {
+      const data = snap.data();
+      const last = data?.lastKnownLocation;
 
-    const fetchLocation = async () => {
-      try {
-        const loc = await getUserLocation(userId);
-        setLocation(loc);
-      } catch (err: any) {
-        console.error('❌ Failed to fetch location:', err);
-        setError(err);
-      } finally {
-        setLoading(false);
+      // Chuẩn mới
+      if (last?.geo instanceof GeoPoint) {
+        setLocation({
+          geo: last.geo,
+          address: last.address ?? '',
+          updatedAt: last.updatedAt ?? Timestamp.now(),
+          location: last.location ?? `${last.geo.latitude},${last.geo.longitude}`,
+        });
+        return;
       }
-    };
 
-    fetchLocation();
-  }, [userId]);
+      // Dữ liệu cũ (lat/lng rời) -> migrate tạm vào state
+      if (typeof last?.lat === 'number' && typeof last?.lng === 'number') {
+        const gp = new GeoPoint(last.lat, last.lng);
+        setLocation({
+          geo: gp,
+          address: last.address ?? '',
+          updatedAt: last.updatedAt ?? Timestamp.now(),
+          location: `${gp.latitude},${gp.longitude}`,
+        });
+        return;
+      }
 
-  // Cập nhật vị trí người dùng
-  const updateLocation = async (newLoc: Partial<UserLocation>) => {
-  if (!userId) return;
+      setLocation(null);
+    });
+  }, [uid]);
 
-  if (newLoc.lat == null || newLoc.lng == null) {
-    console.error('Latitude and Longitude are required');
-    return;
-  }
+  const updateLocation = async (input: { lat: number; lng: number; address?: string }) => {
+    if (!uid) return;
+    const ref = doc(db, 'users', uid);
+    await updateDoc(ref, {
+      lastKnownLocation: {
+        geo: new GeoPoint(input.lat, input.lng),
+        location: `${input.lat},${input.lng}`,
+        address: input.address ?? '',
+        updatedAt: serverTimestamp(),
+      },
+    });
+  };
 
-  try {
-    const updated: UserLocation = {
-      lat: newLoc.lat,
-      lng: newLoc.lng,
-      address: newLoc.address || location?.address || '',
-      updatedAt: Timestamp.now(),
-    };
-    await updateUserLocation(userId, updated);
-    setLocation(updated);
-  } catch (err: any) {
-    console.error('❌ Failed to update location:', err);
-    setError(err);
-  }
-};
-  return { location, updateLocation, loading, error };
+  return { location, updateLocation };
 }
