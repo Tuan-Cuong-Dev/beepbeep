@@ -249,7 +249,9 @@
     "submit_repair_shop": "Submit Repair Shop",
     "submitting": "Submitting...",
     "thank_you": "Thank you for your contribution!",
-    "submission_received": "We’ve received your submission and will review it shortly."
+    "submission_received": "We’ve received your submission and will review it shortly.",
+    "working_start_time": "Start Time",
+    "working_end_time": "End Time"
   },
 
   "rental_shop_form": {

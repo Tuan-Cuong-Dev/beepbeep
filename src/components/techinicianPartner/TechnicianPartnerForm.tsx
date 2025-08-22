@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
+import type { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
+import type { LocationCore } from '@/src/lib/locations/locationTypes';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { Textarea } from '@/src/components/ui/textarea';
@@ -12,23 +13,35 @@ import { useTranslation } from 'react-i18next';
 
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
-// ===== Legacy type để đọc dữ liệu cũ (có workingHours) =====
+// ===== Legacy type để đọc dữ liệu cũ =====
 type LegacyData = TechnicianPartner & {
   workingHours?: { isWorking?: boolean; startTime?: string; endTime?: string }[];
   workingStartTime?: string;
   workingEndTime?: string;
+  mapAddress?: string;
+  coordinates?: { lat?: number; lng?: number } | null;
 };
 
-interface Props {
-  initialData?: Partial<TechnicianPartner>;
-  onSave: (
-    data: Partial<TechnicianPartner & { email?: string; password?: string; role: 'technician_partner' }>
-  ) => Promise<void>;
-}
+  // ⬇️ Thêm kiểu payload cho Form (location “lite”)
+  type SavePayload = Partial<
+    Omit<TechnicianPartner, 'location'> & {
+      // location ở layer Form chỉ gửi những gì người dùng nhập
+      location?: Partial<Pick<LocationCore, 'address' | 'location'>>;
+      email?: string;
+      password?: string;
+      role: 'technician_partner';
+    }
+  >;
+
+  interface Props {
+    initialData?: Partial<TechnicianPartner>;
+    onSave: (data: SavePayload) => Promise<void>; // ⬅️ nới type ở đây
+  }
+
 
 // 🧹 Bỏ toàn bộ undefined (đệ quy)
 function stripUndefinedDeep<T>(obj: T): T {
-  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj === null || typeof obj !== 'object') return obj as T;
   if (Array.isArray(obj)) {
     return obj.map(stripUndefinedDeep).filter((v) => v !== undefined) as unknown as T;
   }
@@ -40,12 +53,14 @@ function stripUndefinedDeep<T>(obj: T): T {
   return out as T;
 }
 
-// ✅ Helper: hợp lệ hoá toạ độ
-function normalizeCoords(input: any): { lat: number; lng: number } | null {
-  const lat = Number(input?.lat);
-  const lng = Number(input?.lng);
-  if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
-  return null;
+// "lat,lng" -> {lat,lng}
+function parseLatLngString(s?: string): { lat: number; lng: number } | null {
+  if (!s) return null;
+  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lng = parseFloat(m[3]);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
 }
 
 export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
@@ -54,17 +69,37 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
   const isEditMode = !!initialData?.id;
   const [submitting, setSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState<
-    Partial<
-      TechnicianPartner & {
-        email?: string;
-        password?: string;
-        role: 'technician_partner';
-        workingStartTime?: string; // HH:mm
-        workingEndTime?: string; // HH:mm
-      }
-    >
-  >({});
+  // ❗️Loại bỏ location gốc để không bị yêu cầu GeoPoint
+  type FormShape = Partial<
+  Omit<TechnicianPartner, 'location'>
+  > & {
+    email?: string;
+    password?: string;
+    role: 'technician_partner';              // vẫn required
+    workingStartTime?: string;
+    workingEndTime?: string;
+    location?: Partial<Pick<LocationCore, 'address' | 'location'>>;
+  };
+
+  const [formData, setFormData] = useState<FormShape>(() => ({
+    role: 'technician_partner',
+    type: 'mobile',
+    isActive: true,
+    assignedRegions: [],
+    serviceCategories: [],
+    workingStartTime: '',
+    workingEndTime: '',
+    location: { address: '', location: '' }, // “lite”
+    // các trường khác để trống khi chưa có dữ liệu
+    name: '',
+    phone: '',
+    email: '',
+    password: '',
+    shopName: '',
+    shopAddress: '',
+    vehicleType: 'motorbike',
+  }));
+
 
   const { geocode, coords } = useGeocodeAddress();
 
@@ -85,38 +120,71 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     const legacy = (initialData || {}) as LegacyData;
     const firstWorking = legacy.workingHours?.find?.((d) => d?.isWorking);
 
+    // dựng location “lite” từ dữ liệu cũ nếu có
+    const legacyLocation: Partial<LocationCore> = {};
+    if (legacy.mapAddress) legacyLocation.address = legacy.mapAddress;
+    if (legacy.coordinates && Number.isFinite(legacy.coordinates.lat) && Number.isFinite(legacy.coordinates.lng)) {
+      legacyLocation.location = `${legacy.coordinates.lat},${legacy.coordinates.lng}`;
+    } else if (legacy.location?.location) {
+      legacyLocation.location = legacy.location.location;
+    }
+    if (legacy.location?.address && !legacyLocation.address) {
+      legacyLocation.address = legacy.location.address;
+    }
+
+    // ❗️Không spread toàn bộ legacy để tránh kéo theo location gốc
     setFormData({
-      ...legacy,
-      // chuẩn hoá mảng/rỗng
-      assignedRegions: Array.isArray(legacy.assignedRegions) ? legacy.assignedRegions : [],
+      id: legacy.id,
+      userId: legacy.userId,
+      name: legacy.name ?? '',
+      phone: legacy.phone ?? '',
+      email: (legacy as any).email ?? '',
+      shopName: legacy.shopName ?? '',
+      shopAddress: legacy.shopAddress ?? '',
       type: legacy.type ?? 'mobile',
-      mapAddress: legacy.mapAddress ?? '',
-      // 🔒 không để undefined: chỉ {lat,lng} hoặc null
-      coordinates: normalizeCoords(legacy.coordinates),
+      assignedRegions: Array.isArray(legacy.assignedRegions) ? legacy.assignedRegions : [],
+      serviceCategories: Array.isArray(legacy.serviceCategories) ? legacy.serviceCategories : [],
+      vehicleType: legacy.vehicleType ?? 'motorbike',
       isActive: legacy.isActive ?? true,
-      // Ưu tiên trường mới; fallback từ workingHours cũ
       workingStartTime: legacy.workingStartTime ?? firstWorking?.startTime ?? '',
       workingEndTime: legacy.workingEndTime ?? firstWorking?.endTime ?? '',
-      // KHÔNG ép email/password nếu không có
-      email: legacy.email ?? '',
       password: '',
+      role: 'technician_partner', 
+      location: {
+        address: legacyLocation.address ?? '',
+        location: legacyLocation.location ?? '',
+      },
     });
   }, [initialData]);
 
-  // Update toạ độ khi geocode xong
+  // Update tọa độ khi geocode xong -> ghi vào location.location = "lat,lng"
   useEffect(() => {
-    if (coords) {
-      const c = normalizeCoords(coords);
-      if (c) setFormData((prev) => ({ ...prev, coordinates: c }));
-    }
+    if (!coords) return;
+    setFormData((prev) => ({
+      ...prev,
+      location: {
+        ...(prev.location || {}),
+        location: `${coords.lat},${coords.lng}`,
+      },
+    }));
   }, [coords]);
 
   const updateField = useCallback(
-    (field: keyof typeof formData, value: unknown) => {
+    (field: keyof FormShape, value: unknown) => {
       setFormData((prev) => ({ ...prev, [field]: value as any }));
     },
     []
   );
+
+  const updateLocationField = useCallback((key: 'address' | 'location', value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      location: {
+        ...(prev.location || {}),
+        [key]: value,
+      },
+    }));
+  }, []);
 
   const handleRegionInput = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -127,40 +195,35 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
   );
 
   const handleGeocode = useCallback(() => {
-    const addr = (formData.mapAddress || '').trim();
+    const addr = (formData.location?.address || '').trim();
     if (addr) geocode(addr);
-  }, [formData.mapAddress, geocode]);
+  }, [formData.location?.address, geocode]);
 
   const parseCoordinates = useCallback(
     (raw: string) => {
       const text = raw.trim();
       if (!text) {
-        // người dùng xoá -> đặt null (KHÔNG để undefined)
-        updateField('coordinates', null);
+        updateLocationField('location', '');
         return;
       }
-      const [latStr, lngStr] = text.split(',').map((p) => p.trim());
-      const lat = Number(latStr);
-      const lng = Number(lngStr);
-      if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        updateField('coordinates', { lat, lng });
-      } else {
-        // nhập sai -> không cập nhật (giữ giá trị hiện tại)
+      const parsed = parseLatLngString(text);
+      if (parsed) {
+        updateLocationField('location', `${parsed.lat},${parsed.lng}`);
       }
     },
-    [updateField]
+    [updateLocationField]
   );
 
   const resetForm = useCallback(() => {
     setFormData({
       assignedRegions: [],
       type: 'mobile',
-      mapAddress: '',
-      coordinates: null, // 🚫 không để undefined
+      location: { address: '', location: '' },
       name: '',
       phone: '',
       email: '',
       password: '',
+      role: 'technician_partner',     
       serviceCategories: [],
       shopName: '',
       shopAddress: '',
@@ -184,29 +247,35 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       try {
         setSubmitting(true);
 
-        // Chuẩn hoá coordinates lần cuối
-        const coordsFinal = normalizeCoords(formData.coordinates);
-        // payload KHÔNG có undefined
-        const payload = stripUndefinedDeep({
+        // Chuẩn hoá "lat,lng" lần cuối
+        const parsed = parseLatLngString(formData.location?.location);
+        const locationOut: Partial<LocationCore> | undefined =
+          formData.location && (formData.location.address || parsed)
+            ? {
+                address: formData.location.address || undefined,
+                location: parsed ? `${parsed.lat},${parsed.lng}` : undefined,
+                // GeoPoint/updatedAt sẽ được thêm ở layer repo/service khi lưu
+              }
+            : undefined;
+
+        const payload: SavePayload = stripUndefinedDeep({
           ...formData,
           name: (formData.name || '').trim(),
           phone: (formData.phone || '').trim(),
-          email: (formData.email || '')?.trim() || undefined, // nếu rỗng -> bỏ
+          email: (formData.email || '')?.trim() || undefined,
           password: (formData.password || '')?.trim() || undefined,
-          shopName: (formData.shopName || '').trim() || undefined,
-          shopAddress: (formData.shopAddress || '').trim() || undefined,
-          mapAddress: (formData.mapAddress || '').trim() || undefined,
+          shopName: (formData.shopName || '')?.trim() || undefined,
+          shopAddress: (formData.shopAddress || '')?.trim() || undefined,
           role: 'technician_partner' as const,
           workingStartTime: formData.workingStartTime || '',
           workingEndTime: formData.workingEndTime || '',
-          // ✅ chỉ {lat,lng} hoặc null; KHÔNG để undefined
-          coordinates: coordsFinal, // nếu không hợp lệ sẽ là null
+          // ⬇️ location “lite”: address / "lat,lng" (không có geo)
+          location: locationOut,
+          // dọn legacy
+          workingHours: undefined as any,
+          coordinates: undefined as any,
+          mapAddress: undefined as any,
         });
-
-        // Không lưu field cũ
-        // @ts-ignore
-        delete (payload as any).workingHours;
-
         await onSave(payload);
         if (!isEditMode) resetForm();
       } finally {
@@ -214,6 +283,12 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       }
     },
     [canSubmit, formData, isEditMode, onSave, resetForm]
+  );
+
+  // Preview map từ location.location
+  const previewCoords = useMemo(
+    () => parseLatLngString(formData.location?.location || ''),
+    [formData.location?.location]
   );
 
   return (
@@ -264,18 +339,17 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
               value={formData.shopName || ''}
               onChange={(e) => updateField('shopName', e.target.value)}
             />
+            {/* Địa chỉ bản đồ -> location.address */}
             <Textarea
               placeholder={t('technician_partner_form.map_address_hint')}
-              value={formData.mapAddress || ''}
-              onChange={(e) => updateField('mapAddress', e.target.value)}
+              value={formData.location?.address || ''}
+              onChange={(e) => updateLocationField('address', e.target.value)}
               onBlur={handleGeocode}
             />
+            {/* Tọa độ -> location.location ("lat,lng") */}
             <Input
               placeholder={t('technician_partner_form.coordinates_placeholder')}
-              value={
-                formData.coordinates ? `${formData.coordinates.lat}, ${formData.coordinates.lng}` : ''
-              }
-              readOnly={!!coords}
+              value={formData.location?.location || ''}
               onChange={(e) => parseCoordinates(e.target.value)}
             />
             <Input
@@ -287,12 +361,12 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         )}
       </div>
 
-      {formData.type === 'shop' && formData.coordinates && (
+      {formData.type === 'shop' && previewCoords && (
         <>
           <p className="text-sm text-gray-600">
             {t('technician_partner_form.detected_coords', {
-              lat: String(formData.coordinates.lat),
-              lng: String(formData.coordinates.lng),
+              lat: String(previewCoords.lat),
+              lng: String(previewCoords.lng),
             })}
           </p>
           <iframe
@@ -303,7 +377,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
             style={{ border: 0 }}
             loading="lazy"
             allowFullScreen
-            src={`https://www.google.com/maps?q=${formData.coordinates.lat},${formData.coordinates.lng}&hl=vi&z=16&output=embed`}
+            src={`https://www.google.com/maps?q=${previewCoords.lat},${previewCoords.lng}&hl=vi&z=16&output=embed`}
           />
         </>
       )}
@@ -314,7 +388,10 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
           rows={4}
           placeholder={t('technician_partner_form.assigned_regions_placeholder')}
           value={(formData.assignedRegions || []).join('\n')}
-          onChange={handleRegionInput}
+          onChange={(e) => {
+            const regions = e.target.value.split('\n').map((r) => r.trim()).filter(Boolean);
+            updateField('assignedRegions', regions);
+          }}
         />
       </div>
 

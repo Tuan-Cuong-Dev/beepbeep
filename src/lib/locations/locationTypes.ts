@@ -5,11 +5,12 @@
 // location: tùy chọn, string "lat,lng" → tiện hiển thị, export/import.
 // mapAddress: tùy chọn, địa chỉ mô tả (Google Maps link hoặc plain text).
 
-import { GeoPoint, Timestamp } from 'firebase/firestore';
+import { GeoPoint, Timestamp,FieldValue } from 'firebase/firestore';
 
 export interface LocationCore {
   geo: GeoPoint;                 // 🔴 CHUẨN DUY NHẤT để truy vấn
   location?: string;             // "16.047079,108.206230" (tùy chọn)
   mapAddress?: string;           // địa chỉ mô tả/link (tùy chọn)
-  updatedAt?: Timestamp;         // cập nhật lần cuối (tùy chọn)
+  address?: string;             // địa chỉ dạng string là địa chỉ cụ thể 
+  updatedAt?: Timestamp| FieldValue; // 👈 nới type để nhận serverTimestamp();         // cập nhật lần cuối (tùy chọn)
 }

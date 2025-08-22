@@ -56,7 +56,7 @@ export interface TechnicianPartner {
   createdAt: Timestamp | FieldValue;
   updatedAt: Timestamp | FieldValue;
 
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 
   /**
    * ⛔️ Deprecated: kept only for backward compatibility during migration.

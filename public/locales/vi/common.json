@@ -259,8 +259,11 @@
     "submit_repair_shop": "Gửi thông tin cửa hàng",
     "submitting": "Đang gửi...",
     "thank_you": "Cảm ơn bạn đã đóng góp!",
-    "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất."
+    "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất.",
+    "working_start_time": "Giờ bắt đầu",
+    "working_end_time": "Giờ kết thúc"
   },
+
   "rental_shop_form": {
     "shop_name": "Tên cửa hàng",
     "display_address": "Địa chỉ hiển thị",

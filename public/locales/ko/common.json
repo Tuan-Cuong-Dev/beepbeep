@@ -248,7 +248,9 @@
   "submit_repair_shop": "수리점 제출",
   "submitting": "제출 중...",
   "thank_you": "소중한 기여 감사합니다!",
-  "submission_received": "제출이 접수되었으며, 곧 검토할 예정입니다."
+  "submission_received": "제출이 접수되었으며, 곧 검토할 예정입니다.",
+  "working_start_time": "시작 시간",
+  "working_end_time": "종료 시간"
 },
 
 "rental_shop_form": {

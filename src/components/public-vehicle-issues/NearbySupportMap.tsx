@@ -7,6 +7,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import type { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import type { PublicVehicleIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+import type { LocationCore } from '@/src/lib/locations/locationTypes';
 import { useTranslation } from 'react-i18next';
 
 // SSR-safe react-leaflet
@@ -23,27 +24,12 @@ const useMap = () => {
 type LatLng = { lat: number; lng: number };
 
 interface NearbySupportMapProps {
-  issueCoords?: LatLng | null;       // vị trí sự cố đang xem
+  issueCoords?: LatLng | null;       // vị trí sự cố đang xem (focus)
   issues?: PublicVehicleIssue[];     // toàn bộ issues (sẽ tự lọc trạng thái mở)
   limitPerType?: number;             // số shop/mobile hiển thị mỗi loại
 }
 
-/** Chuẩn hoá "lat,lng" | {lat,lng} -> {lat,lng} */
-function normalizeCoords(coords: any): LatLng | null {
-  if (!coords) return null;
-  if (typeof coords === 'object' && 'lat' in coords && 'lng' in coords) {
-    const lat = Number(coords.lat); const lng = Number(coords.lng);
-    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
-  }
-  if (typeof coords === 'string' && coords.includes(',')) {
-    const [latStr, lngStr] = coords.split(',').map((s: string) => s.trim());
-    const lat = Number(latStr); const lng = Number(lngStr);
-    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
-  }
-  return null;
-}
-
-/** Haversine (km) */
+// ===== Helpers =====
 function distanceKm(a: LatLng, b: LatLng) {
   const R = 6371;
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
@@ -53,6 +39,48 @@ function distanceKm(a: LatLng, b: LatLng) {
   const x = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
   const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
   return R * c;
+}
+
+function parseLatLngString(s?: string): LatLng | null {
+  if (!s) return null;
+  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lng = parseFloat(m[3]);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+}
+
+/** LocationCore → LatLng (hỗ trợ geo: GeoPoint hoặc location: "lat,lng") */
+function extractLatLngFromLocationCore(loc?: LocationCore | null): LatLng | null {
+  if (!loc) return null;
+
+  if (typeof loc.geo?.latitude === 'number' && typeof loc.geo?.longitude === 'number') {
+
+    return { lat: loc.geo.latitude, lng: loc.geo.longitude };
+  }
+  const parsed = parseLatLngString(loc.location);
+  return parsed ?? null;
+}
+
+/** PublicVehicleIssue.location có thể lưu theo chuẩn LocationCore-like */
+function extractLatLngFromIssueLocation(issue: PublicVehicleIssue): LatLng | null {
+  // Ưu tiên issue.location.geo / issue.location.location
+  const loc: any = issue.location;
+  if (loc) {
+    if (typeof loc?.geo?.latitude === 'number' && typeof loc?.geo?.longitude === 'number') {
+      return { lat: loc.geo.latitude, lng: loc.geo.longitude };
+    }
+    const fromStr = parseLatLngString(loc.location || loc.coordinates); // fallback nếu còn trường cũ "coordinates"
+    if (fromStr) return fromStr;
+  }
+  // Fallback cũ: i.location?.coordinates là {lat,lng} hoặc "lat,lng"
+  if (issue?.location?.coordinates) {
+    const c = issue.location.coordinates as any;
+    if (typeof c?.lat === 'number' && typeof c?.lng === 'number') return { lat: c.lat, lng: c.lng };
+    const fromStr = parseLatLngString(typeof c === 'string' ? c : undefined);
+    if (fromStr) return fromStr;
+  }
+  return null;
 }
 
 function FitToMarkers({ center, others }: { center?: LatLng; others: LatLng[] }) {
@@ -80,7 +108,7 @@ const OPEN_STATUSES: PublicIssueStatus[] = [
   'in_progress',
 ];
 
-/** Màu theo trạng thái (dùng cho legend/nhãn) */
+/** Màu theo trạng thái (legend) */
 const statusColor: Record<PublicIssueStatus, string> = {
   pending: '#ef4444',
   assigned: '#fb923c',
@@ -106,7 +134,7 @@ export default function NearbySupportMap({
 
   useEffect(() => { setIsClient(true); }, []);
 
-  // Load đối tác (shop/mobile)
+  // Load đối tác (shop/mobile) đang active
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -136,34 +164,34 @@ export default function NearbySupportMap({
     return () => { mounted = false; };
   }, []);
 
-  // Top N cửa hàng quanh issue
+  // Top N cửa hàng quanh issue (đọc partner.location)
   const topShops = useMemo(() => {
     if (!issueCoords) return [];
     return shops
-      .map((p) => ({ p, coord: normalizeCoords(p.coordinates) }))
+      .map((p) => ({ p, coord: extractLatLngFromLocationCore(p.location) }))
       .filter((x): x is { p: TechnicianPartner; coord: LatLng } => !!x.coord)
       .map((x) => ({ ...x, d: distanceKm(issueCoords, x.coord) }))
       .sort((a, b) => a.d - b.d)
       .slice(0, limitPerType);
   }, [shops, issueCoords, limitPerType]);
 
-  // Top N KTV lưu động quanh issue
+  // Top N KTV lưu động quanh issue (đọc partner.location)
   const topMobiles = useMemo(() => {
     if (!issueCoords) return [];
     return mobiles
-      .map((p) => ({ p, coord: normalizeCoords(p.coordinates) }))
+      .map((p) => ({ p, coord: extractLatLngFromLocationCore(p.location) }))
       .filter((x): x is { p: TechnicianPartner; coord: LatLng } => !!x.coord)
       .map((x) => ({ ...x, d: distanceKm(issueCoords, x.coord) }))
       .sort((a, b) => a.d - b.d)
       .slice(0, limitPerType);
   }, [mobiles, issueCoords, limitPerType]);
 
-  // Lấy các issue “mở”
+  // Các issue “mở” (đọc issue.location)
   const openIssuePoints = useMemo(() => {
     return (issues || [])
       .filter((i) => OPEN_STATUSES.includes(i.status))
       .map((i) => {
-        const coord = normalizeCoords(i.location?.coordinates);
+        const coord = extractLatLngFromIssueLocation(i);
         return coord ? { issue: i, coord } : null;
       })
       .filter((x): x is { issue: PublicVehicleIssue; coord: LatLng } => !!x)
@@ -188,7 +216,7 @@ export default function NearbySupportMap({
     );
   }
 
-  // Icon pulse cho tất cả sự cố (đang xem + mở)
+  // Icon pulse cho các sự cố
   const pulseIcon = useMemo(() => {
     if (!isClient) return null;
     const L = require('leaflet');
@@ -265,6 +293,7 @@ export default function NearbySupportMap({
                         {t('phone_short')}: {issue.phone}
                       </div>
                     )}
+                    {/* Địa chỉ mô tả sự cố nếu có */}
                     {issue.location?.issueAddress && (
                       <div className="text-xs mt-1">{issue.location.issueAddress}</div>
                     )}
@@ -284,7 +313,7 @@ export default function NearbySupportMap({
               </Marker>
             ))}
 
-            {/* 🟦 Cửa hàng gần nhất (tĩnh) */}
+            {/* 🟦 Cửa hàng gần nhất */}
             {topShops.map(({ p, coord, d }) => (
               <CircleMarker
                 key={`shop-${p.id}`}
@@ -300,7 +329,10 @@ export default function NearbySupportMap({
                         {t('phone_short')}: <a className="underline" href={`tel:${p.phone}`}>{p.phone}</a>
                       </div>
                     )}
-                    {p.shopAddress && <div className="text-xs mt-1">{p.shopAddress}</div>}
+                    {/* Ưu tiên location.address mới, fallback shopAddress */}
+                    {(p.location?.address || p.shopAddress) && (
+                      <div className="text-xs mt-1">{p.location?.address || p.shopAddress}</div>
+                    )}
                     <div className="text-xs mt-1">{t('distance_km', { val: d.toFixed(2) })}</div>
                     <a
                       className="text-blue-600 underline text-xs mt-1 inline-block"
@@ -315,7 +347,7 @@ export default function NearbySupportMap({
               </CircleMarker>
             ))}
 
-            {/* 🟩 KTV lưu động gần nhất (tĩnh) */}
+            {/* 🟩 KTV lưu động gần nhất */}
             {topMobiles.map(({ p, coord, d }) => (
               <CircleMarker
                 key={`mobile-${p.id}`}
@@ -331,7 +363,7 @@ export default function NearbySupportMap({
                         {t('phone_short')}: <a className="underline" href={`tel:${p.phone}`}>{p.phone}</a>
                       </div>
                     )}
-                    {p.mapAddress && <div className="text-xs mt-1">{p.mapAddress}</div>}
+                    {(p.location?.address) && <div className="text-xs mt-1">{p.location.address}</div>}
                     <div className="text-xs mt-1">{t('distance_km', { val: d.toFixed(2) })}</div>
                     <a
                       className="text-blue-600 underline text-xs mt-1 inline-block"

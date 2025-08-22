@@ -250,7 +250,9 @@
   "submit_repair_shop": "修理店を送信",
   "submitting": "送信中...",
   "thank_you": "ご協力ありがとうございます！",
-  "submission_received": "ご送信内容を受け付けました。まもなく確認いたします。"
+  "submission_received": "ご送信内容を受け付けました。まもなく確認いたします。",
+  "working_start_time": "開始時間",
+  "working_end_time": "終了時間"  
 },
 "rental_shop_form": {
   "shop_name": "店舗名",
