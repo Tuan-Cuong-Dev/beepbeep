@@ -32,7 +32,29 @@ export default function AddRentalShopForm() {
   const [submitting, setSubmitting] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
-  useEffect(() => {
+  useEffect(() => {<Input
+  placeholder="Tọa độ (vd: 16.07° N, 108.22° E)"
+  value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : ''}
+  onChange={(e) => {
+    const value = e.target.value;
+    // Hỗ trợ cả định dạng "16.07,108.22" hoặc "16.07° N, 108.22° E"
+    const regex = /(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/;
+    const match = value.match(regex);
+
+    if (match) {
+      const latStr = match[1];
+      const lngStr = match[3];
+      setForm((prev) => ({
+        ...prev,
+        _lat: latStr,
+        _lng: lngStr,
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, _lat: '', _lng: '' }));
+    }
+  }}
+/>
+
     if (form.mapAddress) geocode(form.mapAddress);
   }, [form.mapAddress]);
 

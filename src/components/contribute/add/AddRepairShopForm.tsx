@@ -273,19 +273,30 @@ export default function AddRepairShopForm() {
         onChange={(e) => setLocationField('address', e.target.value)}
       />
 
-      {/* Lat/Lng hỗ trợ nhập tay */}
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          placeholder={t('repair_shop_form.latitude')}
-          value={form._lat ?? ''}
-          onChange={(e) => setForm((p) => ({ ...p, _lat: e.target.value }))}
-        />
-        <Input
-          placeholder={t('repair_shop_form.longitude')}
-          value={form._lng ?? ''}
-          onChange={(e) => setForm((p) => ({ ...p, _lng: e.target.value }))}
-        />
-      </div>
+      {/* Lat/Lng hỗ trợ nhập tay (gộp một input) */}
+      <Input
+        placeholder="Tọa độ (vd: 16.07° N, 108.22° E)"
+        value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : ''}
+        onChange={(e) => {
+          const value = e.target.value;
+          // Hỗ trợ cả định dạng "16.07,108.22" hoặc "16.07° N, 108.22° E"
+          const regex = /(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/;
+          const match = value.match(regex);
+
+          if (match) {
+            const latStr = match[1];
+            const lngStr = match[3];
+            setForm((prev) => ({
+              ...prev,
+              _lat: latStr,
+              _lng: lngStr,
+            }));
+          } else {
+            setForm((prev) => ({ ...prev, _lat: '', _lng: '' }));
+          }
+        }}
+      />
+
 
       {/* Vehicle type */}
       <select
@@ -304,7 +315,7 @@ export default function AddRepairShopForm() {
         <label className="font-medium block mb-2">
           {t('technician_partner_form.working_time')}
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium">
               {t('technician_partner_form.start_time')}
