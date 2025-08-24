@@ -8,16 +8,16 @@ import { SimpleSelect } from '@/src/components/ui/select';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
-// ===== Local loose types (chịu mọi biến thể legacy) =====
+// ===== Local loose types =====
 type GeoLike = { latitude: number; longitude: number };
 type LocationCoreLoose = {
   geo?: GeoLike | { latitude: number; longitude: number };
-  location?: string;               // "lat,lng"
+  location?: string; // "lat,lng"
   coordinates?: string | { lat?: number; lng?: number };
   address?: string;
 };
 type TPDocLoose = {
-  id?: string;                     // sẽ bỏ để tránh overwrite
+  id?: string;
   userId?: string;
   ownerId?: string;
   createdBy?: string;
@@ -25,9 +25,9 @@ type TPDocLoose = {
   phone?: string;
   email?: string;
   avatarUrl?: string;
-  type?: string;                   // 'mobile' | 'shop' | 'technician_partner'
-  subtype?: string;                // 'mobile' | 'shop'
-  businessType?: string;           // đôi khi lưu sai field
+  type?: string; // 'mobile' | 'shop' | 'technician_partner'
+  subtype?: string;
+  businessType?: string;
   isActive?: boolean;
   serviceCategories?: string[];
   assignedRegions?: string[];
@@ -66,7 +66,6 @@ interface Props {
   onAssign: (userId: string, name: string) => void | Promise<void>;
   filterCategory?: string;
   filterRegion?: string;
-  /** toạ độ sự cố để tính khoảng cách */
   issueCoords?: { lat: number; lng: number } | null;
 }
 
@@ -94,26 +93,19 @@ function parseLatLngString(s?: string): { lat: number; lng: number } | null {
 }
 function extractLatLngFromLocation(loc?: LocationCoreLoose | null): { lat: number; lng: number } | null {
   if (!loc) return null;
-  // geo
   const g = (loc as any)?.geo;
   if (g && typeof g.latitude === 'number' && typeof g.longitude === 'number') {
     return { lat: g.latitude, lng: g.longitude };
   }
-  // location: "lat,lng"
   if (typeof loc.location === 'string') {
-    const p = parseLatLngString(loc.location);
-    if (p) return p;
+    return parseLatLngString(loc.location);
   }
-  // coordinates: "lat,lng"
   if (typeof loc.coordinates === 'string') {
-    const p = parseLatLngString(loc.coordinates);
-    if (p) return p;
+    return parseLatLngString(loc.coordinates);
   }
-  // coordinates: {lat,lng}
   const c = loc.coordinates as any;
   if (c && typeof c.lat === 'number' && typeof c.lng === 'number') {
-    const { lat, lng } = c;
-    if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+    return { lat: c.lat, lng: c.lng };
   }
   return null;
 }
@@ -139,7 +131,7 @@ export default function AssignTechnicianForm({
   filterRegion,
   issueCoords,
 }: Props) {
-  const { t } = useTranslation('common'); // 👈 dùng namespace "common"
+  const { t } = useTranslation('common');
   const [technicians, setTechnicians] = useState<DisplayTechnician[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -149,19 +141,13 @@ export default function AssignTechnicianForm({
     const fetchMobileTechs = async () => {
       setLoading(true);
       try {
-        // 1) Users có role technician_partner
         const usersQ = query(collection(db, 'users'), where('role', '==', 'technician_partner'));
         const usersSnap = await getDocs(usersQ);
-        const users: UserLoose[] = usersSnap.docs.map((d) => ({
-          uid: d.id,
-          ...(d.data() as any),
-        }));
+        const users: UserLoose[] = usersSnap.docs.map((d) => ({ uid: d.id, ...(d.data() as any) }));
 
-        // 2) Partners active
         const partnersQ = query(collection(db, 'technicianPartners'), where('isActive', '==', true));
         const partnersSnap = await getDocs(partnersQ);
 
-        // Loại bỏ field id trong data() để tránh overwrite rồi đặt docId
         const rawPartners: (Omit<TPDocLoose, 'id'> & { docId: string })[] = partnersSnap.docs.map(
           (ds) => {
             const { id: _ignored, ...rest } = ds.data() as TPDocLoose;
@@ -169,20 +155,13 @@ export default function AssignTechnicianForm({
           }
         );
 
-        // Lọc đúng MOBILE (đỡ miss do legacy)
         const mobilePartners = rawPartners.filter((p) => {
           const type = String(p.type ?? '').toLowerCase();
           const subtype = String(p.subtype ?? '').toLowerCase();
           const btype = String(p.businessType ?? '').toLowerCase();
-          return (
-            type === 'mobile' ||
-            subtype === 'mobile' ||
-            (type === 'technician_partner' && subtype === 'mobile') ||
-            (btype === 'technician_partner' && subtype === 'mobile')
-          );
+          return type === 'mobile' || subtype === 'mobile' || (type === 'technician_partner' && subtype === 'mobile') || (btype === 'technician_partner' && subtype === 'mobile');
         });
 
-        // Map by userId
         const partnersByUserId = new Map(
           mobilePartners
             .map((p) => {
@@ -193,23 +172,18 @@ export default function AssignTechnicianForm({
             .filter(Boolean) as readonly (readonly [string, Omit<TPDocLoose, 'id'> & { docId: string }])[]
         );
 
-        // Merge user + partner
         let merged: DisplayTechnician[] = users
           .filter((u) => partnersByUserId.has(u.uid))
           .map((u) => {
             const p = partnersByUserId.get(u.uid)!;
             const coords = extractLatLngFromLocation(p.location || undefined);
 
-            const distanceKm =
-              issueCoords && coords ? haversineKm(issueCoords, coords) : null;
+            const distanceKm = issueCoords && coords ? haversineKm(issueCoords, coords) : null;
 
-            // chấm điểm
             let score = 0;
             if (filterCategory && (p.serviceCategories ?? []).includes(filterCategory)) score += 2;
             if (filterRegion && (p.assignedRegions ?? []).includes(filterRegion)) score += 1;
             if (isRecent(u.lastKnownLocation?.updatedAt, 24)) score += 1;
-
-            // gần hơn +0.5, xa hơn -0.5 (nhẹ thôi)
             if (distanceKm != null) {
               if (distanceKm <= 5) score += 0.5;
               else if (distanceKm > 15) score -= 0.5;
@@ -231,14 +205,12 @@ export default function AssignTechnicianForm({
             };
           });
 
-        // Lọc theo filter (sau merge)
         merged = merged.filter((t) => {
           const okCat = filterCategory ? t.serviceCategories.includes(filterCategory) : true;
           const okReg = filterRegion ? t.assignedRegions.includes(filterRegion) : true;
           return okCat && okReg;
         });
 
-        // Sort: score desc → distance asc → name
         merged.sort((a, b) => {
           const s = b.score - a.score;
           if (s !== 0) return s;
@@ -280,9 +252,7 @@ export default function AssignTechnicianForm({
           })}`;
         }
         if (typeof tch.distanceKm === 'number') {
-          label += `  •  ${t('assign_technician.distance_km', {
-            km: tch.distanceKm.toFixed(1),
-          })}`;
+          label += `  •  ${t('assign_technician.distance_km', { km: tch.distanceKm.toFixed(1) })}`;
         }
         if (tch.score > 0) {
           label += `  •  ${t('assign_technician.score', { score: tch.score })}`;
@@ -323,10 +293,7 @@ export default function AssignTechnicianForm({
             <div className="mt-1 text-sm text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
               {selectedTech.phone && (
                 <span>
-                  📞{' '}
-                  <a className="underline" href={`tel:${selectedTech.phone}`}>
-                    {selectedTech.phone}
-                  </a>
+                  📞 <a className="underline" href={`tel:${selectedTech.phone}`}>{selectedTech.phone}</a>
                 </span>
               )}
               {selectedTech.averageRating != null && (
@@ -339,25 +306,18 @@ export default function AssignTechnicianForm({
               )}
               {typeof selectedTech.distanceKm === 'number' && (
                 <span>
-                  {t('assign_technician.distance_km', {
-                    km: selectedTech.distanceKm.toFixed(1),
-                  })}
+                  {t('assign_technician.distance_km', { km: selectedTech.distanceKm.toFixed(1) })}
                 </span>
               )}
             </div>
 
-            {(selectedTech.serviceCategories?.length > 0 ||
-              selectedTech.assignedRegions?.length > 0) && (
+            {(selectedTech.serviceCategories?.length > 0 || selectedTech.assignedRegions?.length > 0) && (
               <div className="mt-2 text-xs text-gray-500 space-y-1">
                 {selectedTech.serviceCategories?.length > 0 && (
-                  <div>
-                    {t('assign_technician.services')}: {selectedTech.serviceCategories.join(', ')}
-                  </div>
+                  <div>{t('assign_technician.services')}: {selectedTech.serviceCategories.join(', ')}</div>
                 )}
                 {selectedTech.assignedRegions?.length > 0 && (
-                  <div>
-                    {t('assign_technician.regions')}: {selectedTech.assignedRegions.join(', ')}
-                  </div>
+                  <div>{t('assign_technician.regions')}: {selectedTech.assignedRegions.join(', ')}</div>
                 )}
               </div>
             )}
@@ -370,9 +330,7 @@ export default function AssignTechnicianForm({
       </Button>
 
       {!loading && technicians.length === 0 && (
-        <p className="text-sm text-gray-500">
-          {t('assign_technician.empty_state')}
-        </p>
+        <p className="text-sm text-gray-500">{t('assign_technician.empty_state')}</p>
       )}
     </div>
   );

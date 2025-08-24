@@ -3617,7 +3617,19 @@
     "loading": "読み込み中…",
     "empty_state": "現在のフィルターに一致する出張技術者がいません。",
     "unnamed_technician": "（名称未設定の技術者）"
-  }
+  },
+  "business_about": {
+  "not_found": "企業情報が見つかりません。",
+  "address": "住所",
+  "phone": "電話",
+  "email": "メール",
+  "website": "ウェブサイト",
+  "opening_hours": "営業時間",
+  "call_now": "今すぐ電話",
+  "get_directions": "道順",
+  "socials": "ソーシャルメディア"
+}
+
 
 
 

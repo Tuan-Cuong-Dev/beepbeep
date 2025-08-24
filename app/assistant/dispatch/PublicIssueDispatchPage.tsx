@@ -28,14 +28,12 @@ type LatLng = { lat: number; lng: number };
 function normalizeCoords(coords: any): LatLng | null {
   if (!coords) return null;
 
-  // TH1: object { lat, lng }
   if (typeof coords === 'object' && 'lat' in coords && 'lng' in coords) {
     const lat = Number((coords as any).lat);
     const lng = Number((coords as any).lng);
     return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
   }
 
-  // TH2: string "lat,lng"
   if (typeof coords === 'string' && coords.includes(',')) {
     const [latStr, lngStr] = coords.split(',').map((s) => s.trim());
     const lat = Number(latStr);
@@ -86,16 +84,7 @@ export default function PublicIssueDispatchPage() {
     }
   }, [dialog.open]);
 
-  // Lọc tất cả pending có toạ độ
-  const pendingIssuesWithCoords = useMemo(
-    () =>
-      issues.filter(
-        (i) => i.status === 'pending' && !!(i.location?.coordinates)
-      ),
-    [issues]
-  );
-
-  // ===== Lọc dữ liệu để đổ vào bảng (Hook luôn ở trên, không đặt sau return có điều kiện)
+  // ===== Lọc dữ liệu để đổ vào bảng
   const filteredIssues = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
     const matchStr = (s?: string) => (s || '').toLowerCase().includes(q);
@@ -106,7 +95,7 @@ export default function PublicIssueDispatchPage() {
       const stationId =
         (i as any).stationId ||
         (i.location as any)?.stationId ||
-        (i as any).assignedRegion; // tuỳ schema
+        (i as any).assignedRegion;
       const okStation = stationFilter ? stationId === stationFilter : true;
 
       const okSearch = q
@@ -119,7 +108,6 @@ export default function PublicIssueDispatchPage() {
             i.vehicleModel,
             i.phone,
             (i as any).assignedToName,
-            // stringify coordinates để search
             typeof i.location?.coordinates === 'string'
               ? i.location?.coordinates
               : JSON.stringify(i.location?.coordinates ?? ''),
@@ -130,7 +118,7 @@ export default function PublicIssueDispatchPage() {
     });
   }, [issues, searchTerm, statusFilter, stationFilter]);
 
-  /** ✅ Chọn issue để hiển thị trên bản đồ (Hook trước mọi return) */
+  /** ✅ Chọn issue đang chỉnh sửa hoặc issue có coords để show map */
   const mapIssue = useMemo(() => {
     const eCoord = normalizeCoords(editingIssue?.location?.coordinates as any);
     if (editingIssue && eCoord) return editingIssue;
@@ -140,12 +128,11 @@ export default function PublicIssueDispatchPage() {
     );
   }, [editingIssue, filteredIssues]);
 
-  /** ✅ Tính center map theo normalizeCoords (Hook trước mọi return) */
+  /** ✅ Tọa độ sự cố hiện tại (dùng cho bản đồ + AssignTechnicianForm) */
   const mapCenter = useMemo<LatLng | null>(() => {
     return normalizeCoords((mapIssue?.location as any)?.coordinates);
   }, [mapIssue]);
 
-  // ✅ Sau khi mọi Hook đã được gọi theo thứ tự ổn định, mới return có điều kiện
   if (loading) return <div className="text-center py-10">{t('loading')}</div>;
   if (!canView) return <div className="text-center py-10 text-red-500">{t('no_permission')}</div>;
 
@@ -227,9 +214,10 @@ export default function PublicIssueDispatchPage() {
       <Header />
       <UserTopMenu />
       <main className="flex-1 p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-center flex items-center justify-center gap-2">{t('title')}</h1>
+        <h1 className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+          {t('title')}
+        </h1>
 
-        {/* Tổng quan: vẫn dùng toàn bộ issues */}
         <VehicleIssuesSummaryCard issues={issues} />
 
         <VehicleIssuesSearchFilter
@@ -241,15 +229,16 @@ export default function PublicIssueDispatchPage() {
           setStationFilter={setStationFilter}
         />
 
-        {/* ✅ Bản đồ hỗ trợ (khách + 5 shop + 5 mobile) */}
-        {mapCenter && <NearbySupportMap issueCoords={mapCenter} issues={issues}  limitPerType={5} />}
+        {mapCenter && <NearbySupportMap issueCoords={mapCenter} issues={issues} limitPerType={5} />}
 
-        {/* Form phân công */}
         {showForm && editingIssue && (
           <div className="bg-white border rounded-xl shadow p-6 space-y-6">
             <h2 className="text-2xl font-bold">{t('assign_title')}</h2>
-            {/* onAssign trả (id, name) từ AssignTechnicianForm */}
-            <AssignTechnicianForm onAssign={handleAssignTechnician} />
+            {/* ✅ Truyền issueCoords để AssignTechnicianForm sắp xếp kỹ thuật gần nhất */}
+            <AssignTechnicianForm
+              onAssign={handleAssignTechnician}
+              issueCoords={mapCenter}
+            />
             <div className="flex justify-end">
               <Button
                 variant="ghost"
@@ -264,7 +253,6 @@ export default function PublicIssueDispatchPage() {
           </div>
         )}
 
-        {/* Bảng hiển thị danh sách đã lọc */}
         <PublicIssueTable
           issues={filteredIssues}
           updateIssue={updateIssue}

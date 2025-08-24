@@ -3595,7 +3595,20 @@
     "loading": "Loading...",
     "empty_state": "No mobile technicians match the current filters.",
     "unnamed_technician": "(Unnamed Technician)"
-  }
+  },
+
+  "business_about": {
+  "not_found": "Business information not found.",
+  "address": "Address",
+  "phone": "Phone",
+  "email": "Email",
+  "website": "Website",
+  "opening_hours": "Opening Hours",
+  "call_now": "Call Now",
+  "get_directions": "Get Directions",
+  "socials": "Social Media"
+}
+
 
 
 
