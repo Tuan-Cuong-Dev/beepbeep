@@ -1,5 +1,5 @@
 {
-  "preferences": {
+"preferences": {
   "preferences": "Tùy chọn",
   "region_language": "Khu vực & Ngôn ngữ",
   "currency": "Tiền tệ",
@@ -18,7 +18,9 @@
   "spain": "Tây Ban Nha",
   "portugal": "Bồ Đào Nha",
   "saudiArabia": "Ả Rập Xê Út",
-  "saved_notice": "Tất cả thay đổi tùy chọn sẽ được lưu vào tài khoản của bạn."
+  "saved_notice": "Tất cả thay đổi tùy chọn sẽ được lưu vào tài khoản của bạn.",
+  "language":"Ngôn ngữ",
+  "region":"Khu vực"
   },
 
   "landing": {
@@ -192,7 +194,17 @@
     "sign_in": "Đăng nhập"
   },
 
-  "account": {
+   "account": {
+    "profile_address": "Địa chỉ hồ sơ",
+    "address_placeholder": "Nhập địa chỉ mô tả (không bắt buộc)",
+    "fetching_location": "Đang lấy vị trí hiện tại…",
+    "refresh_location": "Lấy lại vị trí",
+    "update_success": "Cập nhật thành công",
+    "saved": "Thay đổi của bạn đã được lưu.",
+    "update_failed": "Cập nhật thất bại",
+    "reset_success": "Đã gửi email đặt lại mật khẩu",
+    "reset_notice": "Vui lòng kiểm tra hộp thư để tiếp tục.",
+    "reset_failed": "Gửi email đặt lại mật khẩu thất bại",
     "first_name": "Tên",
     "last_name": "Họ",
     "full_name": "Họ và tên",
@@ -201,36 +213,32 @@
     "female": "Nữ",
     "other": "Khác",
     "date_of_birth": "Ngày sinh",
-    "id_number": "Số CMND/CCCD",
-    "referral_hint": "Mã giới thiệu sẽ được tạo từ số CMND/CCCD",
-    "phone": "Số điện thoại",
+    "id_number": "Số định danh",
+    "referral_hint": "Mã giới thiệu sẽ lấy từ số này (viết hoa, bỏ dấu cách).",
+    "phone": "Điện thoại",
     "email": "Email",
-    "login_email_note": "Đây là email đăng nhập của bạn",
+    "login_email_note": "Đây là email đăng nhập của bạn.",
     "password": "Mật khẩu",
-    "reset_password": "Đặt lại mật khẩu",
-    "reset_success": "Yêu cầu đặt lại mật khẩu thành công",
-    "reset_notice": "Vui lòng kiểm tra email để thay đổi mật khẩu",
-    "reset_failed": "Không thể đặt lại mật khẩu",
+    "reset_password": "Gửi email đặt lại mật khẩu",
     "language": "Ngôn ngữ",
     "region": "Khu vực",
     "currency": "Tiền tệ",
-    "address": "Địa chỉ",
-    "city": "Thành phố",
-    "state": "Tỉnh/Quận",
-    "zip": "Mã bưu điện",
-    "country": "Quốc gia",
     "last_known_address": "Địa chỉ gần nhất",
     "latitude": "Vĩ độ",
     "longitude": "Kinh độ",
     "save": "Lưu",
-    "cancel": "Hủy",
-    "update_success": "Cập nhật thành công",
-    "saved": "Thông tin đã được lưu",
-    "update_failed": "Cập nhật thất bại",
-
-    "fetching_location": "Đang lấy vị trí...",
-    "refresh_location": "Lấy lại vị trí hiện tại",
-    "address_placeholder": "Nhập địa chỉ chi tiết"
+    "cancel":"Huỷ",
+    "account_info": "Thông tin tài khoản",
+    "addr": {
+      "line1": "Địa chỉ dòng 1",
+      "line2": "Địa chỉ dòng 2",
+      "locality": "Thành phố / Thị trấn",
+      "admin_area": "Tỉnh / Bang / Vùng",
+      "postal_code": "Mã bưu chính",
+      "country_code": "Mã quốc gia (ISO-2)",
+      "formatted": "Địa chỉ hiển thị",
+      "formatted_placeholder": "Tuỳ chọn: chuỗi hiển thị dễ đọc (ví dụ lấy từ Places API)"
+    }
   },
 
   "contribute": {
@@ -1359,6 +1367,7 @@
     "reported": "Báo cáo lúc",
     "actions": "Hành động"
   },
+
   "actions": {
     "submit_proposal": "Gửi đề xuất",
     "mark_in_progress": "Đánh dấu đang xử lý",
@@ -1931,9 +1940,13 @@
     "confirm_title": "Xác nhận xoá",
     "confirm_desc": "Bạn có chắc chắn muốn xoá vĩnh viễn gói này?"
   },
+
   "actions": {
     "cancel": "Huỷ",
-    "delete": "Xoá"
+    "delete": "Xoá",
+    "add_user":"Thêm người dùng mới",
+    "update_user":"Cập nhật người dùng",
+    "edit":"Chỉnh sửa"
   },
 
   "subscription_package_search_import_export": {
@@ -3505,7 +3518,138 @@
     "resolved": "Đã giải quyết",
     "closed": "Đã đóng"
   }
+},
+
+"user_form": {
+  "add_user": "Thêm người dùng mới",
+  "update_user": "Cập nhật người dùng",
+  "first_name": "Tên",
+  "last_name": "Họ",
+  "display_name": "Tên hiển thị",
+  "email": "Email",
+  "phone": "Số điện thoại",
+  "photo_url": "Ảnh đại diện (URL)",
+  "company_id_optional": "Mã công ty (không bắt buộc)",
+  "home_airport": "Sân bay gần nhất",
+  "profile_address_section": "Địa chỉ hồ sơ (AddressCore)",
+  "extra_info_section": "Thông tin bổ sung",
+  "id_number": "Số CMND / Hộ chiếu",
+  "gender_placeholder": "Giới tính",
+  "gender_male": "Nam",
+  "gender_female": "Nữ",
+  "gender_other": "Khác",
+  "date_of_birth": "Ngày sinh",
+  "cover_url": "Ảnh bìa (URL)",
+  "preferences_section": "Tùy chọn",
+  "contribution_section": "Đóng góp",
+  "contribution_points": "Điểm đóng góp",
+  "contribution_level": "Cấp độ đóng góp",
+  "total_contributions": "Tổng số đóng góp",
+  "referral_section": "Giới thiệu",
+  "referral_code": "Mã giới thiệu",
+  "referred_by": "Được giới thiệu bởi",
+  "referral_points": "Điểm giới thiệu",
+  "total_referrals": "Tổng số lượt giới thiệu",
+  "last_location_section": "Vị trí gần nhất"
+},
+"address": {
+  "line1": "Địa chỉ dòng 1",
+  "line2": "Địa chỉ dòng 2",
+  "locality": "Thành phố / Khu vực",
+  "admin_area": "Tỉnh / Bang / Khu hành chính",
+  "postal_code": "Mã bưu điện",
+  "country_code": "Mã quốc gia (ISO-2, ví dụ: US, VN, GB)",
+  "formatted": "Định dạng (chuỗi hiển thị thân thiện)"
+},
+"location": {
+  "location_string_example": "Chuỗi tọa độ (ví dụ: 16.047079,108.206230)",
+  "map_address": "Địa chỉ bản đồ (không bắt buộc)",
+  "address": "Địa chỉ (không bắt buộc)",
+  "note_geopoint_will_be_set_on_submit": "Lưu ý: GeoPoint sẽ được tạo khi gửi dựa trên chuỗi tọa độ."
+},
+
+"roles": {
+  "customer": "Khách hàng — Người dùng cuối",
+  "staff": "Nhân viên — Nhân viên trạm",
+  "agent": "Đại lý — Đối tác liên kết",
+  "station_manager": "Quản lý trạm",
+  "company_owner": "Chủ công ty",
+  "technician": "Kỹ thuật viên",
+  "technician_partner": "Đối tác kỹ thuật",
+  "technician_assistant": "Trợ lý kỹ thuật",
+  "private_provider": "Nhà cung cấp cá nhân",
+  "investor": "Nhà đầu tư",
+  "admin": "Quản trị — Toàn quyền truy cập",
+  "other": "Khác"
+},
+
+"user_table": {
+  "empty": "Không có người dùng nào.",
+  "fullname": "Họ và tên",
+  "company": "Công ty",
+  "home_airport": "Sân bay chính",
+  "extra_info": "Thông tin bổ sung",
+  "id_number": "Số CMND/CCCD",
+  "gender": "Giới tính",
+  "dob": "Ngày sinh",
+  "preferences": "Tùy chọn",
+  "contributions": "Đóng góp",
+  "referral": "Giới thiệu",
+  "last_location": "Vị trí gần nhất",
+  "points": "Điểm",
+  "level": "Cấp độ",
+  "total": "Tổng",
+  "code": "Mã",
+  "by": "Bởi",
+  "col_photo": "Ảnh",
+  "col_name": "Tên",
+  "col_first_name": "Tên",
+  "col_last_name": "Họ",
+  "col_email": "Email",
+  "col_phone": "Số điện thoại",
+  "col_role": "Vai trò",
+  "col_company": "Công ty",
+  "col_home_airport": "Sân bay chính",
+  "col_address": "Địa chỉ hồ sơ",
+  "col_id_number": "Số CMND/CCCD",
+  "col_gender": "Giới tính",
+  "col_dob": "Ngày sinh",
+  "col_preferences": "Tùy chọn",
+  "col_contributions": "Đóng góp",
+  "col_referral": "Giới thiệu",
+  "col_last_location": "Vị trí gần nhất",
+  "col_cover": "Ảnh bìa",
+  "col_actions": "Hành động"
+},
+
+"user_summary": {
+  "total": "Tổng số người dùng",
+  "by_business_type": "Theo loại hình doanh nghiệp"
+},
+"business_types": {
+  "rental_company": "Công ty cho thuê xe",
+  "private_provider": "Nhà cung cấp xe cá nhân",
+  "agent": "Đại lý / Cộng tác viên",
+  "technician_partner": "Đối tác kỹ thuật",
+  "intercity_bus": "Công ty xe buýt liên tỉnh",
+  "vehicle_transport": "Đơn vị vận tải xe",
+  "tour_guide": "Hướng dẫn viên du lịch"
+},
+
+"user_page": {
+  "title": "Quản lý người dùng"
+},
+"user_notify": {
+  "updated": "✅ Người dùng đã được cập nhật!",
+  "added": "✅ Người dùng đã được thêm!",
+  "save_failed": "❌ Lưu người dùng thất bại.",
+  "delete_confirm_title": "Xóa người dùng?",
+  "delete_confirm_desc": "Hành động này không thể hoàn tác.",
+  "deleted": "🗑️ Người dùng đã bị xóa.",
+  "delete_failed": "❌ Xóa người dùng thất bại."
 }
+
+
 
 
 

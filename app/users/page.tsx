@@ -19,8 +19,12 @@ import UserForm from '@/src/components/users/UserForm';
 import UserTable from '@/src/components/users/UserTable';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import UserSummaryCard from '@/src/components/users/UserSummaryCard';
+import type { AddressCore } from '@/src/lib/locations/addressTypes';
+import { useTranslation } from 'react-i18next';
 
 export default function Users() {
+  const { t } = useTranslation('common');
+
   const [users, setUsers] = useState<User[]>([]);
   const [user, setUser] = useState<Partial<User>>({
     firstName: '',
@@ -30,19 +34,22 @@ export default function Users() {
     phone: '',
     photoURL: '',
     role: 'customer',
-    address: '',
-    address2: '',
-    city: '',
-    state: '',
-    zip: '',
-    country: '',
+    profileAddress: {
+      line1: '',
+      line2: '',
+      locality: '',
+      adminArea: '',
+      postalCode: '',
+      countryCode: '',
+      formatted: '',
+    } as AddressCore,
     homeAirport: '',
   });
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const USERS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(users.length / USERS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(users.length / USERS_PER_PAGE));
   const paginatedUsers = users.slice(
     (currentPage - 1) * USERS_PER_PAGE,
     currentPage * USERS_PER_PAGE
@@ -85,37 +92,34 @@ export default function Users() {
         ? `${user.firstName} ${user.lastName}`.trim()
         : user.name || '';
 
-    const userData = {
+    const userData: Partial<User> = {
       ...user,
       name: fullName,
-    } as Partial<User>;
-
-    const now = new Date();
-    const nowTimestamp = Timestamp.fromDate(now);
+    };
 
     try {
       if (editingUser) {
         const ref = doc(db, 'users', editingUser.uid);
         await updateDoc(ref, {
           ...userData,
-          updatedAt: now,
+          updatedAt: Timestamp.now(),
         });
 
         setUsers((prev) =>
           prev.map((u) =>
             u.uid === editingUser.uid
-              ? { ...u, ...userData, updatedAt: now } as User
+              ? ({ ...u, ...userData, updatedAt: Timestamp.now() } as User)
               : u
           )
         );
 
-        notify('✅ User updated!', 'success');
+        notify(t('user_notify.updated', '✅ User updated!'), 'success');
         setEditingUser(null);
       } else {
         const ref = await addDoc(collection(db, 'users'), {
           ...userData,
-          createdAt: now,
-          updatedAt: now,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
         });
 
         setUsers([
@@ -123,16 +127,16 @@ export default function Users() {
           {
             ...(userData as User),
             uid: ref.id,
-            createdAt: now,
-            updatedAt: now,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
           },
         ]);
 
-        notify('✅ User added!', 'success');
+        notify(t('user_notify.added', '✅ User added!'), 'success');
       }
     } catch (err) {
       console.error('User save failed:', err);
-      notify('❌ Failed to save user.', 'error');
+      notify(t('user_notify.save_failed', '❌ Failed to save user.'), 'error');
     }
 
     setUser({
@@ -143,12 +147,15 @@ export default function Users() {
       phone: '',
       photoURL: '',
       role: 'customer',
-      address: '',
-      address2: '',
-      city: '',
-      state: '',
-      zip: '',
-      country: '',
+      profileAddress: {
+        line1: '',
+        line2: '',
+        locality: '',
+        adminArea: '',
+        postalCode: '',
+        countryCode: '',
+        formatted: '',
+      },
       homeAirport: '',
     });
   };
@@ -157,16 +164,22 @@ export default function Users() {
     setDialog({
       open: true,
       type: 'confirm',
-      title: 'Delete user?',
-      description: 'This action cannot be undone.',
+      title: t('user_notify.delete_confirm_title', 'Delete user?'),
+      description: t(
+        'user_notify.delete_confirm_desc',
+        'This action cannot be undone.'
+      ),
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'users', uid));
           setUsers(users.filter((u) => u.uid !== uid));
-          notify('🗑️ User deleted.', 'success');
+          notify(t('user_notify.deleted', '🗑️ User deleted.'), 'success');
         } catch (error) {
           console.error('Delete failed:', error);
-          notify('❌ Failed to delete user.', 'error');
+          notify(
+            t('user_notify.delete_failed', '❌ Failed to delete user.'),
+            'error'
+          );
         }
       },
     });
@@ -182,55 +195,67 @@ export default function Users() {
       phone: userToEdit.phone || '',
       photoURL: userToEdit.photoURL || '',
       role: userToEdit.role || 'customer',
-      address: userToEdit.address || '',
-      address2: userToEdit.address2 || '',
-      city: userToEdit.city || '',
-      state: userToEdit.state || '',
-      zip: userToEdit.zip || '',
-      country: userToEdit.country || '',
+      profileAddress: userToEdit.profileAddress ?? {
+        line1: '',
+        line2: '',
+        locality: '',
+        adminArea: '',
+        postalCode: '',
+        countryCode: '',
+        formatted: '',
+      },
       homeAirport: userToEdit.homeAirport || '',
     });
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <Header />
       <UserTopMenu />
       <div className="p-6">
-        <h1 className="text-2xl font-semibold mb-4 border-[#00d289] border-b-2 pb-2">
-          Users Management
+        <h1 className="mb-4 border-b-2 border-[#00d289] pb-2 text-2xl font-semibold">
+          {t('user_page.title', 'Users Management')}
         </h1>
+
         <UserSummaryCard users={users} />
-        <UserTable users={paginatedUsers} onEdit={handleEditUser} onDelete={deleteUser} />
+
+        <UserTable
+          users={paginatedUsers}
+          onEdit={handleEditUser}
+          onDelete={deleteUser}
+        />
 
         {/* Pagination */}
-        <div className="flex justify-center items-center gap-4 mt-4">
+        <div className="mt-4 flex items-center justify-center gap-4">
           <button
             className={`px-4 py-2 rounded border text-sm transition
-              ${currentPage === 1
-                ? 'text-gray-400 border-gray-200 bg-white cursor-not-allowed'
-                : 'text-gray-800 border-gray-300 hover:bg-gray-100'}
-            `}
+              ${
+                currentPage === 1
+                  ? 'cursor-not-allowed border-gray-200 bg-white text-gray-400'
+                  : 'border-gray-300 text-gray-800 hover:bg-gray-100'
+              }`}
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
-            Previous
+            {t('pagination.previous', 'previous')}
           </button>
 
-          <span className="text-gray-600 text-sm">
-            Page {currentPage} of {totalPages}
+          <span className="text-sm text-gray-600">
+            {t('pagination.page', 'Page')} {currentPage} {t('pagination.of', 'of')}{' '}
+            {totalPages}
           </span>
 
           <button
             className={`px-4 py-2 rounded border text-sm transition
-              ${currentPage === totalPages
-                ? 'text-gray-400 border-gray-200 bg-white cursor-not-allowed'
-                : 'text-gray-800 border-gray-300 hover:bg-gray-100'}
-            `}
+              ${
+                currentPage === totalPages
+                  ? 'cursor-not-allowed border-gray-200 bg-white text-gray-400'
+                  : 'border-gray-300 text-gray-800 hover:bg-gray-100'
+              }`}
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
-            Next
+            {t('pagination.next', 'Next')}
           </button>
         </div>
 

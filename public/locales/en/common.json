@@ -18,7 +18,9 @@
     "spain": "Spain",
     "portugal": "Portugal",
     "saudiArabia": "Saudi Arabia",
-    "saved_notice": "All preference changes will be saved to your account."
+    "saved_notice": "All preference changes will be saved to your account.",
+    "language":"Language",
+    "region":"Region"
   },
 
   "landing": {
@@ -182,45 +184,51 @@
     }
   },
 
-  "account": {
-    "first_name": "First Name",
-    "last_name": "Last Name",
-    "full_name": "Full Name",
+   "account": {
+    "profile_address": "Profile address",
+    "address_placeholder": "Enter a descriptive address (optional)",
+    "fetching_location": "Fetching current location…",
+    "refresh_location": "Refresh current location",
+    "update_success": "Updated",
+    "saved": "Your changes have been saved.",
+    "update_failed": "Update failed",
+    "reset_success": "Password reset email sent",
+    "reset_notice": "Please check your inbox to continue.",
+    "reset_failed": "Password reset failed",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "full_name": "Full name",
     "gender": "Gender",
     "male": "Male",
     "female": "Female",
     "other": "Other",
-    "date_of_birth": "Date of Birth",
-    "id_number": "ID Number",
-    "referral_hint": "Referral code will be generated from ID Number",
+    "date_of_birth": "Date of birth",
+    "id_number": "ID number",
+    "referral_hint": "Your referral code will be derived from this ID (uppercase, no spaces).",
     "phone": "Phone",
     "email": "Email",
-    "login_email_note": "This is your login email",
+    "login_email_note": "This is your login email.",
     "password": "Password",
-    "reset_password": "Reset Password",
-    "reset_success": "Password reset request sent",
-    "reset_notice": "Please check your email to change your password",
-    "reset_failed": "Password reset failed",
+    "reset_password": "Send password reset email",
     "language": "Language",
     "region": "Region",
     "currency": "Currency",
-    "address": "Address",
-    "city": "City",
-    "state": "State/Province",
-    "zip": "ZIP/Postal Code",
-    "country": "Country",
-    "last_known_address": "Last Known Address",
+    "last_known_address": "Last known address",
     "latitude": "Latitude",
     "longitude": "Longitude",
     "save": "Save",
-    "cancel": "Cancel",
-    "update_success": "Update successful",
-    "saved": "Information saved",
-    "update_failed": "Update failed",
-
-    "fetching_location": "Fetching location...",
-    "refresh_location": "Refresh current location",
-    "address_placeholder": "Enter detailed address"
+    "cancel":"Cancel",
+    "account_info": "Account information",
+    "addr": {
+      "line1": "Address line 1",
+      "line2": "Address line 2",
+      "locality": "City / Town",
+      "admin_area": "State / Province / Region",
+      "postal_code": "ZIP / Postal code",
+      "country_code": "Country code (ISO-2)",
+      "formatted": "Formatted address",
+      "formatted_placeholder": "Optional: human-readable address for display (e.g. from Places API)"
+    }
   },
 
 "contribute": {
@@ -1342,6 +1350,7 @@
     "service_pricing": "Standard Service Pricing"
   },
   "assigned_issues": "Assigned Issues",
+
   "table_headers": {
     "vin": "VIN",
     "plate": "Plate Number",
@@ -1351,6 +1360,7 @@
     "reported": "Reported At",
     "actions": "Actions"
   },
+
   "actions": {
     "submit_proposal": "Submit Proposal",
     "mark_in_progress": "Mark In Progress",
@@ -1916,9 +1926,13 @@
     "confirm_title": "Confirm Deletion",
     "confirm_desc": "Are you sure you want to permanently delete this package?"
   },
+
   "actions": {
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "add_user":"Add New User",
+    "update_user":"Update User",
+    "edit":"Edit"
   },
 
   "subscription_package_search_import_export": {
@@ -3432,13 +3446,136 @@
     "resolved": "Resolved",
     "closed": "Closed"
   }
-}
+},
 
+"user_form": {
+    "add_user": "Add New User",
+    "update_user": "Update User",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "display_name": "Display Name",
+    "email": "Email",
+    "phone": "Phone",
+    "photo_url": "Photo URL",
+    "company_id_optional": "Company ID (optional)",
+    "home_airport": "Home Airport",
+    "profile_address_section": "Profile Address (AddressCore)",
+    "extra_info_section": "Extra Information",
+    "id_number": "ID / Passport Number",
+    "gender_placeholder": "Gender",
+    "gender_male": "Male",
+    "gender_female": "Female",
+    "gender_other": "Other",
+    "date_of_birth": "Date of Birth",
+    "cover_url": "Cover Image URL",
+    "preferences_section": "Preferences",
+    "contribution_section": "Contributions",
+    "contribution_points": "Contribution Points",
+    "contribution_level": "Contribution Level",
+    "total_contributions": "Total Contributions",
+    "referral_section": "Referral",
+    "referral_code": "Referral Code",
+    "referred_by": "Referred By",
+    "referral_points": "Referral Points",
+    "total_referrals": "Total Referrals",
+    "last_location_section": "Last Known Location"
+  },
+  "address": {
+    "line1": "Address line 1",
+    "line2": "Address line 2",
+    "locality": "City / Locality",
+    "admin_area": "State / Province / Admin Area",
+    "postal_code": "Postal Code",
+    "country_code": "Country Code (ISO-2 e.g. US, VN, GB)",
+    "formatted": "Formatted (friendly display string)"
+  },
+  "location": {
+    "location_string_example": "Location string (e.g. 16.047079,108.206230)",
+    "map_address": "Map Address (optional)",
+    "address": "Address (optional)",
+    "note_geopoint_will_be_set_on_submit": "Note: GeoPoint will be set during submit based on the location string."
+  },
 
+  "roles": {
+    "customer": "Customer — End-user",
+    "staff": "Staff — Station employee",
+    "agent": "Agent — Affiliate partner",
+    "station_manager": "Station Manager",
+    "company_owner": "Company Owner",
+    "technician": "Technician",
+    "technician_partner": "Technician Partner",
+    "technician_assistant": "Technician Assistant",
+    "private_provider": "Private Provider",
+    "investor": "Investor",
+    "admin": "Admin — Full access",
+    "other": "Other"
+  },
+  
+   "user_table": {
+    "empty": "No users found.",
+    "fullname": "Full name",
+    "company": "Company",
+    "home_airport": "Home airport",
+    "extra_info": "Extra info",
+    "id_number": "ID Number",
+    "gender": "Gender",
+    "dob": "Date of birth",
+    "preferences": "Preferences",
+    "contributions": "Contributions",
+    "referral": "Referral",
+    "last_location": "Last location",
+    "points": "Pts",
+    "level": "Lvl",
+    "total": "Total",
+    "code": "Code",
+    "by": "By",
+    "col_photo": "Photo",
+    "col_name": "Name",
+    "col_first_name": "First",
+    "col_last_name": "Last",
+    "col_email": "Email",
+    "col_phone": "Phone",
+    "col_role": "Role",
+    "col_company": "Company",
+    "col_home_airport": "Home Airport",
+    "col_address": "Profile Address",
+    "col_id_number": "ID Number",
+    "col_gender": "Gender",
+    "col_dob": "Date of Birth",
+    "col_preferences": "Preferences",
+    "col_contributions": "Contributions",
+    "col_referral": "Referral",
+    "col_last_location": "Last Location",
+    "col_cover": "Cover",
+    "col_actions": "Actions"
+  },
 
+ "user_summary": {
+    "total": "Total Users",
+    "by_business_type": "By Business Type"
+  },
+  "business_types": {
+    "rental_company": "Rental Company",
+    "private_provider": "Private Vehicle Provider",
+    "agent": "Agent",
+    "technician_partner": "Technician Partner",
+    "intercity_bus": "Intercity Bus Company",
+    "vehicle_transport": "Vehicle Transporter",
+    "tour_guide": "Tour Guide"
+  },
 
-
-
+  "user_page": {
+    "title": "Users Management"
+  },
+  "user_notify": {
+    "updated": "✅ User updated!",
+    "added": "✅ User added!",
+    "save_failed": "❌ Failed to save user.",
+    "delete_confirm_title": "Delete user?",
+    "delete_confirm_desc": "This action cannot be undone.",
+    "deleted": "🗑️ User deleted.",
+    "delete_failed": "❌ Failed to delete user."
+  }
 
 
 

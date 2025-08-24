@@ -11,13 +11,13 @@ import { Button } from '@/src/components/ui/button';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useTranslation } from 'react-i18next';
-import { useContributions } from '@/src/hooks/useContributions'; // ✅ THÊM
+import { useContributions } from '@/src/hooks/useContributions'; 
 
 export default function AddRentalShopForm() {
   const { t } = useTranslation('common');
   const { user } = useUser();
   const { coords, geocode } = useGeocodeAddress();
-  const { submitContribution } = useContributions(); // ✅ THÊM
+  const { submitContribution } = useContributions(); 
 
   const [form, setForm] = useState<StationFormValues>({
     name: '',

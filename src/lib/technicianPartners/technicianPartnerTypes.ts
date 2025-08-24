@@ -1,6 +1,6 @@
-// lib/technicianPartners/technicianPartnerTypes.ts
+// 📁 lib/technicianPartners/technicianPartnerTypes.ts
 import { Timestamp, FieldValue } from 'firebase/firestore';
-import { LocationCore } from '../locations/locationTypes';
+import type { LocationCore } from '@/src/lib/locations/locationTypes'; // ← chỉnh path nếu file ở /common
 
 export type VehicleType = 'car' | 'motorbike' | 'bike';
 
@@ -17,12 +17,14 @@ export interface TechnicianPartner {
 
   // Shop fields
   shopName?: string;
-  shopAddress?: string;
 
-  // Map / location (CHUẨN MỚI)
-  location?: LocationCore;        // ✅ chuẩn duy nhất
+  // 📍 CHUẨN DUY NHẤT
+  location: LocationCore;
 
-  // Nếu vẫn cần ô vùng phủ (tuỳ chọn)
+  // Coverage
+  assignedRegions: string[]; // nên set [] khi khởi tạo
+
+  // Optional geo box
   geoBox?: {
     latMin: number;
     latMax: number;
@@ -30,17 +32,11 @@ export interface TechnicianPartner {
     lngMax: number;
   };
 
-  // Coverage
-  assignedRegions: string[]; // ["DaNang/ThanhKhe/...", ...]
-
   // Services / vehicle type
-  serviceCategories?: string[]; // ["battery", "brake", ...]
+  serviceCategories?: string[];
   vehicleType?: VehicleType;
 
-  /**
-   * ✅ New simplified working time (applies to all days)
-   * Format: "HH:mm" 24h, e.g. "08:00", "18:30"
-   */
+  // Working time
   workingStartTime?: string;
   workingEndTime?: string;
 
@@ -56,11 +52,13 @@ export interface TechnicianPartner {
   createdAt: Timestamp | FieldValue;
   updatedAt: Timestamp | FieldValue;
 
-  avatarUrl?: string | null;
+  avatarUrl?: string;
 
-  /**
-   * ⛔️ Deprecated: kept only for backward compatibility during migration.
-   * Do not write new data here.
-   */
+  /** ⛔️ Deprecated – bắt lỗi compile nếu còn dùng */
+  coordinates?: never;
+  mapAddress?: never;
+  geo?: never;
+
+  /** ⛔️ Deprecated giữ cho tới khi cleanup xong */
   workingHours?: unknown;
 }

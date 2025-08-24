@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { updateUserLocation } from '@/src/lib/users/locationService';
+import { updateUserLocation } from '@/src/lib/locations/locationService';
 import { Timestamp } from 'firebase/firestore';
 
 interface LocationPayload {

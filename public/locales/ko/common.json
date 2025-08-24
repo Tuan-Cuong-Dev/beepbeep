@@ -18,7 +18,9 @@
   "spain": "스페인",
   "portugal": "포르투갈",
   "saudiArabia": "사우디아라비아",
-  "saved_notice": "모든 환경설정 변경사항은 계정에 저장됩니다."
+  "saved_notice": "모든 환경설정 변경사항은 계정에 저장됩니다.",
+  "language":"언어",
+  "region":"지역"
 },
 
 "landing": {
@@ -181,46 +183,53 @@
     "description": "현재 렌트 스테이션을 준비 중입니다. 리뷰 작성 기능은 아직 사용할 수 없습니다."
   }
 },
-"account": {
-    "first_name": "이름",
-    "last_name": "성",
-    "full_name": "전체 이름",
-    "gender": "성별",
-    "male": "남성",
-    "female": "여성",
-    "other": "기타",
-    "date_of_birth": "생년월일",
-    "id_number": "신분증 번호",
-    "referral_hint": "추천 코드는 신분증 번호에서 자동 생성됩니다",
-    "phone": "전화번호",
-    "email": "이메일",
-    "login_email_note": "로그인용 이메일입니다",
-    "password": "비밀번호",
-    "reset_password": "비밀번호 재설정",
-    "reset_success": "비밀번호 재설정 요청이 전송되었습니다",
-    "reset_notice": "비밀번호를 변경하려면 이메일을 확인하세요",
-    "reset_failed": "비밀번호 재설정 실패",
-    "language": "언어",
-    "region": "지역",
-    "currency": "통화",
-    "address": "주소",
-    "city": "도시",
-    "state": "도/시",
-    "zip": "우편번호",
-    "country": "국가",
-    "last_known_address": "마지막으로 확인된 주소",
-    "latitude": "위도",
-    "longitude": "경도",
-    "save": "저장",
-    "cancel": "취소",
-    "update_success": "업데이트 성공",
-    "saved": "정보가 저장되었습니다",
-    "update_failed": "업데이트 실패",
 
-    "fetching_location": "위치 정보를 가져오는 중...",
-    "refresh_location": "현재 위치 새로고침",
-    "address_placeholder": "상세 주소를 입력하세요"
-  },
+"account": {
+  "profile_address": "프로필 주소",
+  "address_placeholder": "설명용 주소를 입력하세요 (선택 사항)",
+  "fetching_location": "현재 위치 가져오는 중…",
+  "refresh_location": "현재 위치 새로고침",
+  "update_success": "업데이트 성공",
+  "saved": "변경 사항이 저장되었습니다.",
+  "update_failed": "업데이트 실패",
+  "reset_success": "비밀번호 재설정 메일을 보냈습니다",
+  "reset_notice": "받은 편지함을 확인하세요.",
+  "reset_failed": "비밀번호 재설정 메일 전송 실패",
+  "first_name": "이름",
+  "last_name": "성",
+  "full_name": "성명",
+  "gender": "성별",
+  "male": "남성",
+  "female": "여성",
+  "other": "기타",
+  "date_of_birth": "생년월일",
+  "id_number": "ID 번호",
+  "referral_hint": "추천 코드는 이 번호에서 생성됩니다 (대문자, 공백 없음).",
+  "phone": "전화번호",
+  "email": "이메일",
+  "login_email_note": "이것은 로그인 이메일입니다.",
+  "password": "비밀번호",
+  "reset_password": "비밀번호 재설정 메일 보내기",
+  "language": "언어",
+  "region": "지역",
+  "currency": "통화",
+  "last_known_address": "최근 주소",
+  "latitude": "위도",
+  "longitude": "경도",
+  "save": "저장",
+  "cancel": "취소",
+  "account_info": "계정 정보",
+  "addr": {
+    "line1": "주소 1행",
+    "line2": "주소 2행",
+    "locality": "도시 / 구 / 군",
+    "admin_area": "도 / 주 / 지역",
+    "postal_code": "우편번호",
+    "country_code": "국가 코드 (ISO-2)",
+    "formatted": "표시용 주소",
+    "formatted_placeholder": "선택 사항: 보기 쉬운 표시용 주소 (예: Places API에서 가져오기)"
+  }
+},
 
 "contribute": {
   "add_to_map": "내 장소를 지도에 추가",
@@ -1901,9 +1910,13 @@
     "confirm_title": "삭제 확인",
     "confirm_desc": "이 패키지를 영구적으로 삭제하시겠습니까?"
   },
+
   "actions": {
     "cancel": "취소",
-    "delete": "삭제"
+    "delete": "삭제",
+    "add_user":"새 사용자 추가",
+    "update_user":"사용자 업데이트",
+    "edit":"직원 수정"
   },
 
   "subscription_package_search_import_export": {
@@ -3468,7 +3481,138 @@
     "resolved": "해결됨",
     "closed": "종료"
   }
+},
+"user_form": {
+  "add_user": "새 사용자 추가",
+  "update_user": "사용자 업데이트",
+  "first_name": "이름",
+  "last_name": "성",
+  "display_name": "표시 이름",
+  "email": "이메일",
+  "phone": "전화번호",
+  "photo_url": "사진 URL",
+  "company_id_optional": "회사 ID (선택 사항)",
+  "home_airport": "기본 공항",
+  "profile_address_section": "프로필 주소 (AddressCore)",
+  "extra_info_section": "추가 정보",
+  "id_number": "신분증 / 여권 번호",
+  "gender_placeholder": "성별",
+  "gender_male": "남성",
+  "gender_female": "여성",
+  "gender_other": "기타",
+  "date_of_birth": "생년월일",
+  "cover_url": "커버 이미지 URL",
+  "preferences_section": "환경 설정",
+  "contribution_section": "기여",
+  "contribution_points": "기여 포인트",
+  "contribution_level": "기여 레벨",
+  "total_contributions": "총 기여 수",
+  "referral_section": "추천",
+  "referral_code": "추천 코드",
+  "referred_by": "추천인",
+  "referral_points": "추천 포인트",
+  "total_referrals": "총 추천 수",
+  "last_location_section": "마지막 위치"
+},
+"address": {
+  "line1": "주소 1",
+  "line2": "주소 2",
+  "locality": "도시 / 지역",
+  "admin_area": "주 / 도 / 행정 구역",
+  "postal_code": "우편번호",
+  "country_code": "국가 코드 (ISO-2, 예: US, VN, GB)",
+  "formatted": "형식화됨 (보기 편한 문자열)"
+},
+"location": {
+  "location_string_example": "위치 문자열 (예: 16.047079,108.206230)",
+  "map_address": "지도 주소 (선택 사항)",
+  "address": "주소 (선택 사항)",
+  "note_geopoint_will_be_set_on_submit": "참고: GeoPoint는 제출 시 위치 문자열을 기반으로 설정됩니다."
+},
+
+"roles": {
+  "customer": "고객 — 최종 사용자",
+  "staff": "직원 — 스테이션 직원",
+  "agent": "에이전트 — 제휴 파트너",
+  "station_manager": "스테이션 관리자",
+  "company_owner": "회사 소유자",
+  "technician": "기술자",
+  "technician_partner": "기술 파트너",
+  "technician_assistant": "기술 보조",
+  "private_provider": "개인 제공자",
+  "investor": "투자자",
+  "admin": "관리자 — 전체 권한",
+  "other": "기타"
+},
+
+"user_table": {
+  "empty": "사용자가 없습니다.",
+  "fullname": "성명",
+  "company": "회사",
+  "home_airport": "주요 공항",
+  "extra_info": "추가 정보",
+  "id_number": "신분증 번호",
+  "gender": "성별",
+  "dob": "생년월일",
+  "preferences": "환경 설정",
+  "contributions": "기여",
+  "referral": "추천",
+  "last_location": "마지막 위치",
+  "points": "포인트",
+  "level": "레벨",
+  "total": "총계",
+  "code": "코드",
+  "by": "추천인",
+  "col_photo": "사진",
+  "col_name": "이름",
+  "col_first_name": "이름",
+  "col_last_name": "성",
+  "col_email": "이메일",
+  "col_phone": "전화번호",
+  "col_role": "역할",
+  "col_company": "회사",
+  "col_home_airport": "주요 공항",
+  "col_address": "프로필 주소",
+  "col_id_number": "신분증 번호",
+  "col_gender": "성별",
+  "col_dob": "생년월일",
+  "col_preferences": "환경 설정",
+  "col_contributions": "기여",
+  "col_referral": "추천",
+  "col_last_location": "마지막 위치",
+  "col_cover": "커버 이미지",
+  "col_actions": "작업"
+},
+
+"user_summary": {
+  "total": "총 사용자 수",
+  "by_business_type": "사업 유형별"
+},
+"business_types": {
+  "rental_company": "렌터카 회사",
+  "private_provider": "개인 차량 제공자",
+  "agent": "대리점 / 에이전트",
+  "technician_partner": "기술 파트너",
+  "intercity_bus": "시외버스 회사",
+  "vehicle_transport": "차량 운송업체",
+  "tour_guide": "투어 가이드"
+},
+
+"user_page": {
+  "title": "사용자 관리"
+},
+"user_notify": {
+  "updated": "✅ 사용자가 업데이트되었습니다!",
+  "added": "✅ 사용자가 추가되었습니다!",
+  "save_failed": "❌ 사용자 저장에 실패했습니다.",
+  "delete_confirm_title": "사용자를 삭제하시겠습니까?",
+  "delete_confirm_desc": "이 작업은 되돌릴 수 없습니다.",
+  "deleted": "🗑️ 사용자가 삭제되었습니다.",
+  "delete_failed": "❌ 사용자 삭제에 실패했습니다."
 }
+
+
+
 
 
 

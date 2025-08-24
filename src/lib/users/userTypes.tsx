@@ -1,5 +1,7 @@
 // 📁 lib/users/userTypes.ts
-import { Timestamp, GeoPoint } from 'firebase/firestore';
+import type { AddressCore } from '@/src/lib/locations/addressTypes';
+import type { UserLocation } from '@/src/lib/locations/locationTypes'; // cập nhật import
+import { Timestamp } from 'firebase/firestore';
 
 export interface UserPreferences {
   language: string;
@@ -7,65 +9,47 @@ export interface UserPreferences {
   currency?: string;
 }
 
-export interface UserLocation {
-  geo: GeoPoint;                 // ⬅️ thay thế lat/lng number
-  address?: string;
-  updatedAt: Timestamp;
-  // Optional tiện lợi:
-  location?: string;             // "lat,lng"
-}
-
 export interface User {
   uid: string;
 
-  // Thông tin cá nhân
+  // Thông tin
   firstName?: string;
   lastName?: string;
   name: string;
   email: string;
   phone: string;
   photoURL: string;
-
-  // Làm việc tại công ty nào ?
   companyId?: string;
-
-  // Phân quyền
   role: string;
 
-  // Địa chỉ tĩnh
-  address: string;
-  address2?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
+  // ✅ Địa chỉ hồ sơ (tĩnh) – có cấu trúc, dễ i18n / thuế / shipping
+  profileAddress?: AddressCore;
 
+  // ✈️ tuỳ chọn
   homeAirport?: string;
 
-  // Tuỳ chọn hệ thống
   preferences?: UserPreferences;
 
-  // Mở rộng dữ liệu cá nhân
+  // Mở rộng
   idNumber?: string;
   gender?: 'male' | 'female' | 'other';
   dateOfBirth?: string;
   coverURL?: string;
 
-  // 🚨 Vị trí gần nhất được hệ thống ghi nhận
+  // 🚨 Vị trí gần nhất (động)
   lastKnownLocation?: UserLocation;
 
-  // 🎯 TÍNH NĂNG ĐÓNG GÓP
+  // Đóng góp
   contributionPoints?: number;
   contributionLevel?: 1 | 2 | 3;
   totalContributions?: number;
 
-  // 📣 MÃ GIỚI THIỆU
+  // Referral
   referralCode?: string;
   referredBy?: string;
   referralPoints?: number;
   totalReferrals?: number;
 
-  // Thời gian
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | Timestamp;
+  updatedAt: Date | Timestamp;
 }

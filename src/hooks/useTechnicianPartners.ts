@@ -9,35 +9,104 @@ import {
   Timestamp,
   setDoc,
   getDoc,
+  GeoPoint,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
+import type { LocationCore } from '@/src/lib/locations/locationTypes';
 import { useUser } from '@/src/context/AuthContext';
 
-// ---- Legacy type để đọc dữ liệu cũ (có workingHours) ----
+// ---- Legacy helpers ----
 type LegacyWorking = { isWorking?: boolean; startTime?: string; endTime?: string };
 type LegacyPartner = TechnicianPartner & {
+  // legacy slots that may still exist on historical docs:
+  coordinates?: { lat?: number; lng?: number } | null;
+  mapAddress?: string;
+  geo?: { lat: number; lng: number };
   workingHours?: LegacyWorking[];
   workingStartTime?: string;
   workingEndTime?: string;
 };
 
-// Chuẩn hoá 1 record: lấy workingStart/EndTime từ trường mới,
-// nếu thiếu thì fallback từ phần tử đầu tiên isWorking=true trong workingHours cũ.
-function normalizePartner(docId: string, raw: LegacyPartner): TechnicianPartner {
+// ---- normalize legacy location → LocationCore ----
+function toLocationCoreFromLegacy(raw: any): LocationCore | null {
+  // 1) Nếu đã đúng chuẩn LocationCore + có geo (GeoPoint) -> dùng luôn
+  const loc = raw?.location;
+  if (loc?.geo instanceof GeoPoint) {
+    // đảm bảo có location string (optional)
+    const locationStr =
+      typeof loc?.location === 'string' && loc.location.trim()
+        ? loc.location
+        : `${loc.geo.latitude},${loc.geo.longitude}`;
+    return {
+      geo: loc.geo,
+      location: locationStr,
+      mapAddress: loc?.mapAddress,
+      address: loc?.address,
+      updatedAt: loc?.updatedAt ?? raw?.updatedAt ?? serverTimestamp(),
+    };
+  }
+
+  // 2) Legacy field ở root: geo {lat,lng} hoặc coordinates {lat,lng}
+  const g = raw?.geo;
+  const c = raw?.coordinates;
+  const lat =
+    typeof g?.lat === 'number'
+      ? g.lat
+      : typeof c?.lat === 'number'
+      ? c.lat
+      : undefined;
+  const lng =
+    typeof g?.lng === 'number'
+      ? g.lng
+      : typeof c?.lng === 'number'
+      ? c.lng
+      : undefined;
+
+  if (typeof lat === 'number' && typeof lng === 'number') {
+    const gp = new GeoPoint(lat, lng);
+    return {
+      geo: gp,
+      location: `${lat},${lng}`,
+      mapAddress: raw?.location?.mapAddress ?? raw?.mapAddress, // ưu tiên trong location nếu có
+      address: raw?.location?.address ?? raw?.shopAddress ?? undefined,
+      updatedAt: serverTimestamp(),
+    };
+  }
+
+  // 3) Chưa có gì để build LocationCore
+  return loc?.geo ? (loc as LocationCore) : null;
+}
+
+// ---- fallback giờ làm việc từ legacy workingHours nếu thiếu ----
+function deriveWorkingTimes(raw: LegacyPartner) {
   const firstWorking = raw.workingHours?.find?.((d) => d?.isWorking);
   const workingStartTime = raw.workingStartTime ?? firstWorking?.startTime ?? '';
   const workingEndTime = raw.workingEndTime ?? firstWorking?.endTime ?? '';
+  return { workingStartTime, workingEndTime };
+}
 
-  // Trả về object theo schema mới; không để workingHours trong object
+// ---- Chuẩn hoá 1 record sang TechnicianPartner (schema mới) ----
+function normalizePartner(docId: string, raw: LegacyPartner): TechnicianPartner {
+  const { workingStartTime, workingEndTime } = deriveWorkingTimes(raw);
+
+  // Bóc tách legacy keys để không trả về trong object cuối
   const {
-    workingHours: _deprecated,
+    workingHours: _legacyWorkingHours,
+    coordinates: _legacyCoordinates,
+    mapAddress: _legacyMapAddress,
+    geo: _legacyGeo,
     ...rest
   } = raw as any;
+
+  // Chuẩn hoá LocationCore
+  const normalizedLoc = toLocationCoreFromLegacy(raw);
 
   return {
     ...rest,
     id: docId,
+    location: normalizedLoc ?? rest.location, // nếu null (hiếm), vẫn gán cái có sẵn để không crash UI
     workingStartTime,
     workingEndTime,
   } as TechnicianPartner;
@@ -65,6 +134,7 @@ export function useTechnicianPartners() {
     }
   };
 
+  // API tạo user Firebase qua route riêng (giữ nguyên)
   const createFirebaseUser = async ({
     email,
     password,
@@ -94,19 +164,30 @@ export function useTechnicianPartners() {
     return data.uid;
   };
 
+  // ---- ADD ----
   const addPartner = async (
     partner: Partial<TechnicianPartner> & { email?: string; password?: string }
   ) => {
     try {
       if (!user?.uid) throw new Error('Missing creator userId');
 
-      const now = Timestamp.now();
-
-      // Không lưu workingHours cũ
+      // Loại bỏ legacy nếu lỡ truyền từ UI cũ
       const {
-        workingHours: _deprecated,
+        // legacy – sẽ bỏ qua
+        coordinates: _legacyCoordinates,
+        mapAddress: _legacyMapAddress,
+        geo: _legacyGeo,
+        workingHours: _legacyWorkingHours,
+        // còn lại
         ...clean
       } = partner as any;
+
+      // Bắt buộc phải có location.geo (chuẩn mới)
+      if (!clean.location?.geo || !(clean.location.geo instanceof GeoPoint)) {
+        throw new Error('Missing valid location.geo (GeoPoint) in payload');
+      }
+
+      const now = Timestamp.now();
 
       const newDoc = await addDoc(collection(db, 'technicianPartners'), {
         ...clean,
@@ -114,11 +195,12 @@ export function useTechnicianPartners() {
         createdBy: user.uid,
         isActive: partner.isActive ?? true,
         avatarUrl: partner.avatarUrl || '/assets/images/technician.png',
-        // đảm bảo 2 trường mới tồn tại (string)
         workingStartTime: partner.workingStartTime ?? '',
         workingEndTime: partner.workingEndTime ?? '',
         createdAt: now,
         updatedAt: now,
+        // đảm bảo location.updatedAt
+        'location.updatedAt': serverTimestamp(),
       });
 
       await fetchPartners();
@@ -129,9 +211,15 @@ export function useTechnicianPartners() {
     }
   };
 
+  // ---- UPDATE ----
   const updatePartner = async (
     id: string | undefined,
-    updates: Partial<Omit<TechnicianPartner, 'createdAt' | 'createdBy' | 'id'> & { email: string; password: string }>
+    updates: Partial<
+      Omit<TechnicianPartner, 'createdAt' | 'createdBy' | 'id'> & {
+        email: string;
+        password: string;
+      }
+    >
   ) => {
     if (!id) {
       console.error('❌ Missing partner ID when updating');
@@ -141,7 +229,9 @@ export function useTechnicianPartners() {
     try {
       const partnerRef = doc(db, 'technicianPartners', id);
       const partnerSnap = await getDoc(partnerRef);
-      const existingPartner = partnerSnap.exists() ? (partnerSnap.data() as TechnicianPartner) : null;
+      const existingPartner = partnerSnap.exists()
+        ? (partnerSnap.data() as TechnicianPartner)
+        : null;
 
       let userId = updates.userId || existingPartner?.userId;
 
@@ -179,19 +269,34 @@ export function useTechnicianPartners() {
         }
       }
 
-      // Không lưu workingHours cũ trong cập nhật
-      const { workingHours: _deprecated, ...cleanUpdates } = updates as any;
+      // Bỏ legacy keys nếu được truyền vào
+      const {
+        coordinates: _legacyCoordinates,
+        mapAddress: _legacyMapAddress,
+        geo: _legacyGeo,
+        workingHours: _legacyWorkingHours,
+        ...cleanUpdates
+      } = updates as any;
 
-      await updateDoc(partnerRef, {
+      // Nếu có cập nhật location thì đảm bảo updatedAt
+      const payload: any = {
         ...cleanUpdates,
         ...(userId ? { userId } : {}),
         isActive: updates.isActive ?? existingPartner?.isActive ?? true,
-        avatarUrl: updates.avatarUrl || existingPartner?.avatarUrl || '/assets/images/technician.png',
-        // đảm bảo 2 trường mới luôn là string
-        workingStartTime: updates.workingStartTime ?? existingPartner?.workingStartTime ?? '',
-        workingEndTime: updates.workingEndTime ?? existingPartner?.workingEndTime ?? '',
+        avatarUrl:
+          updates.avatarUrl || existingPartner?.avatarUrl || '/assets/images/technician.png',
+        workingStartTime:
+          updates.workingStartTime ?? existingPartner?.workingStartTime ?? '',
+        workingEndTime:
+          updates.workingEndTime ?? existingPartner?.workingEndTime ?? '',
         updatedAt: Timestamp.now(),
-      });
+      };
+
+      if (cleanUpdates.location) {
+        payload['location.updatedAt'] = serverTimestamp();
+      }
+
+      await updateDoc(partnerRef, payload);
 
       console.log('✅ Partner updated successfully:', id);
       await fetchPartners();
@@ -201,6 +306,7 @@ export function useTechnicianPartners() {
     }
   };
 
+  // ---- DELETE ----
   const deletePartner = async (id: string, userId?: string) => {
     try {
       if (userId) {

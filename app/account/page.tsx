@@ -20,8 +20,11 @@ import { useUserProfile } from '@/src/hooks/useUserProfile';
 import { useUserPreferences } from '@/src/hooks/useUserPreferences';
 import { useUserLocation } from '@/src/hooks/useUserLocation';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
+
 import type { User as AppUser } from '@/src/lib/users/userTypes';
+import type { AddressCore } from '@/src/lib/locations/addressTypes';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
+import { composeFromAddressCore } from '@/src/utils/address';
 
 // ===== Helpers =====
 const sanitizeReferral = (idNumber?: string) =>
@@ -33,7 +36,7 @@ const toISODateOrEmpty = (value?: string) => {
   return isNaN(d.getTime()) ? '' : format(d, 'yyyy-MM-dd');
 };
 
-// State cục bộ cho UI (không dùng type có GeoPoint)
+// Trạng thái địa điểm cho UI (tránh dùng GeoPoint trong input)
 type EditableUserLocation = {
   lat: number;
   lng: number;
@@ -47,10 +50,7 @@ export default function AccountPage() {
   // Core data
   const { user, loading, update } = useUserProfile();
   const { preferences, updatePreferences } = useUserPreferences(user?.uid ?? '');
-  // ⚠️ Đổi tên để tránh "đè": hook trả về bản từ DB (có geo)
   const { location: dbLocation, updateLocation } = useUserLocation(user?.uid ?? '');
-
-  // Browser location
   const { location: currentLoc, error: locError, loading: locLoading } = useCurrentLocation();
 
   // Local editable states
@@ -65,7 +65,7 @@ export default function AccountPage() {
   const [notifyTitle, setNotifyTitle] = useState('');
   const [notifyDescription, setNotifyDescription] = useState('');
 
-  // Manual refresh state
+  // Refresh state
   const [manualRefreshing, setManualRefreshing] = useState(false);
 
   // ===== Sync remote → local =====
@@ -77,7 +77,11 @@ export default function AccountPage() {
     setLocalPrefs(preferences);
   }, [preferences]);
 
-  // Map DB location (có geo) → editable state
+  // ép về Timestamp an toàn
+  const ensureTimestamp = (v: unknown): Timestamp =>
+    v instanceof Timestamp ? v : Timestamp.now();
+
+  // Map DB location → editable state
   useEffect(() => {
     if (!dbLocation) {
       setLocalLoc(null);
@@ -87,11 +91,11 @@ export default function AccountPage() {
       lat: dbLocation.geo.latitude,
       lng: dbLocation.geo.longitude,
       address: dbLocation.address ?? '',
-      updatedAt: dbLocation.updatedAt ?? Timestamp.now(),
+      updatedAt: ensureTimestamp(dbLocation.updatedAt),
     });
   }, [dbLocation]);
 
-  // Khi browser định vị được → cập nhật editable state (giữ address cũ)
+  // Khi browser định vị → cập nhật editable state
   useEffect(() => {
     if (currentLoc) {
       setLocalLoc(prev => ({
@@ -108,21 +112,45 @@ export default function AccountPage() {
     setFormattedDateOfBirth(toISODateOrEmpty(localUser?.dateOfBirth));
   }, [localUser?.dateOfBirth]);
 
+  // Auto-fill profileAddress.formatted từ tọa độ nếu trống
+  useEffect(() => {
+    const run = async () => {
+      if (!localLoc?.lat || !localLoc?.lng) return;
+      if (localUser?.profileAddress?.formatted) return;
+      try {
+        const r = await fetch(
+          `/api/revgeo?lat=${localLoc.lat}&lng=${localLoc.lng}&lang=${i18n.language}`
+        );
+        if (!r.ok) return;
+        const { formatted, addressCore } = await r.json();
+        setLocalUser(prev => {
+          const pa = { ...(prev?.profileAddress ?? {}), ...(addressCore ?? {}) };
+          pa.formatted = (formatted && String(formatted).trim()) || composeFromAddressCore(pa);
+          return { ...(prev ?? {}), profileAddress: pa };
+        });
+      } catch (e) {
+        console.warn('revgeo failed:', e);
+      }
+    };
+    run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localLoc?.lat, localLoc?.lng, i18n.language]);
+
   // ===== Derived UI states =====
   const isBusy = loading || !user || !localUser;
   const isSavingDisabled = !localUser || !user?.uid;
 
   const latText = useMemo(() => {
     if (locLoading || manualRefreshing) return t('account.fetching_location');
-    return localLoc?.lat !== undefined ? String(localLoc.lat) : '';
+    return typeof localLoc?.lat === 'number' ? String(localLoc.lat) : '';
   }, [locLoading, manualRefreshing, localLoc?.lat, t]);
 
   const lngText = useMemo(() => {
     if (locLoading || manualRefreshing) return t('account.fetching_location');
-    return localLoc?.lng !== undefined ? String(localLoc.lng) : '';
+    return typeof localLoc?.lng === 'number' ? String(localLoc.lng) : '';
   }, [locLoading, manualRefreshing, localLoc?.lng, t]);
 
-  // ===== UI helpers =====
+  // ===== Helpers =====
   const showNotification = (type: NotificationType, title: string, description?: string) => {
     setNotifyType(type);
     setNotifyTitle(title);
@@ -132,6 +160,14 @@ export default function AccountPage() {
 
   const handleFieldChange = <K extends keyof AppUser>(field: K, value: AppUser[K]) => {
     setLocalUser(prev => (prev ? { ...prev, [field]: value } : { [field]: value } as Partial<AppUser>));
+  };
+
+  const setProfileAddr = <K extends keyof AddressCore>(field: K, value: AddressCore[K]) => {
+    setLocalUser(prev => {
+      const curr = prev ?? {};
+      const pa = curr.profileAddress ?? {};
+      return { ...curr, profileAddress: { ...pa, [field]: value } };
+    });
   };
 
   // ===== Actions =====
@@ -150,19 +186,41 @@ export default function AccountPage() {
     if (!user?.uid || !localUser) return;
 
     try {
-      // Build user payload
       const referralCode = sanitizeReferral(localUser.idNumber);
-      const cleanedUserData: Partial<AppUser> = { ...localUser, referralCode };
 
-      const userDataToSave = Object.fromEntries(
-        Object.entries(cleanedUserData).filter(([, value]) => value !== undefined && value !== null)
+      // đảm bảo formatted luôn có
+      const pa = localUser.profileAddress;
+      const finalizedPA = pa
+        ? { ...pa, formatted: (pa.formatted && pa.formatted.trim()) || composeFromAddressCore(pa) }
+        : undefined;
+
+      // strip các field legacy nếu còn
+      const {
+        address: _legacy1,
+        address2: _legacy2,
+        city: _legacy3,
+        state: _legacy4,
+        zip: _legacy5,
+        country: _legacy6,
+        ...rest
+      } = localUser as any;
+
+      const cleanedUserData: Partial<AppUser> = {
+        ...rest,
+        referralCode,
+        ...(finalizedPA ? { profileAddress: finalizedPA } : {}),
+      };
+
+      // lọc undefined/null
+      const payload = Object.fromEntries(
+        Object.entries(cleanedUserData).filter(([, v]) => v !== undefined && v !== null)
       );
 
-      await update(userDataToSave);
+      await update(payload);
       await updatePreferences(localPrefs);
 
-      // Map editable → hook updater (hook sẽ convert sang GeoPoint)
-      if (localLoc?.lat !== undefined && localLoc?.lng !== undefined) {
+      // Lưu lastKnownLocation
+      if (typeof localLoc?.lat === 'number' && typeof localLoc?.lng === 'number') {
         await updateLocation({
           lat: localLoc.lat,
           lng: localLoc.lng,
@@ -177,7 +235,6 @@ export default function AccountPage() {
     }
   };
 
-  // Manual refresh via Geolocation API
   const refreshCurrentLocation = () => {
     if (!navigator.geolocation) {
       showNotification('error', t('common.error'), 'Geolocation is not supported by your browser.');
@@ -210,211 +267,250 @@ export default function AccountPage() {
     <>
       <Header />
       <UserTopMenu />
-      <main className="max-w-4xl mx-auto p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b-2 border-[#00d289] pb-2">
+      <main className="max-w-4xl mx-auto p-6 space-y-6">
+        <h2 className="text-2xl font-semibold border-b-2 border-[#00d289] pb-2">
           {t('user_sidebar.menu.account_info')}
         </h2>
 
-        <form onSubmit={e => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-6 rounded shadow-lg bg-white">
-          {/* First Name */}
-          <div>
-            <Label>{t('account.first_name')}</Label>
-            <Input
-              value={localUser.firstName ?? ''}
-              onChange={e => handleFieldChange('firstName', e.target.value)}
-              autoComplete="given-name"
-            />
-          </div>
+        <form onSubmit={e => e.preventDefault()} className="grid grid-cols-1 gap-6">
+          {/* ===== Card: Thông tin cơ bản ===== */}
+          <section className="border rounded-xl bg-white p-4 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* First Name */}
+            <div>
+              <Label>{t('account.first_name')}</Label>
+              <Input
+                value={localUser?.firstName ?? ''}
+                onChange={e => handleFieldChange('firstName', e.target.value)}
+                autoComplete="given-name"
+              />
+            </div>
 
-          {/* Last Name */}
-          <div>
-            <Label>{t('account.last_name')}</Label>
-            <Input
-              value={localUser.lastName ?? ''}
-              onChange={e => handleFieldChange('lastName', e.target.value)}
-              autoComplete="family-name"
-            />
-          </div>
+            {/* Last Name */}
+            <div>
+              <Label>{t('account.last_name')}</Label>
+              <Input
+                value={localUser?.lastName ?? ''}
+                onChange={e => handleFieldChange('lastName', e.target.value)}
+                autoComplete="family-name"
+              />
+            </div>
 
-          {/* Full Name */}
-          <div className="md:col-span-2">
-            <Label>{t('account.full_name')}</Label>
-            <Input
-              value={localUser.name ?? ''}
-              onChange={e => handleFieldChange('name', e.target.value)}
-              autoComplete="name"
-            />
-          </div>
+            {/* Full Name */}
+            <div className="md:col-span-2">
+              <Label>{t('account.full_name')}</Label>
+              <Input
+                value={localUser?.name ?? ''}
+                onChange={e => handleFieldChange('name', e.target.value)}
+                autoComplete="name"
+              />
+            </div>
 
-          {/* Gender */}
-          <div>
-            <Label>{t('account.gender')}</Label>
-            <SimpleSelect
-              value={localUser.gender ?? ''}
-              onChange={val => handleFieldChange('gender', val as AppUser['gender'])}
-              options={[
-                { label: t('account.male'), value: 'male' },
-                { label: t('account.female'), value: 'female' },
-                { label: t('account.other'), value: 'other' },
-              ]}
-              placeholder={t('account.gender')}
-            />
-          </div>
+            {/* Gender */}
+            <div>
+              <Label>{t('account.gender')}</Label>
+              <SimpleSelect
+                value={localUser?.gender ?? ''}
+                onChange={val => handleFieldChange('gender', val as AppUser['gender'])}
+                options={[
+                  { label: t('account.male'), value: 'male' },
+                  { label: t('account.female'), value: 'female' },
+                  { label: t('account.other'), value: 'other' },
+                ]}
+                placeholder={t('account.gender')}
+              />
+            </div>
 
-          {/* Date of Birth */}
-          <div>
-            <Label>{t('account.date_of_birth')}</Label>
-            <Input
-              type="date"
-              value={formattedDateOfBirth}
-              onChange={e => {
-                setFormattedDateOfBirth(e.target.value);
-                handleFieldChange('dateOfBirth', e.target.value);
-              }}
-            />
-          </div>
+            {/* Date of Birth */}
+            <div>
+              <Label>{t('account.date_of_birth')}</Label>
+              <Input
+                type="date"
+                value={formattedDateOfBirth}
+                onChange={e => {
+                  setFormattedDateOfBirth(e.target.value);
+                  handleFieldChange('dateOfBirth', e.target.value);
+                }}
+              />
+            </div>
 
-          {/* ID Number */}
-          <div className="md:col-span-1">
-            <Label>{t('account.id_number')}</Label>
-            <Input
-              value={localUser.idNumber ?? ''}
-              onChange={e => handleFieldChange('idNumber', e.target.value)}
-            />
-            <p className="text-xs text-gray-500 mt-1">{t('account.referral_hint')}</p>
-          </div>
+            {/* ID Number */}
+            <div>
+              <Label>{t('account.id_number')}</Label>
+              <Input
+                value={localUser?.idNumber ?? ''}
+                onChange={e => handleFieldChange('idNumber', e.target.value)}
+              />
+              <p className="text-xs text-gray-500 mt-1">{t('account.referral_hint')}</p>
+            </div>
 
-          {/* Phone */}
-          <div>
-            <Label>{t('account.phone')}</Label>
-            <Input
-              value={localUser.phone ?? ''}
-              onChange={e => handleFieldChange('phone', e.target.value)}
-              autoComplete="tel"
-            />
-          </div>
+            {/* Phone */}
+            <div>
+              <Label>{t('account.phone')}</Label>
+              <Input
+                value={localUser?.phone ?? ''}
+                onChange={e => handleFieldChange('phone', e.target.value)}
+                autoComplete="tel"
+              />
+            </div>
 
-          {/* Email */}
-          <div className="md:col-span-1">
-            <Label>{t('account.email')}</Label>
-            <Input value={localUser.email ?? ''} readOnly />
-            <p className="text-sm text-gray-500 mt-1">{t('account.login_email_note')}</p>
-          </div>
+            {/* Email */}
+            <div>
+              <Label>{t('account.email')}</Label>
+              <Input value={localUser?.email ?? ''} readOnly />
+              <p className="text-sm text-gray-500 mt-1">{t('account.login_email_note')}</p>
+            </div>
 
-          {/* Password */}
-          <div className="md:col-span-1">
-            <Label>{t('account.password')}</Label>
-            <Input type="password" value="********" disabled />
-            <button
-              type="button"
-              onClick={handleResetPassword}
-              className="text-sm text-[#00d289] mt-2 hover:underline"
-            >
-              {t('account.reset_password')}
-            </button>
-          </div>
+            {/* Password */}
+            <div>
+              <Label>{t('account.password')}</Label>
+              <Input type="password" value="********" disabled />
+              <button
+                type="button"
+                onClick={handleResetPassword}
+                className="text-sm text-[#00d289] mt-2 hover:underline"
+              >
+                {t('account.reset_password')}
+              </button>
+            </div>
+          </section>
 
-          {/* Preferences - Language */}
-          <div>
-            <Label>{t('account.language')}</Label>
-            <SimpleSelect
-              value={localPrefs.language ?? ''}
-              onChange={val => {
-                i18n.changeLanguage(val);
-                setLocalPrefs(prev => ({ ...prev, language: val }));
-              }}
-              options={[
-                { label: 'Vietnamese', value: 'vi' },
-                { label: 'English (UK)', value: 'en' },
-                { label: 'Japanese', value: 'ja' },
-                { label: 'Chinese', value: 'zh' },
-                { label: 'Korean', value: 'ko' },
-                { label: 'Russian', value: 'ru' },
-                { label: 'French', value: 'fr' },
-                { label: 'German', value: 'de' },
-                { label: 'Italian', value: 'it' },
-                { label: 'Spanish', value: 'es' },
-                { label: 'Portuguese', value: 'pt' },
-                { label: 'Arabic', value: 'ar' },
-              ]}
-            />
-          </div>
+          {/* ===== Card: Preferences ===== */}
+          <section className="border rounded-xl bg-white p-4 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Language */}
+            <div>
+              <Label>{t('account.language')}</Label>
+              <SimpleSelect
+                value={localPrefs.language ?? ''}
+                onChange={val => {
+                  i18n.changeLanguage(val);
+                  setLocalPrefs(prev => ({ ...prev, language: val }));
+                }}
+                options={[
+                  { label: 'Vietnamese', value: 'vi' },
+                  { label: 'English (UK)', value: 'en' },
+                  { label: 'Japanese', value: 'ja' },
+                  { label: 'Chinese', value: 'zh' },
+                  { label: 'Korean', value: 'ko' },
+                  { label: 'Russian', value: 'ru' },
+                  { label: 'French', value: 'fr' },
+                  { label: 'German', value: 'de' },
+                  { label: 'Italian', value: 'it' },
+                  { label: 'Spanish', value: 'es' },
+                  { label: 'Portuguese', value: 'pt' },
+                  { label: 'Arabic', value: 'ar' },
+                ]}
+              />
+            </div>
 
-          {/* Preferences - Region */}
-          <div>
-            <Label>{t('account.region')}</Label>
-            <SimpleSelect
-              value={localPrefs.region ?? ''}
-              onChange={val => setLocalPrefs(prev => ({ ...prev, region: val }))}
-              options={[
-                { label: 'Vietnam', value: 'VN' },
-                { label: 'United Kingdom', value: 'GB' },
-                { label: 'Japan', value: 'JP' },
-                { label: 'China', value: 'CN' },
-                { label: 'South Korea', value: 'KR' },
-                { label: 'Russia', value: 'RU' },
-                { label: 'France', value: 'FR' },
-                { label: 'Germany', value: 'DE' },
-                { label: 'Italy', value: 'IT' },
-                { label: 'Spain', value: 'ES' },
-                { label: 'Portugal', value: 'PT' },
-                { label: 'Saudi Arabia', value: 'SA' },
-              ]}
-            />
-          </div>
+            {/* Region */}
+            <div>
+              <Label>{t('account.region')}</Label>
+              <SimpleSelect
+                value={localPrefs.region ?? ''}
+                onChange={val => setLocalPrefs(prev => ({ ...prev, region: val }))}
+                options={[
+                  { label: 'Vietnam', value: 'VN' },
+                  { label: 'United Kingdom', value: 'GB' },
+                  { label: 'Japan', value: 'JP' },
+                  { label: 'China', value: 'CN' },
+                  { label: 'South Korea', value: 'KR' },
+                  { label: 'Russia', value: 'RU' },
+                  { label: 'France', value: 'FR' },
+                  { label: 'Germany', value: 'DE' },
+                  { label: 'Italy', value: 'IT' },
+                  { label: 'Spain', value: 'ES' },
+                  { label: 'Portugal', value: 'PT' },
+                  { label: 'Saudi Arabia', value: 'SA' },
+                ]}
+              />
+            </div>
 
-          {/* Preferences - Currency */}
-          <div>
-            <Label>{t('account.currency')}</Label>
-            <SimpleSelect
-              value={localPrefs.currency ?? ''}
-              onChange={val => setLocalPrefs(prev => ({ ...prev, currency: val }))}
-              options={[
-                { label: 'VND - Vietnamese Dong', value: 'VND' },
-                { label: 'GBP - British Pound Sterling', value: 'GBP' },
-                { label: 'JPY - Japanese Yen', value: 'JPY' },
-                { label: 'CNY - Chinese Yuan', value: 'CNY' },
-                { label: 'KRW - South Korean Won', value: 'KRW' },
-                { label: 'RUB - Russian Ruble', value: 'RUB' },
-                { label: 'EUR - Euro', value: 'EUR' },
-                { label: 'SAR - Saudi Riyal', value: 'SAR' },
-              ]}
-            />
-          </div>
+            {/* Currency */}
+            <div>
+              <Label>{t('account.currency')}</Label>
+              <SimpleSelect
+                value={localPrefs.currency ?? ''}
+                onChange={val => setLocalPrefs(prev => ({ ...prev, currency: val }))}
+                options={[
+                  { label: 'VND - Vietnamese Dong', value: 'VND' },
+                  { label: 'GBP - British Pound Sterling', value: 'GBP' },
+                  { label: 'JPY - Japanese Yen', value: 'JPY' },
+                  { label: 'CNY - Chinese Yuan', value: 'CNY' },
+                  { label: 'KRW - South Korean Won', value: 'KRW' },
+                  { label: 'RUB - Russian Ruble', value: 'RUB' },
+                  { label: 'EUR - Euro', value: 'EUR' },
+                  { label: 'SAR - Saudi Riyal', value: 'SAR' },
+                ]}
+              />
+            </div>
+          </section>
 
-          {/* Address Info */}
-          <div className="md:col-span-2">
-            <Label>{t('account.address')}</Label>
-            <Input
-              value={localUser.address ?? ''}
-              onChange={e => handleFieldChange('address', e.target.value)}
-              autoComplete="street-address"
-            />
-          </div>
+          {/* ===== Card: Profile Address (AddressCore) ===== */}
+          <section className="border rounded-xl bg-white p-4 shadow-sm">
+            <h3 className="font-semibold mb-2">{t('account.profile_address')}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <Label>{t('account.addr.line1')}</Label>
+                <Input
+                  value={localUser?.profileAddress?.line1 ?? ''}
+                  onChange={e => setProfileAddr('line1', e.target.value)}
+                  autoComplete="address-line1"
+                />
+              </div>
+              <div>
+                <Label>{t('account.addr.line2')}</Label>
+                <Input
+                  value={localUser?.profileAddress?.line2 ?? ''}
+                  onChange={e => setProfileAddr('line2', e.target.value)}
+                  autoComplete="address-line2"
+                />
+              </div>
+              <div>
+                <Label>{t('account.addr.locality')}</Label>
+                <Input
+                  value={localUser?.profileAddress?.locality ?? ''}
+                  onChange={e => setProfileAddr('locality', e.target.value)}
+                  autoComplete="address-level2"
+                />
+              </div>
+              <div>
+                <Label>{t('account.addr.admin_area')}</Label>
+                <Input
+                  value={localUser?.profileAddress?.adminArea ?? ''}
+                  onChange={e => setProfileAddr('adminArea', e.target.value)}
+                  autoComplete="address-level1"
+                />
+              </div>
+              <div>
+                <Label>{t('account.addr.postal_code')}</Label>
+                <Input
+                  value={localUser?.profileAddress?.postalCode ?? ''}
+                  onChange={e => setProfileAddr('postalCode', e.target.value)}
+                  autoComplete="postal-code"
+                />
+              </div>
+              <div>
+                <Label>{t('account.addr.country_code')}</Label>
+                <Input
+                  value={localUser?.profileAddress?.countryCode ?? ''}
+                  onChange={e => setProfileAddr('countryCode', e.target.value.toUpperCase())}
+                  placeholder="US, VN, GB…"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label>{t('account.addr.formatted')}</Label>
+                <Input
+                  value={localUser?.profileAddress?.formatted ?? ''}
+                  onChange={e => setProfileAddr('formatted', e.target.value)}
+                  placeholder={t('account.addr.formatted_placeholder')}
+                />
+              </div>
+            </div>
+          </section>
 
-          <div>
-            <Label>{t('account.city')}</Label>
-            <Input value={localUser.city ?? ''} onChange={e => handleFieldChange('city', e.target.value)} />
-          </div>
-
-          <div>
-            <Label>{t('account.state')}</Label>
-            <Input value={localUser.state ?? ''} onChange={e => handleFieldChange('state', e.target.value)} />
-          </div>
-
-          <div>
-            <Label>{t('account.zip')}</Label>
-            <Input value={localUser.zip ?? ''} onChange={e => handleFieldChange('zip', e.target.value)} />
-          </div>
-
-          <div>
-            <Label>{t('account.country')}</Label>
-            <Input value={localUser.country ?? ''} onChange={e => handleFieldChange('country', e.target.value)} />
-          </div>
-
-          {/* LOCATION */}
-          <div className="md:col-span-2">
-            <div className="flex items-center justify-between">
+          {/* ===== Card: Last Known Location ===== */}
+          <section className="border rounded-xl bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
               <Label>{t('account.last_known_address')}</Label>
               <Button
                 type="button"
@@ -428,7 +524,7 @@ export default function AccountPage() {
             </div>
 
             <Input
-              className="mt-2"
+              className="mb-3"
               value={localLoc?.address ?? ''}
               onChange={e =>
                 setLocalLoc(prev => ({
@@ -439,21 +535,22 @@ export default function AccountPage() {
               placeholder={t('account.address_placeholder')}
             />
 
-            {locError && <p className="text-sm text-red-500 mt-2">{locError}</p>}
-          </div>
+            {locError && <p className="text-sm text-red-500 mb-2">{locError}</p>}
 
-          <div>
-            <Label>{t('account.latitude')}</Label>
-            <Input value={latText} readOnly />
-          </div>
-
-          <div>
-            <Label>{t('account.longitude')}</Label>
-            <Input value={lngText} readOnly />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <Label>{t('account.latitude')}</Label>
+                <Input value={latText} readOnly />
+              </div>
+              <div>
+                <Label>{t('account.longitude')}</Label>
+                <Input value={lngText} readOnly />
+              </div>
+            </div>
+          </section>
 
           {/* Actions */}
-          <div className="md:col-span-2 flex gap-4 mt-6">
+          <div className="flex gap-4">
             <Button type="button" onClick={handleSaveAll} disabled={isSavingDisabled}>
               {t('account.save')}
             </Button>
