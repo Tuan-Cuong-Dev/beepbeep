@@ -1,4 +1,4 @@
-// Chưa sử dung vì nó đang ở trong Staff; 
+// Đây là những kỹ thuật làm việc trong công ty. Tôi sẽ tập trung viết sau.
 // Techinician là 1 role của Staff
 
 export interface Technician {

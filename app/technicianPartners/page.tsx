@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
+import { useTechnicianPartners } from '@/src/hooks/useTechnicianPartners';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
@@ -95,7 +95,7 @@ function normalizeUserLocation(u: any): LatLng | null {
 }
 
 export default function TechnicianPartnerPage() {
-  const { partners } = usePublicTechnicianPartners();
+  const { partners } = useTechnicianPartners();
   const { location: rawUserLocation } = useCurrentLocation();
   const userLatLng = useMemo(() => normalizeUserLocation(rawUserLocation), [rawUserLocation]);
 

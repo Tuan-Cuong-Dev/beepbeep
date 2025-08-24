@@ -28,7 +28,7 @@ function parseLatLngString(s?: string): [number, number] | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
 }
 
-/** Đọc tọa độ từ LocationCore/legacy */
+/** Lấy toạ độ từ LocationCore (ưu tiên chuẩn mới), có fallback nhẹ cho legacy */
 function extractLatLngFromPartner(p: TechnicianPartner): [number, number] | null {
   const loc: any = p.location;
 
@@ -36,22 +36,28 @@ function extractLatLngFromPartner(p: TechnicianPartner): [number, number] | null
   if (loc?.geo && typeof loc.geo.latitude === 'number' && typeof loc.geo.longitude === 'number') {
     return [loc.geo.latitude, loc.geo.longitude];
   }
+
   // ✅ Chuẩn mới: chuỗi "lat,lng"
   if (typeof loc?.location === 'string') {
     const parsed = parseLatLngString(loc.location);
     if (parsed) return parsed;
   }
-  // ♻️ Legacy fallback: location.coordinates có thể là "lat,lng"
+
+  // ♻️ Legacy rất cũ: {lat,lng} hoặc location.coordinates: "lat,lng"
+  if (typeof loc?.lat === 'number' && typeof loc?.lng === 'number') {
+    if (Number.isFinite(loc.lat) && Number.isFinite(loc.lng)) return [loc.lat, loc.lng];
+  }
   if (typeof loc?.coordinates === 'string') {
     const parsed = parseLatLngString(loc.coordinates);
     if (parsed) return parsed;
   }
-  // ♻️ Legacy fallback: coordinates hoặc location.coordinates là {lat,lng}
-  const legacy = (p as any).coordinates ?? loc?.coordinates;
-  if (legacy && typeof legacy.lat === 'number' && typeof legacy.lng === 'number') {
-    const { lat, lng } = legacy;
-    if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
+  const legacyCoords = (p as any)?.coordinates; // chỉ để đọc doc cũ
+  if (legacyCoords && typeof legacyCoords.lat === 'number' && typeof legacyCoords.lng === 'number') {
+    if (Number.isFinite(legacyCoords.lat) && Number.isFinite(legacyCoords.lng)) {
+      return [legacyCoords.lat, legacyCoords.lng];
+    }
   }
+
   return null;
 }
 
@@ -62,10 +68,7 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
     let mounted = true;
     (async () => {
       try {
-        const baseQ = query(
-          collection(db, 'technicianPartners'),
-          where('isActive', '==', true)
-        );
+        const baseQ = query(collection(db, 'technicianPartners'), where('isActive', '==', true));
         const snap = await getDocs(baseQ);
         const data = snap.docs.map((d) => ({ id: d.id, ...(d.data() as TechnicianPartner) }));
         if (!mounted) return;
@@ -74,14 +77,19 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
         console.error('Error fetching technician partners:', err);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Optional filter theo vehicleType (client-side để đơn giản)
-  // Chú ý vì có nhiều dữ liệu chưa chọn vehicleType; Nên tôi để mặc định là đang chọn 'motorbike'
+  // Optional filter theo vehicleType (client-side)
+  // Nếu bản ghi chưa set vehicleType → coi như 'motorbike'
   const visibleTechs = useMemo(() => {
     const base = technicians.filter((t) => !!extractLatLngFromPartner(t));
-    return base.filter(t => t.vehicleType === vehicleType || (!t.vehicleType && vehicleType === 'motorbike'));
+    if (!vehicleType) return base;
+    return base.filter(
+      (t) => t.vehicleType === vehicleType || (!t.vehicleType && vehicleType === 'motorbike')
+    );
   }, [technicians, vehicleType]);
 
   return (
@@ -91,19 +99,23 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
         if (!coord) return null;
 
         return (
-          <Marker key={tech.id} position={coord} icon={technicianIcon}>
+          <Marker key={tech.id ?? `${coord[0]}-${coord[1]}`} position={coord} icon={technicianIcon}>
             <Popup>
               <div className="text-sm leading-snug max-w-[220px]">
                 <p className="font-semibold">{tech.name}</p>
                 <p className="text-xs text-gray-700">
                   {tech.type === 'shop' ? 'Shop technician' : 'Mobile technician'}
                 </p>
+                {/* ✅ Địa chỉ theo chuẩn mới: location.address */}
                 <p className="text-xs text-gray-600">
-                  📍 {tech.location?.address || tech.shopAddress || 'N/A'}
+                  📍 {tech.location?.address || 'N/A'}
                 </p>
                 {tech.phone && (
                   <p className="text-xs text-gray-600">
-                    📞 <a className="underline" href={`tel:${tech.phone}`}>{tech.phone}</a>
+                    📞{' '}
+                    <a className="underline" href={`tel:${tech.phone}`}>
+                      {tech.phone}
+                    </a>
                   </p>
                 )}
               </div>

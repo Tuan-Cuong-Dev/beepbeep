@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, GeoPoint } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import type { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
 import type { PublicVehicleIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import type { LocationCore } from '@/src/lib/locations/locationTypes';
 import { useTranslation } from 'react-i18next';
+import type { User } from '@/src/lib/users/userTypes';
 
 // SSR-safe react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(m => m.MapContainer), { ssr: false });
@@ -24,9 +25,9 @@ const useMap = () => {
 type LatLng = { lat: number; lng: number };
 
 interface NearbySupportMapProps {
-  issueCoords?: LatLng | null;       // vị trí sự cố đang xem (focus)
-  issues?: PublicVehicleIssue[];     // toàn bộ issues (sẽ tự lọc trạng thái mở)
-  limitPerType?: number;             // số shop/mobile hiển thị mỗi loại
+  issueCoords?: LatLng | null;
+  issues?: PublicVehicleIssue[];
+  limitPerType?: number;
 }
 
 // ===== Helpers =====
@@ -50,30 +51,26 @@ function parseLatLngString(s?: string): LatLng | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
 }
 
-/** LocationCore → LatLng (hỗ trợ geo: GeoPoint hoặc location: "lat,lng") */
+/** LocationCore → LatLng (ưu tiên geo; rớt xuống string "lat,lng") */
 function extractLatLngFromLocationCore(loc?: LocationCore | null): LatLng | null {
   if (!loc) return null;
-
   if (typeof loc.geo?.latitude === 'number' && typeof loc.geo?.longitude === 'number') {
-
     return { lat: loc.geo.latitude, lng: loc.geo.longitude };
   }
   const parsed = parseLatLngString(loc.location);
   return parsed ?? null;
 }
 
-/** PublicVehicleIssue.location có thể lưu theo chuẩn LocationCore-like */
+/** PublicVehicleIssue.location có thể theo chuẩn LocationCore-like */
 function extractLatLngFromIssueLocation(issue: PublicVehicleIssue): LatLng | null {
-  // Ưu tiên issue.location.geo / issue.location.location
   const loc: any = issue.location;
   if (loc) {
     if (typeof loc?.geo?.latitude === 'number' && typeof loc?.geo?.longitude === 'number') {
       return { lat: loc.geo.latitude, lng: loc.geo.longitude };
     }
-    const fromStr = parseLatLngString(loc.location || loc.coordinates); // fallback nếu còn trường cũ "coordinates"
+    const fromStr = parseLatLngString(loc.location || loc.coordinates);
     if (fromStr) return fromStr;
   }
-  // Fallback cũ: i.location?.coordinates là {lat,lng} hoặc "lat,lng"
   if (issue?.location?.coordinates) {
     const c = issue.location.coordinates as any;
     if (typeof c?.lat === 'number' && typeof c?.lng === 'number') return { lat: c.lat, lng: c.lng };
@@ -90,13 +87,14 @@ function FitToMarkers({ center, others }: { center?: LatLng; others: LatLng[] })
     if (center) pts.push(center);
     if (!pts.length) return;
     const lats = pts.map((p) => p.lat);
-    const lngs = pts.map((p) => p.lng);
+    const lngs = pts.map((p) => p.lng); // ✅ bỏ "rather"
     const southWest = [Math.min(...lats), Math.min(...lngs)] as [number, number];
     const northEast = [Math.max(...lats), Math.max(...lngs)] as [number, number];
     map.fitBounds([southWest, northEast], { padding: [40, 40] });
   }, [center?.lat, center?.lng, others.map((p) => `${p.lat},${p.lng}`).join('|')]);
   return null;
 }
+
 
 /** Các trạng thái “mở” cần hiển thị */
 const OPEN_STATUSES: PublicIssueStatus[] = [
@@ -120,6 +118,35 @@ const statusColor: Record<PublicIssueStatus, string> = {
   closed: '#6b7280',
 };
 
+/** Chuẩn hoá Location-like → LocationCore (bắt buộc có geo: GeoPoint) */
+function toLocationCore(loc: any): LocationCore | null {
+  if (!loc) return null;
+
+  if (loc.geo instanceof GeoPoint) {
+    return loc as LocationCore;
+  }
+  if (loc.geo && typeof loc.geo.latitude === 'number' && typeof loc.geo.longitude === 'number') {
+    return {
+      geo: new GeoPoint(loc.geo.latitude, loc.geo.longitude),
+      location: typeof loc.location === 'string' ? loc.location : `${loc.geo.latitude},${loc.geo.longitude}`,
+      address: loc.address,
+      updatedAt: loc.updatedAt,
+    };
+  }
+  if (typeof loc.location === 'string') {
+    const parsed = parseLatLngString(loc.location);
+    if (parsed) {
+      return {
+        geo: new GeoPoint(parsed.lat, parsed.lng),
+        location: `${parsed.lat},${parsed.lng}`,
+        address: loc.address,
+        updatedAt: loc.updatedAt,
+      };
+    }
+  }
+  return null;
+}
+
 export default function NearbySupportMap({
   issueCoords,
   issues = [],
@@ -134,37 +161,70 @@ export default function NearbySupportMap({
 
   useEffect(() => { setIsClient(true); }, []);
 
-  // Load đối tác (shop/mobile) đang active
+  // Load đối tác (shop từ technicianPartners, mobile từ users role=technician_partner)
   useEffect(() => {
     let mounted = true;
+
+    async function loadShops(): Promise<TechnicianPartner[]> {
+      const shopsQ = query(
+        collection(db, 'technicianPartners'),
+        where('isActive', '==', true),
+        where('type', '==', 'shop'),
+      );
+      const shopsSnap = await getDocs(shopsQ);
+      return shopsSnap.docs.map(d => ({ id: d.id, ...d.data() } as TechnicianPartner));
+    }
+
+    async function loadMobilesFromUsers(): Promise<TechnicianPartner[]> {
+      const usersQ = query(
+        collection(db, 'users'),
+        where('role', '==', 'technician_partner')
+        // Có thể thêm isActive == true nếu bạn có cờ này ở users
+      );
+      const usersSnap = await getDocs(usersQ);
+
+      return usersSnap.docs.map(d => {
+        const u = d.data() as User;
+
+        // Ưu tiên dùng lastKnownLocation; nếu không có, không ép fallback toạ độ 0,0 để tránh hiển thị sai
+        const normalized = toLocationCore(u.lastKnownLocation);
+        const tp: TechnicianPartner = {
+          id: d.id,                 // id theo user doc
+          userId: u.uid,
+          name: u.name,
+          phone: u.phone,
+          email: u.email,
+          role: 'technician_partner',
+          type: 'mobile',
+          location: normalized ?? undefined as any, // để giữ đúng type, downstream sẽ lọc toạ độ null
+          assignedRegions: [],
+          isActive: true,          // tuỳ chính sách, có thể map từ user flag
+          createdBy: u.uid,
+          createdAt: (u.createdAt as any) ?? new Date(),
+          updatedAt: (u.updatedAt as any) ?? new Date(),
+        };
+        return tp;
+      });
+    }
+
     (async () => {
       setLoading(true);
       try {
-        const shopsQ = query(
-          collection(db, 'technicianPartners'),
-          where('isActive', '==', true),
-          where('type', '==', 'shop'),
-        );
-        const mobilesQ = query(
-          collection(db, 'technicianPartners'),
-          where('isActive', '==', true),
-          where('type', '==', 'mobile'),
-        );
-        const [shopsSnap, mobilesSnap] = await Promise.all([getDocs(shopsQ), getDocs(mobilesQ)]);
+        const [shopsRes, mobilesRes] = await Promise.all([loadShops(), loadMobilesFromUsers()]);
         if (!mounted) return;
-        const parse = (d: any): TechnicianPartner => ({ id: d.id, ...d.data() });
-        setShops(shopsSnap.docs.map(parse));
-        setMobiles(mobilesSnap.docs.map(parse));
+        setShops(shopsRes);
+        setMobiles(mobilesRes);
       } catch (e) {
         console.error('Load partners failed', e);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     })();
+
     return () => { mounted = false; };
   }, []);
 
-  // Top N cửa hàng quanh issue (đọc partner.location)
+  // Top N cửa hàng quanh issue
   const topShops = useMemo(() => {
     if (!issueCoords) return [];
     return shops
@@ -175,7 +235,7 @@ export default function NearbySupportMap({
       .slice(0, limitPerType);
   }, [shops, issueCoords, limitPerType]);
 
-  // Top N KTV lưu động quanh issue (đọc partner.location)
+  // Top N KTV lưu động quanh issue
   const topMobiles = useMemo(() => {
     if (!issueCoords) return [];
     return mobiles
@@ -186,7 +246,7 @@ export default function NearbySupportMap({
       .slice(0, limitPerType);
   }, [mobiles, issueCoords, limitPerType]);
 
-  // Các issue “mở” (đọc issue.location)
+  // Các issue “mở”
   const openIssuePoints = useMemo(() => {
     return (issues || [])
       .filter((i) => OPEN_STATUSES.includes(i.status))
@@ -195,11 +255,9 @@ export default function NearbySupportMap({
         return coord ? { issue: i, coord } : null;
       })
       .filter((x): x is { issue: PublicVehicleIssue; coord: LatLng } => !!x)
-      // tránh trùng marker focus (nếu gần <~10m)
       .filter((x) => !issueCoords || distanceKm(issueCoords, x.coord) > 0.01);
   }, [issues, issueCoords]);
 
-  // Tính bounds
   const otherPoints: LatLng[] = useMemo(() => {
     return [
       ...topShops.map((x) => x.coord),
@@ -293,7 +351,6 @@ export default function NearbySupportMap({
                         {t('phone_short')}: {issue.phone}
                       </div>
                     )}
-                    {/* Địa chỉ mô tả sự cố nếu có */}
                     {issue.location?.issueAddress && (
                       <div className="text-xs mt-1">{issue.location.issueAddress}</div>
                     )}
@@ -329,9 +386,8 @@ export default function NearbySupportMap({
                         {t('phone_short')}: <a className="underline" href={`tel:${p.phone}`}>{p.phone}</a>
                       </div>
                     )}
-                    {/* Ưu tiên location.address mới, fallback shopAddress */}
-                    {(p.location?.address || p.shopAddress) && (
-                      <div className="text-xs mt-1">{p.location?.address || p.shopAddress}</div>
+                    {p.location?.address && (
+                      <div className="text-xs mt-1">{p.location.address}</div>
                     )}
                     <div className="text-xs mt-1">{t('distance_km', { val: d.toFixed(2) })}</div>
                     <a
@@ -363,7 +419,7 @@ export default function NearbySupportMap({
                         {t('phone_short')}: <a className="underline" href={`tel:${p.phone}`}>{p.phone}</a>
                       </div>
                     )}
-                    {(p.location?.address) && <div className="text-xs mt-1">{p.location.address}</div>}
+                    {p.location?.address && <div className="text-xs mt-1">{p.location.address}</div>}
                     <div className="text-xs mt-1">{t('distance_km', { val: d.toFixed(2) })}</div>
                     <a
                       className="text-blue-600 underline text-xs mt-1 inline-block"

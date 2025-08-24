@@ -3,14 +3,14 @@
 
 'use client';
 
-import { PublicIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+import { PublicVehicleIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 
 interface Props {
-  issues: PublicIssue[];
+  issues: PublicVehicleIssue[];
   technicianMap: Record<string, string>;
-  onEdit?: (issue: PublicIssue) => void;
-  onUpdateStatus?: (issue: PublicIssue, newStatus: PublicIssueStatus) => void;
+  onEdit?: (issue: PublicVehicleIssue) => void;
+  onUpdateStatus?: (issue: PublicVehicleIssue, newStatus: PublicIssueStatus) => void;
   isTechnician?: boolean;
 }
 

@@ -1120,15 +1120,16 @@
 
 "create_business_page": {
   "title": {
-    "rental_company": "렌터카 회사를 생성",
-    "private_provider": "개인 차량 제공자를 생성",
+    "rental_company": "렌탈 회사를 생성",
+    "private_provider": "개인 제공자를 생성",
     "agent": "에이전트를 생성",
     "technician_partner": "기술 파트너를 생성",
     "intercity_bus": "시외버스 회사를 생성",
-    "vehicle_transport": "차량 운송업체를 생성",
-    "tour_guide": "관광 가이드를 생성"
+    "vehicle_transport": "차량 운송 회사를 생성",
+    "tour_guide": "가이드를 생성"
   },
-  "subtitle": "시작하려면 아래 정보를 입력해 주세요."
+  "subtitle": "시작하려면 아래 정보를 입력하세요.",
+  "invalid_type": "프로필로 이동하여 비즈니스를 생성하세요"
 },
 
 "create_business_form": {
@@ -1150,7 +1151,13 @@
   "not_logged_in_title": "로그인되지 않음",
   "not_logged_in_description": "이 작업을 하려면 로그인해야 합니다.",
   "missing_fields_title": "누락된 항목",
-  "missing_fields_description": "모든 항목을 입력해주세요."
+  "missing_fields_description": "모든 항목을 입력해주세요.",
+  "subtype_label": "하위 유형",
+  "subtype": {
+    "mobile": "출장 기술자 (현장 방문)",
+    "shop": "매장 상주 기술자"
+  },
+  "technician_subtype_hint": "선택된 하위 유형: {{subtype}}"
 },
 
 
@@ -3609,7 +3616,20 @@
   "delete_confirm_desc": "이 작업은 되돌릴 수 없습니다.",
   "deleted": "🗑️ 사용자가 삭제되었습니다.",
   "delete_failed": "❌ 사용자 삭제에 실패했습니다."
-}
+},
+
+"assign_technician": {
+    "select_placeholder": "출장 기술자를 선택하세요",
+    "rating_with_count": "★{{rating}} ({{count}})",
+    "distance_km": "📍 {{km}} km",
+    "score": "⭐{{score}}",
+    "services": "서비스",
+    "regions": "지역",
+    "assign_button": "기술자 배정",
+    "loading": "로딩 중...",
+    "empty_state": "현재 필터에 맞는 출장 기술자가 없습니다.",
+    "unnamed_technician": "(이름 미정 기술자)"
+  }
 
 
 

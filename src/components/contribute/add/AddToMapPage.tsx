@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-import AddRepairShopForm from './AddRepairShopForm';
+import AddRepairShopForm from './AddTechnicianPartnerForm';
 import AddRentalShopForm from './AddRentalShopForm';
 import AddBatteryStationForm from './AddBatteryStationForm';
 import AddBatteryChargingStationForm from './AddBatteryChargingStationForm'; // ✅ NEW

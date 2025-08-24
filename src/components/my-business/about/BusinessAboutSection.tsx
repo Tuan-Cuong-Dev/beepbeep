@@ -154,15 +154,21 @@ export default function BusinessAboutSection({ businessId, businessType, classNa
       {/* Actions */}
       <div className="mt-5 flex flex-col sm:flex-row gap-3">
         {phoneHref && (
-          <Button className="w-full sm:w-auto" asChild>
-            <a href={phoneHref}>{t('business_about.call_now')}</a>
+          <Button
+            className="w-full sm:w-auto"
+            onClick={() => { window.location.href = phoneHref; }}
+          >
+            {t('business_about.call_now')}
           </Button>
         )}
+
         {mapsHref && (
-          <Button className="w-full sm:w-auto" variant="outline" asChild>
-            <a target="_blank" rel="noopener noreferrer" href={mapsHref}>
-              {t('business_about.get_directions')}
-            </a>
+          <Button
+            className="w-full sm:w-auto"
+            variant="outline"
+            onClick={() => { window.open(mapsHref, '_blank', 'noopener,noreferrer'); }}
+          >
+            {t('business_about.get_directions')}
           </Button>
         )}
       </div>

@@ -52,7 +52,7 @@ export interface TechnicianPartner {
   createdAt: Timestamp | FieldValue;
   updatedAt: Timestamp | FieldValue;
 
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 
   /** ⛔️ Deprecated – bắt lỗi compile nếu còn dùng */
   coordinates?: never;

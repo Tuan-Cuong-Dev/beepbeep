@@ -24,9 +24,13 @@ const getCoordsText = (p: TechnicianPartner) => {
   return '-';
 };
 
-/** Lấy mapAddress chuẩn: ưu tiên location.mapAddress → p.mapAddress */
+/** Lấy mapAddress chuẩn từ location.mapAddress */
 const getMapAddress = (p: TechnicianPartner) =>
-  (p as any)?.location?.mapAddress ?? (p as any)?.mapAddress ?? '';
+  (p as any)?.location?.mapAddress ?? '';
+
+/** Lấy address chuẩn từ location.address */
+const getAddress = (p: TechnicianPartner) =>
+  (p as any)?.location?.address ?? '';
 
 export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: Props) {
   const { t } = useTranslation('common');
@@ -46,7 +50,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
         (p.email || '').toLowerCase().includes(q) ||
         (p.phone || '').toLowerCase().includes(q) ||
         (p.shopName || '').toLowerCase().includes(q) ||
-        (p.shopAddress || '').toLowerCase().includes(q);
+        getAddress(p).toLowerCase().includes(q);
       return matchesType && matchesSearch;
     });
   }, [partners, search, typeFilter]);
@@ -83,7 +87,8 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
       [t('technician_partner_table.export.email')]: p.email,
       [t('technician_partner_table.export.type')]: t(`technician_partner_table.type.${p.type}`),
       [t('technician_partner_table.export.shop_name')]: p.shopName || '',
-      [t('technician_partner_table.export.shop_address')]: p.shopAddress || '',
+      // ⬇️ dùng location.address thay cho shopAddress
+      [t('technician_partner_table.export.shop_address')]: getAddress(p),
       [t('technician_partner_table.export.map_address')]: getMapAddress(p),
       [t('technician_partner_table.export.coordinates')]: getCoordsText(p),
       [t('technician_partner_table.export.assigned_regions')]: (p.assignedRegions || []).join(', '),
@@ -161,7 +166,7 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
             {partner.type === 'shop' && (
               <>
                 <div>{t('technician_partner_table.col.shop_name')}: {partner.shopName || '-'}</div>
-                <div>{t('technician_partner_table.col.shop_address')}: {partner.shopAddress || '-'}</div>
+                <div>{t('technician_partner_table.col.shop_address')}: {getAddress(partner) || '-'}</div>
               </>
             )}
 
@@ -212,7 +217,8 @@ export default function TechnicianPartnerTable({ partners, onEdit, onDelete }: P
                 <td className="p-3">{partner.email || '-'}</td>
                 <td className="p-3 capitalize">{t(`technician_partner_table.type.${partner.type}`)}</td>
                 <td className="p-3">{partner.shopName || '-'}</td>
-                <td className="p-3">{partner.shopAddress || '-'}</td>
+                {/* ⬇️ dùng location.address thay cho shopAddress */}
+                <td className="p-3">{getAddress(partner) || '-'}</td>
                 <td className="p-3">{getCoordsText(partner)}</td>
                 <td className="p-3">{(partner.assignedRegions || []).join(', ') || '-'}</td>
                 <td className="p-3">{workingTimeText(partner)}</td>

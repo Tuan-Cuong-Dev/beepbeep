@@ -111,7 +111,6 @@ export default function PublicIssueDispatchPage() {
 
       const okSearch = q
         ? [
-            i.vin,
             i.vehicleLicensePlate,
             i.customerName,
             i.issueDescription,

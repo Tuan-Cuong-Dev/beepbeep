@@ -143,11 +143,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
                     <b>📞</b> {u.phone}
                   </p>
                 )}
-                {u.companyId && (
-                  <p>
-                    <b>{t('user_table.company', 'Company')}:</b> {u.companyId}
-                  </p>
-                )}
+
                 {u.homeAirport && (
                   <p>
                     <b>{t('user_table.home_airport', 'Home airport')}:</b> {u.homeAirport}

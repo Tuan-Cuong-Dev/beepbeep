@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
-import PendingTechnicians from './PendingTechnicians';
+import PendingTechnicians from './PendingTechnicianPartner';
 import PendingRentalShops from './PendingRentalShops';
 import PendingBatteryStations from './PendingBatteryStations';
 import PendingBatteryChargingStations from './PendingBatteryChargingStations'; // 👈 Thêm dòng này

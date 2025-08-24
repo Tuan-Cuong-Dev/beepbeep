@@ -1127,14 +1127,15 @@
 "create_business_page": {
   "title": {
     "rental_company": "Create Rental Company",
-    "private_provider": "Create Private Vehicle Provider",
+    "private_provider": "Create Private Provider",
     "agent": "Create Agent",
     "technician_partner": "Create Technician Partner",
-    "intercity_bus": "Create Intercity Bus Company",
-    "vehicle_transport": "Create Vehicle Transporter",
+    "intercity_bus": "Create Intercity Bus Operator",
+    "vehicle_transport": "Create Vehicle Transport Company",
     "tour_guide": "Create Tour Guide"
   },
-  "subtitle": "Please fill in the information below to get started."
+  "subtitle": "Please fill in the information below to get started.",
+  "invalid_type": "Go to your Profile to create your business"
 },
 
 "create_business_form": {
@@ -1156,7 +1157,13 @@
     "not_logged_in_title": "Not Logged In",
     "not_logged_in_description": "You must be logged in to perform this action.",
     "missing_fields_title": "Missing Fields",
-    "missing_fields_description": "Please fill in all fields."
+    "missing_fields_description": "Please fill in all fields.",
+    "subtype_label": "Subtype",
+    "subtype": {
+      "mobile": "Mobile technician (on-site)",
+      "shop": "Shop-based technician"
+    },
+    "technician_subtype_hint": "Selected subtype: {{subtype}}"
   },
 
  "dynamic_service_form": {
@@ -3575,6 +3582,19 @@
     "delete_confirm_desc": "This action cannot be undone.",
     "deleted": "🗑️ User deleted.",
     "delete_failed": "❌ Failed to delete user."
+  },
+
+  "assign_technician": {
+    "select_placeholder": "Select Mobile Technician",
+    "rating_with_count": "★{{rating}} ({{count}})",
+    "distance_km": "📍 {{km}} km",
+    "score": "⭐{{score}}",
+    "services": "Services",
+    "regions": "Regions",
+    "assign_button": "Assign Technician",
+    "loading": "Loading...",
+    "empty_state": "No mobile technicians match the current filters.",
+    "unnamed_technician": "(Unnamed Technician)"
   }
 
 

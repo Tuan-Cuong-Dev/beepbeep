@@ -1,12 +1,13 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import type { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
-import { useEffect, useMemo, useState } from 'react';
 import L from 'leaflet';
 import { useAuth } from '@/src/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 
+// Icon mặc định cho technician
 const technicianIcon = new L.Icon({
   iconUrl: '/assets/images/technician.png',
   iconSize: [32, 32],
@@ -17,14 +18,9 @@ const technicianIcon = new L.Icon({
 function FlyToUser({ userPosition }: { userPosition: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(userPosition, 15, { animate: true, duration: 1.5 });
+    if (userPosition) map.setView(userPosition, 15);
   }, [userPosition, map]);
   return null;
-}
-
-interface Props {
-  partners: TechnicianPartner[];
-  userLocation?: [number, number] | null;
 }
 
 // ===== Helpers =====
@@ -37,34 +33,29 @@ function parseLatLngString(s?: string): [number, number] | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
 }
 
-/** Đọc LocationCore linh hoạt: geo: GeoPoint | location: "lat,lng" | {lat,lng} (fallback) */
 function extractLatLngFromLocation(loc: any): [number, number] | null {
   if (!loc) return null;
 
-  // GeoPoint trong Firestore
   if (typeof loc?.geo?.latitude === 'number' && typeof loc?.geo?.longitude === 'number') {
     return [loc.geo.latitude, loc.geo.longitude];
   }
-
-  // Chuỗi "lat,lng"
   if (typeof loc?.location === 'string') {
     const p = parseLatLngString(loc.location);
     if (p) return p;
   }
-
-  // Fallback dữ liệu cũ có thể là {lat,lng}
   if (typeof loc?.lat === 'number' && typeof loc?.lng === 'number') {
-    const { lat, lng } = loc;
-    if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
+    return [loc.lat, loc.lng];
   }
-
-  // Fallback nếu lỡ lưu cả object {coordinates:"lat,lng"}
   if (typeof loc?.coordinates === 'string') {
     const p = parseLatLngString(loc.coordinates);
     if (p) return p;
   }
-
   return null;
+}
+
+interface Props {
+  partners: TechnicianPartner[];
+  userLocation?: [number, number] | null;
 }
 
 export default function TechnicianMap({ partners, userLocation }: Props) {
@@ -75,19 +66,20 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
   const [userIcon, setUserIcon] = useState<L.Icon | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  // Sửa CSS control position (nếu cần)
+  // CSS để giữ nút zoom(+/-) chính phía trên trái
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `
       .leaflet-top.leaflet-left {
-        top: 1rem !important;
-        left: 50% !important;
-        transform: translateX(-50%);
+        top: 4 !important;
+        left: 1/2 !important;
         z-index: 1001 !important;
       }
     `;
     document.head.appendChild(style);
-    return () => { document.head.removeChild(style); };
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   // Lấy vị trí user nếu prop không truyền
@@ -112,7 +104,7 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
     setUserIcon(icon);
   }, [currentUser?.photoURL]);
 
-  // Tính điểm hợp lệ từ partners theo chuẩn mới
+  // Tính điểm hợp lệ từ partners
   const partnerPoints = useMemo(() => {
     return partners
       .map((p) => {
@@ -122,15 +114,13 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
       .filter((x): x is { p: TechnicianPartner; coord: [number, number] } => !!x);
   }, [partners]);
 
-  // Center mặc định: vị trí user → hoặc 1st partner → fallback Đà Nẵng
-  const defaultCenter: [number, number] =
-    userPosition ??
-    partnerPoints[0]?.coord ??
-    [16.0471, 108.2062];
+  const defaultCenter: [number, number] = [16.0471, 108.2062];
+  const center: [number, number] =
+    userPosition ?? partnerPoints[0]?.coord ?? defaultCenter;
 
   return (
     <div className="h-full w-full relative flex flex-col">
-      <MapContainer center={defaultCenter} zoom={13} className="w-full h-full">
+      <MapContainer center={center} zoom={13} className="w-full h-full">
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="© OpenStreetMap contributors"
@@ -156,22 +146,14 @@ export default function TechnicianMap({ partners, userLocation }: Props) {
               <div className="text-sm leading-snug max-w-[240px]">
                 <p className="font-semibold text-black">{p.name}</p>
                 <p className="text-gray-700 text-xs mb-1">
-                  {t(
-                    p.type === 'shop'
-                      ? 'technician_map.shop_technician'
-                      : 'technician_map.mobile_technician'
-                  )}
+                  {t(p.type === 'shop' ? 'technician_map.shop_technician' : 'technician_map.mobile_technician')}
                 </p>
-
-                {/* Ưu tiên địa chỉ chuẩn mới từ location.address, fallback shopAddress */}
                 <p className="text-gray-600 text-xs">
-                  📍 {p.location?.address || p.shopAddress || t('technician_map.no_address')}
+                  📍 {p.location?.address || t('technician_map.no_address')}
                 </p>
-
                 <p className="text-gray-600 text-xs mb-1">
                   📞 {p.phone || t('technician_map.no_phone')}
                 </p>
-
                 {p.phone && (
                   <a
                     href={`tel:${p.phone}`}

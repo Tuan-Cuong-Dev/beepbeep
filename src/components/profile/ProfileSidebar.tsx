@@ -1,6 +1,4 @@
-// Bắt đầu thiết kế cái này từ 12.08.2025
 // components/profile/ProfileSidebar.tsx
-
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -27,14 +25,25 @@ interface ProfileSidebarProps {
   businessId?: string;
   businessType?: BusinessType;
 
-  // ✅ Dùng để auto phát hiện staff org khi không truyền businessId/businessType
+  // ✅ Dùng để auto phát hiện org khi không truyền businessId/businessType
   currentUserId?: string;
 
-  // existing (để dành, nếu cần hiển thị thêm info user)
+  // existing (để dành)
   location?: string;
   joinedDate?: string;
   helpfulVotes?: number;
 }
+
+// Map BusinessType -> Firestore collection
+const COLLECTION_BY_TYPE: Record<BusinessType, string> = {
+  rental_company: 'rentalCompanies',
+  private_provider: 'privateProviders',
+  agent: 'agents',
+  technician_partner: 'technicianPartners',
+  intercity_bus: 'intercityBusCompanies',
+  vehicle_transport: 'vehicleTransporters',
+  tour_guide: 'tourGuides',
+};
 
 export default function ProfileSidebar({
   businessId,
@@ -46,10 +55,10 @@ export default function ProfileSidebar({
 }: ProfileSidebarProps) {
   const { t } = useTranslation('common');
 
-  // State nội bộ khi cần tự tìm doanh nghiệp staff
+  // State nội bộ khi cần tự tìm doanh nghiệp
   const [staffBusinessId, setStaffBusinessId] = useState<string | undefined>();
   const [staffBusinessType, setStaffBusinessType] = useState<BusinessType | undefined>();
-  const [loadingStaffOrg, setLoadingStaffOrg] = useState(false);
+  const [loadingAutoDetect, setLoadingAutoDetect] = useState(false);
 
   // Có nguồn businessId/businessType từ parent không?
   const hasParentBusiness = useMemo(
@@ -58,14 +67,11 @@ export default function ProfileSidebar({
   );
 
   useEffect(() => {
-    // Nếu parent đã truyền business → không cần tự tìm
     if (hasParentBusiness) {
       setStaffBusinessId(undefined);
       setStaffBusinessType(undefined);
       return;
     }
-
-    // Nếu không có user → không tìm được staff org
     if (!currentUserId) {
       setStaffBusinessId(undefined);
       setStaffBusinessType(undefined);
@@ -74,70 +80,94 @@ export default function ProfileSidebar({
 
     let mounted = true;
 
-    const loadStaffOrg = async () => {
-      setLoadingStaffOrg(true);
+    const autoDetectOrg = async () => {
+      setLoadingAutoDetect(true);
       try {
-        // 1) Lấy staff record đã accepted của user
+        // 1) Ưu tiên lấy từ users/{uid}.business (đã set khi tạo business)
+        const userRef = doc(db, 'users', currentUserId);
+        const userSnap = await getDoc(userRef);
+        if (!mounted) return;
+
+        const userData = userSnap.exists() ? (userSnap.data() as any) : null;
+        const biz = userData?.business as
+          | { id?: string; type?: BusinessType; collection?: string; subtype?: string }
+          | undefined;
+
+        if (biz?.id && biz?.type) {
+          setStaffBusinessId(biz.id);
+          setStaffBusinessType(biz.type);
+          setLoadingAutoDetect(false);
+          return;
+        }
+
+        // 2) Fallback staff: chỉ lịch sử cho rentalCompanies (như logic cũ)
         const qStaffs = query(
           collection(db, 'staffs'),
           where('userId', '==', currentUserId),
           where('accepted', '==', true)
         );
-
-        const snap = await getDocs(qStaffs);
+        const staffSnap = await getDocs(qStaffs);
         if (!mounted) return;
 
-        if (snap.empty) {
-          setStaffBusinessId(undefined);
-          setStaffBusinessType(undefined);
-          setLoadingStaffOrg(false);
+        if (!staffSnap.empty) {
+          const sd = staffSnap.docs[0];
+          const { id: _dropId, ...rawStaff } = sd.data() as Staff;
+          const staffData: Staff = { ...rawStaff, id: sd.id };
+
+          // Lấy company record tương ứng
+          const companyRef = doc(db, 'rentalCompanies', staffData.companyId);
+          const companySnap = await getDoc(companyRef);
+          if (!mounted) return;
+
+          if (companySnap.exists()) {
+            const { id: _ignored, ...rawCompany } = companySnap.data() as RentalCompany;
+            const company: RentalCompany = { ...rawCompany, id: companySnap.id };
+            setStaffBusinessId(company.id);
+            setStaffBusinessType(company.businessType as BusinessType);
+            setLoadingAutoDetect(false);
+            return;
+          }
+        }
+
+        // 3) Fallback chủ sở hữu technicianPartners (ownerId == currentUserId)
+        const qTech = query(
+          collection(db, 'technicianPartners'),
+          where('ownerId', '==', currentUserId)
+        );
+        const techSnap = await getDocs(qTech);
+        if (!mounted) return;
+
+        if (!techSnap.empty) {
+          const d = techSnap.docs[0];
+          const data = d.data() as any;
+          setStaffBusinessId(d.id);
+          setStaffBusinessType('technician_partner');
+          setLoadingAutoDetect(false);
           return;
         }
 
-        // Chỉ lấy 1 org theo yêu cầu
-        const staffDoc = snap.docs[0];
+        // 4) (tùy chọn) Có thể thêm các collection khác có ownerId == uid nếu muốn
 
-        // Tránh "id overwritten": bỏ id trong data nếu có
-        const { id: _ignoredStaffId, ...restStaff } = staffDoc.data() as Staff;
-        const staffData: Staff = { ...restStaff, id: staffDoc.id };
-
-        // 2) Lấy company tương ứng
-        const companyRef = doc(db, 'rentalCompanies', staffData.companyId);
-        const companySnap = await getDoc(companyRef);
-        if (!mounted) return;
-
-        if (!companySnap.exists()) {
-          setStaffBusinessId(undefined);
-          setStaffBusinessType(undefined);
-          setLoadingStaffOrg(false);
-          return;
-        }
-
-        // Bỏ id trong data company, dùng doc.id
-        const { id: _ignoredCompanyId, ...restCompany } =
-          companySnap.data() as RentalCompany;
-        const company: RentalCompany = { ...restCompany, id: companySnap.id };
-
-        // businessType nằm trong company.businessType
-        setStaffBusinessId(company.id);
-        setStaffBusinessType(company.businessType as BusinessType);
+        // Không tìm được
+        setStaffBusinessId(undefined);
+        setStaffBusinessType(undefined);
       } catch (e) {
-        console.error('ProfileSidebar.loadStaffOrg error:', e);
+        console.error('ProfileSidebar.autoDetectOrg error:', e);
         if (!mounted) return;
         setStaffBusinessId(undefined);
         setStaffBusinessType(undefined);
       } finally {
-        if (mounted) setLoadingStaffOrg(false);
+        if (mounted) setLoadingAutoDetect(false);
       }
     };
 
-    loadStaffOrg();
+    autoDetectOrg();
     return () => {
       mounted = false;
     };
   }, [hasParentBusiness, currentUserId]);
 
-  // Ưu tiên nguồn từ parent, nếu không có thì dùng staff org
+  // Ưu tiên nguồn từ parent, nếu không có thì dùng auto-detect
   const finalBusinessId = hasParentBusiness ? businessId : staffBusinessId;
   const finalBusinessType = hasParentBusiness ? businessType : staffBusinessType;
 
@@ -149,19 +179,15 @@ export default function ProfileSidebar({
             businessId={finalBusinessId}
             businessType={finalBusinessType}
           />
-
-          {/* Nếu services lưu theo businessId thì chỉ cần businessId.
-             Nếu services lưu theo userId, bạn có thể truyền thêm userId (ở đây dùng currentUserId). */}
-          {/* Hiển thị dịch vụ gắn với DOANH NGHIỆP */}
-            <ServicesAboutSection
-              businessId={finalBusinessId}
-              statusIn={['active', 'pending', 'inactive']}
-            />
+          <ServicesAboutSection
+            businessId={finalBusinessId}
+            statusIn={['active', 'pending', 'inactive']}
+          />
         </>
       ) : (
         <div className="bg-white p-4 rounded-lg shadow-sm">
           <p className="text-sm text-gray-500">
-            {loadingStaffOrg
+            {loadingAutoDetect
               ? t('common.loading', 'Đang tải...')
               : t('business_about.not_found')}
           </p>

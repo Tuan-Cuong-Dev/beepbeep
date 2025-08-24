@@ -62,7 +62,7 @@ function extractLatLngFromLocationCore(loc: any): LatLng | null {
   return null;
 }
 
-/** Chuẩn hoá userLocation: nhận [lat,lng] hoặc {lat,lng} hoặc {geo} hoặc GeoPoint */
+/** Chuẩn hoá userLocation: [lat,lng] | {lat,lng} | {geo} | GeoPoint | {location:"lat,lng"} */
 function normalizeUserLocation(u: any): LatLng | null {
   if (!u) return null;
 
@@ -100,24 +100,32 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       ? t('technician_partner_card.shop_technician')
       : t('technician_partner_card.mobile_technician');
 
+  // ✅ Theo schema mới: địa chỉ lấy từ location.address
   const address =
-    partner.location?.address ??
-    partner.shopAddress ??
+    (partner.location?.address && partner.location.address.trim()) ||
     t('technician_partner_card.address_not_available');
 
   const partnerLatLng = extractLatLngFromLocationCore(partner.location);
   const userLatLng = normalizeUserLocation(userLocation);
 
-  const distanceText =
-    partnerLatLng && userLatLng
-      ? `📍 ${t('technician_partner_card.distance', {
-          km: Math.round(haversineKm(userLatLng, partnerLatLng) * 10) / 10,
-        })}`
-      : '';
+  let distanceText = '';
+  if (partnerLatLng && userLatLng) {
+    const km = haversineKm(userLatLng, partnerLatLng);
+    if (Number.isFinite(km)) {
+      const kmRounded = Math.round(km * 10) / 10;
+      distanceText = `📍 ${t('technician_partner_card.distance', { km: kmRounded })}`;
+    }
+  }
+
+  const ratingValue =
+    typeof partner.averageRating === 'number' && Number.isFinite(partner.averageRating)
+      ? partner.averageRating.toFixed(1)
+      : 'N/A';
+  const ratingCount = partner.ratingCount ?? 0;
 
   const ratingText = t('technician_partner_card.rating', {
-    rating: partner.averageRating?.toFixed(1) ?? 'N/A',
-    count: partner.ratingCount ?? 0,
+    rating: ratingValue,
+    count: ratingCount,
   });
 
   return (
@@ -125,21 +133,19 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       {/* Avatar + Name + Role */}
       <div className="flex items-start gap-3 mb-2 w-full">
         {/* Avatar */}
-        <div className="w-1/3 flex justify-start">
-          <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-300">
-            <Image
-              src={avatar}
-              alt={partner.name || 'Technician'}
-              width={64}
-              height={64}
-              className="object-cover w-full h-full rounded-full"
-            />
-          </div>
+        <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-300 shrink-0">
+          <Image
+            src={avatar}
+            alt={partner.name || 'Technician'}
+            width={64}
+            height={64}
+            className="object-cover w-full h-full rounded-full"
+          />
         </div>
 
         {/* Name + Role */}
-        <div className="w-2/3">
-          <h3 className="text-base font-semibold text-gray-800 leading-tight">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-semibold text-gray-800 leading-tight truncate">
             {partner.name}
           </h3>
           <p className="text-sm text-gray-600 leading-tight">{roleLabel}</p>
@@ -149,7 +155,7 @@ export default function TechnicianPartnerCard({ partner, onContact, userLocation
       {/* Address */}
       <div className="text-sm text-gray-600 mt-1 flex items-start gap-1 w-full">
         <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-        <span>{address}</span>
+        <span className="line-clamp-2">{address}</span>
       </div>
 
       {/* Distance */}

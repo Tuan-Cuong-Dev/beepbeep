@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 // Lazy load các form để tối ưu bundle
 const RepairShopEditForm = dynamic(
-  () => import('@/src/components/contribute/edit/RepairShopEditForm')
+  () => import('@/src/components/contribute/edit/TechnicianPartnerEditForm')
 );
 const RentalShopEditForm = dynamic(
   () => import('@/src/components/contribute/edit/RentalShopEditForm')

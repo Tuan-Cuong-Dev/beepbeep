@@ -7,10 +7,10 @@ import {
   doc,
   updateDoc,
 } from 'firebase/firestore';
-import { PublicIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+import { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 
 export function usePublicIssuesToDispatch() {
-  const [issues, setIssues] = useState<PublicIssue[]>([]);
+  const [issues, setIssues] = useState<PublicVehicleIssue[]>([]);
   const [loading, setLoading] = useState(true);
   const [technicianMap, setTechnicianMap] = useState<Record<string, string>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
@@ -63,7 +63,7 @@ export function usePublicIssuesToDispatch() {
 
       const snap = await getDocs(collection(db, 'publicVehicleIssues'));
       const rawIssues = snap.docs.map(
-        (d) => ({ id: d.id, ...d.data() } as PublicIssue)
+        (d) => ({ id: d.id, ...d.data() } as PublicVehicleIssue)
       );
 
       const enriched = rawIssues.map((issue) => ({
@@ -93,7 +93,7 @@ export function usePublicIssuesToDispatch() {
     fetchVehicleIssues();
   }, []);
 
-  const updateIssue = async (id: string, data: Partial<PublicIssue>) => {
+  const updateIssue = async (id: string, data: Partial<PublicVehicleIssue>) => {
     await updateDoc(doc(db, 'publicVehicleIssues', id), data);
   };
 

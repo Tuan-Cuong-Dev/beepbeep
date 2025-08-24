@@ -35,7 +35,7 @@ export default function StationMap({ stations, userLocation }: Props) {
   const [userIcon, setUserIcon] = useState<L.Icon | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  // CSS tùy chỉnh
+  // CSS để giữ nút zoom(+/-) chính phía trên trái
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `

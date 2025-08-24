@@ -1,142 +1,377 @@
-// Cần thiết kế thông minh hơn dựa vào nhiều yếu tố để cho Trợ lý có thể 
-// giao việc cho đúng kỹ thuật viên phù hợp với lỗi của khách hàng
-
-
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { Button } from '../ui/button';
-import { SimpleSelect } from '../ui/select';
+import { Button } from '@/src/components/ui/button';
+import { SimpleSelect } from '@/src/components/ui/select';
 import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
+
+// ===== Local loose types (chịu mọi biến thể legacy) =====
+type GeoLike = { latitude: number; longitude: number };
+type LocationCoreLoose = {
+  geo?: GeoLike | { latitude: number; longitude: number };
+  location?: string;               // "lat,lng"
+  coordinates?: string | { lat?: number; lng?: number };
+  address?: string;
+};
+type TPDocLoose = {
+  id?: string;                     // sẽ bỏ để tránh overwrite
+  userId?: string;
+  ownerId?: string;
+  createdBy?: string;
+  name?: string;
+  phone?: string;
+  email?: string;
+  avatarUrl?: string;
+  type?: string;                   // 'mobile' | 'shop' | 'technician_partner'
+  subtype?: string;                // 'mobile' | 'shop'
+  businessType?: string;           // đôi khi lưu sai field
+  isActive?: boolean;
+  serviceCategories?: string[];
+  assignedRegions?: string[];
+  averageRating?: number | null;
+  ratingCount?: number | null;
+  location?: LocationCoreLoose | null;
+};
+
+type UserLoose = {
+  uid: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  photoURL?: string;
+  role?: string; // 'technician_partner'...
+  lastKnownLocation?: { updatedAt?: any; geo?: GeoLike } | null;
+};
+
+// ===== Display type =====
+interface DisplayTechnician {
+  userId: string;
+  docId: string; // doc id của technicianPartners
+  name: string;
+  phone?: string;
+  email?: string;
+  avatarUrl?: string;
+  serviceCategories: string[];
+  assignedRegions: string[];
+  averageRating?: number | null;
+  ratingCount?: number | null;
+  distanceKm?: number | null;
+  score: number; // dùng để sort
+}
 
 interface Props {
-  // chấp nhận cả sync/async
   onAssign: (userId: string, name: string) => void | Promise<void>;
   filterCategory?: string;
   filterRegion?: string;
+  /** toạ độ sự cố để tính khoảng cách */
+  issueCoords?: { lat: number; lng: number } | null;
 }
 
-interface TechnicianPartner {
-  userId: string;
-  name: string;
-  avatarUrl?: string;
-  serviceCategories?: string[];
-  assignedRegions?: string[];
+// ===== Helpers =====
+function toRad(x: number) {
+  return (x * Math.PI) / 180;
 }
+function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+  const R = 6371;
+  const dLat = toRad(b.lat - a.lat);
+  const dLon = toRad(b.lng - a.lng);
+  const A =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(A), Math.sqrt(1 - A));
+  return R * c;
+}
+function parseLatLngString(s?: string): { lat: number; lng: number } | null {
+  if (!s || typeof s !== 'string') return null;
+  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lng = parseFloat(m[3]);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+}
+function extractLatLngFromLocation(loc?: LocationCoreLoose | null): { lat: number; lng: number } | null {
+  if (!loc) return null;
+  // geo
+  const g = (loc as any)?.geo;
+  if (g && typeof g.latitude === 'number' && typeof g.longitude === 'number') {
+    return { lat: g.latitude, lng: g.longitude };
+  }
+  // location: "lat,lng"
+  if (typeof loc.location === 'string') {
+    const p = parseLatLngString(loc.location);
+    if (p) return p;
+  }
+  // coordinates: "lat,lng"
+  if (typeof loc.coordinates === 'string') {
+    const p = parseLatLngString(loc.coordinates);
+    if (p) return p;
+  }
+  // coordinates: {lat,lng}
+  const c = loc.coordinates as any;
+  if (c && typeof c.lat === 'number' && typeof c.lng === 'number') {
+    const { lat, lng } = c;
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+  }
+  return null;
+}
+const isRecent = (d?: any, hours = 24) => {
+  if (!d) return false;
+  try {
+    const t =
+      d instanceof Date
+        ? d.getTime()
+        : typeof d.toDate === 'function'
+        ? d.toDate().getTime()
+        : new Date(d).getTime();
+    return Date.now() - t <= hours * 3600 * 1000;
+  } catch {
+    return false;
+  }
+};
 
+// ===== Component =====
 export default function AssignTechnicianForm({
   onAssign,
   filterCategory,
   filterRegion,
+  issueCoords,
 }: Props) {
-  const [technicians, setTechnicians] = useState<TechnicianPartner[]>([]);
+  const { t } = useTranslation('common'); // 👈 dùng namespace "common"
+  const [technicians, setTechnicians] = useState<DisplayTechnician[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchPartners = async () => {
+    let mounted = true;
+    const fetchMobileTechs = async () => {
       setLoading(true);
       try {
-        const q = query(
-          collection(db, 'technicianPartners'),
-          where('isActive', '==', true)
+        // 1) Users có role technician_partner
+        const usersQ = query(collection(db, 'users'), where('role', '==', 'technician_partner'));
+        const usersSnap = await getDocs(usersQ);
+        const users: UserLoose[] = usersSnap.docs.map((d) => ({
+          uid: d.id,
+          ...(d.data() as any),
+        }));
+
+        // 2) Partners active
+        const partnersQ = query(collection(db, 'technicianPartners'), where('isActive', '==', true));
+        const partnersSnap = await getDocs(partnersQ);
+
+        // Loại bỏ field id trong data() để tránh overwrite rồi đặt docId
+        const rawPartners: (Omit<TPDocLoose, 'id'> & { docId: string })[] = partnersSnap.docs.map(
+          (ds) => {
+            const { id: _ignored, ...rest } = ds.data() as TPDocLoose;
+            return { docId: ds.id, ...rest };
+          }
         );
-        const snap = await getDocs(q);
 
-        const partners: TechnicianPartner[] = snap.docs
-          .map((doc) => {
-            const data = doc.data();
-            return {
-              userId: doc.id, // ✅ thay vì data.userId
-              name: data.name || '(Unnamed Partner)',
-              avatarUrl: data.avatarUrl || '/assets/images/technician.png',
-              serviceCategories: data.serviceCategories || [],
-              assignedRegions: data.assignedRegions || [],
-            } as TechnicianPartner;
-          })
-          .filter(Boolean) as TechnicianPartner[];
-
-        const filtered = partners.filter((p) => {
-          const matchCategory = filterCategory
-            ? p.serviceCategories?.includes(filterCategory)
-            : true;
-          const matchRegion = filterRegion
-            ? p.assignedRegions?.includes(filterRegion)
-            : true;
-          return matchCategory && matchRegion;
+        // Lọc đúng MOBILE (đỡ miss do legacy)
+        const mobilePartners = rawPartners.filter((p) => {
+          const type = String(p.type ?? '').toLowerCase();
+          const subtype = String(p.subtype ?? '').toLowerCase();
+          const btype = String(p.businessType ?? '').toLowerCase();
+          return (
+            type === 'mobile' ||
+            subtype === 'mobile' ||
+            (type === 'technician_partner' && subtype === 'mobile') ||
+            (btype === 'technician_partner' && subtype === 'mobile')
+          );
         });
 
-        setTechnicians(filtered);
+        // Map by userId
+        const partnersByUserId = new Map(
+          mobilePartners
+            .map((p) => {
+              const uid = p.userId || p.ownerId || p.createdBy || '';
+              if (!uid) return null;
+              return [uid, p] as const;
+            })
+            .filter(Boolean) as readonly (readonly [string, Omit<TPDocLoose, 'id'> & { docId: string }])[]
+        );
 
-        // ✅ auto-chọn kỹ thuật viên đầu tiên nếu chưa chọn
-        if (filtered.length > 0 && !selectedUserId) {
-          setSelectedUserId(filtered[0].userId);
+        // Merge user + partner
+        let merged: DisplayTechnician[] = users
+          .filter((u) => partnersByUserId.has(u.uid))
+          .map((u) => {
+            const p = partnersByUserId.get(u.uid)!;
+            const coords = extractLatLngFromLocation(p.location || undefined);
+
+            const distanceKm =
+              issueCoords && coords ? haversineKm(issueCoords, coords) : null;
+
+            // chấm điểm
+            let score = 0;
+            if (filterCategory && (p.serviceCategories ?? []).includes(filterCategory)) score += 2;
+            if (filterRegion && (p.assignedRegions ?? []).includes(filterRegion)) score += 1;
+            if (isRecent(u.lastKnownLocation?.updatedAt, 24)) score += 1;
+
+            // gần hơn +0.5, xa hơn -0.5 (nhẹ thôi)
+            if (distanceKm != null) {
+              if (distanceKm <= 5) score += 0.5;
+              else if (distanceKm > 15) score -= 0.5;
+            }
+
+            return {
+              userId: u.uid,
+              docId: p.docId,
+              name: u.name || p.name || t('assign_technician.unnamed_technician'),
+              phone: u.phone || p.phone,
+              email: u.email || p.email,
+              avatarUrl: p.avatarUrl || u.photoURL || '/assets/images/technician.png',
+              serviceCategories: p.serviceCategories ?? [],
+              assignedRegions: p.assignedRegions ?? [],
+              averageRating: p.averageRating ?? null,
+              ratingCount: p.ratingCount ?? null,
+              distanceKm,
+              score,
+            };
+          });
+
+        // Lọc theo filter (sau merge)
+        merged = merged.filter((t) => {
+          const okCat = filterCategory ? t.serviceCategories.includes(filterCategory) : true;
+          const okReg = filterRegion ? t.assignedRegions.includes(filterRegion) : true;
+          return okCat && okReg;
+        });
+
+        // Sort: score desc → distance asc → name
+        merged.sort((a, b) => {
+          const s = b.score - a.score;
+          if (s !== 0) return s;
+          if (a.distanceKm != null && b.distanceKm != null) {
+            const d = a.distanceKm - b.distanceKm;
+            if (d !== 0) return d;
+          }
+          return a.name.localeCompare(b.name);
+        });
+
+        if (!mounted) return;
+        setTechnicians(merged);
+
+        if (merged.length > 0 && !selectedUserId) {
+          setSelectedUserId(merged[0].userId);
         }
+      } catch (e) {
+        console.error('AssignTechnicianForm fetch error:', e);
+        if (!mounted) setTechnicians([]);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
-    fetchPartners();
-    // chỉ phụ thuộc bộ lọc; không phụ thuộc selectedUserId để tránh loop
-  }, [filterCategory, filterRegion]);
+    fetchMobileTechs();
+    return () => {
+      mounted = false;
+    };
+  }, [filterCategory, filterRegion, issueCoords, selectedUserId, t]);
 
-  const options = technicians.map((tech) => ({
-    value: tech.userId,
-    label: tech.name,
-  }));
+  const options = useMemo(
+    () =>
+      technicians.map((tch) => {
+        let label = tch.name;
+        if (tch.averageRating != null) {
+          label += `  •  ${t('assign_technician.rating_with_count', {
+            rating: tch.averageRating.toFixed(1),
+            count: tch.ratingCount ?? 0,
+          })}`;
+        }
+        if (typeof tch.distanceKm === 'number') {
+          label += `  •  ${t('assign_technician.distance_km', {
+            km: tch.distanceKm.toFixed(1),
+          })}`;
+        }
+        if (tch.score > 0) {
+          label += `  •  ${t('assign_technician.score', { score: tch.score })}`;
+        }
+        return { value: tch.userId, label };
+      }),
+    [technicians, t]
+  );
 
   const selectedTech = technicians.find((t) => t.userId === selectedUserId);
 
   const handleAssignClick = async () => {
-    if (!selectedUserId) return;
-    await onAssign(selectedUserId, selectedTech?.name ?? '');
+    if (!selectedUserId || !selectedTech) return;
+    await onAssign(selectedUserId, selectedTech.name);
   };
 
   return (
     <div className="space-y-4">
       <SimpleSelect
         options={options}
-        placeholder="Select Technician Partner"
+        placeholder={t('assign_technician.select_placeholder')}
         value={selectedUserId}
-        onChange={setSelectedUserId}
+        onChange={(val: string) => setSelectedUserId(val)}
       />
 
       {selectedTech && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-start gap-3 rounded-lg border p-3">
           <Image
             src={selectedTech.avatarUrl || '/assets/images/technician.png'}
             alt={selectedTech.name}
-            width={40}
-            height={40}
+            width={44}
+            height={44}
             className="rounded-full border"
           />
-          <div>
+          <div className="min-w-0">
             <div className="font-semibold">{selectedTech.name}</div>
-            {!!selectedTech?.serviceCategories?.length && (
-              <div className="text-sm text-gray-500">
-                {selectedTech.serviceCategories.join(', ')}
+
+            <div className="mt-1 text-sm text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
+              {selectedTech.phone && (
+                <span>
+                  📞{' '}
+                  <a className="underline" href={`tel:${selectedTech.phone}`}>
+                    {selectedTech.phone}
+                  </a>
+                </span>
+              )}
+              {selectedTech.averageRating != null && (
+                <span>
+                  {t('assign_technician.rating_with_count', {
+                    rating: selectedTech.averageRating.toFixed(1),
+                    count: selectedTech.ratingCount ?? 0,
+                  })}
+                </span>
+              )}
+              {typeof selectedTech.distanceKm === 'number' && (
+                <span>
+                  {t('assign_technician.distance_km', {
+                    km: selectedTech.distanceKm.toFixed(1),
+                  })}
+                </span>
+              )}
+            </div>
+
+            {(selectedTech.serviceCategories?.length > 0 ||
+              selectedTech.assignedRegions?.length > 0) && (
+              <div className="mt-2 text-xs text-gray-500 space-y-1">
+                {selectedTech.serviceCategories?.length > 0 && (
+                  <div>
+                    {t('assign_technician.services')}: {selectedTech.serviceCategories.join(', ')}
+                  </div>
+                )}
+                {selectedTech.assignedRegions?.length > 0 && (
+                  <div>
+                    {t('assign_technician.regions')}: {selectedTech.assignedRegions.join(', ')}
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
       )}
 
-      <Button
-        disabled={loading || !selectedUserId}
-        onClick={handleAssignClick}
-        className="w-full"
-      >
-        {loading ? 'Loading...' : 'Assign Technician'}
+      <Button disabled={loading || !selectedUserId} onClick={handleAssignClick} className="w-full">
+        {loading ? t('assign_technician.loading') : t('assign_technician.assign_button')}
       </Button>
 
-      {/* Gợi ý debug nhanh nếu vẫn không có ai để chọn */}
-      {(!loading && technicians.length === 0) && (
+      {!loading && technicians.length === 0 && (
         <p className="text-sm text-gray-500">
-          No active technician partners match the current filters.
-          {/* Kiểm tra: isActive=true? userId hay doc.id? filterCategory/Region có khớp không? */}
+          {t('assign_technician.empty_state')}
         </p>
       )}
     </div>

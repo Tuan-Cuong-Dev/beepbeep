@@ -1142,7 +1142,8 @@
     "vehicle_transport": "Tạo Đơn vị vận chuyển xe",
     "tour_guide": "Tạo Hướng dẫn viên"
   },
-  "subtitle": "Vui lòng điền thông tin bên dưới để bắt đầu."
+  "subtitle": "Vui lòng điền thông tin bên dưới để bắt đầu.",
+  "invalid_type": "Hãy vào Hồ Sơ để tạo doanh nghiệp của bạn"
 },
 
 "create_business_form": {
@@ -1164,7 +1165,13 @@
     "not_logged_in_title": "Chưa đăng nhập",
     "not_logged_in_description": "Bạn cần đăng nhập để thực hiện thao tác này.",
     "missing_fields_title": "Thiếu thông tin",
-    "missing_fields_description": "Vui lòng điền đầy đủ tất cả các trường."
+    "missing_fields_description": "Vui lòng điền đầy đủ tất cả các trường.",
+    "subtype_label": "Loại phụ",
+    "subtype": {
+      "mobile": "Kỹ thuật viên lưu động",
+      "shop": "Kỹ thuật viên tại cửa hàng"
+    },
+    "technician_subtype_hint": "Loại phụ đã chọn: {{subtype}} "
   },
 
  "dynamic_service_form": {
@@ -3647,7 +3654,20 @@
   "delete_confirm_desc": "Hành động này không thể hoàn tác.",
   "deleted": "🗑️ Người dùng đã bị xóa.",
   "delete_failed": "❌ Xóa người dùng thất bại."
-}
+},
+
+"assign_technician": {
+    "select_placeholder": "Chọn kỹ thuật viên lưu động",
+    "rating_with_count": "★{{rating}} ({{count}})",
+    "distance_km": "📍 {{km}} km",
+    "score": "⭐{{score}}",
+    "services": "Dịch vụ",
+    "regions": "Khu vực",
+    "assign_button": "Gán kỹ thuật viên",
+    "loading": "Đang tải...",
+    "empty_state": "Không có kỹ thuật viên lưu động phù hợp với bộ lọc hiện tại.",
+    "unnamed_technician": "(Chưa đặt tên)"
+  }
 
 
 

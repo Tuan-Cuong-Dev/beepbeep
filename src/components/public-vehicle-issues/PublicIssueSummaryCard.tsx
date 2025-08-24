@@ -1,6 +1,6 @@
 'use client';
 
-import { PublicIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+import { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Card } from '@/src/components/ui/card';
 import {
   Bug,
@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  issues: PublicIssue[];
+  issues: PublicVehicleIssue[];
 }
 
 export default function PublicIssuesSummaryCard({ issues }: Props) {

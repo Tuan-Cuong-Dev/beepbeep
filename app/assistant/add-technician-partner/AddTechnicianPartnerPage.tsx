@@ -9,7 +9,8 @@ import TechnicianPartnerTable from '@/src/components/techinicianPartner/Technici
 import { useTechnicianPartners } from '@/src/hooks/useTechnicianPartners';
 import { Wrench } from 'lucide-react';
 import { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
-import { serverTimestamp } from 'firebase/firestore';
+import type { LocationCore } from '@/src/lib/locations/locationTypes';
+import { GeoPoint } from 'firebase/firestore';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,28 @@ import {
   DialogFooter,
 } from '@/src/components/ui/dialog';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/src/components/ui/button';
+
+// -------- Helpers --------
+type LatLng = { lat: number; lng: number };
+function parseLatLngString(s?: string): LatLng | null {
+  if (!s) return null;
+  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lng = parseFloat(m[3]);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+}
+
+// Khớp đúng kiểu onSave của TechnicianPartnerForm
+type FormSavePayload = Partial<
+  Omit<TechnicianPartner, 'location'> & {
+    location?: Partial<Pick<LocationCore, 'address' | 'location' | 'mapAddress'>>;
+    email?: string;
+    password?: string;
+    role: 'technician_partner';
+  }
+>;
 
 export default function AddTechnicianPartnerPage() {
   const { t } = useTranslation('common');
@@ -26,7 +49,6 @@ export default function AddTechnicianPartnerPage() {
   const {
     partners,
     loading,
-    fetchPartners,
     addPartner,
     updatePartner,
     deletePartner,
@@ -50,42 +72,51 @@ export default function AddTechnicianPartnerPage() {
   };
 
   const confirmDelete = async () => {
-    if (deleteTargetId) {
-      await deletePartner(deleteTargetId);
-      fetchPartners();
-      setDeleteTargetId(null);
-      setShowDeleteDialog(false);
-    }
+    if (!deleteTargetId) return;
+    await deletePartner(deleteTargetId);
+    setDeleteTargetId(null);
+    setShowDeleteDialog(false);
   };
 
-  const handleSave = async (
-    data: Partial<TechnicianPartner & { email?: string; password?: string }>
-  ) => {
+  const handleSave = async (data: FormSavePayload) => {
     const isEditing = !!editingPartner?.id;
 
+    // Chuẩn hoá role
+    const base: FormSavePayload = { ...data, role: 'technician_partner' };
+
+    // Từ location “lite” -> LocationCore (nếu có lat,lng)
+    let locationCore: LocationCore | undefined;
+    const latlng = parseLatLngString(base.location?.location);
+    if (latlng) {
+      locationCore = {
+        geo: new GeoPoint(latlng.lat, latlng.lng),
+        location: `${latlng.lat},${latlng.lng}`,
+        address: base.location?.address,
+        mapAddress: base.location?.mapAddress,
+      };
+    } else if (base.location?.address) {
+      // Chưa có toạ độ nhưng có address: để undefined, tránh ép kiểu sai.
+      // (update có thể merge address; add thì nên yêu cầu toạ độ)
+    }
+
     const finalData: Partial<TechnicianPartner> = {
-      ...data,
-      role: 'technician_partner',
-      updatedAt: serverTimestamp(),
+      ...base,
+      location: locationCore, // chỉ set khi build được
     };
 
     if (isEditing) {
-      await updatePartner(editingPartner.id, finalData);
+      await updatePartner(editingPartner!.id!, finalData);
       setSuccessMessage(t('add_technician_partner_page.updated_success'));
     } else {
-      const hasLogin = !!data.email && !!data.password;
-      await addPartner({
-        ...finalData,
-        ...(hasLogin && {
-          email: data.email!,
-          password: data.password!,
-        }),
-        createdAt: serverTimestamp(),
-      });
+      // addPartner yêu cầu location.geo hợp lệ
+      if (!locationCore?.geo) {
+        alert(t('add_technician_partner_page.missing_coordinates') || 'Vui lòng nhập toạ độ hợp lệ cho đối tác.');
+        return;
+      }
+      await addPartner(finalData);
       setSuccessMessage(t('add_technician_partner_page.created_success'));
     }
 
-    fetchPartners();
     setEditingPartner(null);
     setShowSuccessDialog(true);
   };
@@ -102,9 +133,17 @@ export default function AddTechnicianPartnerPage() {
         </h1>
 
         <div>
-          <h2 className="text-xl font-bold mb-4">
-            {t('add_technician_partner_page.existing')}
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">
+              {t('add_technician_partner_page.existing')}
+            </h2>
+            {loading && (
+              <span className="text-sm text-gray-500">
+                {t('loading', 'Loading...')}
+              </span>
+            )}
+          </div>
+
           <TechnicianPartnerTable
             partners={partners}
             onEdit={handleEdit}
@@ -112,22 +151,34 @@ export default function AddTechnicianPartnerPage() {
           />
         </div>
 
+        {/* Form desktop */}
         <div className="hidden md:block">
           <h2 className="text-xl font-bold mb-4">
             {editingPartner
               ? t('add_technician_partner_page.edit')
               : t('add_technician_partner_page.add')}
           </h2>
+
           <TechnicianPartnerForm
             initialData={editingPartner || undefined}
-            onSave={handleSave}
+            onSave={handleSave} // <-- đã khớp kiểu
           />
+        </div>
+
+        {/* Gợi ý trên mobile */}
+        <div className="md:hidden">
+          <p className="text-sm text-gray-600">
+            {t(
+              'add_technician_partner_page.mobile_hint',
+              'For the best experience, please open on desktop to add or edit partners.'
+            )}
+          </p>
         </div>
       </main>
 
       <Footer />
 
-      {/* ✅ Dialog xác nhận xoá */}
+      {/* Dialog xác nhận xoá */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
@@ -137,23 +188,23 @@ export default function AddTechnicianPartnerPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button
-              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+            <Button
+              variant="secondary"
               onClick={() => setShowDeleteDialog(false)}
             >
               {t('add_technician_partner_page.cancel')}
-            </button>
-            <button
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+            </Button>
+            <Button
+              variant="destructive"
               onClick={confirmDelete}
             >
               {t('add_technician_partner_page.delete')}
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ✅ Dialog thông báo thành công */}
+      {/* Dialog thông báo thành công */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent>
           <DialogHeader>
@@ -161,12 +212,7 @@ export default function AddTechnicianPartnerPage() {
             <DialogDescription>{successMessage}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-              onClick={() => setShowSuccessDialog(false)}
-            >
-              OK
-            </button>
+            <Button onClick={() => setShowSuccessDialog(false)}>OK</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

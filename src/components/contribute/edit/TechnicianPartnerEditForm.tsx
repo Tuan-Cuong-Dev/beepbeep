@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { doc, getDoc, Timestamp, GeoPoint } from 'firebase/firestore';
+import { doc, getDoc, GeoPoint } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
@@ -25,32 +25,36 @@ function parseLatLngString(s?: string): LatLng | null {
   if (!m) return null;
   const lat = parseFloat(m[1]);
   const lng = parseFloat(m[3]);
-  if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return { lat, lng };
 }
 
-function extractLatLngFromLocation(loc?: LocationCore | null): LatLng | null {
+function extractLatLngFromLocation(loc?: Pick<LocationCore, 'geo' | 'location'> | null): LatLng | null {
   if (!loc) return null;
-  // GeoPoint
-  if (typeof loc.geo?.latitude === 'number' && typeof loc.geo?.longitude === 'number') {
+  if (loc.geo && typeof loc.geo.latitude === 'number' && typeof loc.geo.longitude === 'number') {
     return { lat: loc.geo.latitude, lng: loc.geo.longitude };
   }
-  const parsed = parseLatLngString(loc.location);
-  return parsed ?? null;
+  return parseLatLngString(loc.location) ?? null;
 }
+
+// FormState cho phép location là Partial<LocationCore> trong lúc nhập
+type FormState = Partial<Omit<TechnicianPartner, 'location'>> & {
+  location?: Partial<LocationCore>;
+  _lat?: string;
+  _lng?: string;
+};
 
 interface Props {
   id: string;
   onClose: () => void;
 }
 
-export default function RepairShopEditForm({ id, onClose }: Props) {
+export default function TechnicianPartnerEditForm({ id, onClose }: Props) {
   const { t } = useTranslation('common');
   const { updatePartner } = useTechnicianPartners();
   const { coords, geocode } = useGeocodeAddress();
 
-  // Giữ form theo chuẩn mới + hai input phụ trợ lat/lng
-  const [form, setForm] = useState<(Partial<TechnicianPartner> & { _lat?: string; _lng?: string }) | null>(null);
+  const [form, setForm] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Load doc
@@ -63,6 +67,7 @@ export default function RepairShopEditForm({ id, onClose }: Props) {
         const latlng = extractLatLngFromLocation(data.location);
         setForm({
           ...data,
+          location: { ...data.location }, // giữ nguyên location cũ
           _lat: latlng ? String(latlng.lat) : '',
           _lng: latlng ? String(latlng.lng) : '',
         });
@@ -71,9 +76,10 @@ export default function RepairShopEditForm({ id, onClose }: Props) {
           type: 'shop',
           name: '',
           phone: '',
+          // shopName vẫn hợp lệ (Shop fields)
           shopName: '',
-          shopAddress: '',
-          location: { address: '', location: '' } as Partial<LocationCore> as LocationCore,
+          // KHÔNG dùng shopAddress ở root nữa
+          location: { address: '', location: '' },
           assignedRegions: [],
           vehicleType: 'motorbike',
           isActive: false,
@@ -86,33 +92,32 @@ export default function RepairShopEditForm({ id, onClose }: Props) {
 
   // Geocode khi đổi địa chỉ bản đồ (location.address)
   useEffect(() => {
-    const addr = (form?.location as any)?.address;
+    const addr = form?.location?.address;
     if (typeof addr === 'string' && addr.trim()) {
       geocode(addr.trim());
     }
-  }, [form?.location, geocode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form?.location?.address]);
 
   // Khi có coords từ geocode → cập nhật preview lat/lng & location.location
   useEffect(() => {
-    if (!form) return;
-    if (coords) {
-      setForm((prev) =>
-        prev
-          ? {
-              ...prev,
-              _lat: String(coords.lat ?? ''),
-              _lng: String(coords.lng ?? ''),
-              location: {
-                ...(prev.location || {}),
-                location: `${coords.lat},${coords.lng}`,
-              } as Partial<LocationCore> as LocationCore,
-            }
-          : prev
-      );
-    }
+    if (!form || !coords) return;
+    setForm((prev) =>
+      prev
+        ? {
+            ...prev,
+            _lat: String(coords.lat ?? ''),
+            _lng: String(coords.lng ?? ''),
+            location: {
+              ...(prev.location || {}),
+              location: `${coords.lat},${coords.lng}`,
+            },
+          }
+        : prev
+    );
   }, [coords, form]);
 
-  const setField = (field: keyof TechnicianPartner, value: any) => {
+  const setField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     setForm((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
@@ -124,7 +129,7 @@ export default function RepairShopEditForm({ id, onClose }: Props) {
             location: {
               ...(prev.location || {}),
               [key]: value,
-            } as Partial<LocationCore> as LocationCore,
+            },
           }
         : prev
     );
@@ -134,66 +139,59 @@ export default function RepairShopEditForm({ id, onClose }: Props) {
     if (!form) return;
     setSaving(true);
     try {
-      // Chốt lat/lng theo ưu tiên: _lat/_lng → location.location → giữ nguyên
-      let lat: number | undefined;
-      let lng: number | undefined;
+      // Quy tắc chốt lat/lng:
+      // 1) Ưu tiên _lat/_lng (user nhập tay hoặc từ geocode)
+      // 2) Nếu không có, thử parse từ location.location
+      // 3) Nếu vẫn không có nhưng location cũ đã có geo → giữ nguyên geo
+      // 4) Nếu không có gì → không gửi field 'location' trong update (tránh vi phạm schema)
+
+      let latLngFromInputs: LatLng | null = null;
 
       const typedLat = form._lat ? parseFloat(form._lat) : NaN;
       const typedLng = form._lng ? parseFloat(form._lng) : NaN;
-
       if (Number.isFinite(typedLat) && Number.isFinite(typedLng)) {
-        lat = typedLat;
-        lng = typedLng;
+        latLngFromInputs = { lat: typedLat, lng: typedLng };
       } else {
-        const parsed = parseLatLngString((form.location as any)?.location);
-        if (parsed) {
-          lat = parsed.lat;
-          lng = parsed.lng;
-        }
+        latLngFromInputs = parseLatLngString(form.location?.location);
       }
 
-      // Build location (nếu có lat/lng)
-      let nextLocation: LocationCore | undefined = undefined;
-      if (lat !== undefined && lng !== undefined) {
-        nextLocation = {
-          geo: new GeoPoint(lat, lng),
-          location: `${lat},${lng}`,
-          address: (form.location as any)?.address || form.shopAddress || '',
-          // Dùng Timestamp.now() để khớp type nếu updatedAt của LocationCore là Timestamp
-          updatedAt: Timestamp.now(),
-        } as unknown as LocationCore;
-      } else if (form.location) {
-        // Không có lat/lng mới → giữ nguyên location (nhưng vẫn có thể update address)
-        nextLocation = {
-          ...(form.location as any),
-          address: (form.location as any)?.address || form.shopAddress || '',
-          updatedAt: Timestamp.now(),
-        } as unknown as LocationCore;
-      }
-
-      // Chuẩn hóa vehicleType đúng enum
+      // Chuẩn hóa vehicleType
       const vt: VehicleType | undefined =
         form.vehicleType === 'bike' || form.vehicleType === 'motorbike' || form.vehicleType === 'car'
           ? form.vehicleType
           : undefined;
 
+      // Build payload
       const updateData: Partial<TechnicianPartner> = {
         name: form.name,
         phone: form.phone,
         email: form.email,
         shopName: form.shopName,
-        shopAddress: form.shopAddress,
         type: 'shop',
         vehicleType: vt,
-        location: nextLocation,
-        // Có thể cập nhật cả workingStartTime/workingEndTime nếu form có
         workingStartTime: form.workingStartTime,
         workingEndTime: form.workingEndTime,
         assignedRegions: form.assignedRegions,
         serviceCategories: form.serviceCategories,
-        // Audit doc-level
-        updatedAt: Timestamp.now(),
+        role: 'technician_partner',
       };
+
+      // Xử lý location
+      if (latLngFromInputs) {
+        const { lat, lng } = latLngFromInputs;
+        updateData.location = {
+          geo: new GeoPoint(lat, lng),
+          location: `${lat},${lng}`,
+          address: form.location?.address || '',
+          // mapAddress nếu bạn muốn lưu ở location (không phải root):
+          // mapAddress: form.location?.mapAddress,
+        } as LocationCore;
+      } else if (form.location?.geo) {
+        // Giữ nguyên geo cũ, chỉ có thể update address/location string nếu có
+        updateData.location = {
+          ...(form.location as LocationCore),
+        };
+      } // else: không có gì chắc chắn → bỏ qua field 'location'
 
       await updatePartner(id, updateData);
       onClose();
@@ -209,11 +207,10 @@ export default function RepairShopEditForm({ id, onClose }: Props) {
 
   // Tính coords để preview map
   const previewLatLng = (() => {
-    const typed =
-      form._lat && form._lng && Number.isFinite(parseFloat(form._lat)) && Number.isFinite(parseFloat(form._lng))
-        ? { lat: parseFloat(form._lat), lng: parseFloat(form._lng) }
-        : null;
-    return typed || extractLatLngFromLocation(form.location);
+    if (form._lat && form._lng && Number.isFinite(parseFloat(form._lat)) && Number.isFinite(parseFloat(form._lng))) {
+      return { lat: parseFloat(form._lat), lng: parseFloat(form._lng) };
+    }
+    return extractLatLngFromLocation(form.location as LocationCore | undefined);
   })();
 
   return (
@@ -238,36 +235,21 @@ export default function RepairShopEditForm({ id, onClose }: Props) {
         <Input value={form.shopName || ''} onChange={(e) => setField('shopName', e.target.value)} />
       </div>
 
+      {/* Địa chỉ cửa hàng → lưu trong location.address */}
       <div>
         <Label>{t('repair_shop_edit_form.shop_address')}</Label>
-        <Textarea value={form.shopAddress || ''} onChange={(e) => setField('shopAddress', e.target.value)} />
-      </div>
-
-      {/* Địa chỉ bản đồ → lưu vào location.address */}
-      <div>
-        <Label>{t('repair_shop_edit_form.map_address')}</Label>
-        <Textarea
-          className="min-h-[120px]"
-          value={(form.location as any)?.address || ''}
-          onChange={(e) => setLocationField('address', e.target.value)}
-        />
+        <Textarea value={form.location?.address || ''} onChange={(e) => setLocationField('address', e.target.value)} />
       </div>
 
       {/* Lat/Lng trợ giúp nhập tay */}
       <div className="grid grid-cols-2 gap-2">
         <div>
           <Label>{t('repair_shop_edit_form.latitude')}</Label>
-          <Input
-            value={form._lat ?? ''}
-            onChange={(e) => setForm((p) => (p ? { ...p, _lat: e.target.value } : p))}
-          />
+          <Input value={form._lat ?? ''} onChange={(e) => setForm((p) => (p ? { ...p, _lat: e.target.value } : p))} />
         </div>
         <div>
           <Label>{t('repair_shop_edit_form.longitude')}</Label>
-          <Input
-            value={form._lng ?? ''}
-            onChange={(e) => setForm((p) => (p ? { ...p, _lng: e.target.value } : p))}
-          />
+          <Input value={form._lng ?? ''} onChange={(e) => setForm((p) => (p ? { ...p, _lng: e.target.value } : p))} />
         </div>
       </div>
 

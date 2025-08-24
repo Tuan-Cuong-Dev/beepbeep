@@ -13,33 +13,47 @@ import { useTranslation } from 'react-i18next';
 
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
-// ===== Legacy type để đọc dữ liệu cũ =====
+// ===== Helpers =====
+type LatLng = { lat: number; lng: number };
+type MaybeLatLng = { lat?: number; lng?: number } | null | undefined;
+
+function isFiniteNumber(n: unknown): n is number {
+  return typeof n === 'number' && Number.isFinite(n);
+}
+function hasFiniteLatLng(v: MaybeLatLng): v is LatLng {
+  return !!v && isFiniteNumber(v.lat) && isFiniteNumber(v.lng);
+}
+function parseLatLngString(s?: string): LatLng | null {
+  if (!s) return null;
+  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lng = parseFloat(m[3]);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+}
+
+// ===== Legacy-safe cho seed form (không ghi ra DB) =====
 type LegacyData = TechnicianPartner & {
   workingHours?: { isWorking?: boolean; startTime?: string; endTime?: string }[];
   workingStartTime?: string;
   workingEndTime?: string;
-  mapAddress?: string;
   coordinates?: { lat?: number; lng?: number } | null;
 };
 
-  // ⬇️ Thêm kiểu payload cho Form (location “lite”)
-  type SavePayload = Partial<
-    Omit<TechnicianPartner, 'location'> & {
-      // location ở layer Form chỉ gửi những gì người dùng nhập
-      location?: Partial<Pick<LocationCore, 'address' | 'location'>>;
-      email?: string;
-      password?: string;
-      role: 'technician_partner';
-    }
-  >;
-
-  interface Props {
-    initialData?: Partial<TechnicianPartner>;
-    onSave: (data: SavePayload) => Promise<void>; // ⬅️ nới type ở đây
+// Payload gửi ra ngoài (form “lite” – không có GeoPoint/updatedAt)
+type SavePayload = Partial<
+  Omit<TechnicianPartner, 'location'> & {
+    location?: Partial<Pick<LocationCore, 'address' | 'location' | 'mapAddress'>>;
+    role: 'technician_partner';
   }
+>;
 
+interface Props {
+  initialData?: Partial<TechnicianPartner>;
+  onSave: (data: SavePayload) => Promise<void>;
+}
 
-// 🧹 Bỏ toàn bộ undefined (đệ quy)
+// 🧹 Dọn undefined đệ quy
 function stripUndefinedDeep<T>(obj: T): T {
   if (obj === null || typeof obj !== 'object') return obj as T;
   if (Array.isArray(obj)) {
@@ -53,32 +67,17 @@ function stripUndefinedDeep<T>(obj: T): T {
   return out as T;
 }
 
-// "lat,lng" -> {lat,lng}
-function parseLatLngString(s?: string): { lat: number; lng: number } | null {
-  if (!s) return null;
-  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
-  if (!m) return null;
-  const lat = parseFloat(m[1]);
-  const lng = parseFloat(m[3]);
-  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
-}
-
 export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
   const { t } = useTranslation<'common'>('common');
-
   const isEditMode = !!initialData?.id;
   const [submitting, setSubmitting] = useState(false);
 
-  // ❗️Loại bỏ location gốc để không bị yêu cầu GeoPoint
-  type FormShape = Partial<
-  Omit<TechnicianPartner, 'location'>
-  > & {
-    email?: string;
-    password?: string;
-    role: 'technician_partner';              // vẫn required
+  type FormShape = Partial<Omit<TechnicianPartner, 'location'>> & {
+    role: 'technician_partner';
     workingStartTime?: string;
     workingEndTime?: string;
-    location?: Partial<Pick<LocationCore, 'address' | 'location'>>;
+    // “lite” location, chỉ address/location/mapAddress (string)
+    location?: Partial<Pick<LocationCore, 'address' | 'location' | 'mapAddress'>>;
   };
 
   const [formData, setFormData] = useState<FormShape>(() => ({
@@ -89,21 +88,15 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     serviceCategories: [],
     workingStartTime: '',
     workingEndTime: '',
-    location: { address: '', location: '' }, // “lite”
-    // các trường khác để trống khi chưa có dữ liệu
+    location: { address: '', location: '', mapAddress: '' },
     name: '',
     phone: '',
-    email: '',
-    password: '',
     shopName: '',
-    shopAddress: '',
     vehicleType: 'motorbike',
   }));
 
-
   const { geocode, coords } = useGeocodeAddress();
 
-  // Options dịch qua i18n
   const serviceOptions = useMemo(
     () => [
       { label: t('technician_partner_form.service.battery', { defaultValue: 'Battery' }), value: 'battery' },
@@ -115,32 +108,49 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     [t]
   );
 
-  // ===== Khởi tạo formData (legacy-safe) =====
+  // ===== Seed form từ initialData (legacy-safe) =====
   useEffect(() => {
     const legacy = (initialData || {}) as LegacyData;
     const firstWorking = legacy.workingHours?.find?.((d) => d?.isWorking);
 
-    // dựng location “lite” từ dữ liệu cũ nếu có
-    const legacyLocation: Partial<LocationCore> = {};
-    if (legacy.mapAddress) legacyLocation.address = legacy.mapAddress;
-    if (legacy.coordinates && Number.isFinite(legacy.coordinates.lat) && Number.isFinite(legacy.coordinates.lng)) {
-      legacyLocation.location = `${legacy.coordinates.lat},${legacy.coordinates.lng}`;
-    } else if (legacy.location?.location) {
-      legacyLocation.location = legacy.location.location;
-    }
-    if (legacy.location?.address && !legacyLocation.address) {
-      legacyLocation.address = legacy.location.address;
-    }
+    const legacyLoc: Partial<LocationCore> = {};
+    // Ưu tiên string có sẵn
+    if (legacy.location?.location) legacyLoc.location = legacy.location.location;
+    if (legacy.location?.address) legacyLoc.address = legacy.location.address;
+    if ((legacy.location as any)?.mapAddress) legacyLoc.mapAddress = (legacy.location as any).mapAddress;
+    // Rớt xuống coordinates (legacy)
+    type LegacyData = Omit<
+      TechnicianPartner,
+      'coordinates' | 'mapAddress' | 'geo' | 'workingHours'
+    > & {
+      // các field legacy có thể vẫn còn trong doc cũ
+      coordinates?: { lat?: number; lng?: number } | null;
+      mapAddress?: string;
+      geo?: { lat?: number; lng?: number } | null;
+      workingHours?: { isWorking?: boolean; startTime?: string; endTime?: string }[];
+    };
 
-    // ❗️Không spread toàn bộ legacy để tránh kéo theo location gốc
+    // Helpers
+      type LatLng = { lat: number; lng: number };
+      type MaybeLatLng = { lat?: number; lng?: number } | null | undefined;
+      const isFiniteNumber = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n);
+      const hasFiniteLatLng = (v: MaybeLatLng): v is LatLng => !!v && isFiniteNumber(v.lat) && isFiniteNumber(v.lng);
+
+      // Rớt xuống coordinates (legacy)
+      if (!legacyLoc.location) {
+        const coords = legacy.coordinates ?? legacy.geo; // <-- giờ không còn là never
+        if (hasFiniteLatLng(coords)) {
+          legacyLoc.location = `${coords.lat},${coords.lng}`;
+        }
+      }
+
+
     setFormData({
       id: legacy.id,
       userId: legacy.userId,
       name: legacy.name ?? '',
       phone: legacy.phone ?? '',
-      email: (legacy as any).email ?? '',
       shopName: legacy.shopName ?? '',
-      shopAddress: legacy.shopAddress ?? '',
       type: legacy.type ?? 'mobile',
       assignedRegions: Array.isArray(legacy.assignedRegions) ? legacy.assignedRegions : [],
       serviceCategories: Array.isArray(legacy.serviceCategories) ? legacy.serviceCategories : [],
@@ -148,16 +158,16 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       isActive: legacy.isActive ?? true,
       workingStartTime: legacy.workingStartTime ?? firstWorking?.startTime ?? '',
       workingEndTime: legacy.workingEndTime ?? firstWorking?.endTime ?? '',
-      password: '',
-      role: 'technician_partner', 
+      role: 'technician_partner',
       location: {
-        address: legacyLocation.address ?? '',
-        location: legacyLocation.location ?? '',
+        address: legacyLoc.address ?? '',
+        location: legacyLoc.location ?? '',
+        mapAddress: legacyLoc.mapAddress ?? '',
       },
     });
   }, [initialData]);
 
-  // Update tọa độ khi geocode xong -> ghi vào location.location = "lat,lng"
+  // Geocode từ address -> cập nhật location.location (lat,lng)
   useEffect(() => {
     if (!coords) return;
     setFormData((prev) => ({
@@ -176,7 +186,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     []
   );
 
-  const updateLocationField = useCallback((key: 'address' | 'location', value: string) => {
+  const updateLocationField = useCallback((key: 'address' | 'location' | 'mapAddress', value: string) => {
     setFormData((prev) => ({
       ...prev,
       location: {
@@ -218,18 +228,16 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     setFormData({
       assignedRegions: [],
       type: 'mobile',
-      location: { address: '', location: '' },
+      location: { address: '', location: '', mapAddress: '' },
       name: '',
       phone: '',
-      email: '',
-      password: '',
-      role: 'technician_partner',     
+      role: 'technician_partner',
       serviceCategories: [],
       shopName: '',
-      shopAddress: '',
       isActive: true,
       workingStartTime: '',
       workingEndTime: '',
+      vehicleType: 'motorbike',
     });
   }, []);
 
@@ -247,35 +255,38 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
       try {
         setSubmitting(true);
 
-        // Chuẩn hoá "lat,lng" lần cuối
+        // Chuẩn hoá "lat,lng" lần cuối (string)
         const parsed = parseLatLngString(formData.location?.location);
-        const locationOut: Partial<LocationCore> | undefined =
-          formData.location && (formData.location.address || parsed)
+        const locationOut: SavePayload['location'] =
+          formData.location && (formData.location.address || formData.location.mapAddress || parsed)
             ? {
                 address: formData.location.address || undefined,
+                mapAddress: formData.location.mapAddress || undefined,
                 location: parsed ? `${parsed.lat},${parsed.lng}` : undefined,
-                // GeoPoint/updatedAt sẽ được thêm ở layer repo/service khi lưu
               }
             : undefined;
 
         const payload: SavePayload = stripUndefinedDeep({
-          ...formData,
+          // giữ các field hợp lệ theo schema
+          id: formData.id,
+          userId: formData.userId,
           name: (formData.name || '').trim(),
           phone: (formData.phone || '').trim(),
-          email: (formData.email || '')?.trim() || undefined,
-          password: (formData.password || '')?.trim() || undefined,
           shopName: (formData.shopName || '')?.trim() || undefined,
-          shopAddress: (formData.shopAddress || '')?.trim() || undefined,
-          role: 'technician_partner' as const,
+          type: formData.type || 'mobile',
+          assignedRegions: formData.assignedRegions,
+          serviceCategories: formData.serviceCategories,
+          vehicleType: formData.vehicleType,
+          isActive: !!formData.isActive,
           workingStartTime: formData.workingStartTime || '',
           workingEndTime: formData.workingEndTime || '',
-          // ⬇️ location “lite”: address / "lat,lng" (không có geo)
+          role: 'technician_partner',
           location: locationOut,
-          // dọn legacy
+          // dọn legacy (không gửi ra)
           workingHours: undefined as any,
           coordinates: undefined as any,
-          mapAddress: undefined as any,
         });
+
         await onSave(payload);
         if (!isEditMode) resetForm();
       } finally {
@@ -285,7 +296,6 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
     [canSubmit, formData, isEditMode, onSave, resetForm]
   );
 
-  // Preview map từ location.location
   const previewCoords = useMemo(
     () => parseLatLngString(formData.location?.location || ''),
     [formData.location?.location]
@@ -293,7 +303,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
           placeholder={t('technician_partner_form.name')}
           value={formData.name || ''}
@@ -304,20 +314,9 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
           value={formData.phone || ''}
           onChange={(e) => updateField('phone', e.target.value)}
         />
-        <Input
-          placeholder={t('technician_partner_form.email_for_login')}
-          value={formData.email || ''}
-          onChange={(e) => updateField('email', e.target.value)}
-        />
-        <Input
-          placeholder={t('technician_partner_form.password_for_login')}
-          type="password"
-          value={formData.password || ''}
-          onChange={(e) => updateField('password', e.target.value)}
-        />
 
         <div>
-          <label className="block text-sm font-medium mb-1">
+          <label className="mb-1 block text-sm font-medium">
             {t('technician_partner_form.technician_type')}
           </label>
           <SimpleSelect
@@ -339,23 +338,24 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
               value={formData.shopName || ''}
               onChange={(e) => updateField('shopName', e.target.value)}
             />
-            {/* Địa chỉ bản đồ -> location.address */}
+            {/* Địa chỉ hiển thị → location.address */}
             <Textarea
-              placeholder={t('technician_partner_form.map_address_hint')}
+              placeholder={t('technician_partner_form.shop_address')}
               value={formData.location?.address || ''}
               onChange={(e) => updateLocationField('address', e.target.value)}
               onBlur={handleGeocode}
             />
-            {/* Tọa độ -> location.location ("lat,lng") */}
+            {/* Link Google Maps (optional) → location.mapAddress */}
+            <Input
+              placeholder={t('technician_partner_form.map_address_hint')}
+              value={formData.location?.mapAddress || ''}
+              onChange={(e) => updateLocationField('mapAddress', e.target.value)}
+            />
+            {/* Tọa độ → location.location ("lat,lng") */}
             <Input
               placeholder={t('technician_partner_form.coordinates_placeholder')}
               value={formData.location?.location || ''}
               onChange={(e) => parseCoordinates(e.target.value)}
-            />
-            <Input
-              placeholder={t('technician_partner_form.shop_address')}
-              value={formData.shopAddress || ''}
-              onChange={(e) => updateField('shopAddress', e.target.value)}
             />
           </>
         )}
@@ -388,19 +388,20 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
           rows={4}
           placeholder={t('technician_partner_form.assigned_regions_placeholder')}
           value={(formData.assignedRegions || []).join('\n')}
-          onChange={(e) => {
-            const regions = e.target.value.split('\n').map((r) => r.trim()).filter(Boolean);
-            updateField('assignedRegions', regions);
-          }}
+          onChange={handleRegionInput}
         />
       </div>
 
       <div>
-        <label className="font-medium block mb-1">{t('technician_partner_form.service_categories')}</label>
+        <label className="mb-1 block font-medium">
+          {t('technician_partner_form.service_categories')}
+        </label>
         <Select
           isMulti
           options={serviceOptions}
-          value={serviceOptions.filter((opt) => (formData.serviceCategories || []).includes(opt.value))}
+          value={serviceOptions.filter((opt) =>
+            (formData.serviceCategories || []).includes(opt.value)
+          )}
           onChange={(selected) => {
             const selectedOptions = (selected || []) as { label: string; value: string }[];
             updateField(
@@ -411,10 +412,12 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
         />
       </div>
 
-      {/* ⏰ Working time: simplified (global start/end) */}
+      {/* ⏰ Working time */}
       <div>
-        <label className="font-medium block mb-2">{t('technician_partner_form.working_time')}</label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <label className="mb-2 block font-medium">
+          {t('technician_partner_form.working_time')}
+        </label>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div className="flex-1">
             <label className="block text-xs font-medium">
               {t('technician_partner_form.start_time')}
@@ -423,7 +426,7 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
               type="time"
               step="60"
               value={formData.workingStartTime || ''}
-              className="w-full border rounded px-2 py-1"
+              className="w-full rounded border px-2 py-1"
               onChange={(e) => updateField('workingStartTime', e.target.value)}
             />
           </div>
@@ -435,12 +438,14 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
               type="time"
               step="60"
               value={formData.workingEndTime || ''}
-              className="w-full border rounded px-2 py-1"
+              className="w-full rounded border px-2 py-1"
               onChange={(e) => updateField('workingEndTime', e.target.value)}
             />
           </div>
         </div>
-        <p className="text-xs text-gray-500 mt-1">{t('technician_partner_form.working_time_note')}</p>
+        <p className="mt-1 text-xs text-gray-500">
+          {t('technician_partner_form.working_time_note')}
+        </p>
       </div>
 
       <div className="flex items-center gap-2">
@@ -450,7 +455,9 @@ export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
           checked={!!formData.isActive}
           onChange={(e) => updateField('isActive', e.target.checked)}
         />
-        <label className="text-sm font-medium">{t('technician_partner_form.is_active')}</label>
+        <label className="text-sm font-medium">
+          {t('technician_partner_form.is_active')}
+        </label>
       </div>
 
       <Button type="submit" disabled={!canSubmit}>

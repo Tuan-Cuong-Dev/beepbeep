@@ -98,7 +98,7 @@ export default function UserForm({
   };
 
   return (
-    <div className="mb-6 mt-6 rounded-xl border bg-white p-5 shadow-sm">
+    <div className="hidden md:block mb-6 mt-6 rounded-xl border bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold">
           {editingUser ? t('user_form.update_user') : t('user_form.add_user')}

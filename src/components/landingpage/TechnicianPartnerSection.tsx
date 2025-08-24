@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { usePublicTechnicianPartners } from '@/src/hooks/usePublicTechnicianPartners';
+import { useTechnicianPartners } from '@/src/hooks/useTechnicianPartners';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation'; // vẫn dùng hook hiện tại của bạn
 import { useTranslation } from 'react-i18next';
 
@@ -131,7 +131,7 @@ function normalizeUserLocation(userLocation: any): LatLng | null {
 // ===== Component =====
 export default function TechnicianPartnerSection() {
   const { t } = useTranslation();
-  const { partners, loading } = usePublicTechnicianPartners(); // đảm bảo hook trả về partner.location chuẩn
+  const { partners, loading } = useTechnicianPartners(); // đảm bảo hook trả về partner.location chuẩn
   const { location: rawUserLocation } = useCurrentLocation();
   const userLatLng = useMemo(() => normalizeUserLocation(rawUserLocation), [rawUserLocation]);
 
@@ -202,7 +202,7 @@ export default function TechnicianPartnerSection() {
 
             {!loading && (
               <div
-                onClick={() => router.push('/technician-partners')}
+                onClick={() => router.push('/technicianPartners')}
                 className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer"
               >
                 <div className="border rounded-xl shadow bg-white h-full flex flex-col items-center justify-center p-6 text-center hover:shadow-md transition">

@@ -34,7 +34,7 @@ function parseLatLngString(s?: string): LatLng | null {
 
 /** Loại bỏ toàn bộ undefined (deep). Giữ nguyên null và '' */
 function stripUndefined<T>(obj: T): T {
-  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj === null || typeof obj !== 'object') return obj as T;
   if (obj instanceof GeoPoint) return obj as T;
   if (Array.isArray(obj)) {
     return obj.map(stripUndefined).filter((v) => v !== undefined) as unknown as T;
@@ -57,12 +57,13 @@ function parseTimeToMinutes(t: string): number | null {
   return h * 60 + min;
 }
 
-export default function AddRepairShopForm() {
+export default function AddTechnicianPartnerForm() {
   const { t } = useTranslation('common');
   const { user } = useUser();
   const { coords, geocode } = useGeocodeAddress();
   const { submitContribution } = useContributions();
 
+  // ⛳️ Form theo schema mới: address nằm trong location
   const [form, setForm] = useState<
     Partial<TechnicianPartner> & { _lat?: string; _lng?: string }
   >({
@@ -70,7 +71,6 @@ export default function AddRepairShopForm() {
     name: '',
     phone: '',
     shopName: '',
-    shopAddress: '',
     location: { address: '', location: '' } as any,
     assignedRegions: [],
     vehicleType: 'motorbike',
@@ -83,7 +83,7 @@ export default function AddRepairShopForm() {
   const [showDialog, setShowDialog] = useState(false);
   const [workingTimeError, setWorkingTimeError] = useState('');
 
-  // 🔎 Geocode khi nhập địa chỉ (debounce)
+  // 🔎 Geocode khi nhập địa chỉ (debounce) — từ location.address
   useEffect(() => {
     const addr = (form.location as any)?.address;
     const trimmed = typeof addr === 'string' ? addr.trim() : '';
@@ -92,7 +92,7 @@ export default function AddRepairShopForm() {
     return () => clearTimeout(id);
   }, [(form.location as any)?.address, geocode]);
 
-  // 📍 Khi có coords từ geocode → cập nhật preview lat/lng
+  // 📍 Khi có coords từ geocode → cập nhật preview lat/lng & location.location
   useEffect(() => {
     if (!coords) return;
     setForm((prev) => {
@@ -119,7 +119,7 @@ export default function AddRepairShopForm() {
   const setField = (field: keyof TechnicianPartner, value: any) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
-  const setLocationField = (key: 'address' | 'location', value: string) =>
+  const setLocationField = (key: 'address' | 'location' | 'mapAddress', value: string) =>
     setForm((prev) => ({
       ...prev,
       location: { ...(prev.location as any), [key]: value } as any,
@@ -147,22 +147,32 @@ export default function AddRepairShopForm() {
     });
   }
 
+  // ✅ Yêu cầu: phải có name, phone, location.address
   const canSubmit = useMemo(
     () =>
       Boolean(
-        user?.uid && form.name && form.phone && form.shopAddress && !workingTimeError
+        user?.uid &&
+          (form.name || '').trim() &&
+          (form.phone || '').trim() &&
+          ((form.location as any)?.address || '').trim() &&
+          !workingTimeError
       ),
-    [user?.uid, form.name, form.phone, form.shopAddress, workingTimeError]
+    [user?.uid, form.name, form.phone, (form.location as any)?.address, workingTimeError]
   );
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
+    // Chuẩn hóa toạ độ
     let lat: number | undefined;
     let lng: number | undefined;
     if (form._lat && form._lng) {
-      lat = parseFloat(form._lat);
-      lng = parseFloat(form._lng);
+      const latNum = parseFloat(form._lat);
+      const lngNum = parseFloat(form._lng);
+      if (Number.isFinite(latNum) && Number.isFinite(lngNum)) {
+        lat = latNum;
+        lng = lngNum;
+      }
     }
     if (lat === undefined || lng === undefined) {
       const parsed = parseLatLngString((form.location as any)?.location);
@@ -173,24 +183,33 @@ export default function AddRepairShopForm() {
       lng = coords.lng;
     }
 
+    // Xây LocationCore khi có lat/lng
     const locationCore =
       lat !== undefined && lng !== undefined
         ? {
             geo: new GeoPoint(lat, lng),
             location: `${lat},${lng}`,
             address: (form.location as any)?.address || '',
+            // có thể thêm mapAddress nếu bạn cho phép nhập
+            mapAddress: (form.location as any)?.mapAddress || undefined,
             updatedAt: serverTimestamp(),
           }
-        : undefined;
+        : {
+            // Nếu chưa có toạ độ, vẫn lưu address để về sau bổ sung geo
+            address: (form.location as any)?.address || '',
+            mapAddress: (form.location as any)?.mapAddress || undefined,
+            // updatedAt để server set
+            updatedAt: serverTimestamp(),
+          } as any;
 
     const rawData: Partial<TechnicianPartner> = {
       userId: '',
       role: 'technician_partner',
-      name: form.name!,
-      phone: form.phone!,
+      name: (form.name || '').trim(),
+      phone: (form.phone || '').trim(),
       type: 'shop',
       shopName: form.shopName ?? '',
-      shopAddress: form.shopAddress!,
+      // ❌ KHÔNG còn shopAddress ở root — đã gộp vào location.address
       location: locationCore,
       assignedRegions: form.assignedRegions ?? [],
       serviceCategories: form.serviceCategories ?? [],
@@ -210,22 +229,16 @@ export default function AddRepairShopForm() {
 
     setSubmitting(true);
     try {
-      const docRef = await addDoc(
-        collection(db, 'technicianPartners'),
-        dataToWrite
-      );
+      const docRef = await addDoc(collection(db, 'technicianPartners'), dataToWrite);
       await updateDoc(docRef, { id: docRef.id });
-      await submitContribution('repair_shop', {
-        ...dataToWrite,
-        id: docRef.id,
-      });
+      await submitContribution('repair_shop', { ...dataToWrite, id: docRef.id });
 
+      // Reset form
       setForm({
         type: 'shop',
         name: '',
         phone: '',
         shopName: '',
-        shopAddress: '',
         location: { address: '', location: '' } as any,
         assignedRegions: [],
         vehicleType: 'motorbike',
@@ -260,22 +273,24 @@ export default function AddRepairShopForm() {
         value={form.shopName || ''}
         onChange={(e) => setField('shopName', e.target.value)}
       />
+
+      {/* ✅ Địa chỉ cửa hàng → location.address */}
       <Textarea
         placeholder={t('repair_shop_form.shop_address')}
-        value={form.shopAddress || ''}
-        onChange={(e) => setField('shopAddress', e.target.value)}
-      />
-
-      <Textarea
-        className="min-h-[120px]"
-        placeholder={t('repair_shop_form.map_address')}
         value={(form.location as any)?.address || ''}
         onChange={(e) => setLocationField('address', e.target.value)}
       />
 
+      {/* (Optional) Link Google Maps → location.mapAddress */}
+      {/* <Input
+        placeholder={t('repair_shop_form.map_address')}
+        value={(form.location as any)?.mapAddress || ''}
+        onChange={(e) => setLocationField('mapAddress', e.target.value)}
+      /> */}
+
       {/* Lat/Lng hỗ trợ nhập tay (gộp một input) */}
       <Input
-        placeholder="Tọa độ (vd: 16.07° N, 108.22° E)"
+        placeholder="Tọa độ (vd: 16.07, 108.22 hoặc 16.07° N, 108.22° E)"
         value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : ''}
         onChange={(e) => {
           const value = e.target.value;
@@ -296,7 +311,6 @@ export default function AddRepairShopForm() {
           }
         }}
       />
-
 
       {/* Vehicle type */}
       <select

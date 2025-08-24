@@ -14,7 +14,7 @@ interface Technician {
   [key: string]: any;
 }
 
-export default function PendingTechnicians() {
+export default function PendingTechnicianPartners() {
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
 
