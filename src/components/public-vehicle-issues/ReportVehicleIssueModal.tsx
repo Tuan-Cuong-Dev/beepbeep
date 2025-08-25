@@ -30,6 +30,7 @@ export default function ReportVehicleIssueModal({ open, onClose }: Props) {
   const { user } = useUser();
   const uid = user?.uid;
 
+  // --- state ---
   const { vehicles, loading: loadingVehicles } = usePersonalVehicles(uid);
   const { location, loading: loadingGeo, error: geoError } = useCurrentLocation();
   const toCoordString = location ? `${location[0]},${location[1]}` : undefined;
@@ -42,6 +43,14 @@ export default function ReportVehicleIssueModal({ open, onClose }: Props) {
 
   const [customerName, setCustomerName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
+
+// 🔁 NEW: Sync lại khi user đã load xong hoặc khi modal mở
+  useEffect(() => {
+    if (open) {
+      setCustomerName(user?.name || '');
+      setPhone(user?.phone || '');
+    }
+  }, [open, user?.name, user?.phone]);
 
   const vehicleOptions = useMemo(
     () =>
