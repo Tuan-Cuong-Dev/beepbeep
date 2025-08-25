@@ -2360,12 +2360,14 @@
 },
 
 "proposal_popup": {
-  "title": "Submit Proposal",
-  "solution_placeholder": "Proposed solution",
-  "cost_placeholder": "Estimated cost (VND)",
-  "cancel": "Cancel",
-  "submit": "Submit Proposal"
-},
+    "title": "Submit Proposal",
+    "subtitle": "Please enter your proposed solution and cost to send to the customer.",
+    "solution_placeholder": "Proposed solution",
+    "cost_placeholder": "Proposed cost",
+    "solution_label": "Proposed solution",
+    "cost_label": "Proposed cost",
+    "submit": "Submit Proposal"
+  },
 
 "report_issue_form": {
   "select_vehicle_label": "Select Vehicle (VIN)",

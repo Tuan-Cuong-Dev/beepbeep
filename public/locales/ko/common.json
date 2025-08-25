@@ -2358,12 +2358,14 @@
 },
 
 "proposal_popup": {
-  "title": "제안 제출",
-  "solution_placeholder": "제안된 해결책",
-  "cost_placeholder": "예상 비용 (VND)",
-  "cancel": "취소",
-  "submit": "제안 제출"
-},
+    "title": "해결 방안 제안",
+    "subtitle": "고객에게 보낼 해결 방안과 비용을 입력하세요.",
+    "solution_placeholder": "해결 방안을 입력...",
+    "cost_placeholder": "제안 비용을 입력...",
+    "solution_label": "제안된 해결 방안",
+    "cost_label": "제안 비용",
+    "submit": "제안 제출"
+  },
 
 "report_issue_form": {
   "select_vehicle_label": "차량 선택 (VIN)",

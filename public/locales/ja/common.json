@@ -2342,12 +2342,14 @@
 },
 
 "proposal_popup": {
-  "title": "提案を提出",
-  "solution_placeholder": "提案された解決策",
-  "cost_placeholder": "予想コスト（VND）",
-  "cancel": "キャンセル",
-  "submit": "提案を送信"
-},
+    "title": "提案内容",
+    "subtitle": "お客様に送信する提案内容と費用を入力してください。",
+    "solution_placeholder": "解決策を入力...",
+    "cost_placeholder": "提案費用を入力...",
+    "solution_label": "提案内容",
+    "cost_label": "提案費用",
+    "submit": "提案を送信"
+  },
 
 "report_issue_form": {
   "select_vehicle_label": "車両を選択 (VIN)",

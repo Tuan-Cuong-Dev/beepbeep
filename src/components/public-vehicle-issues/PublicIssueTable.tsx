@@ -5,6 +5,7 @@ import { PublicVehicleIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIs
 import { Button } from '@/src/components/ui/button';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Props {
   issues: PublicVehicleIssue[];
@@ -51,6 +52,10 @@ function PublicIssueTableBase({
     }),
     []
   );
+
+  // + NEW: helper định dạng tiền
+  const fmtMoney = (v?: number | string | null) =>
+  v === null || v === undefined || v === '' ? '-' : formatCurrency(v);
 
   const safe = (v?: string | number | null) => (v !== null && v !== undefined && v !== '' ? v : '-');
   const fmt = (d?: any) => (d?.toDate ? format(d.toDate(), 'Pp') : '-');
@@ -237,14 +242,13 @@ function PublicIssueTableBase({
                     <CellText className="max-w-[220px]">{safe(issue.proposedSolution)}</CellText>
                   </td>
 
-                  <td className="px-3 py-3 whitespace-nowrap">{issue.proposedCost ?? '-'}</td>
-                  <td className="px-3 py-3 whitespace-nowrap">{safe(issue.approveStatus)}</td>
+                  <td className="px-3 py-3 whitespace-nowrap">{fmtMoney(issue.proposedCost ?? '-')}</td>
 
                   <td className="px-3 py-3">
                     <CellText className="max-w-[220px]">{safe(issue.actualSolution)}</CellText>
                   </td>
 
-                  <td className="px-3 py-3 whitespace-nowrap">{issue.actualCost ?? '-'}</td>
+                  <td className="px-3 py-3 whitespace-nowrap">{fmtMoney(issue.actualCost ?? '-')}</td>
                   <td className="px-3 py-3 whitespace-nowrap">{fmt(issue.createdAt)}</td>
                   <td className="px-3 py-3 whitespace-nowrap">{fmt(issue.updatedAt)}</td>
                   <td className="px-3 py-3 whitespace-nowrap">{safe(issue.closedByName)}</td>
@@ -277,7 +281,19 @@ function PublicIssueTableBase({
               <div className="flex items-start justify-between">
                 <div>
                   <div className="font-semibold text-gray-900">{safe(issue.customerName)}</div>
-                  <div className="text-xs text-gray-500">{safe(issue.phone)}</div>
+                  {/* Phone nổi bật hơn */}
+                    <div className="mt-1">
+                      {issue.phone ? (
+                        <a
+                          href={`tel:${issue.phone}`}
+                          className="text-base font-semibold text-blue-600 underline decoration-dotted underline-offset-2"
+                        >
+                          {safe(issue.phone)}
+                        </a>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
+                      )}
+                    </div>
                 </div>
                 <StatusChip status={issue.status} />
               </div>

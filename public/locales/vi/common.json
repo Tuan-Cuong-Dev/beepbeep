@@ -2387,13 +2387,15 @@
   "unnamed": "(Không tên)"
 },
 
-"proposal_popup": {
-  "title": "Gửi đề xuất",
-  "solution_placeholder": "Phương án đề xuất",
-  "cost_placeholder": "Chi phí dự kiến (VNĐ)",
-  "cancel": "Huỷ",
-  "submit": "Gửi đề xuất"
-},
+ "proposal_popup": {
+    "title": "Đề xuất giải pháp",
+    "subtitle": "Vui lòng nhập giải pháp và chi phí đề xuất để gửi cho khách hàng.",
+    "solution_placeholder": "Nhập giải pháp...",
+    "cost_placeholder": "Nhập chi phí đề xuất...",
+    "solution_label": "Giải pháp đề xuất",
+    "cost_label": "Chi phí đề xuất",
+    "submit": "Gửi đề xuất"
+  },
 
 "report_issue_form": {
   "select_vehicle_label": "Chọn xe (Số khung, Biển số)",
