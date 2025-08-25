@@ -1372,7 +1372,10 @@
     "description": "Mô tả",
     "status": "Trạng thái",
     "reported": "Báo cáo lúc",
-    "actions": "Hành động"
+    "actions": "Hành động",
+    "vehicle":"Xe",
+    "assigned_to":"Người xử lý",
+    "location":"Vị trí"
   },
 
   "actions": {

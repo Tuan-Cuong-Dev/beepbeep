@@ -1,6 +1,3 @@
-// 📁 components/report-public-issue/ProposalPopup.tsx
-// OK rồi
-
 'use client';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/src/components/ui/dialog";
@@ -8,7 +5,8 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
 import { useState, useEffect } from "react";
-import { parseCurrencyString } from "@/src/utils/parseCurrencyString"; // 🔁 Đường dẫn đúng file của bạn
+import { parseCurrencyString } from "@/src/utils/parseCurrencyString";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   open: boolean;
@@ -21,6 +19,7 @@ function formatCurrency(value: number): string {
 }
 
 export default function ProposalPopup({ open, onClose, onSubmit }: Props) {
+  const { t } = useTranslation("common"); // 👈
   const [solution, setSolution] = useState("");
   const [costRaw, setCostRaw] = useState("0");
 
@@ -40,17 +39,17 @@ export default function ProposalPopup({ open, onClose, onSubmit }: Props) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Submit Proposal</DialogTitle>
+          <DialogTitle>{t("proposal_popup.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <Textarea
-            placeholder="Proposed Solution"
+            placeholder={t("proposal_popup.solution_placeholder")}
             value={solution}
             onChange={(e) => setSolution(e.target.value)}
           />
           <Input
-            placeholder="Proposed Cost (VNĐ)"
+            placeholder={t("proposal_popup.cost_placeholder")}
             inputMode="numeric"
             value={formatCurrency(parseCurrencyString(costRaw))}
             onChange={(e) => setCostRaw(e.target.value)}
@@ -64,12 +63,14 @@ export default function ProposalPopup({ open, onClose, onSubmit }: Props) {
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button variant="ghost" onClick={onClose}>
+            {t("common.cancel")}
+          </Button>
           <Button
             disabled={!solution || parseCurrencyString(costRaw) <= 0}
             onClick={handleSubmit}
           >
-            Submit Proposal
+            {t("proposal_popup.submit")}
           </Button>
         </DialogFooter>
       </DialogContent>

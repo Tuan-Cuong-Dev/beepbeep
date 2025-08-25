@@ -1332,7 +1332,10 @@
     "description": "説明",
     "status": "ステータス",
     "reported": "報告時間",
-    "actions": "操作"
+    "actions": "操作",
+    "vehicle": "車両",
+    "assigned_to": "担当者",
+    "location": "位置"
   },
   "actions": {
     "submit_proposal": "提案を送信",

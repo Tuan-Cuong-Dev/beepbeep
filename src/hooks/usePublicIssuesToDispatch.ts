@@ -1,4 +1,5 @@
 // 📁 hooks/usePublicIssuesToDispatch.ts
+// Đang dùng chung thay cho cả : usePublicVehicleIssues.ts (Chưa tạo ? cần thì tạo sau 25/08)
 import { useEffect, useState } from 'react';
 import { db } from '@/src/firebaseConfig';
 import {

@@ -1,31 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useUser } from '@/src/context/AuthContext';
-import { useVehicleIssues } from '@/src/hooks/useVehicleIssues';
-import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
-import ProposalPopup from '@/src/components/vehicle-issues/ProposalPopup';
-import ActualResultPopup from '@/src/components/vehicle-issues/ActualResultPopup';
+import { usePublicIssuesToDispatch } from '@/src/hooks/usePublicIssuesToDispatch';
+import type { PublicVehicleIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+import ProposalPopup from '@/src/components/public-vehicle-issues/ProposalPopup';
+import ActualResultPopup from '@/src/components/public-vehicle-issues/ActualResultPopup';
 import { Wrench, ClipboardList, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import Link from 'next/link';
 import { JSX } from 'react/jsx-runtime';
 import { useTranslation } from 'react-i18next';
 
-function formatCurrency(value: number) {
-  return value.toLocaleString('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    minimumFractionDigits: 0,
-  });
-}
-
-function renderStatusBadge(status: VehicleIssueStatus, t: any) {
-  const colorMap: Record<VehicleIssueStatus, string> = {
+function renderStatusBadge(status: PublicIssueStatus, t: any) {
+  const colorMap: Record<PublicIssueStatus, string> = {
     pending: 'bg-gray-400',
     assigned: 'bg-blue-500',
     proposed: 'bg-yellow-500',
@@ -35,47 +27,70 @@ function renderStatusBadge(status: VehicleIssueStatus, t: any) {
     resolved: 'bg-purple-500',
     closed: 'bg-black',
   };
-  return <span className={`px-2 py-1 text-white rounded ${colorMap[status]}`}>{t(`status.${status}`)}</span>;
+  return (
+    <span className={`px-2 py-1 text-white rounded ${colorMap[status]}`}>
+      {t(`status.${status}`)}
+    </span>
+  );
 }
-
 
 export default function TechnicianPartnerDashboard() {
   const { t } = useTranslation('common');
   const { user, role, loading: userLoading } = useUser();
+  const normalizedRole = role?.toLowerCase();
+  const isPartner = normalizedRole === 'technician_partner';
+
   const [notification, setNotification] = useState<string | null>(null);
-  const [proposingIssue, setProposingIssue] = useState<ExtendedVehicleIssue | null>(null);
-  const [updatingActualIssue, setUpdatingActualIssue] = useState<ExtendedVehicleIssue | null>(null);
+  const [proposingIssue, setProposingIssue] = useState<PublicVehicleIssue | null>(null);
+  const [updatingActualIssue, setUpdatingActualIssue] = useState<PublicVehicleIssue | null>(null);
 
-  const isPartner = role === 'technician_partner';
+  const { issues, loading: issuesLoading, updateIssue } = usePublicIssuesToDispatch();
 
-  const { issues, updateIssue, loading: issuesLoading } = useVehicleIssues(
-    !isPartner ? { disabled: true } as any : { technicianUserId: user?.uid, role: 'technician_partner' }
+  // Chỉ các issue được giao cho technician_partner hiện tại
+  const myIssues = useMemo(
+    () => issues.filter((i) => i.assignedTo === user?.uid),
+    [issues, user?.uid]
   );
 
-  const getTranslatedIssueType = (rawType: string) => {
-    const normalized = rawType.toLowerCase().replace(/\s+/g, '_');
-    return t(`vehicle_issue_type.${normalized}`, { defaultValue: rawType });
-  };
+  // Đếm theo trạng thái
+  const counts = useMemo(() => {
+    const init: Record<PublicIssueStatus, number> = {
+      pending: 0,
+      assigned: 0,
+      proposed: 0,
+      confirmed: 0,
+      rejected: 0,
+      in_progress: 0,
+      resolved: 0,
+      closed: 0,
+    };
+    for (const it of myIssues) init[it.status] = (init[it.status] ?? 0) + 1;
+    return init;
+  }, [myIssues]);
 
   useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => setNotification(null), 3000);
-      return () => clearTimeout(timer);
-    }
+    if (!notification) return;
+    const timer = setTimeout(() => setNotification(null), 3000);
+    return () => clearTimeout(timer);
   }, [notification]);
 
-  if (!user || userLoading) return <div className="text-center py-10">🔎 {t('technician_partner_dashboard.checking_permission')}</div>;
-  if (!isPartner) return <div className="text-center py-10 text-red-500">🚫 {t('technician_partner_dashboard.only_for_technician_partner')}</div>;
-  if (issuesLoading) return <div className="text-center py-10">⏳ {t('technician_partner_dashboard.loading_issues')}</div>;
+  if (!user || userLoading)
+    return <div className="text-center py-10">🔎 {t('technician_partner_dashboard.checking_permission')}</div>;
+  if (!isPartner)
+    return <div className="text-center py-10 text-red-500">🚫 {t('technician_partner_dashboard.only_for_technician_partner')}</div>;
+  if (issuesLoading)
+    return <div className="text-center py-10">⏳ {t('technician_partner_dashboard.loading_issues')}</div>;
 
-  const handleUpdateStatus = async (issue: ExtendedVehicleIssue, newStatus: VehicleIssueStatus) => {
-    await updateIssue(issue.id, { status: newStatus });
-    setNotification(t('technician_partner_dashboard.status_updated', { status: t(`status.${newStatus}`) }));
+  const handleUpdateStatus = async (issue: PublicVehicleIssue, newStatus: PublicIssueStatus) => {
+    await updateIssue(issue.id!, { status: newStatus });
+    setNotification(
+      t('technician_partner_dashboard.status_updated', { status: t(`status.${newStatus}`) })
+    );
   };
 
   const handlePropose = async (solution: string, cost: number) => {
     if (!proposingIssue) return;
-    await updateIssue(proposingIssue.id, {
+    await updateIssue(proposingIssue.id!, {
       status: 'proposed',
       proposedSolution: solution,
       proposedCost: cost,
@@ -86,7 +101,7 @@ export default function TechnicianPartnerDashboard() {
 
   const handleActualSubmit = async (solution: string, cost: number) => {
     if (!updatingActualIssue) return;
-    await updateIssue(updatingActualIssue.id, {
+    await updateIssue(updatingActualIssue.id!, {
       status: 'resolved',
       actualSolution: solution,
       actualCost: cost,
@@ -95,20 +110,41 @@ export default function TechnicianPartnerDashboard() {
     setUpdatingActualIssue(null);
   };
 
+  const getDateStr = (iss: PublicVehicleIssue) =>
+    iss.createdAt?.toDate ? iss.createdAt.toDate().toLocaleString() : '';
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       <UserTopMenu />
+
       <main className="flex-1 px-4 sm:px-6 py-6 sm:py-10 space-y-10 max-w-7xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800">
           🛠️ {t('technician_partner_dashboard.title')}
         </h1>
 
+        {/* Cards tóm tắt */}
         <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <DashboardCard icon={<ClipboardList />} title={t('technician_partner_dashboard.summary.assigned')} value={issues.length.toString()} />
-          <DashboardCard icon={<AlertTriangle />} title={t('technician_partner_dashboard.summary.proposed')} value={issues.filter(i => i.status === 'proposed').length.toString()} />
-          <DashboardCard icon={<Wrench />} title={t('technician_partner_dashboard.summary.in_progress')} value={issues.filter(i => i.status === 'in_progress').length.toString()} />
-          <DashboardCard icon={<CheckCircle />} title={t('technician_partner_dashboard.summary.resolved')} value={issues.filter(i => i.status === 'resolved').length.toString()} />
+          <DashboardCard
+            icon={<ClipboardList />}
+            title={t('technician_partner_dashboard.summary.assigned')}
+            value={String(counts.assigned)}
+          />
+          <DashboardCard
+            icon={<AlertTriangle />}
+            title={t('technician_partner_dashboard.summary.proposed')}
+            value={String(counts.proposed)}
+          />
+          <DashboardCard
+            icon={<Wrench />}
+            title={t('technician_partner_dashboard.summary.in_progress')}
+            value={String(counts.in_progress)}
+          />
+          <DashboardCard
+            icon={<CheckCircle />}
+            title={t('technician_partner_dashboard.summary.resolved')}
+            value={String(counts.resolved)}
+          />
         </section>
 
         <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">
@@ -120,26 +156,56 @@ export default function TechnicianPartnerDashboard() {
         </section>
 
         <section className="bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">🚧 {t('technician_partner_dashboard.assigned_issues')}</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            🚧 {t('technician_partner_dashboard.assigned_issues')}
+          </h2>
 
           {/* Mobile view */}
           <div className="md:hidden space-y-4">
-            {issues.map(issue => (
+            {myIssues.map((issue) => (
               <div key={issue.id} className="border rounded-xl p-4 bg-white shadow">
                 <div className="text-sm font-semibold mb-2">
-                  {getTranslatedIssueType(issue.issueType)} – {renderStatusBadge(issue.status, t)}
+                  {(issue.vehicleBrand || '') + (issue.vehicleModel ? ` ${issue.vehicleModel}` : '')}{' '}
+                  – {renderStatusBadge(issue.status, t)}
                 </div>
-                <p className="text-sm text-gray-600"><strong>VIN:</strong> {issue.vin}</p>
-                <p className="text-sm text-gray-600"><strong>Plate:</strong> {issue.plateNumber}</p>
-                <p className="text-sm text-gray-600"><strong>{t('technician_partner_dashboard.description')}:</strong> {issue.description}</p>
-                <p className="text-sm text-gray-600"><strong>{t('technician_partner_dashboard.reported')}:</strong> {issue.reportedAt?.toDate().toLocaleString()}</p>
+                <p className="text-sm text-gray-600">
+                  <strong>Plate:</strong> {issue.vehicleLicensePlate || '-'}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>{t('technician_partner_dashboard.description')}:</strong> {issue.issueDescription}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>{t('technician_partner_dashboard.reported')}:</strong> {getDateStr(issue)}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>{t('assigned_to')}:</strong> {issue.assignedToName || '-'}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>{t('location')}:</strong> {issue.location?.mapAddress || issue.location?.issueAddress || '-'}
+                </p>
 
                 <div className="mt-3 space-y-2">
-                  {issue.status === 'assigned' && <Button className="w-full" onClick={() => setProposingIssue(issue)}>{t('technician_partner_dashboard.submit_proposal')}</Button>}
-                  {issue.status === 'confirmed' && <Button className="w-full" onClick={() => handleUpdateStatus(issue, 'in_progress')}>{t('technician_partner_dashboard.mark_in_progress')}</Button>}
-                  {issue.status === 'in_progress' && <Button className="w-full" onClick={() => setUpdatingActualIssue(issue)}>{t('technician_partner_dashboard.complete_and_submit')}</Button>}
-                  {issue.status === 'proposed' && <p className="text-green-600 text-center">{t('technician_partner_dashboard.waiting_approval')}</p>}
-                  {issue.status === 'rejected' && <p className="text-gray-400 italic text-center">{t('technician_partner_dashboard.no_actions')}</p>}
+                  {issue.status === 'assigned' && (
+                    <Button className="w-full" onClick={() => setProposingIssue(issue)}>
+                      {t('technician_partner_dashboard.submit_proposal')}
+                    </Button>
+                  )}
+                  {issue.status === 'confirmed' && (
+                    <Button className="w-full" onClick={() => handleUpdateStatus(issue, 'in_progress')}>
+                      {t('technician_partner_dashboard.mark_in_progress')}
+                    </Button>
+                  )}
+                  {issue.status === 'in_progress' && (
+                    <Button className="w-full" onClick={() => setUpdatingActualIssue(issue)}>
+                      {t('technician_partner_dashboard.complete_and_submit')}
+                    </Button>
+                  )}
+                  {issue.status === 'proposed' && (
+                    <p className="text-green-600 text-center">{t('technician_partner_dashboard.waiting_approval')}</p>
+                  )}
+                  {issue.status === 'rejected' && (
+                    <p className="text-gray-400 italic text-center">{t('technician_partner_dashboard.no_actions')}</p>
+                  )}
                 </div>
               </div>
             ))}
@@ -150,30 +216,56 @@ export default function TechnicianPartnerDashboard() {
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-gray-100 text-left">
-                  <th className="p-2">{t('technician_partner_dashboard.table_headers.vin')}</th>
                   <th className="p-2">{t('technician_partner_dashboard.table_headers.plate')}</th>
-                  <th className="p-2">{t('technician_partner_dashboard.table_headers.issue_type')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.vehicle')}</th>
                   <th className="p-2">{t('technician_partner_dashboard.table_headers.description')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.assigned_to')}</th>
+                  <th className="p-2">{t('technician_partner_dashboard.table_headers.location')}</th>
                   <th className="p-2">{t('technician_partner_dashboard.table_headers.status')}</th>
                   <th className="p-2">{t('technician_partner_dashboard.table_headers.reported')}</th>
                   <th className="p-2">{t('technician_partner_dashboard.table_headers.actions')}</th>
                 </tr>
               </thead>
               <tbody>
-                {issues.map(issue => (
+                {myIssues.map((issue) => (
                   <tr key={issue.id} className="border-t hover:bg-gray-50">
-                    <td className="p-2">{issue.vin}</td>
-                    <td className="p-2">{issue.plateNumber}</td>
-                    <td className="p-2">{getTranslatedIssueType(issue.issueType)}</td>
-                    <td className="p-2">{issue.description}</td>
+                    <td className="p-2">{issue.vehicleLicensePlate || '-'}</td>
+                    <td className="p-2">
+                      {(issue.vehicleBrand || '') + (issue.vehicleModel ? ` ${issue.vehicleModel}` : '')}
+                    </td>
+                    <td className="p-2">{issue.issueDescription}</td>
+                    <td className="p-2">{issue.assignedToName || '-'}</td>
+                    <td className="p-2">
+                      {issue.location?.mapAddress || issue.location?.issueAddress || '-'}
+                    </td>
                     <td className="p-2">{renderStatusBadge(issue.status, t)}</td>
-                    <td className="p-2">{issue.reportedAt?.toDate().toLocaleString()}</td>
+                    <td className="p-2">{getDateStr(issue)}</td>
                     <td className="p-2 space-y-1">
-                      {issue.status === 'assigned' && <Button onClick={() => setProposingIssue(issue)}>{t('technician_partner_dashboard.submit_proposal')}</Button>}
-                      {issue.status === 'confirmed' && <Button onClick={() => handleUpdateStatus(issue, 'in_progress')}>{t('technician_partner_dashboard.mark_in_progress')}</Button>}
-                      {issue.status === 'in_progress' && <Button onClick={() => setUpdatingActualIssue(issue)}>{t('technician_partner_dashboard.submit_actual')}</Button>}
-                      {issue.status === 'proposed' && <span className="text-green-600">{t('technician_partner_dashboard.waiting_approval')}</span>}
-                      {issue.status === 'rejected' && <span className="text-gray-400 italic">{t('technician_partner_dashboard.no_actions')}</span>}
+                      {issue.status === 'assigned' && (
+                        <Button onClick={() => setProposingIssue(issue)}>
+                          {t('technician_partner_dashboard.submit_proposal')}
+                        </Button>
+                      )}
+                      {issue.status === 'confirmed' && (
+                        <Button onClick={() => handleUpdateStatus(issue, 'in_progress')}>
+                          {t('technician_partner_dashboard.mark_in_progress')}
+                        </Button>
+                      )}
+                      {issue.status === 'in_progress' && (
+                        <Button onClick={() => setUpdatingActualIssue(issue)}>
+                          {t('technician_partner_dashboard.submit_actual')}
+                        </Button>
+                      )}
+                      {issue.status === 'proposed' && (
+                        <span className="text-green-600">
+                          {t('technician_partner_dashboard.waiting_approval')}
+                        </span>
+                      )}
+                      {issue.status === 'rejected' && (
+                        <span className="text-gray-400 italic">
+                          {t('technician_partner_dashboard.no_actions')}
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -182,10 +274,27 @@ export default function TechnicianPartnerDashboard() {
           </div>
         </section>
       </main>
+
       <Footer />
-      <NotificationDialog open={!!notification} type="success" title={t('notification.success')} description={notification || undefined} onClose={() => setNotification(null)} />
-      <ProposalPopup open={!!proposingIssue} onClose={() => setProposingIssue(null)} onSubmit={handlePropose} />
-      <ActualResultPopup open={!!updatingActualIssue} onClose={() => setUpdatingActualIssue(null)} onSubmit={handleActualSubmit} />
+
+      <NotificationDialog
+        open={!!notification}
+        type="success"
+        title={t('notification.success')}
+        description={notification || undefined}
+        onClose={() => setNotification(null)}
+      />
+
+      <ProposalPopup
+        open={!!proposingIssue}
+        onClose={() => setProposingIssue(null)}
+        onSubmit={handlePropose}
+      />
+      <ActualResultPopup
+        open={!!updatingActualIssue}
+        onClose={() => setUpdatingActualIssue(null)}
+        onSubmit={handleActualSubmit}
+      />
     </div>
   );
 }
@@ -204,7 +313,10 @@ function DashboardCard({ icon, title, value }: { icon: JSX.Element; title: strin
 
 function QuickAction({ label, href }: { label: string; href: string }) {
   return (
-    <Link href={href} className="block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition">
+    <Link
+      href={href}
+      className="block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition"
+    >
       {label}
     </Link>
   );
