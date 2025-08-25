@@ -28,6 +28,10 @@ interface NearbySupportMapProps {
   issueCoords?: LatLng | null;
   issues?: PublicVehicleIssue[];
   limitPerType?: number;
+  /** Bật/tắt lớp “Cửa hàng gần nhất” (shop) */
+  showNearestShops?: boolean;
+  /** Bật/tắt lớp “KTV lưu động gần nhất” (mobile) */
+  showNearestMobiles?: boolean;
 }
 
 // ===== Helpers =====
@@ -87,14 +91,13 @@ function FitToMarkers({ center, others }: { center?: LatLng; others: LatLng[] })
     if (center) pts.push(center);
     if (!pts.length) return;
     const lats = pts.map((p) => p.lat);
-    const lngs = pts.map((p) => p.lng); // ✅ bỏ "rather"
+    const lngs = pts.map((p) => p.lng);
     const southWest = [Math.min(...lats), Math.min(...lngs)] as [number, number];
     const northEast = [Math.max(...lats), Math.max(...lngs)] as [number, number];
     map.fitBounds([southWest, northEast], { padding: [40, 40] });
   }, [center?.lat, center?.lng, others.map((p) => `${p.lat},${p.lng}`).join('|')]);
   return null;
 }
-
 
 /** Các trạng thái “mở” cần hiển thị */
 const OPEN_STATUSES: PublicIssueStatus[] = [
@@ -151,6 +154,8 @@ export default function NearbySupportMap({
   issueCoords,
   issues = [],
   limitPerType = 5,
+  showNearestShops = true,
+  showNearestMobiles = true,
 }: NearbySupportMapProps) {
   const { t } = useTranslation('common', { keyPrefix: 'map' });
 
@@ -161,7 +166,7 @@ export default function NearbySupportMap({
 
   useEffect(() => { setIsClient(true); }, []);
 
-  // Load đối tác (shop từ technicianPartners, mobile từ users role=technician_partner)
+  // Load đối tác có điều kiện theo flags
   useEffect(() => {
     let mounted = true;
 
@@ -176,29 +181,22 @@ export default function NearbySupportMap({
     }
 
     async function loadMobilesFromUsers(): Promise<TechnicianPartner[]> {
-      const usersQ = query(
-        collection(db, 'users'),
-        where('role', '==', 'technician_partner')
-        // Có thể thêm isActive == true nếu bạn có cờ này ở users
-      );
+      const usersQ = query(collection(db, 'users'), where('role', '==', 'technician_partner'));
       const usersSnap = await getDocs(usersQ);
-
       return usersSnap.docs.map(d => {
         const u = d.data() as User;
-
-        // Ưu tiên dùng lastKnownLocation; nếu không có, không ép fallback toạ độ 0,0 để tránh hiển thị sai
         const normalized = toLocationCore(u.lastKnownLocation);
         const tp: TechnicianPartner = {
-          id: d.id,                 // id theo user doc
+          id: d.id,
           userId: u.uid,
           name: u.name,
           phone: u.phone,
           email: u.email,
           role: 'technician_partner',
           type: 'mobile',
-          location: normalized ?? undefined as any, // để giữ đúng type, downstream sẽ lọc toạ độ null
+          location: (normalized ?? undefined) as any,
           assignedRegions: [],
-          isActive: true,          // tuỳ chính sách, có thể map từ user flag
+          isActive: true,
           createdBy: u.uid,
           createdAt: (u.createdAt as any) ?? new Date(),
           updatedAt: (u.updatedAt as any) ?? new Date(),
@@ -210,7 +208,10 @@ export default function NearbySupportMap({
     (async () => {
       setLoading(true);
       try {
-        const [shopsRes, mobilesRes] = await Promise.all([loadShops(), loadMobilesFromUsers()]);
+        const [shopsRes, mobilesRes] = await Promise.all([
+          showNearestShops ? loadShops() : Promise.resolve([]),
+          showNearestMobiles ? loadMobilesFromUsers() : Promise.resolve([]),
+        ]);
         if (!mounted) return;
         setShops(shopsRes);
         setMobiles(mobilesRes);
@@ -222,29 +223,29 @@ export default function NearbySupportMap({
     })();
 
     return () => { mounted = false; };
-  }, []);
+  }, [showNearestShops, showNearestMobiles]);
 
   // Top N cửa hàng quanh issue
   const topShops = useMemo(() => {
-    if (!issueCoords) return [];
+    if (!issueCoords || !showNearestShops) return [];
     return shops
       .map((p) => ({ p, coord: extractLatLngFromLocationCore(p.location) }))
       .filter((x): x is { p: TechnicianPartner; coord: LatLng } => !!x.coord)
       .map((x) => ({ ...x, d: distanceKm(issueCoords, x.coord) }))
       .sort((a, b) => a.d - b.d)
       .slice(0, limitPerType);
-  }, [shops, issueCoords, limitPerType]);
+  }, [shops, issueCoords, limitPerType, showNearestShops]);
 
   // Top N KTV lưu động quanh issue
   const topMobiles = useMemo(() => {
-    if (!issueCoords) return [];
+    if (!issueCoords || !showNearestMobiles) return [];
     return mobiles
       .map((p) => ({ p, coord: extractLatLngFromLocationCore(p.location) }))
       .filter((x): x is { p: TechnicianPartner; coord: LatLng } => !!x.coord)
       .map((x) => ({ ...x, d: distanceKm(issueCoords, x.coord) }))
       .sort((a, b) => a.d - b.d)
       .slice(0, limitPerType);
-  }, [mobiles, issueCoords, limitPerType]);
+  }, [mobiles, issueCoords, limitPerType, showNearestMobiles]);
 
   // Các issue “mở”
   const openIssuePoints = useMemo(() => {
@@ -258,13 +259,14 @@ export default function NearbySupportMap({
       .filter((x) => !issueCoords || distanceKm(issueCoords, x.coord) > 0.01);
   }, [issues, issueCoords]);
 
+  // Tập điểm để fit bounds (chỉ gồm layer đang bật)
   const otherPoints: LatLng[] = useMemo(() => {
     return [
-      ...topShops.map((x) => x.coord),
-      ...topMobiles.map((x) => x.coord),
+      ...(showNearestShops ? topShops.map((x) => x.coord) : []),
+      ...(showNearestMobiles ? topMobiles.map((x) => x.coord) : []),
       ...openIssuePoints.map((x) => x.coord),
     ];
-  }, [topShops, topMobiles, openIssuePoints]);
+  }, [showNearestShops, showNearestMobiles, topShops, topMobiles, openIssuePoints]);
 
   if (!issueCoords && openIssuePoints.length === 0) {
     return (
@@ -371,68 +373,68 @@ export default function NearbySupportMap({
             ))}
 
             {/* 🟦 Cửa hàng gần nhất */}
-            {topShops.map(({ p, coord, d }) => (
-              <CircleMarker
-                key={`shop-${p.id}`}
-                center={[coord.lat, coord.lng]}
-                radius={8}
-                pathOptions={{ color: '#2563eb', weight: 2, fillOpacity: 0.5 }}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <div className="font-semibold">{p.shopName || p.name || t('shop_fallback')}</div>
-                    {p.phone && (
-                      <div className="text-xs mt-1">
-                        {t('phone_short')}: <a className="underline" href={`tel:${p.phone}`}>{p.phone}</a>
-                      </div>
-                    )}
-                    {p.location?.address && (
-                      <div className="text-xs mt-1">{p.location.address}</div>
-                    )}
-                    <div className="text-xs mt-1">{t('distance_km', { val: d.toFixed(2) })}</div>
-                    <a
-                      className="text-blue-600 underline text-xs mt-1 inline-block"
-                      href={`https://www.google.com/maps/search/?api=1&query=${coord.lat},${coord.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('open_on_maps')}
-                    </a>
-                  </div>
-                </Popup>
-              </CircleMarker>
-            ))}
+            {showNearestShops &&
+              topShops.map(({ p, coord, d }) => (
+                <CircleMarker
+                  key={`shop-${p.id}`}
+                  center={[coord.lat, coord.lng]}
+                  radius={8}
+                  pathOptions={{ color: '#2563eb', weight: 2, fillOpacity: 0.5 }}
+                >
+                  <Popup>
+                    <div className="text-sm">
+                      <div className="font-semibold">{p.shopName || p.name || t('shop_fallback')}</div>
+                      {p.phone && (
+                        <div className="text-xs mt-1">
+                          {t('phone_short')}: <a className="underline" href={`tel:${p.phone}`}>{p.phone}</a>
+                        </div>
+                      )}
+                      {p.location?.address && <div className="text-xs mt-1">{p.location.address}</div>}
+                      <div className="text-xs mt-1">{t('distance_km', { val: d.toFixed(2) })}</div>
+                      <a
+                        className="text-blue-600 underline text-xs mt-1 inline-block"
+                        href={`https://www.google.com/maps/search/?api=1&query=${coord.lat},${coord.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t('open_on_maps')}
+                      </a>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              ))}
 
             {/* 🟩 KTV lưu động gần nhất */}
-            {topMobiles.map(({ p, coord, d }) => (
-              <CircleMarker
-                key={`mobile-${p.id}`}
-                center={[coord.lat, coord.lng]}
-                radius={8}
-                pathOptions={{ color: '#00d289', weight: 2, fillOpacity: 0.5 }}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <div className="font-semibold">{p.name || t('mobile_fallback')}</div>
-                    {p.phone && (
-                      <div className="text-xs mt-1">
-                        {t('phone_short')}: <a className="underline" href={`tel:${p.phone}`}>{p.phone}</a>
-                      </div>
-                    )}
-                    {p.location?.address && <div className="text-xs mt-1">{p.location.address}</div>}
-                    <div className="text-xs mt-1">{t('distance_km', { val: d.toFixed(2) })}</div>
-                    <a
-                      className="text-blue-600 underline text-xs mt-1 inline-block"
-                      href={`https://www.google.com/maps/search/?api=1&query=${coord.lat},${coord.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('open_on_maps')}
-                    </a>
-                  </div>
-                </Popup>
-              </CircleMarker>
-            ))}
+            {showNearestMobiles &&
+              topMobiles.map(({ p, coord, d }) => (
+                <CircleMarker
+                  key={`mobile-${p.id}`}
+                  center={[coord.lat, coord.lng]}
+                  radius={8}
+                  pathOptions={{ color: '#00d289', weight: 2, fillOpacity: 0.5 }}
+                >
+                  <Popup>
+                    <div className="text-sm">
+                      <div className="font-semibold">{p.name || t('mobile_fallback')}</div>
+                      {p.phone && (
+                        <div className="text-xs mt-1">
+                          {t('phone_short')}: <a className="underline" href={`tel:${p.phone}`}>{p.phone}</a>
+                        </div>
+                      )}
+                      {p.location?.address && <div className="text-xs mt-1">{p.location.address}</div>}
+                      <div className="text-xs mt-1">{t('distance_km', { val: d.toFixed(2) })}</div>
+                      <a
+                        className="text-blue-600 underline text-xs mt-1 inline-block"
+                        href={`https://www.google.com/maps/search/?api=1&query=${coord.lat},${coord.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t('open_on_maps')}
+                      </a>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              ))}
           </MapContainer>
         )}
       </div>
@@ -451,14 +453,18 @@ export default function NearbySupportMap({
           </div>
         ))}
 
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#2563eb' }} />
-          {t('legend.nearest_shop')}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#00d289' }} />
-          {t('legend.nearest_mobile')}
-        </div>
+        {showNearestShops && (
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#2563eb' }} />
+            {t('legend.nearest_shop')}
+          </div>
+        )}
+        {showNearestMobiles && (
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#00d289' }} />
+            {t('legend.nearest_mobile')}
+          </div>
+        )}
       </div>
 
       {/* CSS pulse cho marker sự cố */}

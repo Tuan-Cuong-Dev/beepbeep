@@ -1,3 +1,4 @@
+// Quản lý issues của hệ thống Bíp Bíp — phiên bản Public (publicVehicleIssues)
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -5,12 +6,14 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
+
 import { useUser } from '@/src/context/AuthContext';
 import { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@/src/components/ui/dialog';
+
 import AssignTechnicianForm from '@/src/components/public-vehicle-issues/AssignTechnicianForm';
-import PublicIssuesSummaryCard from '@/src/components/public-vehicle-issues/PublicIssueSummaryCard';
+import VehicleIssuesSummaryCard from '@/src/components/public-vehicle-issues/PublicIssueSummaryCard';
 import PublicIssuesSearchFilter from '@/src/components/public-vehicle-issues/PublicIssueSearchFilter';
 import PublicIssueTable from '@/src/components/public-vehicle-issues/PublicIssueTable';
 import ProposalPopup from '@/src/components/public-vehicle-issues/ProposalPopup';
@@ -18,14 +21,13 @@ import ActualResultPopup from '@/src/components/public-vehicle-issues/ActualResu
 import ViewProposalDialog from '@/src/components/public-vehicle-issues/ViewProposalDialog';
 import ApproveProposalDialog from '@/src/components/public-vehicle-issues/ApproveProposalDialog';
 import NearbySupportMap from '@/src/components/public-vehicle-issues/NearbySupportMap';
+
 import { usePublicIssuesToDispatch } from '@/src/hooks/usePublicIssuesToDispatch';
 import { Timestamp } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
 
 type LatLng = { lat: number; lng: number };
-type Status = 'All' | PublicVehicleIssue['status'];
 
-/** Chuẩn hoá mọi kiểu toạ độ thành {lat,lng} hoặc null */
 function normalizeCoords(coords: any): LatLng | null {
   if (!coords) return null;
   if (typeof coords === 'object' && 'lat' in coords && 'lng' in coords) {
@@ -42,19 +44,23 @@ function normalizeCoords(coords: any): LatLng | null {
   return null;
 }
 
-export default function PublicIssueDispatchPage() {
+export default function PuVehicleIssuesManagementPage() {
   const { t } = useTranslation('common', { keyPrefix: 'public_issue_dispatch_page' });
-  const { role, user } = useUser();
+
+  const { role, user, loading: userLoading } = useUser();
   const normalizedRole = role?.toLowerCase();
+
   const isAdmin = normalizedRole === 'admin';
   const isTechAssistant = normalizedRole === 'technician_assistant';
   const isTechnicianPartner = normalizedRole === 'technician_partner';
 
+  // ai được vào trang
   const canView = isAdmin || isTechAssistant || isTechnicianPartner;
+  // ai được mở form phân công
   const canAssign = isAdmin || isTechAssistant;
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<Status>('All');
+  const [statusFilter, setStatusFilter] = useState<'All' | PublicVehicleIssue['status']>('All');
   const [stationFilter, setStationFilter] = useState('');
 
   const [editingIssue, setEditingIssue] = useState<PublicVehicleIssue | null>(null);
@@ -84,21 +90,23 @@ export default function PublicIssueDispatchPage() {
   };
 
   useEffect(() => {
-    if (!dialog.open) return;
-    const timer = setTimeout(() => setDialog((prev) => ({ ...prev, open: false })), 3000);
-    return () => clearTimeout(timer);
+    if (dialog.open) {
+      const timer = setTimeout(() => setDialog((prev) => ({ ...prev, open: false })), 3000);
+      return () => clearTimeout(timer);
+    }
   }, [dialog.open]);
 
-  // 1) Lọc theo quyền: partner chỉ thấy issue được assign cho họ
+  // ========== Lọc theo quyền trước (partner chỉ thấy issue được assign cho họ) ==========
   const scopedIssues = useMemo(() => {
     if (isTechnicianPartner) {
       const uid = user?.uid;
       return issues.filter((i) => i.assignedTo === uid);
     }
-    return issues; // admin & technician_assistant thấy tất cả
+    // admin & technician_assistant thấy tất cả
+    return issues;
   }, [issues, isTechnicianPartner, user?.uid]);
 
-  // 2) Lọc theo UI (search/status/station)
+  // ===== Lọc theo UI (search/status/station) =====
   const filteredIssues = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
     const matchStr = (s?: string) => (s || '').toLowerCase().includes(q);
@@ -132,7 +140,7 @@ export default function PublicIssueDispatchPage() {
     });
   }, [scopedIssues, searchTerm, statusFilter, stationFilter]);
 
-  // 3) Tính map center (ưu tiên issue đang chỉnh sửa)
+  // ===== Map center (ưu tiên issue đang chỉnh sửa) =====
   const mapIssue = useMemo(() => {
     const eCoord = normalizeCoords(editingIssue?.location?.coordinates as any);
     if (editingIssue && eCoord) return editingIssue;
@@ -143,7 +151,8 @@ export default function PublicIssueDispatchPage() {
     return normalizeCoords((mapIssue?.location as any)?.coordinates);
   }, [mapIssue]);
 
-  if (loading) return <div className="text-center py-10">{t('loading')}</div>;
+  // ===== Loading/Permission =====
+  if (loading || userLoading) return <div className="text-center py-10">{t('loading')}</div>;
   if (!canView) return <div className="text-center py-10 text-red-500">{t('no_permission')}</div>;
 
   // ===== Handlers =====
@@ -231,8 +240,8 @@ export default function PublicIssueDispatchPage() {
           <p className="text-sm text-gray-600">{t('subtitle')}</p>
         </div>
 
-        {/* Summary dùng scopedIssues để khớp quyền */}
-        <PublicIssuesSummaryCard issues={scopedIssues} />
+        {/* Summary: dùng scopedIssues để số liệu khớp quyền */}
+        <VehicleIssuesSummaryCard issues={scopedIssues} />
 
         {/* Filters */}
         <PublicIssuesSearchFilter
@@ -244,24 +253,27 @@ export default function PublicIssueDispatchPage() {
           setStationFilter={setStationFilter}
         />
 
-        {/* Map: dựa trên scopedIssues đã lọc quyền */}
-        {mapCenter && (
-          <NearbySupportMap
-            issueCoords={mapCenter}
-            issues={scopedIssues}
-            limitPerType={5}
-            showNearestShops={isAdmin || isTechAssistant} // chỉ Admin & Assistant thấy Shop
-            showNearestMobiles={true}                      // ai cũng thấy KTV lưu động
-          />
-        )}
+        {/* Map: dựa trên scopedIssues đã lọc */}
+          {mapCenter && (
+            <NearbySupportMap
+              issueCoords={mapCenter}
+              issues={scopedIssues}
+              limitPerType={5}
+              // Admin & Technician Assistant: hiện cả shop + mobile
+              showNearestShops={isAdmin || isTechAssistant}
+              showNearestMobiles={true} // luôn cho hiện mobile
+            />
+          )}
 
-        {/* Bảng issues: đã lọc theo quyền + UI */}
+
+        {/* Bảng issues: hiển thị filteredIssues (đã lọc theo quyền + UI) */}
         <PublicIssueTable
           issues={filteredIssues}
           updateIssue={updateIssue}
           onEdit={(issue) => {
             setEditingIssue(issue);
-            if (canAssign) setShowForm(true); // chỉ admin/assistant mở form phân công
+            // chỉ admin/assistant được mở form phân công
+            if (canAssign) setShowForm(true);
           }}
           setClosingIssue={setClosingIssue}
           setCloseDialogOpen={setCloseDialogOpen}
@@ -269,14 +281,15 @@ export default function PublicIssueDispatchPage() {
           setShowForm={setShowForm}
           normalizedRole={normalizedRole}
           isAdmin={isAdmin}
-          isTechnician={isTechnicianPartner} // partner như technician ở UI
+          // partner được đối xử như technician ở UI hành động
+          isTechnician={isTechnicianPartner}
           setProposingIssue={setProposingIssue}
           setUpdatingActualIssue={setUpdatingActualIssue}
           setViewingProposal={setViewingProposal}
           setApprovingProposal={setApprovingProposal}
         />
 
-        {/* Form phân công: chỉ admin/assistant */}
+        {/* Form phân công: chỉ admin/assistant nhìn thấy */}
         {showForm && editingIssue && canAssign && (
           <div className="bg-white border rounded-xl shadow p-6 space-y-6">
             <h2 className="text-2xl font-bold">{t('assign_title')}</h2>

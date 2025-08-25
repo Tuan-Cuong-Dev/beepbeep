@@ -4,18 +4,18 @@
 'use client';
 
 import { useState } from 'react';
-import { PublicIssue, VehicleIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+import { PublicVehicleIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { Label } from '@/src/components/ui/label';
 
 interface Props {
-  issue: PublicIssue;
-  onSave: (updated: Partial<PublicIssue>) => void;
+  issue: PublicVehicleIssue;
+  onSave: (updated: Partial<PublicVehicleIssue>) => void;
 }
 
-const statusOptions: VehicleIssueStatus[] = [
+const statusOptions: PublicIssueStatus[] = [
   'pending',
   'assigned',
   'proposed',
@@ -27,7 +27,7 @@ const statusOptions: VehicleIssueStatus[] = [
 ];
 
 export default function VehicleIssueUpdateForm({ issue, onSave }: Props) {
-  const [status, setStatus] = useState<VehicleIssueStatus>(issue.status);
+  const [status, setStatus] = useState<PublicIssueStatus>(issue.status);
   const [closeComment, setCloseComment] = useState(issue.closeComment || '');
 
   const handleSave = () => {
@@ -46,7 +46,7 @@ export default function VehicleIssueUpdateForm({ issue, onSave }: Props) {
         <select
           id="status"
           value={status}
-          onChange={(e) => setStatus(e.target.value as VehicleIssueStatus)}
+          onChange={(e) => setStatus(e.target.value as PublicIssueStatus)}
           className="w-full border border-gray-300 rounded px-3 py-2"
         >
           {statusOptions.map((opt) => (

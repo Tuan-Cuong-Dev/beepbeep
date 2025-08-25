@@ -1512,7 +1512,8 @@
   "next": "Sau",
   "suggestions_title": "💬 Gợi ý cho mã lỗi {{code}}",
   "all_brands": "Tất cả hãng",
-  "brand_filter": "Lọc theo hãng"
+  "brand_filter": "Lọc theo hãng",
+  "clear_filters": "Xóa lọc"
 },
 
 "error_code_form": {
@@ -3237,7 +3238,7 @@
 },
 
 "public_issue_dispatch_page": {
-    "title": "🛠️ Điều phối & Quản lý sự cố khách lẻ đã mua bảo hiểm",
+    "title": "🛠️ Điều phối & Quản lý sự cố xe",
     "assign_title": "Giao kỹ thuật viên",
     "cancel": "Hủy",
     "close_dialog": {
@@ -3257,7 +3258,8 @@
       "reject_success": "Đề xuất đã bị từ chối"
     },
     "loading": "⏳ Đang tải...",
-    "no_permission": "🚫 Bạn không có quyền truy cập trang này."
+    "no_permission": "🚫 Bạn không có quyền truy cập trang này.",
+    "subtitle": "Phân công kỹ thuật viên để xử lý sự cố do khách hàng gửi lên."
   },
 
   "public_issues_summary_card": {

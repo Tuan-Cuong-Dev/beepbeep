@@ -1503,7 +1503,8 @@
   "next": "Next",
   "suggestions_title": "💬 Suggestions for {{code}}",
   "all_brands": "All brands",
-  "brand_filter": "Filter by brand"
+  "brand_filter": "Filter by brand",
+  "clear_filters": "Clear Filters"
 },
 
 "error_code_form": {
@@ -3182,7 +3183,8 @@
       "reject_success": "Proposal rejected"
     },
     "loading": "⏳ Loading...",
-    "no_permission": "🚫 You do not have permission to view this page."
+    "no_permission": "🚫 You do not have permission to view this page.",
+    "subtitle": "Assign technicians to handle issues reported by customers."
   },
 
   "public_issues_summary_card": {

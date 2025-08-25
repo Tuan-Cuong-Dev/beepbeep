@@ -3,12 +3,15 @@
 import { Input } from '@/src/components/ui/input';
 import { SimpleSelect } from '@/src/components/ui/select';
 import { useTranslation } from 'react-i18next';
+import { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
+
+type Status = PublicVehicleIssue['status'] | 'All';
 
 interface Props {
   searchTerm: string;
   setSearchTerm: (val: string) => void;
-  statusFilter: string;
-  setStatusFilter: (val: string) => void;
+  statusFilter: Status;
+  setStatusFilter: (val: Status) => void;
   stationFilter: string;
   setStationFilter: (val: string) => void;
 }
@@ -18,7 +21,7 @@ export default function PublicIssuesSearchFilter({
   setSearchTerm,
   statusFilter,
   setStatusFilter,
-  stationFilter,
+  stationFilter,          // (nếu chưa dùng, có thể xoá 2 prop station để gọn)
   setStationFilter,
 }: Props) {
   const { t } = useTranslation('common', { keyPrefix: 'public_issues_search_filter' });
@@ -42,7 +45,9 @@ export default function PublicIssuesSearchFilter({
         </label>
         <SimpleSelect
           value={statusFilter}
-          onChange={setStatusFilter}
+          // SimpleSelect onChange: (value: string) => void
+          // Ta ép về Status để khớp với state ở parent
+          onChange={(v) => setStatusFilter(v as Status)}
           options={[
             { label: t('status.all'), value: 'All' },
             { label: t('status.pending'), value: 'pending' },

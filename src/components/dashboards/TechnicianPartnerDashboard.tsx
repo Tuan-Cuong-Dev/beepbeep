@@ -112,7 +112,7 @@ export default function TechnicianPartnerDashboard() {
         </section>
 
         <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/vehicle-issues" />
+          <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/public-vehicle-issues" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.proposal_history')} href="/vehicle-issues/proposals" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/vehicle-issues/suggest-error" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.error_codes')} href="/vehicle-issues/error-codes" />
