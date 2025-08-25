@@ -3241,23 +3241,6 @@
     "closed": "종료됨"
   },
 
-   "public_issues_search_filter": {
-    "search_label": "검색",
-    "search_placeholder": "🔍 VIN, 차량 번호판, 설명",
-    "status_label": "상태",
-    "status": {
-      "all": "전체",
-      "pending": "대기 중",
-      "assigned": "배정됨",
-      "proposed": "제안됨",
-      "confirmed": "확인됨",
-      "rejected": "거절됨",
-      "in_progress": "진행 중",
-      "resolved": "해결됨",
-      "closed": "종료됨"
-    }
-  },
-
   "public_issue_table": {
     "col_customer": "고객",
     "col_phone": "전화번호",
@@ -3673,7 +3656,89 @@
   "approve": "승인",
   "reject": "반려",
   "cancel": "취소"
+},
+
+"actual_result": {
+  "title": "실제 결과 확인",
+  "solution_label": "실제 해결 방법",
+  "solution_placeholder": "문제를 해결하기 위해 실제로 수행한 작업을 자세히 작성하세요...",
+  "cost_label": "실제 비용 (VND)",
+  "cost_placeholder": "예: 500,000 ₫",
+  "submit": "결과 제출",
+  "cancel": "취소"
+},
+
+"public_issue_proposed_page": {
+  "title": "제안된 문제",
+  "subtitle": "기술자의 제안을 검토하고 승인합니다",
+  "loading": "로딩 중...",
+  "no_permission": "접근 권한이 없습니다",
+  "empty": "데이터가 없습니다",
+  "customer": "고객",
+  "phone": "전화번호",
+  "plate": "번호판",
+  "brand": "브랜드",
+  "model": "모델",
+  "issue_description": "문제 내용",
+  "address": "주소",
+  "assigned_to": "담당자",
+  "proposed_solution": "제안된 해결책",
+  "proposed_cost": "제안 비용",
+  "status": "상태",
+  "reported": "보고일",
+  "updated": "업데이트됨",
+  "actions": "작업",
+  "view": "보기",
+  "review": "검토",
+  "messages": {
+    "approve_success": "승인되었습니다",
+    "approve_failed": "승인 실패",
+    "reject_success": "거절되었습니다",
+    "reject_failed": "거절 실패"
+  }
+},
+
+"public_issue_filters": {
+  "approval_status": {
+    "label": "승인 상태",
+    "all": "전체",
+    "pending": "대기 중",
+    "approved": "승인됨",
+    "rejected": "거절됨"
+  }
+},
+
+ "approval": {
+    "label": "승인 상태",
+    "all": "전체",
+    "pending": "대기",
+    "approved": "승인됨",
+    "rejected": "거절됨"
+  },
+"public_issues_search_filter": {
+  "search_label": "검색",
+  "search_placeholder": "이름, 전화번호, 차량, 주소로 검색...",
+  "status_label": "상태",
+  "status": {
+    "all": "전체",
+    "pending": "대기 중",
+    "assigned": "배정됨",
+    "proposed": "제안됨",
+    "confirmed": "확인됨",
+    "rejected": "거절됨",
+    "in_progress": "처리 중",
+    "resolved": "해결됨",
+    "closed": "종료됨"
+  },
+  "approval": {
+    "label": "승인 상태",
+    "all": "전체",
+    "pending": "대기",
+    "approved": "승인됨",
+    "rejected": "거절됨"
+  }
 }
+
 
 
 

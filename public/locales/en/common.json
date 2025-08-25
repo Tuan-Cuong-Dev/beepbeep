@@ -3204,23 +3204,6 @@
     "closed": "Closed"
   },
 
-  "public_issues_search_filter": {
-    "search_label": "Search",
-    "search_placeholder": "🔍 VIN, Plate, Description",
-    "status_label": "Status",
-    "status": {
-      "all": "All",
-      "pending": "Pending",
-      "assigned": "Assigned",
-      "proposed": "Proposed",
-      "confirmed": "Confirmed",
-      "rejected": "Rejected",
-      "in_progress": "In Progress",
-      "resolved": "Resolved",
-      "closed": "Closed"
-    }
-  },
-
   "public_issue_table": {
     "col_customer": "Customer",
     "col_phone": "Phone",
@@ -3637,7 +3620,83 @@
   "approve": "Approve",
   "reject": "Reject",
   "cancel": "Cancel"
+},
+
+"actual_result": {
+  "title": "Submit Actual Result",
+  "solution_label": "Actual Solution",
+  "solution_placeholder": "Describe in detail what was actually done to fix the issue...",
+  "cost_label": "Actual Cost (VND)",
+  "cost_placeholder": "e.g. 500,000 ₫",
+  "submit": "Submit Result",
+  "cancel": "Cancel"
+},
+
+"public_issue_proposed_page": {
+  "title": "Proposed Issues",
+  "subtitle": "Review and approve technician proposals",
+  "loading": "Loading...",
+  "no_permission": "You do not have permission",
+  "empty": "No records",
+  "customer": "Customer",
+  "phone": "Phone",
+  "plate": "Plate",
+  "brand": "Brand",
+  "model": "Model",
+  "issue_description": "Issue",
+  "address": "Address",
+  "assigned_to": "Assigned To",
+  "proposed_solution": "Proposed Solution",
+  "proposed_cost": "Proposed Cost",
+  "status": "Status",
+  "reported": "Reported",
+  "updated": "Updated",
+  "actions": "Actions",
+  "view": "View",
+  "review": "Review",
+  "messages": {
+    "approve_success": "Approved successfully",
+    "approve_failed": "Approve failed",
+    "reject_success": "Rejected successfully",
+    "reject_failed": "Reject failed"
+  }
+},
+
+"public_issue_filters": {
+    "approval_status": {
+      "label": "Approval Status",
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  
+"public_issues_search_filter": {
+  "search_label": "Search",
+  "search_placeholder": "Search by name, phone, vehicle, address...",
+  "status_label": "Status",
+  "status": {
+    "all": "All",
+    "pending": "Pending",
+    "assigned": "Assigned",
+    "proposed": "Proposed",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "in_progress": "In Progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "approval": {
+    "label": "Approval Status",
+    "all": "All",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
 }
+
+
 
 
 

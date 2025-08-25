@@ -3279,23 +3279,6 @@
     "closed": "Đã đóng"
   },
 
-  "public_issues_search_filter": {
-    "search_label": "Tìm kiếm",
-    "search_placeholder": "🔍 VIN, Biển số, Mô tả",
-    "status_label": "Trạng thái",
-    "status": {
-      "all": "Tất cả",
-      "pending": "Đang chờ",
-      "assigned": "Đã phân công",
-      "proposed": "Đề xuất",
-      "confirmed": "Đã xác nhận",
-      "rejected": "Bị từ chối",
-      "in_progress": "Đang xử lý",
-      "resolved": "Đã xử lý",
-      "closed": "Đã đóng"
-    }
-  },
-
   "public_issue_table": {
     "col_customer": "Khách hàng",
     "col_phone": "Số điện thoại",
@@ -3698,7 +3681,89 @@
     "approve": "Duyệt",
     "reject": "Từ chối",
      "cancel": "Hủy"
+  },
+
+  "actual_result": {
+    "title": "Xác nhận Kết quả Thực tế",
+    "solution_label": "Giải pháp thực tế",
+    "solution_placeholder": "Mô tả chi tiết những gì đã thực hiện để khắc phục sự cố...",
+    "cost_label": "Chi phí thực tế (VND)",
+    "cost_placeholder": "vd: 500.000 ₫",
+    "submit": "Gửi kết quả",
+    "cancel": "Hủy"
+  },
+
+  "public_issue_proposed_page": {
+  "title": "Sự cố đã đề xuất",
+  "subtitle": "Xem và duyệt các đề xuất từ kỹ thuật viên",
+  "loading": "Đang tải...",
+  "no_permission": "Bạn không có quyền truy cập",
+  "empty": "Không có dữ liệu",
+  "customer": "Khách hàng",
+  "phone": "Điện thoại",
+  "plate": "Biển số",
+  "brand": "Hãng xe",
+  "model": "Mẫu xe",
+  "issue_description": "Sự cố",
+  "address": "Địa chỉ",
+  "assigned_to": "Người xử lý",
+  "proposed_solution": "Giải pháp đề xuất",
+  "proposed_cost": "Chi phí đề xuất",
+  "status": "Trạng thái",
+  "reported": "Ngày báo cáo",
+  "updated": "Cập nhật",
+  "actions": "Hành động",
+  "view": "Xem",
+  "review": "Duyệt",
+  "messages": {
+    "approve_success": "Duyệt thành công",
+    "approve_failed": "Duyệt thất bại",
+    "reject_success": "Từ chối thành công",
+    "reject_failed": "Từ chối thất bại"
   }
+},
+
+"public_issue_filters": {
+    "approval_status": {
+      "label": "Trạng thái duyệt",
+      "all": "Tất cả",
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối"
+    }
+  },
+ "approval": {
+    "label": "Trạng thái duyệt",
+    "all": "Tất cả",
+    "pending": "Chờ duyệt",
+    "approved": "Đã duyệt",
+    "rejected": "Từ chối"
+  },
+
+"public_issues_search_filter": {
+  "search_label": "Tìm kiếm",
+  "search_placeholder": "Tìm theo tên, điện thoại, xe, địa chỉ...",
+  "status_label": "Trạng thái",
+  "status": {
+    "all": "Tất cả",
+    "pending": "Chờ xử lý",
+    "assigned": "Đã phân công",
+    "proposed": "Đã đề xuất",
+    "confirmed": "Đã xác nhận",
+    "rejected": "Bị từ chối",
+    "in_progress": "Đang xử lý",
+    "resolved": "Đã xử lý",
+    "closed": "Đã đóng"
+  },
+  "approval": {
+    "label": "Trạng thái duyệt",
+    "all": "Tất cả",
+    "pending": "Chờ duyệt",
+    "approved": "Đã duyệt",
+    "rejected": "Từ chối"
+  }
+}
+
 
 
 

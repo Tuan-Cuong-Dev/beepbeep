@@ -1,6 +1,3 @@
-// 📁 components/report-public-issue/ActualResultPopup.tsx
-// OK rồi
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -14,24 +11,9 @@ import {
 import { Textarea } from '@/src/components/ui/textarea';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
-
-/**
- * Parse chuỗi tiền (ví dụ '1.250.000 ₫') thành số nguyên 1250000
- */
-function parseCurrencyString(value: string): number {
-  if (!value) return 0;
-  const numericString = value.replace(/[^\d]/g, '');
-  const number = parseInt(numericString, 10);
-  return isNaN(number) ? 0 : number;
-}
-
-/**
- * Format số thành chuỗi tiền tệ
- */
-function formatCurrency(value: string): string {
-  const number = parseCurrencyString(value);
-  return number.toLocaleString('vi-VN');
-}
+import { useTranslation } from 'react-i18next';
+import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
+import { formatCurrency } from '@/src/utils/formatCurrency';
 
 interface Props {
   open: boolean;
@@ -40,6 +22,7 @@ interface Props {
 }
 
 export default function ActualResultPopup({ open, onClose, onSubmit }: Props) {
+  const { t } = useTranslation('common');
   const [solution, setSolution] = useState('');
   const [cost, setCost] = useState('');
 
@@ -61,42 +44,52 @@ export default function ActualResultPopup({ open, onClose, onSubmit }: Props) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Submit Actual Result</DialogTitle>
+          <DialogTitle>
+            {t('actual_result.title', { defaultValue: 'Submit Actual Result' })}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">Actual Solution</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              {t('actual_result.solution_label', { defaultValue: 'Actual Solution' })}
+            </label>
             <Textarea
               value={solution}
               onChange={(e) => setSolution(e.target.value)}
-              placeholder="Describe what was actually done to fix the issue..."
+              placeholder={t('actual_result.solution_placeholder', {
+                defaultValue: 'Describe what was actually done to fix the issue...',
+              })}
               rows={4}
             />
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">Actual Cost (VND)</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              {t('actual_result.cost_label', { defaultValue: 'Actual Cost (VND)' })}
+            </label>
             <Input
               type="text"
               inputMode="numeric"
-              value={formatCurrency(cost)}
+              value={cost ? formatCurrency(cost) : ''}
               onChange={(e) => setCost(e.target.value)}
-              placeholder="e.g. 500.000 ₫"
+              placeholder={t('actual_result.cost_placeholder', {
+                defaultValue: 'e.g. 500.000 ₫',
+              })}
             />
           </div>
         </div>
 
         <DialogFooter className="mt-4">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('actual_result.cancel', { defaultValue: 'Cancel' })}
           </Button>
           <Button
             className="bg-[#00d289] text-white hover:bg-[#00b67a]"
             disabled={!solution || !cost}
             onClick={handleSubmit}
           >
-            Submit
+            {t('actual_result.submit', { defaultValue: 'Submit' })}
           </Button>
         </DialogFooter>
       </DialogContent>

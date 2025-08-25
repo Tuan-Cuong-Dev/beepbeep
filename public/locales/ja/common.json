@@ -3227,23 +3227,6 @@
     "closed": "クローズ"
   },
 
-   "public_issues_search_filter": {
-    "search_label": "検索",
-    "search_placeholder": "🔍 VIN、ナンバー、説明",
-    "status_label": "ステータス",
-    "status": {
-      "all": "すべて",
-      "pending": "保留中",
-      "assigned": "割り当て済み",
-      "proposed": "提案済み",
-      "confirmed": "確認済み",
-      "rejected": "却下",
-      "in_progress": "進行中",
-      "resolved": "解決済み",
-      "closed": "クローズ"
-    }
-  },
-
    "public_issue_table": {
     "col_customer": "顧客",
     "col_phone": "電話番号",
@@ -3659,7 +3642,91 @@
   "approve": "承認",
   "reject": "却下",
   "cancel": "キャンセル"
+},
+"actual_result": {
+  "title": "実際の結果を確認",
+  "solution_label": "実際の解決方法",
+  "solution_placeholder": "問題を解決するために実際に行った内容を詳しく記入してください...",
+  "cost_label": "実際の費用 (VND)",
+  "cost_placeholder": "例: 500,000 ₫",
+  "submit": "結果を送信",
+  "cancel": "キャンセル"
+},
+
+"public_issue_proposed_page": {
+  "title": "提案された問題",
+  "subtitle": "技術者からの提案を確認して承認します",
+  "loading": "読み込み中...",
+  "no_permission": "アクセス権がありません",
+  "empty": "データがありません",
+  "customer": "顧客",
+  "phone": "電話番号",
+  "plate": "ナンバープレート",
+  "brand": "メーカー",
+  "model": "モデル",
+  "issue_description": "問題内容",
+  "address": "住所",
+  "assigned_to": "担当者",
+  "proposed_solution": "提案された解決策",
+  "proposed_cost": "提案された費用",
+  "status": "ステータス",
+  "reported": "報告日",
+  "updated": "更新日",
+  "actions": "操作",
+  "view": "表示",
+  "review": "審査",
+  "messages": {
+    "approve_success": "承認しました",
+    "approve_failed": "承認に失敗しました",
+    "reject_success": "却下しました",
+    "reject_failed": "却下に失敗しました"
+  }
+},
+
+"public_issue_filters": {
+  "approval_status": {
+    "label": "承認ステータス",
+    "all": "すべて",
+    "pending": "保留中",
+    "approved": "承認済み",
+    "rejected": "却下"
+  }
+},
+
+ "approval": {
+    "label": "承認ステータス",
+    "all": "すべて",
+    "pending": "保留中",
+    "approved": "承認済み",
+    "rejected": "却下"
+  },
+
+"public_issues_search_filter": {
+  "search_label": "検索",
+  "search_placeholder": "名前、電話番号、車両、住所で検索...",
+  "status_label": "ステータス",
+  "status": {
+    "all": "すべて",
+    "pending": "保留",
+    "assigned": "割り当て済み",
+    "proposed": "提案済み",
+    "confirmed": "確認済み",
+    "rejected": "却下",
+    "in_progress": "進行中",
+    "resolved": "解決済み",
+    "closed": "クローズ"
+  },
+  "approval": {
+    "label": "承認ステータス",
+    "all": "すべて",
+    "pending": "保留中",
+    "approved": "承認済み",
+    "rejected": "却下"
+  }
 }
+
+
+
 
 
 

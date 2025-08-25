@@ -55,7 +55,7 @@ function PublicIssueTableBase({
 
   // + NEW: helper định dạng tiền
   const fmtMoney = (v?: number | string | null) =>
-  v === null || v === undefined || v === '' ? '-' : formatCurrency(v);
+    v === null || v === undefined || v === '' ? '-' : formatCurrency(v);
 
   const safe = (v?: string | number | null) => (v !== null && v !== undefined && v !== '' ? v : '-');
   const fmt = (d?: any) => (d?.toDate ? format(d.toDate(), 'Pp') : '-');
@@ -97,34 +97,45 @@ function PublicIssueTableBase({
     </div>
   );
 
+  // + NEW: class chung cho khu action để wrap đẹp
+  const wrapClass = 'flex flex-wrap items-start gap-x-2 gap-y-2';
+  const btnTextClass = 'whitespace-normal'; // cho phép label dài xuống dòng
+
   const renderActions = (issue: PublicVehicleIssue) => {
     if (isTechnician) {
+      // CHANGED: thêm wrapClass + btnTextClass (giữ nguyên logic)
       return (
-        <div className="flex gap-2">
+        <div className={wrapClass}>
           {issue.status === 'assigned' && (
-            <Button size="sm" onClick={() => setProposingIssue?.(issue)}>
+            <Button size="sm" className={`${btnTextClass} whitespace-nowrap`} onClick={() => setProposingIssue?.(issue)}>
               {t('btn_submit_proposal')}
             </Button>
           )}
           {issue.status === 'confirmed' && (
-            <Button size="sm" onClick={() => updateIssue(issue.id!, { status: 'in_progress' })}>
+            <Button
+              size="sm"
+              className={`${btnTextClass} whitespace-nowrap`}
+              onClick={() => updateIssue(issue.id!, { status: 'in_progress' })}
+            >
               {t('btn_mark_in_progress')}
             </Button>
           )}
           {issue.status === 'in_progress' && (
-            <Button size="sm" onClick={() => setUpdatingActualIssue?.(issue)}>
+            <Button size="sm" className={`${btnTextClass} whitespace-nowrap`} onClick={() => setUpdatingActualIssue?.(issue)}>
               {t('btn_submit_actual')}
             </Button>
           )}
         </div>
       );
     }
+    // CHANGED: thêm wrapClass + btnTextClass (giữ nguyên logic)
     return (
-      <div className="flex flex-wrap gap-2">
+      <div className={wrapClass}>
         {(issue.status === 'pending' || issue.status === 'assigned') && (
           <Button
             size="sm"
             variant="outline"
+            className={`${btnTextClass} whitespace-nowrap`}
             onClick={() => {
               setEditingIssue(issue);
               setShowForm(true);
@@ -135,10 +146,10 @@ function PublicIssueTableBase({
         )}
         {issue.status === 'proposed' && (
           <>
-            <Button size="sm" variant="outline" onClick={() => setViewingProposal(issue)}>
+            <Button size="sm" variant="outline" className={`${btnTextClass} whitespace-nowrap`} onClick={() => setViewingProposal(issue)}>
               {t('btn_view_proposal')}
             </Button>
-            <Button size="sm" variant="success" onClick={() => setApprovingProposal(issue)}>
+            <Button size="sm" variant="success" className={`${btnTextClass} whitespace-nowrap`} onClick={() => setApprovingProposal(issue)}>
               {t('btn_approve_reject')}
             </Button>
           </>
@@ -147,6 +158,7 @@ function PublicIssueTableBase({
           <Button
             size="sm"
             variant="outline"
+            className={`${btnTextClass} whitespace-nowrap`}
             onClick={() => {
               setClosingIssue(issue);
               setCloseDialogOpen(true);
@@ -183,7 +195,6 @@ function PublicIssueTableBase({
                 <th className="w-[180px]">{t('col_assigned')}</th>
                 <th className="w-[220px]">{t('col_proposal')}</th>
                 <th className="w-[120px]">{t('col_proposed_cost')}</th>
-                <th className="w-[140px]">{t('col_approve_status')}</th>
                 <th className="w-[220px]">{t('col_actual')}</th>
                 <th className="w-[120px]">{t('col_actual_cost')}</th>
                 <th>{t('col_reported')}</th>
@@ -191,7 +202,8 @@ function PublicIssueTableBase({
                 <th>{t('col_closed_by')}</th>
                 <th>{t('col_closed_at')}</th>
                 <th className="w-[220px]">{t('col_close_comment')}</th>
-                <th className="sticky right-0 bg-gray-50 z-10 rounded-tr-2xl">{t('col_actions')}</th>
+                {/* CHANGED: thêm width để đủ chỗ cho nút, vẫn sticky */}
+                <th className="sticky right-2 bg-gray-50 z-10 rounded-tr-2xl w-[260px]">{t('col_actions')}</th>
               </tr>
             </thead>
 
@@ -203,10 +215,7 @@ function PublicIssueTableBase({
               )}
 
               {issues.map((issue, idx) => (
-                <tr
-                  key={issue.id}
-                  className={`hover:bg-gray-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
-                >
+                <tr key={issue.id} className={`hover:bg-gray-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
                   {/* Fixed first cell for easy reading while scrolling */}
                   <td className="px-3 py-3 sticky left-0 bg-inherit z-10 font-medium text-gray-800">
                     <CellText>{safe(issue.customerName)}</CellText>
@@ -242,13 +251,15 @@ function PublicIssueTableBase({
                     <CellText className="max-w-[220px]">{safe(issue.proposedSolution)}</CellText>
                   </td>
 
-                  <td className="px-3 py-3 whitespace-nowrap">{fmtMoney(issue.proposedCost ?? '-')}</td>
+                  {/* CHANGED: dùng fmtMoney trực tiếp */}
+                  <td className="px-3 py-3 whitespace-nowrap">{fmtMoney(issue.proposedCost)}</td>
 
                   <td className="px-3 py-3">
                     <CellText className="max-w-[220px]">{safe(issue.actualSolution)}</CellText>
                   </td>
 
-                  <td className="px-3 py-3 whitespace-nowrap">{fmtMoney(issue.actualCost ?? '-')}</td>
+                  {/* CHANGED: dùng fmtMoney trực tiếp */}
+                  <td className="px-3 py-3 whitespace-nowrap">{fmtMoney(issue.actualCost)}</td>
                   <td className="px-3 py-3 whitespace-nowrap">{fmt(issue.createdAt)}</td>
                   <td className="px-3 py-3 whitespace-nowrap">{fmt(issue.updatedAt)}</td>
                   <td className="px-3 py-3 whitespace-nowrap">{safe(issue.closedByName)}</td>
@@ -259,7 +270,8 @@ function PublicIssueTableBase({
                   </td>
 
                   {/* Fixed action column on the right */}
-                  <td className="px-3 py-3 sticky right-0 bg-inherit z-10">
+                  {/* CHANGED: căn trên + rộng cố định + wrap đẹp */}
+                  <td className="mt-3 flex flex-wrap gap-x-2 gap-y-2">
                     {renderActions(issue)}
                   </td>
                 </tr>
@@ -282,18 +294,18 @@ function PublicIssueTableBase({
                 <div>
                   <div className="font-semibold text-gray-900">{safe(issue.customerName)}</div>
                   {/* Phone nổi bật hơn */}
-                    <div className="mt-1">
-                      {issue.phone ? (
-                        <a
-                          href={`tel:${issue.phone}`}
-                          className="text-base font-semibold text-blue-600 underline decoration-dotted underline-offset-2"
-                        >
-                          {safe(issue.phone)}
-                        </a>
-                      ) : (
-                        <span className="text-sm text-gray-400">-</span>
-                      )}
-                    </div>
+                  <div className="mt-1">
+                    {issue.phone ? (
+                      <a
+                        href={`tel:${issue.phone}`}
+                        className="text-base font-semibold text-blue-600 underline decoration-dotted underline-offset-2"
+                      >
+                        {safe(issue.phone)}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-gray-400">-</span>
+                    )}
+                  </div>
                 </div>
                 <StatusChip status={issue.status} />
               </div>
@@ -354,7 +366,8 @@ function PublicIssueTableBase({
                 </div>
               </dl>
 
-              <div className="mt-3 flex flex-wrap gap-2">{renderActions(issue)}</div>
+              {/* CHANGED: đảm bảo flex + wrap + khoảng cách dọc */}
+              <div className="mt-3 flex flex-wrap gap-x-2 gap-y-2">{renderActions(issue)}</div>
             </div>
           );
         })}

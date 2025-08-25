@@ -44,7 +44,7 @@ function normalizeCoords(coords: any): LatLng | null {
   return null;
 }
 
-export default function PuVehicleIssuesManagementPage() {
+export default function PublicVehicleIssuesManagementPage() {
   const { t } = useTranslation('common', { keyPrefix: 'public_issue_dispatch_page' });
 
   const { role, user, loading: userLoading } = useUser();
