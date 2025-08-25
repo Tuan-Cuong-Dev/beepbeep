@@ -3635,7 +3635,32 @@
   "call_now": "今すぐ電話",
   "get_directions": "道順",
   "socials": "ソーシャルメディア"
+},
+
+"view_proposal": {
+  "title": "Proposal Details",
+  "proposed_by": "Proposed by:",
+  "unknown": "Unknown",
+  "proposal": "Proposal:",
+  "no_proposal": "No proposal",
+  "estimated_cost": "Estimated Cost:",
+  "estimated_note": "The cost is only an estimate and will be confirmed after on-site inspection.",
+  "na": "N/A",
+  "close": "Close"
+},
+
+"approve_proposal": {
+  "title": "提案の承認または却下",
+  "proposal": "提案内容:",
+  "estimated_cost": "見積もり費用:",
+  "estimated_note": "費用はあくまで概算であり、現地確認後に確定されます。",
+  "reject_reason_label": "却下理由（任意）",
+  "reject_reason_placeholder": "提案を却下する場合は理由を入力してください",
+  "approve": "承認",
+  "reject": "却下",
+  "cancel": "キャンセル"
 }
+
 
 
 

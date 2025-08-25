@@ -3674,8 +3674,31 @@
     "loading": "Đang tải...",
     "empty_state": "Không có kỹ thuật viên lưu động phù hợp với bộ lọc hiện tại.",
     "unnamed_technician": "(Chưa đặt tên)"
-  }
+  },
 
+ "view_proposal": {
+    "title": "Chi tiết đề xuất",
+    "proposed_by": "Người đề xuất:",
+    "unknown": "Không xác định",
+    "proposal": "Đề xuất:",
+    "no_proposal": "Chưa có đề xuất",
+    "estimated_cost": "Chi phí ước tính:",
+    "estimated_note": "Chi phí chỉ là ước tính, sẽ xác nhận lại sau khi đến kiểm tra.",
+    "na": "Không có",
+    "close": "Đóng"
+  },
+
+  "approve_proposal": {
+    "title": "Duyệt hoặc Từ chối Đề xuất",
+    "proposal": "Đề xuất:",
+    "estimated_cost": "Chi phí ước tính:",
+    "estimated_note": "Chi phí chỉ là ước tính, sẽ xác nhận lại sau khi đến kiểm tra.",
+    "reject_reason_label": "Lý do từ chối (không bắt buộc)",
+    "reject_reason_placeholder": "Nhập lý do nếu bạn muốn từ chối đề xuất",
+    "approve": "Duyệt",
+    "reject": "Từ chối",
+     "cancel": "Hủy"
+  }
 
 
 

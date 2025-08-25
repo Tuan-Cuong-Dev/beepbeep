@@ -3614,6 +3614,29 @@
   "call_now": "Call Now",
   "get_directions": "Get Directions",
   "socials": "Social Media"
+},
+
+"view_proposal": {
+  "title": "Proposal Details",
+  "proposed_by": "Proposed by:",
+  "unknown": "Unknown",
+  "proposal": "Proposal:",
+  "no_proposal": "No proposal",
+  "estimated_cost": "Estimated Cost:",
+  "estimated_note": "The cost is only an estimate and will be confirmed after on-site inspection.",
+  "na": "N/A",
+  "close": "Close"
+},
+"approve_proposal": {
+  "title": "Approve or Reject Proposal",
+  "proposal": "Proposal:",
+  "estimated_cost": "Estimated Cost:",
+  "estimated_note": "The cost is only an estimate and will be confirmed after on-site inspection.",
+  "reject_reason_label": "Reason for Rejection (optional)",
+  "reject_reason_placeholder": "Enter a reason if you want to reject the proposal",
+  "approve": "Approve",
+  "reject": "Reject",
+  "cancel": "Cancel"
 }
 
 
