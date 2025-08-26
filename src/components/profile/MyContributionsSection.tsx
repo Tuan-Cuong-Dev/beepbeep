@@ -68,10 +68,17 @@ export default function MyContributionsSection() {
 
       await fetchData('technicianPartners', 'repair_shop', (d) => ({
         name: d.shopName || d.name,
-        address: d.shopAddress,
+        // Ưu tiên schema mới, fallback legacy/khác
+        address:
+          d?.location?.address ||
+          d?.location?.mapAddress ||
+          d?.location?.location || // "lat,lng" nếu chưa có address text
+          d?.shopAddress ||        // legacy field
+          '',
         createdAt: d.createdAt,
         status: d.isActive ? 'approved' : 'pending',
       }));
+
 
       await fetchData('rentalStations', 'rental_shop', (d) => ({
         name: d.name,

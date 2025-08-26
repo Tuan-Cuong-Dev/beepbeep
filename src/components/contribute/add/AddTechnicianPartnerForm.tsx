@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   addDoc,
   collection,
@@ -8,6 +8,7 @@ import {
   GeoPoint,
   updateDoc,
 } from 'firebase/firestore';
+import dynamic from 'next/dynamic';
 import { useUser } from '@/src/context/AuthContext';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import { db } from '@/src/firebaseConfig';
@@ -18,6 +19,8 @@ import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useTranslation } from 'react-i18next';
 import { useContributions } from '@/src/hooks/useContributions';
+
+const MapPreview = dynamic(() => import('@/src/components/map/MapPreview'), { ssr: false });
 
 type LatLng = { lat: number; lng: number };
 
@@ -30,6 +33,31 @@ function parseLatLngString(s?: string): LatLng | null {
   const lng = parseFloat(m[3]);
   if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
   return { lat, lng };
+}
+
+/** Parse Google Maps URL để lấy lat,lng (dạng @lat,lng hoặc ?q=lat,lng|query|ll) */
+function extractLatLngFromGMapUrl(url?: string): LatLng | null {
+  if (!url) return null;
+  try {
+    const at = url.match(/@(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)/);
+    if (at) {
+      const lat = parseFloat(at[1]);
+      const lng = parseFloat(at[3]);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+    }
+    const u = new URL(url);
+    const qs = u.searchParams;
+    for (const k of ['q', 'query', 'll']) {
+      const v = qs.get(k);
+      const m = v?.match?.(/(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)/);
+      if (m) {
+        const lat = parseFloat(m[1]);
+        const lng = parseFloat(m[3]);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+      }
+    }
+  } catch { /* ignore */ }
+  return null;
 }
 
 /** Loại bỏ toàn bộ undefined (deep). Giữ nguyên null và '' */
@@ -61,9 +89,11 @@ export default function AddTechnicianPartnerForm() {
   const { t } = useTranslation('common');
   const { user } = useUser();
   const { coords, geocode } = useGeocodeAddress();
+  const geocodeRef = useRef(geocode);
+  geocodeRef.current = geocode;
   const { submitContribution } = useContributions();
 
-  // ⛳️ Form theo schema mới: address nằm trong location
+  // ⛳️ Form theo schema mới: address & mapAddress nằm trong location
   const [form, setForm] = useState<
     Partial<TechnicianPartner> & { _lat?: string; _lng?: string }
   >({
@@ -71,7 +101,7 @@ export default function AddTechnicianPartnerForm() {
     name: '',
     phone: '',
     shopName: '',
-    location: { address: '', location: '' } as any,
+    location: { address: '', location: '', mapAddress: '' } as any,
     assignedRegions: [],
     vehicleType: 'motorbike',
     isActive: false,
@@ -83,14 +113,40 @@ export default function AddTechnicianPartnerForm() {
   const [showDialog, setShowDialog] = useState(false);
   const [workingTimeError, setWorkingTimeError] = useState('');
 
-  // 🔎 Geocode khi nhập địa chỉ (debounce) — từ location.address
+  // 🔎 Ưu tiên parse mapAddress (URL/lat,lng), fallback geocode address (debounce)
   useEffect(() => {
-    const addr = (form.location as any)?.address;
-    const trimmed = typeof addr === 'string' ? addr.trim() : '';
-    if (!trimmed) return;
-    const id = setTimeout(() => geocode(trimmed), 300);
+    const raw =
+      (form.location as any)?.mapAddress?.trim() ||
+      (form.location as any)?.address?.trim();
+    if (!raw) return;
+
+    const trySet = (lat: number, lng: number) => {
+      const latStr = String(lat);
+      const lngStr = String(lng);
+      const locStr = `${lat},${lng}`;
+      setForm(prev => {
+        const curLat = prev._lat ?? '';
+        const curLng = prev._lng ?? '';
+        const curLoc = (prev.location as any)?.location ?? '';
+        if (curLat === latStr && curLng === lngStr && curLoc === locStr) return prev;
+        return {
+          ...prev,
+          _lat: latStr,
+          _lng: lngStr,
+          location: { ...(prev.location as any), location: locStr } as any,
+        };
+      });
+    };
+
+    const byPair = parseLatLngString(raw);
+    if (byPair) { trySet(byPair.lat, byPair.lng); return; }
+
+    const byUrl = extractLatLngFromGMapUrl(raw);
+    if (byUrl) { trySet(byUrl.lat, byUrl.lng); return; }
+
+    const id = setTimeout(() => geocodeRef.current(raw), 300);
     return () => clearTimeout(id);
-  }, [(form.location as any)?.address, geocode]);
+  }, [(form.location as any)?.mapAddress, (form.location as any)?.address]);
 
   // 📍 Khi có coords từ geocode → cập nhật preview lat/lng & location.location
   useEffect(() => {
@@ -99,12 +155,8 @@ export default function AddTechnicianPartnerForm() {
       const newLatStr = String(coords.lat ?? '');
       const newLngStr = String(coords.lng ?? '');
       const newLocStr = `${coords.lat},${coords.lng}`;
-      const curLocStr = (prev.location as any)?.location;
-      if (
-        curLocStr === newLocStr &&
-        prev._lat === newLatStr &&
-        prev._lng === newLngStr
-      ) {
+      const curLocStr = (prev.location as any)?.location ?? '';
+      if (curLocStr === newLocStr && prev._lat === newLatStr && prev._lng === newLngStr) {
         return prev;
       }
       return {
@@ -190,15 +242,12 @@ export default function AddTechnicianPartnerForm() {
             geo: new GeoPoint(lat, lng),
             location: `${lat},${lng}`,
             address: (form.location as any)?.address || '',
-            // có thể thêm mapAddress nếu bạn cho phép nhập
             mapAddress: (form.location as any)?.mapAddress || undefined,
             updatedAt: serverTimestamp(),
           }
         : {
-            // Nếu chưa có toạ độ, vẫn lưu address để về sau bổ sung geo
             address: (form.location as any)?.address || '',
             mapAddress: (form.location as any)?.mapAddress || undefined,
-            // updatedAt để server set
             updatedAt: serverTimestamp(),
           } as any;
 
@@ -209,7 +258,6 @@ export default function AddTechnicianPartnerForm() {
       phone: (form.phone || '').trim(),
       type: 'shop',
       shopName: form.shopName ?? '',
-      // ❌ KHÔNG còn shopAddress ở root — đã gộp vào location.address
       location: locationCore,
       assignedRegions: form.assignedRegions ?? [],
       serviceCategories: form.serviceCategories ?? [],
@@ -239,7 +287,7 @@ export default function AddTechnicianPartnerForm() {
         name: '',
         phone: '',
         shopName: '',
-        location: { address: '', location: '' } as any,
+        location: { address: '', location: '', mapAddress: '' } as any,
         assignedRegions: [],
         vehicleType: 'motorbike',
         isActive: false,
@@ -255,6 +303,15 @@ export default function AddTechnicianPartnerForm() {
       setSubmitting(false);
     }
   };
+
+  // Tính coords để preview map
+  const previewLatLng: LatLng | null = (() => {
+    if (form._lat && form._lng && Number.isFinite(parseFloat(form._lat)) && Number.isFinite(parseFloat(form._lng))) {
+      return { lat: parseFloat(form._lat), lng: parseFloat(form._lng) };
+    }
+    const parsed = parseLatLngString((form.location as any)?.location);
+    return parsed ?? null;
+  })();
 
   return (
     <div className="space-y-4">
@@ -281,12 +338,12 @@ export default function AddTechnicianPartnerForm() {
         onChange={(e) => setLocationField('address', e.target.value)}
       />
 
-      {/* (Optional) Link Google Maps → location.mapAddress */}
-      {/* <Input
+      {/* ✅ Google Maps URL → location.mapAddress (tự rút lat,lng) */}
+      <Input
         placeholder={t('repair_shop_form.map_address')}
         value={(form.location as any)?.mapAddress || ''}
         onChange={(e) => setLocationField('mapAddress', e.target.value)}
-      /> */}
+      />
 
       {/* Lat/Lng hỗ trợ nhập tay (gộp một input) */}
       <Input
@@ -294,7 +351,6 @@ export default function AddTechnicianPartnerForm() {
         value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : ''}
         onChange={(e) => {
           const value = e.target.value;
-          // Hỗ trợ cả định dạng "16.07,108.22" hoặc "16.07° N, 108.22° E"
           const regex = /(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/;
           const match = value.match(regex);
 
@@ -305,12 +361,20 @@ export default function AddTechnicianPartnerForm() {
               ...prev,
               _lat: latStr,
               _lng: lngStr,
+              location: { ...(prev.location as any), location: `${latStr},${lngStr}` } as any,
             }));
           } else {
             setForm((prev) => ({ ...prev, _lat: '', _lng: '' }));
           }
         }}
       />
+
+      {/* Map preview */}
+      {previewLatLng && (
+        <div className="h-48 rounded overflow-hidden border">
+          <MapPreview coords={previewLatLng} />
+        </div>
+      )}
 
       {/* Vehicle type */}
       <select

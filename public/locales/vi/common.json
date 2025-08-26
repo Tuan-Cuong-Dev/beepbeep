@@ -575,17 +575,33 @@
   "write_review": "Viết đánh giá"
 },
 
-"my_issues_section": {
-  "title": "Sự cố bạn đã báo cáo",
-  "no_issues": "Bạn chưa báo cáo sự cố nào về phương tiện.",
-  "table": {
-    "title": "Tiêu đề",
-    "status": "Trạng thái",
-    "location": "Vị trí",
-    "reported_at": "Thời gian báo cáo"
+
+  "my_issues_section": {
+    "title": "Sự cố bạn đã báo cáo",
+    "no_issues": "Bạn chưa báo cáo sự cố nào về phương tiện.",
+    "stats": {
+      "total": "Tổng"
+    },
+    "table": {
+      "title": "Tiêu đề",
+      "status": "Trạng thái",
+      "location": "Vị trí",
+      "reported_at": "Thời gian báo cáo",
+      "updated_at": "Cập nhật",
+      "customer": "Khách hàng",
+      "vehicle": "Phương tiện",
+      "assigned_to": "Người được giao",
+      "proposed_cost": "Chi phí đề xuất",
+      "actual_cost": "Chi phí thực tế",
+      "approve_status": "Trạng thái duyệt"
+    },
+    "na": "Không có"
   },
-  "na": "Không có"
-},
+  "approve_status": {
+    "pending": "Chờ duyệt",
+    "approved": "Đã duyệt",
+    "rejected": "Từ chối"
+  },
 
 "about_page": {
   "title": "Về chúng tôi",
@@ -772,7 +788,9 @@
   "vehicle_bike": "Xe đạp",
   "vehicle_motorbike": "Xe máy",
   "vehicle_car": "Ô tô",
-  "update_error": "Cập nhật thông tin tiệm sửa xe thất bại."
+  "update_error": "Cập nhật thông tin tiệm sửa xe thất bại.",
+  "working_start_time":"Giờ bắt đầu",
+  "working_end_time":"Giờ kết thúc"
 },
 
 "common": {
@@ -3797,6 +3815,16 @@
 
 "notification" :{
   "success":"Thành công"
+},
+
+"view_proposal_dialog": {
+  "title": "Chi tiết đề xuất",
+  "proposed_by": "Người đề xuất",
+  "proposal": "Đề xuất",
+  "no_proposal": "Chưa có đề xuất",
+  "estimated_cost": "Chi phí ước tính",
+  "close": "Đóng",
+  "unknown": "Không rõ"
 }
 
 

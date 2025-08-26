@@ -33,7 +33,7 @@ export default function PendingContributionsTable() {
         <TabsPrimitive.Content value="batteryStations">
           <PendingBatteryStations />
         </TabsPrimitive.Content>
-        <TabsPrimitive.Content value="batteryChargingStations"> {/* 👈 Thêm nội dung */}
+        <TabsPrimitive.Content value="batteryChargingStations"> 
           <PendingBatteryChargingStations />
         </TabsPrimitive.Content>
       </Tabs>

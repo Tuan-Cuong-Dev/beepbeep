@@ -548,16 +548,32 @@
   "write_review": "レビューを書く"
 },
 "my_issues_section": {
-  "title": "報告した不具合",
-  "no_issues": "まだ車両の不具合を報告していません。",
-  "table": {
-    "title": "タイトル",
-    "status": "ステータス",
-    "location": "場所",
-    "reported_at": "報告日時"
+    "title": "あなたが報告した不具合",
+    "no_issues": "まだ車両の不具合を報告していません。",
+    "stats": {
+      "total": "合計"
+    },
+    "table": {
+      "title": "タイトル",
+      "status": "ステータス",
+      "location": "場所",
+      "reported_at": "報告日時",
+      "updated_at": "更新日時",
+      "customer": "顧客",
+      "vehicle": "車両",
+      "assigned_to": "担当者",
+      "proposed_cost": "見積費用",
+      "actual_cost": "実費",
+      "approve_status": "承認状況"
+    },
+    "na": "なし"
   },
-  "na": "該当なし"
-},
+  "approve_status": {
+    "pending": "審査待ち",
+    "approved": "承認済み",
+    "rejected": "却下"
+  },
+  
 "about_page": {
   "title": "私たちについて",
   "p1": "Bíp Bíp は、電動車両のレンタル管理と拡張のあり方を変える先進的なプラットフォームを構築しています。当社のシステムは、顧客、スタッフ、投資家、技術者、事業者など、さまざまな関係者が透明で効率的なレンタルエコシステムに参加できるようにします。",
@@ -741,7 +757,9 @@
   "vehicle_bike": "自転車",
   "vehicle_motorbike": "バイク",
   "vehicle_car": "自動車",
-  "update_error": "修理店の更新に失敗しました。"
+  "update_error": "修理店の更新に失敗しました。",
+  "working_start_time":"開始時間",
+  "working_end_time":"終了時間"
 },
 
 "common": {
@@ -3750,7 +3768,18 @@
 
 "notification": {
   "success": "成功"
+},
+
+"view_proposal_dialog": {
+  "title": "提案の詳細",
+  "proposed_by": "提案者",
+  "proposal": "提案内容",
+  "no_proposal": "提案なし",
+  "estimated_cost": "見積もり費用",
+  "close": "閉じる",
+  "unknown": "不明"
 }
+
 
 
 

@@ -13,7 +13,7 @@ import ProfileSidebar from '@/src/components/profile/ProfileSidebar';
 import ProfileMainContent from '@/src/components/profile/ProfileMainContent';
 import MyVehiclesSection from '@/src/components/personalVehicles/MyVehiclesSection';
 import MyInsuranceSection from '@/src/components/profile/MyInsuranceSection';
-import MyIssuesSection from '@/src/components/profile/MyIssuesSection';
+import MyIssuesSectionContainer from '@/src/components/profile/MyIssuesSectionContainer';
 import MyContributionsSection from '@/src/components/profile/MyContributionsSection';
 import MyBusinessSection from '@/src/components/profile/MyBusinessSection';
 import type { BusinessType } from '@/src/lib/my-business/businessTypes';
@@ -117,7 +117,7 @@ export default function ProfilesPageContent() {
           {activeTab === 'activityFeed' && <ProfileMainContent activeTab="activityFeed" />}
           {activeTab === 'vehicles' && <MyVehiclesSection />}
           {activeTab === 'insurance' && <MyInsuranceSection />}
-          {activeTab === 'issues' && <MyIssuesSection issues={[]} />}
+          {activeTab === 'issues' && <MyIssuesSectionContainer />} 
           {activeTab === 'contributions' && <MyContributionsSection />}
           {activeTab === 'business' && <MyBusinessSection />}
         </section>

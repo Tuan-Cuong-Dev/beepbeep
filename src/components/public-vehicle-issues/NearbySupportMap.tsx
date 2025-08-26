@@ -24,6 +24,13 @@ const useMap = () => {
 
 type LatLng = { lat: number; lng: number };
 
+// 1) Thêm helper ở gần đầu file:
+function getEffectiveStatus(i: PublicVehicleIssue): PublicIssueStatus {
+  // Nếu đang ở bước đề xuất nhưng bị từ chối bởi technician_assistant → coi như 'rejected'
+  if (i.status === 'proposed' && i.approveStatus === 'rejected') return 'rejected';
+  return i.status;
+}
+
 interface NearbySupportMapProps {
   issueCoords?: LatLng | null;
   issues?: PublicVehicleIssue[];
@@ -248,9 +255,10 @@ export default function NearbySupportMap({
   }, [mobiles, issueCoords, limitPerType, showNearestMobiles]);
 
   // Các issue “mở”
+  // 2) Sửa openIssuePoints: dùng getEffectiveStatus để lọc
   const openIssuePoints = useMemo(() => {
     return (issues || [])
-      .filter((i) => OPEN_STATUSES.includes(i.status))
+      .filter((i) => OPEN_STATUSES.includes(getEffectiveStatus(i)))  // ⬅️ dùng hiệu lực
       .map((i) => {
         const coord = extractLatLngFromIssueLocation(i);
         return coord ? { issue: i, coord } : null;
@@ -258,6 +266,7 @@ export default function NearbySupportMap({
       .filter((x): x is { issue: PublicVehicleIssue; coord: LatLng } => !!x)
       .filter((x) => !issueCoords || distanceKm(issueCoords, x.coord) > 0.01);
   }, [issues, issueCoords]);
+
 
   // Tập điểm để fit bounds (chỉ gồm layer đang bật)
   const otherPoints: LatLng[] = useMemo(() => {
@@ -337,40 +346,45 @@ export default function NearbySupportMap({
             )}
 
             {/* 🔔 Các sự cố mở (cũng pulse) */}
-            {openIssuePoints.map(({ issue, coord }) => (
-              <Marker
-                key={`open-${issue.id}-${coord.lat}-${coord.lng}`}
-                position={[coord.lat, coord.lng]}
-                icon={pulseIcon}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <div className="font-semibold">
-                      {issue.customerName} — <span className="capitalize">{t(`status.${issue.status}`)}</span>
-                    </div>
-                    {issue.phone && (
-                      <div className="text-xs text-gray-600">
-                        {t('phone_short')}: {issue.phone}
+            // 3) Trong Popup của marker “các sự cố mở”, hiển thị theo status hiệu lực
+            {openIssuePoints.map(({ issue, coord }) => {
+              const eff = getEffectiveStatus(issue);
+              return (
+                <Marker
+                  key={`open-${issue.id}-${coord.lat}-${coord.lng}`}
+                  position={[coord.lat, coord.lng]}
+                  icon={pulseIcon}
+                >
+                  <Popup>
+                    <div className="text-sm">
+                      <div className="font-semibold">
+                        {issue.customerName} — <span className="capitalize">{t(`status.${eff}`)}</span>
                       </div>
-                    )}
-                    {issue.location?.issueAddress && (
-                      <div className="text-xs mt-1">{issue.location.issueAddress}</div>
-                    )}
-                    <div className="mt-1 font-mono text-[11px]">
-                      {coord.lat.toFixed(6)}, {coord.lng.toFixed(6)}
+                      {issue.phone && (
+                                  <div className="text-xs text-gray-600">
+                                    {t('phone_short')}: {issue.phone}
+                                  </div>
+                                )}
+                                {issue.location?.issueAddress && (
+                                  <div className="text-xs mt-1">{issue.location.issueAddress}</div>
+                                )}
+                                <div className="mt-1 font-mono text-[11px]">
+                                  {coord.lat.toFixed(6)}, {coord.lng.toFixed(6)}
+                                </div>
+                                <a
+                                  className="text-blue-600 underline text-xs"
+                                  href={`https://www.google.com/maps/search/?api=1&query=${coord.lat},${coord.lng}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {t('open_on_maps')}
+                                </a>
                     </div>
-                    <a
-                      className="text-blue-600 underline text-xs"
-                      href={`https://www.google.com/maps/search/?api=1&query=${coord.lat},${coord.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('open_on_maps')}
-                    </a>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+                  </Popup>
+                </Marker>
+              );
+            })}
+
 
             {/* 🟦 Cửa hàng gần nhất */}
             {showNearestShops &&

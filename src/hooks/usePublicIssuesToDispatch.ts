@@ -1,12 +1,13 @@
 // 📁 hooks/usePublicIssuesToDispatch.ts
-// Đang dùng chung thay cho cả : usePublicVehicleIssues.ts (Chưa tạo ? cần thì tạo sau 25/08)
 import { useEffect, useState } from 'react';
 import { db } from '@/src/firebaseConfig';
 import {
   collection,
   getDocs,
   doc,
+  getDoc,
   updateDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 
@@ -15,22 +16,18 @@ export function usePublicIssuesToDispatch() {
   const [loading, setLoading] = useState(true);
   const [technicianMap, setTechnicianMap] = useState<Record<string, string>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
-  const [partnerMap, setPartnerMap] = useState<Record<string, string>>({}); // ⬅️ NEW
+  const [partnerMap, setPartnerMap] = useState<Record<string, string>>({}); // keep
 
-  // staffs: map userId -> name (trường hợp bạn còn dùng staffs ở nơi khác)
   const loadTechnicianMap = async () => {
     const snapshot = await getDocs(collection(db, 'staffs'));
     const map: Record<string, string> = {};
     snapshot.docs.forEach((d) => {
       const data = d.data() as any;
-      if (data.userId) {
-        map[data.userId] = data.name || 'Unnamed';
-      }
+      if (data.userId) map[data.userId] = data.name || 'Unnamed';
     });
     return map;
   };
 
-  // users: map doc.id -> name/email
   const loadUserMap = async () => {
     const snapshot = await getDocs(collection(db, 'users'));
     const map: Record<string, string> = {};
@@ -41,7 +38,6 @@ export function usePublicIssuesToDispatch() {
     return map;
   };
 
-  // technicianPartners: map doc.id -> name  ⬅️ NEW (khớp với assignedTo bạn đang lưu)
   const loadTechnicianPartnerMap = async () => {
     const snapshot = await getDocs(collection(db, 'technicianPartners'));
     const map: Record<string, string> = {};
@@ -52,14 +48,13 @@ export function usePublicIssuesToDispatch() {
     return map;
   };
 
-  // Load và enrich
   const fetchVehicleIssues = async () => {
     setLoading(true);
     try {
       const [techMap, usrMap, partnerNameMap] = await Promise.all([
         loadTechnicianMap(),
         loadUserMap(),
-        loadTechnicianPartnerMap(), // ⬅️ NEW
+        loadTechnicianPartnerMap(),
       ]);
 
       const snap = await getDocs(collection(db, 'publicVehicleIssues'));
@@ -69,7 +64,6 @@ export function usePublicIssuesToDispatch() {
 
       const enriched = rawIssues.map((issue) => ({
         ...issue,
-        // ⬇️ ƯU TIÊN GIỮ field đã lưu trong Firestore
         assignedToName:
           issue.assignedToName ??
           (issue.assignedTo ? partnerNameMap[issue.assignedTo] : undefined) ??
@@ -94,8 +88,31 @@ export function usePublicIssuesToDispatch() {
     fetchVehicleIssues();
   }, []);
 
+  /**
+   * Bảo đảm: updatedAt luôn sau createdAt (thời gian báo cáo).
+   * - Check nhanh phía client: Date.now() > createdAt
+   * - Gửi updatedAt = serverTimestamp() để Rules kiểm soát
+   */
   const updateIssue = async (id: string, data: Partial<PublicVehicleIssue>) => {
-    await updateDoc(doc(db, 'publicVehicleIssues', id), data);
+    const ref = doc(db, 'publicVehicleIssues', id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) throw new Error('Issue not found');
+
+    const current = snap.data() as PublicVehicleIssue;
+    if (!current.createdAt) {
+      throw new Error('Issue has no createdAt to compare against');
+    }
+
+    const now = Date.now();
+    const createdMs = current.createdAt.toMillis();
+    if (now <= createdMs) {
+      throw new Error('Cập nhật không hợp lệ: updatedAt phải sau thời gian báo cáo (createdAt).');
+    }
+
+    await updateDoc(ref, {
+      ...data,
+      updatedAt: serverTimestamp(), // luôn ghi đè
+    });
   };
 
   return {
@@ -104,6 +121,7 @@ export function usePublicIssuesToDispatch() {
     updateIssue,
     technicianMap,
     userMap,
+    partnerMap,     // ⬅️ expose luôn cho tiện
     fetchVehicleIssues,
   };
 }

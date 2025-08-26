@@ -566,16 +566,31 @@
     "write_review": "Write review"
   },
 
-  "my_issues_section": {
-    "title": "My Reported Issues",
+"my_issues_section": {
+    "title": "Issues you reported",
     "no_issues": "You haven't reported any vehicle issues yet.",
+    "stats": {
+      "total": "Total"
+    },
     "table": {
       "title": "Title",
       "status": "Status",
       "location": "Location",
-      "reported_at": "Reported At"
+      "reported_at": "Reported at",
+      "updated_at": "Updated",
+      "customer": "Customer",
+      "vehicle": "Vehicle",
+      "assigned_to": "Assignee",
+      "proposed_cost": "Proposed cost",
+      "actual_cost": "Actual cost",
+      "approve_status": "Approval status"
     },
     "na": "N/A"
+  },
+  "approve_status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
   },
 
   "about_page": {
@@ -764,7 +779,9 @@
   "vehicle_bike": "Bicycle",
   "vehicle_motorbike": "Motorbike",
   "vehicle_car": "Car",
-  "update_error": "Failed to update repair shop."
+  "update_error": "Failed to update repair shop.",
+  "working_start_time":"Start Time",
+  "working_end_time":"End Time"
 },
 
 "common": {
@@ -3729,6 +3746,16 @@
 
 "notification": {
   "success": "Success"
+},
+
+"view_proposal_dialog": {
+  "title": "Proposal Details",
+  "proposed_by": "Proposed by",
+  "proposal": "Proposal",
+  "no_proposal": "No proposal",
+  "estimated_cost": "Estimated Cost",
+  "close": "Close",
+  "unknown": "Unknown"
 }
 
 
