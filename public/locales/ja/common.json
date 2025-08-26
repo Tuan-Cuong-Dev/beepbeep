@@ -2768,7 +2768,11 @@
   "pending_contributions": {
     "title": "대기 중인 기여",
     "description": "사용자 제출 데이터 검토 및 승인"
-  }
+  },
+  "live_map": {
+      "title": "ライブマップ監視",
+      "description": "ユーザーの位置、技術パートナー、発生中の問題をリアルタイムで監視します。"
+    }
 },
 
 "vehicle_model_management_page": {

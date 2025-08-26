@@ -2821,7 +2821,37 @@
   "pending_contributions": {
     "title": "Dữ liệu chờ duyệt",
     "description": "Xét duyệt dữ liệu do người dùng đóng góp"
-  }
+  },
+   "live_map": {
+      "toggles":{
+        "users": "Người dùng",
+        "tech_shops": "Cửa hàng kỹ thuật",
+        "tech_mobiles": "Kỹ thuật viên di động",
+        "open_issues": "Sự cố đang mở"
+      },
+      "stats": {
+        "users_with_location": "Người dùng có vị trí",
+        "tech_shops": "Cửa hàng kỹ thuật",
+        "tech_mobiles": "Kỹ thuật viên di động",
+        "open_issues": "Sự cố mở"
+      },
+      "map": {
+        "title": "Bản đồ trực tiếp",
+        "hint_click": "Nhấn vào các điểm để xem chi tiết"
+      },
+      "legend": {
+        "tech_shop": "Cửa hàng kỹ thuật",
+        "tech_mobile": "Kỹ thuật viên di động",
+        "user": "Người dùng"
+      },
+      "hints": {
+        "realtime": "Dữ liệu được cập nhật theo thời gian thực từ Firestore.",
+        "optimize": "Chỉ bật lớp dữ liệu cần thiết để tối ưu hiệu suất.",
+        "colors": "Màu sắc biểu thị vai trò và trạng thái sự cố."
+      },
+      "title": "Bản đồ giám sát",
+      "description": "Giám sát thời gian thực vị trí người dùng, đối tác kỹ thuật và các sự cố đang mở."
+    }
 },
 
 "vehicle_model_management_page": {

@@ -2794,6 +2794,10 @@
     "pending_contributions": {
       "title": "Pending Contributions",
       "description": "Review user-submitted data before approval"
+    },
+    "live_map": {
+      "title": "Live Map Monitor",
+      "description": "Real-time monitoring of user locations, technician partners, and open issues."
     }
   },
 

@@ -2790,7 +2790,11 @@
   "pending_contributions": {
     "title": "대기 중인 기여",
     "description": "사용자 제출 데이터 검토 및 승인"
-  }
+  },
+   "live_map": {
+      "title": "실시간 지도 모니터링",
+      "description": "사용자 위치, 기술 파트너, 진행 중인 문제를 실시간으로 모니터링합니다."
+    }
 },
 
 "vehicle_model_management_page": {
