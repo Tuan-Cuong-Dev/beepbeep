@@ -1,37 +1,45 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
-export type VehicleIssueStatus = 
-  | 'pending'          // Chưa xử lý
-  | 'assigned'         // Đã được giao
-  | 'proposed'         // Gửi đề xuất phương án xử lý
-  | 'confirmed'        // Đã duyệt → OK, bắt đầu xử lý
-  | 'rejected'         // Đã từ chối → Không được thực hiện
-  | 'in_progress'      // Đang xử lý
-  | 'resolved'         // Đã xử lý xong
-  | 'closed';          // Đã đóng (kết thúc)
+/** Trạng thái xử lý sự cố */
+export type VehicleIssueStatus =
+  | 'pending'       // Chưa xử lý
+  | 'assigned'      // Đã giao technician
+  | 'proposed'      // Technician gửi đề xuất
+  | 'confirmed'     // Quản lý duyệt đề xuất
+  | 'rejected'      // Quản lý từ chối đề xuất
+  | 'in_progress'   // Đang xử lý
+  | 'resolved'      // Đã xử lý xong
+  | 'closed';       // Đã đóng
 
 export type VehicleIssueID = string;
 
+/** Trường bắt buộc/chuẩn dùng chung */
 export interface VehicleIssueCore {
   id: VehicleIssueID;
+
+  // Liên kết hệ thống
   companyId: string;
   stationId: string;
   ebikeId: string;
+
+  // Nội dung sự cố
   issueType: string;
   description: string;
   photos: string[];
   status: VehicleIssueStatus;
-  reportedBy: string;
-  assignedTo?: string;
-  assignedAt?: Timestamp;
+
+  // Báo cáo & phân công
+  reportedBy: string;         // uid người báo cáo
   reportedAt: Timestamp;
   updatedAt: Timestamp;
+  assignedTo?: string;        // uid technician được giao
+  assignedAt?: Timestamp;
 
-  // ✅ Thông tin khi đóng sự cố
+  // Đóng sự cố
   closedAt?: Timestamp;
-  closedBy?: string;
+  closedBy?: string;          // uid người đóng
 
-  // ✅ Mở rộng cho khách hàng lẻ
+  // Khách hàng lẻ (ngoài hệ thống)
   customerName?: string;
   customerPhone?: string;
   vehicleBrand?: string;
@@ -40,30 +48,37 @@ export interface VehicleIssueCore {
   customerLocation?: string;
 }
 
+/** Alias đơn giản nếu cần dùng */
 export type VehicleIssue = VehicleIssueCore;
 
+/** Mở rộng cho hiển thị & quy trình duyệt/ghi chú */
 export interface ExtendedVehicleIssue extends VehicleIssueCore {
+  // Tên hiển thị
   companyName?: string;
   stationName?: string;
   vin?: string;
   plateNumber?: string;
   assignedToName?: string;
-  assignedTechnicianId?: string;
+  assignedTechnicianId?: string; // nếu bạn cần id khác với uid
 
-  // ✅ Đề xuất xử lý bởi Technician
+  // Đề xuất của technician
   proposedSolution?: string;
   proposedCost?: number;
 
-  // ✅ Duyệt hoặc từ chối bởi Admin/Company Owner
-  approveStatus?: 'pending' | 'approved' | 'rejected';
+  // Duyệt/từ chối (audit)
+  approvedAt?: Timestamp;
+  approvedBy?: string;     // uid người duyệt
+  rejectedAt?: Timestamp;
+  rejectedBy?: string;     // uid người từ chối
 
-  // ✅ Kết quả xử lý thực tế
+  // Lý do/ghi chú trạng thái (dùng khi reject, hoặc các ghi chú khác)
+  statusComment?: string;
+
+  // Kết quả thực tế
   actualSolution?: string;
   actualCost?: number;
 
-  // ✅ Hiển thị tên người đóng sự cố
+  // Hiển thị khi đóng sự cố
   closedByName?: string;
-
-  // ✅ Thêm trường ghi chú khi đóng sự cố
   closeComment?: string;
 }

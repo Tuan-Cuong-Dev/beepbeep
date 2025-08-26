@@ -1,10 +1,10 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
+import type { ExtendedVehicleIssue, VehicleIssueStatus } from '@/src/lib/vehicle-issues/vehicleIssueTypes';
 import { Button } from '@/src/components/ui/button';
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
-import { JSX } from 'react';
+import type { JSX } from 'react';
 import { CheckCircle2, XCircle, UserPlus, FileText, Send } from 'lucide-react';
 
 interface Props {
@@ -38,11 +38,15 @@ interface Props {
 
 export default function VehicleIssueTable({
   issues,
+  technicianMap: _technicianMap,
+  onEdit: _onEdit,
   updateIssue,
   setClosingIssue,
   setCloseDialogOpen,
   setEditingIssue,
   setShowForm,
+  normalizedRole: _normalizedRole,
+  isAdmin: _isAdmin,
   isTechnician,
   isTechnicianPartner,
   setProposingIssue,
@@ -54,7 +58,7 @@ export default function VehicleIssueTable({
   const isTechOrPartner = !!isTechnician || !!isTechnicianPartner;
 
   // ======= UI helpers =======
-  const renderStatusBadge = (status: VehicleIssueStatus) => {
+  const StatusBadge = ({ status }: { status: VehicleIssueStatus }) => {
     const colorMap: Record<VehicleIssueStatus, string> = {
       pending: 'bg-gray-500',
       assigned: 'bg-blue-600',
@@ -74,75 +78,54 @@ export default function VehicleIssueTable({
   };
 
   const getTranslatedIssueType = (rawType: string) => {
-    const normalized = rawType.toLowerCase().replace(/\s+/g, '_');
+    const normalized = rawType?.toLowerCase().replace(/\s+/g, '_');
     return t(`vehicle_issue_type.${normalized}`, { defaultValue: rawType });
   };
 
-  // A tiny button system for consistent colors/icons
-  type ActionVariant =
-    | 'assign'
-    | 'approve'
-    | 'close'
-    | 'submitProposal'
-    | 'submitActual'
-    | 'view';
+  // ---------- Mini button system ----------
+  type ActionVariant = 'assign' | 'approve' | 'close' | 'submitProposal' | 'submitActual' | 'view';
 
   const variantStyles: Record<ActionVariant, { className: string; icon?: JSX.Element }> = {
     assign: {
-      className:
-        'border-[#00d289] text-[#00d289] hover:bg-[#00d289]/10',
+      className: 'border-[#00d289] text-[#00d289] hover:bg-[#00d289]/10',
       icon: <UserPlus className="size-4" />,
     },
     approve: {
-      className:
-        'border-blue-500 text-blue-600 hover:bg-blue-50',
+      className: 'border-blue-500 text-blue-600 hover:bg-blue-50',
       icon: <CheckCircle2 className="size-4" />,
     },
     close: {
-      className:
-        'bg-rose-600 text-white hover:bg-rose-700',
+      className: 'bg-rose-600 text-white hover:bg-rose-700',
       icon: <XCircle className="size-4" />,
     },
     submitProposal: {
-      className:
-        'bg-amber-500 text-white hover:bg-amber-600',
+      className: 'bg-amber-500 text-white hover:bg-amber-600',
       icon: <Send className="size-4" />,
     },
     submitActual: {
-      className:
-        'bg-violet-600 text-white hover:bg-violet-700',
+      className: 'bg-violet-600 text-white hover:bg-violet-700',
       icon: <Send className="size-4" />,
     },
     view: {
-      className:
-        'text-[#00d289] hover:text-[#00b574] hover:underline',
+      className: 'text-[#00d289] hover:text-[#00b574] hover:underline',
       icon: <FileText className="size-4" />,
     },
   };
 
-  const ActionButton = ({
+  function ActionButton({
     variant,
     children,
     onClick,
-    outline,
   }: {
     variant: ActionVariant;
     children: React.ReactNode;
     onClick: () => void;
-    outline?: boolean;
-  }) => {
+  }) {
     const v = variantStyles[variant];
-    const base =
-      'h-8 px-2.5 sm:px-3 text-xs sm:text-sm rounded-md whitespace-nowrap inline-flex items-center gap-1.5';
-    // use `variant="outline"` from shadcn for border-only cases if needed
+    const base = 'h-8 px-2.5 sm:px-3 text-xs sm:text-sm rounded-md whitespace-nowrap inline-flex items-center gap-1.5';
     if (variant === 'approve' || variant === 'assign') {
       return (
-        <Button
-          size="sm"
-          variant="outline"
-          className={`${base} ${v.className}`}
-          onClick={onClick}
-        >
+        <Button size="sm" variant="outline" className={`${base} ${v.className}`} onClick={onClick}>
           {v.icon}
           {children}
         </Button>
@@ -150,12 +133,7 @@ export default function VehicleIssueTable({
     }
     if (variant === 'view') {
       return (
-        <Button
-          size="sm"
-          variant="ghost"
-          className={`${base} ${v.className}`}
-          onClick={onClick}
-        >
+        <Button size="sm" variant="ghost" className={`${base} ${v.className}`} onClick={onClick}>
           {v.icon}
           {children}
         </Button>
@@ -167,46 +145,35 @@ export default function VehicleIssueTable({
         {children}
       </Button>
     );
-  };
+  }
 
+  // ---------- Actions by role/status ----------
   const renderActions = (issue: ExtendedVehicleIssue) => {
     const buttons: JSX.Element[] = [];
 
     if (isTechOrPartner) {
-      // 👨‍🔧 Tech / Partner: chỉ submit theo trạng thái
+      // 👨‍🔧 Role: Technician / Technician Partner
       if (issue.status === 'assigned') {
         buttons.push(
-          <ActionButton
-            key="submitProposal"
-            variant="submitProposal"
-            onClick={() => setProposingIssue?.(issue)}
-          >
+          <ActionButton key="submitProposal" variant="submitProposal" onClick={() => setProposingIssue?.(issue)}>
             {t('vehicle_issue_table.submit_proposal')}
-          </ActionButton>
+          </ActionButton>,
         );
       }
       if (issue.status === 'confirmed') {
         buttons.push(
-          <ActionButton
-            key="submitActual"
-            variant="submitActual"
-            onClick={() => setUpdatingActualIssue?.(issue)}
-          >
+          <ActionButton key="submitActual" variant="submitActual" onClick={() => setUpdatingActualIssue?.(issue)}>
             {t('vehicle_issue_table.submit_actual')}
-          </ActionButton>
+          </ActionButton>,
         );
       }
     } else {
-      // 👩‍💼 Managerial roles
+      // 👩‍💼 Managerial roles (admin/company/station)
       if (issue.status === 'proposed') {
         buttons.push(
-          <ActionButton
-            key="approve"
-            variant="approve"
-            onClick={() => setApprovingProposal(issue)}
-          >
+          <ActionButton key="approve" variant="approve" onClick={() => setApprovingProposal(issue)}>
             {t('vehicle_issue_table.approve_proposal')}
-          </ActionButton>
+          </ActionButton>,
         );
       }
       if (issue.status === 'resolved') {
@@ -220,10 +187,10 @@ export default function VehicleIssueTable({
             }}
           >
             {t('vehicle_issue_table.close')}
-          </ActionButton>
+          </ActionButton>,
         );
       }
-      // 🧑‍💼 Assign technician (thay cho Edit)
+      // Assign technician (thay cho Edit)
       buttons.push(
         <ActionButton
           key="assign"
@@ -234,37 +201,29 @@ export default function VehicleIssueTable({
           }}
         >
           {t('vehicle_issue_table.assign')}
-        </ActionButton>
+        </ActionButton>,
       );
     }
 
-    // 👀 View proposal: ai cũng xem được
+    // 👀 View proposal: mọi vai trò đều xem được nếu có đề xuất
     if (issue.proposedSolution) {
       buttons.push(
-        <ActionButton
-          key="viewProposal"
-          variant="view"
-          onClick={() => setViewingProposal(issue)}
-        >
+        <ActionButton key="viewProposal" variant="view" onClick={() => setViewingProposal(issue)}>
           {t('vehicle_issue_table.view_proposal')}
-        </ActionButton>
+        </ActionButton>,
       );
     }
 
     return buttons.length > 0 ? (
-      <div
-        className="flex flex-row flex-wrap gap-2 max-w-full items-center"
-        style={{ rowGap: '0.5rem' }}
-      >
+      <div className="flex flex-row flex-wrap items-center gap-2 max-w-full" style={{ rowGap: '0.5rem' }}>
         {buttons}
       </div>
     ) : (
-      <span className="text-gray-400 italic">
-        {t('vehicle_issue_table.no_actions')}
-      </span>
+      <span className="text-gray-400 italic">{t('vehicle_issue_table.no_actions')}</span>
     );
   };
 
+  // ---------- Render ----------
   return (
     <>
       {/* ✅ Mobile Card View */}
@@ -272,15 +231,35 @@ export default function VehicleIssueTable({
         {issues.map((issue) => (
           <div key={issue.id} className="border rounded-lg p-4 bg-white shadow space-y-2">
             <div className="font-semibold text-base text-blue-600">{issue.vin}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.plate')}: {issue.plateNumber}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.station')}: {issue.stationName}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.type')}: {getTranslatedIssueType(issue.issueType)}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.description')}: {issue.description || '-'}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.status')}: {renderStatusBadge(issue.status)}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.assigned_to')}: {issue.assignedToName || '-'}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.proposal')}: {issue.proposedSolution || '-'}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.actual')}: {issue.actualSolution || '-'}</div>
-            <div className="text-sm text-gray-600">{t('vehicle_issue_table.reported')}: {safeFormatDate(issue.reportedAt)}</div>
+
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.plate')}: {issue.plateNumber}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.station')}: {issue.stationName}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.type')}: {getTranslatedIssueType(issue.issueType)}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.description')}: {issue.description || '-'}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.status')}: <StatusBadge status={issue.status} />
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.assigned_to')}: {issue.assignedToName || '-'}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.proposal')}: {issue.proposedSolution || '-'}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.actual')}: {issue.actualSolution || '-'}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('vehicle_issue_table.reported')}: {safeFormatDate(issue.reportedAt)}
+            </div>
+
             <div className="pt-2">{renderActions(issue)}</div>
           </div>
         ))}
@@ -310,7 +289,9 @@ export default function VehicleIssueTable({
                 <td className="p-2">{issue.plateNumber}</td>
                 <td className="p-2">{getTranslatedIssueType(issue.issueType)}</td>
                 <td className="p-2">{issue.description || '-'}</td>
-                <td className="p-2">{renderStatusBadge(issue.status)}</td>
+                <td className="p-2">
+                  <StatusBadge status={issue.status} />
+                </td>
                 <td className="p-2">{issue.assignedToName || '-'}</td>
                 <td className="p-2">{issue.proposedSolution || '-'}</td>
                 <td className="p-2">{issue.actualSolution || '-'}</td>
