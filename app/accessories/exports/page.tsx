@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getAccessoryExports } from '@/src/lib/accessories/accessoryExportService';
 import { AccessoryExport } from '@/src/lib/accessories/accessoryExportTypes';
 import AccessoryExportTable from '@/src/components/accessories/AccessoryExportTable';
@@ -16,8 +16,15 @@ const ITEMS_PER_PAGE = 10;
 export default function AccessoryExportPage() {
   const { companyId, role } = useUser();
   const { t } = useTranslation('common');
-  const [exports, setExports] = useState<AccessoryExport[]>([]);
+
+  const [allExports, setAllExports] = useState<AccessoryExport[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // 🔎 state tìm kiếm đặt ở parent
+  const [searchName, setSearchName] = useState('');
+  const [searchTarget, setSearchTarget] = useState('');
+
+  // 📄 phân trang
   const [currentPage, setCurrentPage] = useState(1);
 
   const fetchData = async () => {
@@ -28,8 +35,7 @@ export default function AccessoryExportPage() {
           : companyId
           ? await getAccessoryExports(companyId)
           : [];
-
-      setExports(data);
+      setAllExports(data);
     } catch (error) {
       console.error('Failed to fetch exports:', error);
     } finally {
@@ -39,16 +45,36 @@ export default function AccessoryExportPage() {
 
   useEffect(() => {
     fetchData();
+    // reset trang khi đổi nguồn dữ liệu
+    setCurrentPage(1);
   }, [companyId, role]);
 
-  const totalPages = Math.ceil(exports.length / ITEMS_PER_PAGE);
-  const paginatedExports = exports.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  // ✅ LỌC & SẮP XẾP ở parent
+  const filtered = useMemo(() => {
+    const s1 = searchName.toLowerCase();
+    const s2 = searchTarget.toLowerCase();
+    return [...allExports]
+      .filter(
+        (e) =>
+          (e.accessoryName || '').toLowerCase().includes(s1) &&
+          (e.target || '').toLowerCase().includes(s2)
+      )
+      .sort((a, b) => b.exportedAt.toDate().getTime() - a.exportedAt.toDate().getTime());
+  }, [allExports, searchName, searchTarget]);
 
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(1, prev - 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+  // khi đổi filter -> về trang 1
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchName, searchTarget]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const paginatedExports = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filtered.slice(start, start + ITEMS_PER_PAGE);
+  }, [filtered, currentPage]);
+
+  const handlePrevPage = () => setCurrentPage((p) => Math.max(1, p - 1));
+  const handleNextPage = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -62,7 +88,14 @@ export default function AccessoryExportPage() {
 
         {!loading && (
           <>
-            <AccessoryExportTable exports={paginatedExports} />
+            <AccessoryExportTable
+              exports={paginatedExports}
+              // ⤵️ controlled search props
+              searchName={searchName}
+              setSearchName={setSearchName}
+              searchTarget={searchTarget}
+              setSearchTarget={setSearchTarget}
+            />
 
             {/* Pagination */}
             <div className="flex justify-center items-center gap-4 mt-4">
@@ -90,7 +123,6 @@ export default function AccessoryExportPage() {
             </div>
           </>
         )}
-
       </main>
 
       <Footer />

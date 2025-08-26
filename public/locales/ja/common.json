@@ -1306,7 +1306,7 @@
   "title": "技術パートナーダッシュボード",
   "checking_permission": "🔎 権限を確認中...",
   "not_partner": "🚫 技術パートナー専用です。",
-  "loading_issues": "⏳ 問題を読み込み中...",
+  "loading_issues": "問題を読み込み中...",
   "status_updated": "ステータスが「{{status}}」に更新されました。",
   "proposal_submitted": "提案が承認のために送信されました。",
   "actual_result_submitted": "実際の結果が送信され、問題が解決済みにマークされました。",
@@ -2680,99 +2680,130 @@
 },
 
 "admin_dashboard": {
-  "title": "관리자 대시보드",
+    "labels": {
+    "role": "役割",
+    "phone": "電話番号"
+  },
+  "open_in_google_maps": "Googleマップで開く",
+  "title": "管理者ダッシュボード",
   "groups": {
-    "business": "비즈니스 유형 및 사용자",
-    "vehicles": "차량 및 배터리",
-    "services": "서비스 및 액세서리",
-    "bookings": "예약 및 프로그램",
-    "insurance": "보험 관리",
-    "tools": "도구 및 기여"
+    "business": "事業形態とユーザー",
+    "vehicles": "車両とバッテリー",
+    "services": "サービスとアクセサリー",
+    "bookings": "予約とパッケージ",
+    "insurance": "保険管理",
+    "tools": "ツールと投稿"
   },
   "rental_companies": {
-    "title": "렌탈 회사",
-    "description": "모든 렌탈 비즈니스를 관리"
+    "title": "レンタル会社",
+    "description": "すべてのレンタル事業を管理"
   },
   "technician_partners": {
-    "title": "기술 파트너",
-    "description": "외부 수리 파트너를 관리"
+    "title": "技術パートナー",
+    "description": "外部修理パートナーを管理"
   },
   "users": {
-    "title": "사용자 관리",
-    "description": "사용자 계정 및 접근 제어"
+    "title": "ユーザー管理",
+    "description": "アカウントとアクセス権を管理"
   },
   "staff": {
-    "title": "직원 관리",
-    "description": "시스템 내 모든 직원을 관리"
+    "title": "スタッフ管理",
+    "description": "システム内の全スタッフを管理"
   },
   "customers": {
-    "title": "고객 관리",
-    "description": "고객 데이터를 조회 및 관리"
+    "title": "顧客管理",
+    "description": "顧客データを表示・管理"
   },
   "vehicle_models": {
-    "title": "차량 모델 관리",
-    "description": "모든 차량 모델을 관리"
+    "title": "車両モデル管理",
+    "description": "すべての車両モデルを管理"
   },
   "vehicles": {
-    "title": "차량 관리",
-    "description": "모든 차량을 관리"
+    "title": "車両管理",
+    "description": "すべての車両を管理"
   },
   "vehicle_issues": {
-    "title": "차량 문제 관리",
-    "description": "차량 문제를 모니터링 및 관리"
+    "title": "車両不具合管理",
+    "description": "不具合を追跡・処理"
   },
   "batteries": {
-    "title": "배터리 관리",
-    "description": "배터리 재고 및 상태를 추적"
+    "title": "バッテリー管理",
+    "description": "在庫と稼働状況を追跡"
   },
   "battery_stations": {
-    "title": "배터리 교환소",
-    "description": "배터리 교환소 위치를 관리"
+    "title": "バッテリー交換ステーション",
+    "description": "交換ステーションの場所を管理"
   },
   "battery_charging_stations": {
-    "title": "배터리 충전소",
-    "description": "배터리 충전소 위치를 관리"
+    "title": "充電ステーション",
+    "description": "充電ステーションの場所を管理"
   },
   "accessories": {
-    "title": "액세서리 관리",
-    "description": "액세서리 및 부품을 관리"
+    "title": "アクセサリー管理",
+    "description": "アクセサリー・部品を管理"
   },
   "accessory_export": {
     "title": "アクセサリー出庫",
-    "description": "アクセサリーの出庫を管理する"
+    "description": "アクセサリー在庫の出庫を管理"
   },
   "bookings": {
-    "title": "예약 관리",
-    "description": "모든 예약을 조회 및 관리"
+    "title": "予約管理",
+    "description": "すべてのレンタル予約を表示・管理"
   },
   "packages": {
-    "title": "구독 패키지",
-    "description": "요금 및 렌탈 패키지 설정"
+    "title": "レンタルパッケージ",
+    "description": "料金とパッケージを設定"
   },
   "programs": {
-    "title": "프로그램",
-    "description": "특별 프로그램 및 프로모션 관리"
+    "title": "プログラム",
+    "description": "プログラムとプロモーションを管理"
   },
   "form_builder": {
-    "title": "폼 빌더",
-    "description": "프로바이더용 렌탈 폼을 사용자 정의"
+    "title": "フォームビルダー",
+    "description": "パートナー向けレンタルフォームをカスタマイズ"
   },
   "insurance_products": {
-    "title": "보험 상품",
-    "description": "사용자 보험 상품 생성 및 관리"
+    "title": "保険商品",
+    "description": "ユーザー向け保険パッケージを作成・管理"
   },
   "insurance_approvals": {
-    "title": "보험 승인",
-    "description": "고객 보험 신청 검토 및 승인"
+    "title": "保険承認",
+    "description": "顧客の保険申請を審査"
   },
   "pending_contributions": {
-    "title": "대기 중인 기여",
-    "description": "사용자 제출 데이터 검토 및 승인"
+    "title": "承認待ちデータ",
+    "description": "ユーザー投稿データを審査"
   },
   "live_map": {
-      "title": "ライブマップ監視",
-      "description": "ユーザーの位置、技術パートナー、発生中の問題をリアルタイムで監視します。"
-    }
+    "toggles": {
+      "users": "ユーザー",
+      "tech_shops": "技術ショップ",
+      "tech_mobiles": "モバイル技術者",
+      "open_issues": "未解決の不具合"
+    },
+    "stats": {
+      "users_with_location": "位置情報付きユーザー",
+      "tech_shops": "技術ショップ",
+      "tech_mobiles": "モバイル技術者",
+      "open_issues": "未解決の不具合"
+    },
+    "map": {
+      "title": "ライブマップ",
+      "hint_click": "ポイントをクリックすると詳細が表示されます"
+    },
+    "legend": {
+      "tech_shop": "技術ショップ",
+      "tech_mobile": "モバイル技術者",
+      "user": "ユーザー"
+    },
+    "hints": {
+      "realtime": "Firestoreからリアルタイムで更新されます。",
+      "optimize": "必要なレイヤーのみ有効化するとパフォーマンスが最適化されます。",
+      "colors": "色は役割と不具合の状態を示します。"
+    },
+    "title": "監視マップ",
+    "description": "ユーザー位置、技術パートナー、不具合をリアルタイムで監視"
+  }
 },
 
 "vehicle_model_management_page": {
@@ -3715,6 +3746,10 @@
     "approved": "承認済み",
     "rejected": "却下"
   }
+},
+
+"notification": {
+  "success": "成功"
 }
 
 

@@ -1325,7 +1325,7 @@
   "title": "기술 파트너 대시보드",
   "checking_permission": "🔎 권한 확인 중...",
   "not_partner": "🚫 기술 파트너 전용입니다.",
-  "loading_issues": "⏳ 문제 로딩 중...",
+  "loading_issues": "문제 로딩 중...",
   "status_updated": "상태가 \"{{status}}\"(으)로 업데이트되었습니다.",
   "proposal_submitted": "제안이 승인 요청으로 제출되었습니다.",
   "actual_result_submitted": "실제 결과가 제출되었으며, 문제가 해결됨으로 표시되었습니다.",
@@ -2702,12 +2702,17 @@
 },
 
 "admin_dashboard": {
+    "labels": {
+    "role": "역할",
+    "phone": "전화번호"
+  },
+  "open_in_google_maps": "Google 지도에서 열기",
   "title": "관리자 대시보드",
   "groups": {
     "business": "비즈니스 유형 및 사용자",
     "vehicles": "차량 및 배터리",
     "services": "서비스 및 액세서리",
-    "bookings": "예약 및 프로그램",
+    "bookings": "예약 및 패키지",
     "insurance": "보험 관리",
     "tools": "도구 및 기여"
   },
@@ -2721,7 +2726,7 @@
   },
   "users": {
     "title": "사용자 관리",
-    "description": "사용자 계정 및 접근 제어"
+    "description": "계정 및 접근 권한 관리"
   },
   "staff": {
     "title": "직원 관리",
@@ -2741,60 +2746,86 @@
   },
   "vehicle_issues": {
     "title": "차량 문제 관리",
-    "description": "차량 문제를 모니터링 및 관리"
+    "description": "차량 문제 추적 및 처리"
   },
   "batteries": {
     "title": "배터리 관리",
-    "description": "배터리 재고 및 상태를 추적"
+    "description": "배터리 재고 및 상태 추적"
   },
   "battery_stations": {
     "title": "배터리 교환소",
-    "description": "배터리 교환소 위치를 관리"
+    "description": "배터리 교환소 위치 관리"
   },
   "battery_charging_stations": {
-    "title": "배터리 충전소",
-    "description": "배터리 충전소 위치를 관리"
+    "title": "충전소",
+    "description": "충전소 위치 관리"
   },
   "accessories": {
     "title": "액세서리 관리",
-    "description": "액세서리 및 부품을 관리"
+    "description": "액세서리 및 부품 관리"
   },
   "accessory_export": {
     "title": "액세서리 출고",
-    "description": "액세서리 출고 관리를 수행합니다"
+    "description": "액세서리 재고 출고 관리"
   },
   "bookings": {
     "title": "예약 관리",
-    "description": "모든 예약을 조회 및 관리"
+    "description": "모든 렌탈 예약 조회 및 관리"
   },
   "packages": {
-    "title": "구독 패키지",
-    "description": "요금 및 렌탈 패키지 설정"
+    "title": "렌탈 패키지",
+    "description": "요금 및 패키지 설정"
   },
   "programs": {
     "title": "프로그램",
-    "description": "특별 프로그램 및 프로모션 관리"
+    "description": "프로그램 및 프로모션 관리"
   },
   "form_builder": {
     "title": "폼 빌더",
-    "description": "프로바이더용 렌탈 폼을 사용자 정의"
+    "description": "파트너용 렌탈 폼 사용자 정의"
   },
   "insurance_products": {
     "title": "보험 상품",
-    "description": "사용자 보험 상품 생성 및 관리"
+    "description": "사용자용 보험 패키지 생성 및 관리"
   },
   "insurance_approvals": {
     "title": "보험 승인",
-    "description": "고객 보험 신청 검토 및 승인"
+    "description": "고객 보험 신청 검토"
   },
   "pending_contributions": {
-    "title": "대기 중인 기여",
-    "description": "사용자 제출 데이터 검토 및 승인"
+    "title": "승인 대기 데이터",
+    "description": "사용자 기여 데이터 검토"
   },
-   "live_map": {
-      "title": "실시간 지도 모니터링",
-      "description": "사용자 위치, 기술 파트너, 진행 중인 문제를 실시간으로 모니터링합니다."
-    }
+  "live_map": {
+    "toggles": {
+      "users": "사용자",
+      "tech_shops": "기술 상점",
+      "tech_mobiles": "모바일 기술자",
+      "open_issues": "열린 문제"
+    },
+    "stats": {
+      "users_with_location": "위치 정보가 있는 사용자",
+      "tech_shops": "기술 상점",
+      "tech_mobiles": "모바일 기술자",
+      "open_issues": "열린 문제"
+    },
+    "map": {
+      "title": "실시간 지도",
+      "hint_click": "포인트를 클릭하면 세부 정보가 표시됩니다"
+    },
+    "legend": {
+      "tech_shop": "기술 상점",
+      "tech_mobile": "모바일 기술자",
+      "user": "사용자"
+    },
+    "hints": {
+      "realtime": "Firestore에서 실시간으로 업데이트됩니다.",
+      "optimize": "필요한 레이어만 활성화하여 성능을 최적화하세요.",
+      "colors": "색상은 역할과 문제 상태를 나타냅니다."
+    },
+    "title": "모니터링 지도",
+    "description": "사용자 위치, 기술 파트너 및 열린 문제를 실시간으로 모니터링"
+  }
 },
 
 "vehicle_model_management_page": {
@@ -3736,6 +3767,10 @@
     "approved": "승인됨",
     "rejected": "거절됨"
   }
+},
+
+"notification": {
+  "success": "성공"
 }
 
 

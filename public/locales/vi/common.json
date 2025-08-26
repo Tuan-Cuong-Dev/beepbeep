@@ -1347,7 +1347,7 @@
   "title": "Bảng điều khiển Đối tác Kỹ thuật",
   "checking_permission": "🔎 Đang kiểm tra quyền...",
   "not_partner": "🚫 Chỉ dành cho Đối tác Kỹ thuật.",
-  "loading_issues": "⏳ Đang tải các sự cố...",
+  "loading_issues": "Đang tải các sự cố...",
   "status_updated": "Trạng thái đã được cập nhật thành \"{{status}}\".",
   "proposal_submitted": "Đề xuất đã được gửi để phê duyệt.",
   "actual_result_submitted": "Kết quả thực tế đã được gửi và sự cố đã được đánh dấu là đã giải quyết.",
@@ -2733,6 +2733,11 @@
 },
 
 "admin_dashboard": {
+  "labels": {
+    "role": "Vai trò",
+    "phone": "Số điện thoại"
+  },
+  "open_in_google_maps": "Mở bằng Google Maps",
   "title": "Bảng Điều Khiển Quản Trị",
   "groups": {
     "business": "Loại hình kinh doanh & người dùng",
@@ -2825,7 +2830,7 @@
    "live_map": {
       "toggles":{
         "users": "Người dùng",
-        "tech_shops": "Cửa hàng kỹ thuật",
+        "tech_shops": "Cửa hàng sửa xe",
         "tech_mobiles": "Kỹ thuật viên di động",
         "open_issues": "Sự cố đang mở"
       },
@@ -3788,6 +3793,10 @@
     "approved": "Đã duyệt",
     "rejected": "Từ chối"
   }
+},
+
+"notification" :{
+  "success":"Thành công"
 }
 
 

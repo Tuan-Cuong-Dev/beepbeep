@@ -1339,7 +1339,7 @@
   "title": "Technician Partner Dashboard",
   "checking_permission": "🔎 Checking permission...",
   "not_partner": "🚫 Technician Partner only.",
-  "loading_issues": "⏳ Loading issues...",
+  "loading_issues": "Loading issues...",
   "status_updated": "Status updated to \"{{status}}\".",
   "proposal_submitted": "Proposal has been submitted for approval.",
   "actual_result_submitted": "Actual result submitted and issue marked as resolved.",
@@ -2705,101 +2705,132 @@
 },
 
 
-  "admin_dashboard": {
-    "title": "Admin Dashboard",
-    "groups": {
-      "business": "Business Types & Users",
-      "vehicles": "Vehicles & Batteries",
-      "services": "Services & Accessories",
-      "bookings": "Bookings & Programs",
-      "insurance": "Insurance Management",
-      "tools": "Tools & Contributions"
-    },
-    "rental_companies": {
-      "title": "Rental Companies",
-      "description": "Manage all rental businesses"
-    },
-    "technician_partners": {
-      "title": "Technician Partners",
-      "description": "Manage external repair partners"
-    },
-    "users": {
-      "title": "Users Management",
-      "description": "Control user accounts and access"
-    },
-    "staff": {
-      "title": "Staff Management",
-      "description": "Manage all staff members in the system"
-    },
-    "customers": {
-      "title": "Customers Management",
-      "description": "View and manage customer data"
-    },
-    "vehicle_models": {
-      "title": "Vehicle Models Management",
-      "description": "Manage all Vehicle Models in the system"
-    },
-    "vehicles": {
-      "title": "Vehicle Management",
-      "description": "Manage all Vehicles in the system"
-    },
-    "vehicle_issues": {
-      "title": "Vehicle Issues Management",
-      "description": "Monitor and manage all vehicle issues"
-    },
-    "batteries": {
-      "title": "Battery Management",
-      "description": "Track battery inventory and status"
-    },
-    "battery_stations": {
-      "title": "Battery Stations",
-      "description": "Manage battery swapping station locations"
-    },
-    "battery_charging_stations": {
-      "title": "Battery Charging Stations",
-      "description": "Manage battery charging station locations"
-    },
-    "accessories": {
-      "title": "Accessories Management",
-      "description": "Manage accessories and parts"
-    },
-    "accessory_export": {
-      "title": "Accessory Export",
-      "description": "Manage accessory stock exports"
-    },
-    "bookings": {
-      "title": "Bookings",
-      "description": "View and manage all bookings"
-    },
-    "packages": {
-      "title": "Subscription Packages",
-      "description": "Set up pricing and rental packages"
-    },
-    "programs": {
-      "title": "Programs",
-      "description": "Manage special programs and promotions"
-    },
-    "form_builder": {
-      "title": "Form Builder",
-      "description": "Customize rental forms for providers"
-    },
-    "insurance_products": {
-      "title": "Insurance Products",
-      "description": "Create and manage user insurance products"
-    },
-    "insurance_approvals": {
-      "title": "Insurance Approvals",
-      "description": "Review and approve customer insurance requests"
-    },
-    "pending_contributions": {
-      "title": "Pending Contributions",
-      "description": "Review user-submitted data before approval"
-    },
-    "live_map": {
-      "title": "Live Map Monitor",
-      "description": "Real-time monitoring of user locations, technician partners, and open issues."
-    }
+"admin_dashboard": {
+  "labels": {
+    "role": "Role",
+    "phone": "Phone"
   },
+  "open_in_google_maps": "Open in Google Maps",
+  "title": "Admin Dashboard",
+  "groups": {
+    "business": "Business Types & Users",
+    "vehicles": "Vehicles & Batteries",
+    "services": "Services & Accessories",
+    "bookings": "Bookings & Packages",
+    "insurance": "Insurance Management",
+    "tools": "Tools & Contributions"
+  },
+  "rental_companies": {
+    "title": "Rental Companies",
+    "description": "Manage all rental businesses"
+  },
+  "technician_partners": {
+    "title": "Technician Partners",
+    "description": "Manage external repair partners"
+  },
+  "users": {
+    "title": "User Management",
+    "description": "Control accounts and access rights"
+  },
+  "staff": {
+    "title": "Staff Management",
+    "description": "Manage all staff in the system"
+  },
+  "customers": {
+    "title": "Customer Management",
+    "description": "View and manage customer data"
+  },
+  "vehicle_models": {
+    "title": "Vehicle Models",
+    "description": "Manage all vehicle models in the system"
+  },
+  "vehicles": {
+    "title": "Vehicles",
+    "description": "Manage all vehicles in the system"
+  },
+  "vehicle_issues": {
+    "title": "Vehicle Issues",
+    "description": "Track and handle vehicle issues"
+  },
+  "batteries": {
+    "title": "Batteries",
+    "description": "Track battery stock and operating status"
+  },
+  "battery_stations": {
+    "title": "Battery Swap Stations",
+    "description": "Manage battery swap station locations"
+  },
+  "battery_charging_stations": {
+    "title": "Battery Charging Stations",
+    "description": "Manage battery charging station locations"
+  },
+  "accessories": {
+    "title": "Accessories",
+    "description": "Manage accessories and spare parts"
+  },
+  "accessory_export": {
+    "title": "Accessory Export",
+    "description": "Manage accessory stock export"
+  },
+  "bookings": {
+    "title": "Bookings",
+    "description": "View and manage all rental bookings"
+  },
+  "packages": {
+    "title": "Rental Packages",
+    "description": "Set rental prices and service packages"
+  },
+  "programs": {
+    "title": "Programs",
+    "description": "Manage programs and promotions"
+  },
+  "form_builder": {
+    "title": "Form Builder",
+    "description": "Customize rental forms for partners"
+  },
+  "insurance_products": {
+    "title": "Insurance Products",
+    "description": "Create and manage insurance packages for users"
+  },
+  "insurance_approvals": {
+    "title": "Insurance Approvals",
+    "description": "Review customer insurance purchase requests"
+  },
+  "pending_contributions": {
+    "title": "Pending Contributions",
+    "description": "Review user-contributed data"
+  },
+  "live_map": {
+    "toggles": {
+      "users": "Users",
+      "tech_shops": "Tech Shops",
+      "tech_mobiles": "Mobile Technicians",
+      "open_issues": "Open Issues"
+    },
+    "stats": {
+      "users_with_location": "Users with Location",
+      "tech_shops": "Tech Shops",
+      "tech_mobiles": "Mobile Technicians",
+      "open_issues": "Open Issues"
+    },
+    "map": {
+      "title": "Live Map",
+      "hint_click": "Click on points to view details"
+    },
+    "legend": {
+      "tech_shop": "Tech Shop",
+      "tech_mobile": "Mobile Technician",
+      "user": "User"
+    },
+    "hints": {
+      "realtime": "Data is updated in real-time from Firestore.",
+      "optimize": "Enable only the necessary layers to optimize performance.",
+      "colors": "Colors represent roles and issue statuses."
+    },
+    "title": "Monitoring Map",
+    "description": "Real-time monitoring of user locations, technician partners, and open issues."
+  }
+},
 
   "vehicle_model_management_page": {
     "title": "Vehicle Model Management"
@@ -3694,6 +3725,10 @@
     "approved": "Approved",
     "rejected": "Rejected"
   }
+},
+
+"notification": {
+  "success": "Success"
 }
 
 

@@ -378,31 +378,42 @@ export default function AdminLiveMapPage() {
                     >
                       <Popup>
                         <div className="text-sm">
-                          <div className="font-semibold">{(u as any).name || (u as any).email}</div>
-                          <div className="text-xs text-gray-600">
-                            {t('labels.role')}: {(u as any).role || 'unknown'}
+                          <div className="font-semibold">
+                            {(u as any).name || (u as any).email}
                           </div>
+
+                          <div className="text-xs text-gray-600">
+                            {t('admin_dashboard.labels.role')}: {(u as any).role || 'unknown'}
+                          </div>
+
                           {(u as any).phone && (
                             <div className="text-xs mt-1">
-                              {t('labels.phone')}: <a className="underline" href={`tel:${(u as any).phone}`}>{(u as any).phone}</a>
+                              {t('admin_dashboard.labels.phone')}: 
+                              <a className="underline" href={`tel:${(u as any).phone}`}>
+                                {(u as any).phone}
+                              </a>
                             </div>
                           )}
+
                           {(u as any).lastKnownLocation?.address && (
                             <div className="text-xs mt-1">{(u as any).lastKnownLocation.address}</div>
                           )}
+
                           <div className="mt-1 font-mono text-[11px]">
                             {coord.lat.toFixed(6)}, {coord.lng.toFixed(6)}
                           </div>
+
                           <a
                             className="text-blue-600 underline text-xs mt-1 inline-block"
                             href={`https://www.google.com/maps/search/?api=1&query=${coord.lat},${coord.lng}`}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {t('actions.open_in_google_maps')}
+                            {t('admin_dashboard.open_in_google_maps')}
                           </a>
                         </div>
                       </Popup>
+
                     </CircleMarker>
                   ))}
 
@@ -420,7 +431,7 @@ export default function AdminLiveMapPage() {
                           <div className="font-semibold">{(p as any).shopName || (p as any).name || t('admin_dashboard.live_map.labels.tech_shop')}</div>
                           {(p as any).phone && (
                             <div className="text-xs mt-1">
-                              {t('labels.phone')}: <a className="underline" href={`tel:${(p as any).phone}`}>{(p as any).phone}</a>
+                              {t('admin_dashboard.labels.phone')}: <a className="underline" href={`tel:${(p as any).phone}`}>{(p as any).phone}</a>
                             </div>
                           )}
                           {(p as any).location?.address && <div className="text-xs mt-1">{(p as any).location.address}</div>}
@@ -433,7 +444,7 @@ export default function AdminLiveMapPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {t('actions.open_in_google_maps')}
+                            {t('admin_dashboard.open_in_google_maps')}
                           </a>
                         </div>
                       </Popup>
@@ -454,7 +465,7 @@ export default function AdminLiveMapPage() {
                           <div className="font-semibold">{(p as any).name || t('admin_dashboard.live_map.labels.tech_mobile')}</div>
                           {(p as any).phone && (
                             <div className="text-xs mt-1">
-                              {t('labels.phone')}: <a className="underline" href={`tel:${(p as any).phone}`}>{(p as any).phone}</a>
+                              {t('admin_dashboard.labels.phone')}: <a className="underline" href={`tel:${(p as any).phone}`}>{(p as any).phone}</a>
                             </div>
                           )}
                           {(p as any).location?.address && <div className="text-xs mt-1">{(p as any).location.address}</div>}
@@ -467,7 +478,7 @@ export default function AdminLiveMapPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {t('actions.open_in_google_maps')}
+                            {t('admin_dashboard.open_in_google_maps')}
                           </a>
                         </div>
                       </Popup>
@@ -486,7 +497,7 @@ export default function AdminLiveMapPage() {
                             <span className="capitalize">{t(`status.${(issue as any).status}`)}</span>
                           </div>
                           {(issue as any).phone && (
-                            <div className="text-xs text-gray-600">{t('labels.phone')}: {(issue as any).phone}</div>
+                            <div className="text-xs text-gray-600">{t('admin_dashboard.labels.phone')}: {(issue as any).phone}</div>
                           )}
                           {(issue as any).location?.issueAddress && (
                             <div className="text-xs mt-1">{(issue as any).location.issueAddress}</div>
@@ -500,7 +511,7 @@ export default function AdminLiveMapPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {t('actions.open_in_google_maps')}
+                            {t('admin_dashboard.open_in_google_maps')}
                           </a>
                         </div>
                       </Popup>

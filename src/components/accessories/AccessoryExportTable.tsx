@@ -22,39 +22,41 @@ import { useUser } from '@/src/context/AuthContext';
 
 interface Props {
   exports: AccessoryExport[];
+  // controlled search (từ parent)
+  searchName: string;
+  setSearchName: (v: string) => void;
+  searchTarget: string;
+  setSearchTarget: (v: string) => void;
 }
 
-export default function AccessoryExportTable({ exports }: Props) {
+export default function AccessoryExportTable({
+  exports,
+  searchName,
+  setSearchName,
+  searchTarget,
+  setSearchTarget,
+}: Props) {
   const { t } = useTranslation();
   const { role } = useUser();
   const isTechnician = role === 'technician';
 
   const [exportedByMap, setExportedByMap] = useState<Record<string, string>>({});
-  const [searchName, setSearchName] = useState('');
-  const [searchTarget, setSearchTarget] = useState('');
   const [selectedItem, setSelectedItem] = useState<AccessoryExport | null>(null);
   const [importingId, setImportingId] = useState<string | null>(null);
 
+  // map tên người xuất
   useEffect(() => {
     const fetchUserNames = async () => {
       const uniqueIds = [...new Set(exports.map((e) => e.exportedBy))];
-      const map: Record<string, string> = {};
-      for (const uid of uniqueIds) {
-        const name = await getUserNameById(uid);
-        map[uid] = name || uid;
-      }
+      const names = await Promise.all(uniqueIds.map((uid) => getUserNameById(uid)));
+      const map = uniqueIds.reduce<Record<string, string>>((acc, uid, i) => {
+        acc[uid] = names[i] || uid;
+        return acc;
+      }, {});
       setExportedByMap(map);
     };
     fetchUserNames();
   }, [exports]);
-
-  const filtered = [...exports]
-    .filter(
-      (e) =>
-        (e.accessoryName || '').toLowerCase().includes(searchName.toLowerCase()) &&
-        (e.target || '').toLowerCase().includes(searchTarget.toLowerCase())
-    )
-    .sort((a, b) => b.exportedAt.toDate().getTime() - a.exportedAt.toDate().getTime());
 
   const handleImportConfirm = async () => {
     if (!selectedItem) return;
@@ -73,7 +75,7 @@ export default function AccessoryExportTable({ exports }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
+      {/* Filters (controlled by parent) */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Input
           placeholder={t('accessory_export_table.search_accessory')}
@@ -89,22 +91,23 @@ export default function AccessoryExportTable({ exports }: Props) {
         />
       </div>
 
-      {/* Mobile: cards */}
+      {/* Mobile cards */}
       <div className="md:hidden space-y-3">
-        {filtered.length === 0 ? (
+        {exports.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-10 bg-white border border-dashed border-gray-300 rounded-xl">
             <div className="text-3xl">📦</div>
-            <p className="text-sm text-gray-600">{t('accessory_export_table.no_result', 'No results')}</p>
+            <p className="text-sm text-gray-600">
+              {t('accessory_export_table.no_result', 'No results')}
+            </p>
           </div>
         ) : (
-          filtered.map((item) => {
+          exports.map((item) => {
             const exportedBy = exportedByMap[item.exportedBy] || item.exportedBy;
             return (
               <div
                 key={item.id}
                 className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4"
               >
-                {/* Header line: name + qty */}
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="font-semibold text-gray-900">{item.accessoryName}</div>
@@ -117,7 +120,6 @@ export default function AccessoryExportTable({ exports }: Props) {
                   </div>
                 </div>
 
-                {/* Meta info */}
                 <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                   <div className="rounded-lg border p-2">
                     <div className="text-xs text-gray-500">{t('accessory_export_table.target')}</div>
@@ -137,7 +139,6 @@ export default function AccessoryExportTable({ exports }: Props) {
                   </div>
                 </div>
 
-                {/* Note */}
                 {item.note ? (
                   <div className="mt-3 text-sm text-gray-700">
                     <span className="text-xs text-gray-500">{t('accessory_export_table.note')}</span>
@@ -145,7 +146,6 @@ export default function AccessoryExportTable({ exports }: Props) {
                   </div>
                 ) : null}
 
-                {/* Actions */}
                 {!isTechnician && (
                   <div className="mt-4">
                     <Dialog
@@ -193,7 +193,7 @@ export default function AccessoryExportTable({ exports }: Props) {
         )}
       </div>
 
-      {/* Desktop: table */}
+      {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-100">
@@ -206,13 +206,11 @@ export default function AccessoryExportTable({ exports }: Props) {
               <th className="p-2 text-left">{t('accessory_export_table.note')}</th>
               <th className="p-2 text-left">{t('accessory_export_table.exported_by')}</th>
               <th className="p-2 text-left">{t('accessory_export_table.date')}</th>
-              {!isTechnician && (
-                <th className="p-2 text-right">{t('accessory_export_table.actions')}</th>
-              )}
+              {!isTechnician && <th className="p-2 text-right">{t('accessory_export_table.actions')}</th>}
             </tr>
           </thead>
           <tbody>
-            {filtered.map((item) => (
+            {exports.map((item) => (
               <tr key={item.id} className="border-b">
                 <td className="p-2">{item.accessoryName}</td>
                 <td className="p-2">{item.quantity}</td>

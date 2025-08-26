@@ -2,11 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/src/components/ui/dialog';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Input } from '@/src/components/ui/input';
@@ -24,21 +20,49 @@ interface Props {
 export default function ActualResultPopup({ open, onClose, onSubmit }: Props) {
   const { t } = useTranslation('common');
   const [solution, setSolution] = useState('');
-  const [cost, setCost] = useState('');
+  const [costRaw, setCostRaw] = useState('');      // giữ nguyên người dùng gõ
+  const [focused, setFocused] = useState(false);   // để biết khi nào nên format
 
   useEffect(() => {
     if (!open) {
       setSolution('');
-      setCost('');
+      setCostRaw('');
+      setFocused(false);
     }
   }, [open]);
 
+  // Hàm chỉ cho phép số và dấu phân tách cơ bản
+  const normalizeDigits = (s: string) => s.replace(/[^\d.,]/g, '');
+
+  const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCostRaw(normalizeDigits(e.target.value));
+  };
+
+  const handleCostBlur = () => {
+    setFocused(false);
+    // format nhẹ nhàng khi blur (nếu có số)
+    const n = parseCurrencyString(costRaw);
+    if (Number.isFinite(n) && n > 0) {
+      setCostRaw(formatCurrency(n));
+    }
+  };
+
+  const handleCostFocus = () => {
+    setFocused(true);
+    // bỏ format khi focus để gõ mượt
+    const n = parseCurrencyString(costRaw);
+    if (n > 0) setCostRaw(String(n));
+  };
+
   const handleSubmit = () => {
-    const costNumber = parseCurrencyString(cost);
+    const costNumber = parseCurrencyString(costRaw);
     onSubmit(solution.trim(), costNumber);
     setSolution('');
-    setCost('');
+    setCostRaw('');
+    setFocused(false);
   };
+
+  const costIsEmpty = costRaw.trim() === '' || parseCurrencyString(costRaw) <= 0;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -71,10 +95,16 @@ export default function ActualResultPopup({ open, onClose, onSubmit }: Props) {
             <Input
               type="text"
               inputMode="numeric"
-              value={cost ? formatCurrency(cost) : ''}
-              onChange={(e) => setCost(e.target.value)}
+              value={
+                focused
+                  ? costRaw // khi focus: hiển thị raw để gõ mượt
+                  : (costRaw ? costRaw : '')
+              }
+              onChange={handleCostChange}
+              onFocus={handleCostFocus}
+              onBlur={handleCostBlur}
               placeholder={t('actual_result.cost_placeholder', {
-                defaultValue: 'e.g. 500.000 ₫',
+                defaultValue: 'e.g. 500000',
               })}
             />
           </div>
@@ -86,7 +116,7 @@ export default function ActualResultPopup({ open, onClose, onSubmit }: Props) {
           </Button>
           <Button
             className="bg-[#00d289] text-white hover:bg-[#00b67a]"
-            disabled={!solution || !cost}
+            disabled={!solution.trim() || costIsEmpty}
             onClick={handleSubmit}
           >
             {t('actual_result.submit', { defaultValue: 'Submit' })}
