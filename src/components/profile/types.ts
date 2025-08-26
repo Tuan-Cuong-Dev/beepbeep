@@ -1,3 +1,5 @@
+// types.ts
+
 export type TabKey =
   | 'activityFeed'
   | 'vehicles'
@@ -6,7 +8,7 @@ export type TabKey =
   | 'contributions'
   | 'business';
 
-// types.ts
+
 export interface VisibleTab {
   key: string;
   label: string;

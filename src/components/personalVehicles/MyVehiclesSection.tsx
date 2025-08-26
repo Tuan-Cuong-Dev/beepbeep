@@ -10,7 +10,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { PersonalVehicle_new } from '@/src/lib/personalVehicles/personalVehiclesTypes';
+import { PersonalVehicle } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 import { useAuth } from '@/src/hooks/useAuth';
 import { Button } from '@/src/components/ui/button';
 import SelectModelThenAddVehicleForm from '@/src/components/personalVehicles/SelectModelThenAddVehicleForm';
@@ -24,9 +24,9 @@ import { useTranslation } from 'react-i18next';
 export default function MyVehiclesSection() {
   const { currentUser, loading } = useAuth();
   const { t } = useTranslation('common');
-  const [vehicles, setVehicles] = useState<PersonalVehicle_new[]>([]);
+  const [vehicles, setVehicles] = useState<PersonalVehicle[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState<PersonalVehicle_new | null>(null);
+  const [editingVehicle, setEditingVehicle] = useState<PersonalVehicle | null>(null);
 
   const [notif, setNotif] = useState<{
     open: boolean;
@@ -40,7 +40,7 @@ export default function MyVehiclesSection() {
     if (!currentUser?.uid) return;
     const q = query(collection(db, 'personalVehicles'), where('userId', '==', currentUser.uid));
     const snap = await getDocs(q);
-    const list = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as PersonalVehicle_new));
+    const list = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as PersonalVehicle));
     setVehicles(list);
   };
 
@@ -53,7 +53,7 @@ export default function MyVehiclesSection() {
     fetchVehicles();
   };
 
-  const handleDelete = (vehicle: PersonalVehicle_new) => {
+  const handleDelete = (vehicle: PersonalVehicle) => {
     setNotif({
       open: true,
       type: 'confirm',
