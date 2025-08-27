@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import 'leaflet/dist/leaflet.css';
 import "./globals.css";
-import { AuthProvider } from "@/src/context/AuthContext";
+import Providers from "./providers"; // ⬅️ dùng Providers client
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,22 +21,17 @@ export const metadata: Metadata = {
   },
 };
 
-
-
 // ✅ TÁCH viewport thành export riêng
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1.0,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {/* GA chạy trên client; để trong <script> là an toàn, không gọi window trong code SSR */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-FFJ85KTLJT" />
         <script
           dangerouslySetInnerHTML={{
@@ -44,15 +39,15 @@ export default function RootLayout({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-FFJ85KTLJT', {
-                page_path: window.location.pathname,
-              });
+              gtag('config', 'G-FFJ85KTLJT', { page_path: window.location.pathname });
             `,
           }}
         />
       </head>
       <body className={`${inter.variable} antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

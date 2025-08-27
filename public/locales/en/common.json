@@ -2846,6 +2846,10 @@
     },
     "title": "Monitoring Map",
     "description": "Real-time monitoring of user locations, technician partners, and open issues."
+  },
+    "tech_live_map": {
+    "title": "Technician Live Map",
+    "description": "Track real-time location and status of mobile technicians."
   }
 },
 
@@ -3237,14 +3241,15 @@
     },
     "loading": "⏳ Loading...",
     "no_permission": "🚫 You do not have permission to view this page.",
-    "subtitle": "Assign technicians to handle issues reported by customers.",
+    "subtitle": "Assign technicians to handle issues reported by customers."
+  },
+  
     "admin_live_map_page": {
       "map": {
         "title": "Technician Live Map",
         "hint_click": "Click on an icon to view technician details"
       }
-    }
-  },
+    },
 
   "public_issues_summary_card": {
     "total": "Total Issues",

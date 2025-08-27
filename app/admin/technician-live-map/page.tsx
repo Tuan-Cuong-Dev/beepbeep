@@ -44,7 +44,6 @@ export default function AdminTechnicianLiveMapPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             🗺️ {t('technician_live_map.map.title')}
           </h1>
-        <p className="text-sm text-gray-600">{t('technician_live_map.map.hint')}</p>
         </div>
 
         {!canView ? (

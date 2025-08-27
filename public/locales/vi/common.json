@@ -3313,14 +3313,15 @@
     },
     "loading": "⏳ Đang tải...",
     "no_permission": "🚫 Bạn không có quyền truy cập trang này.",
-    "subtitle": "Phân công kỹ thuật viên để xử lý sự cố do khách hàng gửi lên.",
-    "admin_live_map_page": {
+    "subtitle": "Phân công kỹ thuật viên để xử lý sự cố do khách hàng gửi lên."
+  },
+
+  "admin_live_map_page": {
       "map": {
         "title": "Bản đồ kỹ thuật viên (thời gian thực)",
         "hint_click": "Bấm vào biểu tượng để xem chi tiết kỹ thuật viên"
       }
-    }
-  },
+    },
 
   "public_issues_summary_card": {
     "total": "Tổng số sự cố",
@@ -3841,7 +3842,7 @@
     "status_online": "Đang theo dõi",
     "status_paused": "Đã tạm dừng"
   },
-  
+
   "tech_tracker_hint": "🔒 Cho phép quyền truy cập vị trí. Hệ thống chỉ ghi dữ liệu khi bạn bắt đầu ca và có thể tạm dừng/kết thúc bất kỳ lúc nào.",
   
   "technician_live_map": {

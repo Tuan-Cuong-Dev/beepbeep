@@ -1,96 +1,121 @@
+// src/components/techinicianPartner/MobileStickyTrackerBar.tsx
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import { useTranslation } from 'react-i18next';
 import { Play, Pause, Square, Satellite, ShieldCheck } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
-import { useUser } from '@/src/context/AuthContext';
 import { useTechLivePublisher } from '@/src/hooks/useTechLivePublisher';
 import { db } from '@/src/firebaseConfig';
 import { COLLECTIONS } from '@/src/lib/tracking/collections';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useLocalStorageState } from '@/src/hooks/useLocalStorageState';
+import { isMobileTechnician } from '@/src/utils/isMobileTechnician';
+import type { User } from '@/src/lib/users/userTypes';
 
-/**
- * 🔥 Sticky bar dành cho mobile:
- * - Cố định cuối màn hình, tôn trọng safe-area (iOS).
- * - Nút to, dễ bấm khi di chuyển.
- * - Tự chứa logic tracking, KHÔNG dùng cùng lúc với TrackerToggle (để tránh ghi trùng).
- *
- * Gợi ý dùng: <MobileStickyTrackerBar className="sm:hidden" />
- */
-export default function MobileStickyTrackerBar({ className = '' }: { className?: string }) {
+type TrackerPersist = { enabled: boolean; paused: boolean; sessionId: string | null };
+const lsKey = (techId: string) => `bb.tracker.${techId || 'anon'}`;
+
+export default function MobileStickyTrackerBar({
+  className = '',
+  user,                                  // ✅ nhận user đã gộp
+}: {
+  className?: string;
+  user: Partial<User> | null | undefined;
+}) {
+  if (!user) return null;
+  const allowed = isMobileTechnician(user);
+  if (!allowed) return null;
+  return <Inner key={(user as any)?.uid} className={className} user={user} />;
+}
+
+function Inner({
+  className = '',
+  user,
+}: {
+  className?: string;
+  user: Partial<User>;
+}) {
   const { t } = useTranslation('common');
-  const { user } = useUser();
+  const techId = String((user as any)?.uid || '');
 
-  const techId = user?.uid || '';
-  const [enabled, setEnabled] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [persist, setPersist] = useLocalStorageState<TrackerPersist>(lsKey(techId), {
+    enabled: false,
+    paused: false,
+    sessionId: null,
+  });
 
-  const effectiveSession = useMemo(
-    () => sessionId ?? (enabled ? uuid() : null),
-    [enabled, sessionId]
-  );
+  useEffect(() => {
+    if (!techId) return;
+    const anon = localStorage.getItem(lsKey('anon'));
+    if (anon && !localStorage.getItem(lsKey(techId))) {
+      localStorage.setItem(lsKey(techId), anon);
+      localStorage.removeItem(lsKey('anon'));
+      try {
+        setPersist(JSON.parse(anon) as TrackerPersist);
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [techId]);
 
   const { error } = useTechLivePublisher({
     techId,
-    name: user?.name,
+    name: (user as any)?.name,
     companyName: (user as any)?.companyName,
-    sessionId: effectiveSession || 'no-session',
-    enabled: enabled && !paused && !!effectiveSession,
+    sessionId: persist.sessionId || 'no-session',
+    enabled: persist.enabled && !persist.paused && !!persist.sessionId,
   });
 
   const goOnline = async () => {
+    if (!techId) return;
     const sid = uuid();
-    setSessionId(sid);
-    setEnabled(true);
-    setPaused(false);
+
     await setDoc(doc(db, COLLECTIONS.sessions(techId), sid), {
       sessionId: sid,
       techId,
       startedAt: serverTimestamp(),
     }, { merge: true });
-    if ('vibrate' in navigator) (navigator as any).vibrate?.(15);
+
+    await setDoc(doc(db, COLLECTIONS.presence, techId), {
+      status: 'online',
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+
+    setPersist({ enabled: true, paused: false, sessionId: sid });
+    (navigator as any)?.vibrate?.(15);
+  };
+
+  const pause = () => {
+    setPersist(prev => ({ ...prev, paused: true }));
+    (navigator as any)?.vibrate?.(10);
+  };
+
+  const resume = () => {
+    setPersist(prev => ({ ...prev, paused: false }));
+    (navigator as any)?.vibrate?.(10);
   };
 
   const endShift = async () => {
-    if (techId && sessionId) {
+    if (!techId) return;
+    const { sessionId } = persist;
+    if (sessionId) {
       await setDoc(doc(db, COLLECTIONS.sessions(techId), sessionId), {
         endedAt: serverTimestamp(),
       }, { merge: true });
     }
-    setEnabled(false);
-    setPaused(false);
-    setSessionId(null);
-    if (techId) {
-      await setDoc(doc(db, COLLECTIONS.presence, techId), {
-        status: 'offline',
-        updatedAt: serverTimestamp(),
-      }, { merge: true });
-    }
-    if ('vibrate' in navigator) (navigator as any).vibrate?.([10, 30, 10]);
+    await setDoc(doc(db, COLLECTIONS.presence, techId), {
+      status: 'offline',
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+
+    setPersist({ enabled: false, paused: false, sessionId: null });
+    (navigator as any)?.vibrate?.([10, 30, 10]);
   };
 
   return (
-    <div
-      className={[
-        // container fixed bottom
-        'fixed inset-x-0 bottom-0 z-50',
-        // safe area bottom + padding
-        'pb-[calc(env(safe-area-inset-bottom,0)+12px)] px-3',
-        className,
-      ].join(' ')}
-    >
-      <div
-        className="
-          mx-auto max-w-3xl
-          rounded-2xl border border-gray-200 bg-white/90 backdrop-blur
-          shadow-lg
-          dark:border-gray-800 dark:bg-neutral-900/80
-        "
-      >
-        {/* Top row: title + status + session */}
+    <div className={['fixed inset-x-0 bottom-0 z-50 pb-[calc(env(safe-area-inset-bottom,0)+12px)] px-3', className].join(' ')}>
+      <div className="mx-auto max-w-3xl rounded-2xl border border-gray-200 bg-white/90 backdrop-blur shadow-lg dark:border-gray-800 dark:bg-neutral-900/80">
         <div className="px-3 pt-2 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-[#e6fff5] text-[#00d289]">
@@ -101,74 +126,40 @@ export default function MobileStickyTrackerBar({ className = '' }: { className?:
                 {t('admin_live_map_page.map.title')}
               </p>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                {user?.name || 'Technician'} · {enabled ? (paused ? t('tech_tracker.status_paused') : t('tech_tracker.status_online')) : 'Offline'}
+                {(user as any)?.name || 'Technician'} · {persist.enabled ? (persist.paused ? t('tech_tracker.status_paused') : t('tech_tracker.status_online')) : 'Offline'}
               </p>
             </div>
           </div>
-          {/* session short id */}
           <div className="hidden xs:block text-[11px] text-gray-500 dark:text-gray-400">
             <ShieldCheck className="inline w-3.5 h-3.5 mr-1" />
-            {enabled && sessionId ? `#${sessionId.slice(0, 6)}` : '—'}
+            {persist.enabled && persist.sessionId ? `#${persist.sessionId.slice(0, 6)}` : '—'}
           </div>
         </div>
 
-        {/* Buttons */}
         <div className="p-3 grid grid-cols-3 gap-2">
-          {!enabled ? (
+          {!persist.enabled ? (
+            <Button onClick={goOnline} className="col-span-3 h-12 text-base font-semibold bg-[#00d289] hover:bg-emerald-700 rounded-xl">
+              <Play className="w-5 h-5 mr-2" />
+              {t('tech_tracker.go_online')}
+            </Button>
+          ) : !persist.paused ? (
             <>
-              <Button
-                onClick={goOnline}
-                className="col-span-3 h-12 text-base font-semibold bg-[#00d289] hover:bg-emerald-700 rounded-xl"
-              >
-                <Play className="w-5 h-5 mr-2" />
-                {t('tech_tracker.go_online')}
-              </Button>
-            </>
-          ) : !paused ? (
-            <>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setPaused(true);
-                  if ('vibrate' in navigator) (navigator as any).vibrate?.(10);
-                }}
-                className="col-span-1 h-12 rounded-xl"
-              >
+              <Button variant="secondary" onClick={pause} className="col-span-1 h-12 rounded-xl">
                 <Pause className="w-5 h-5 mr-1" />
                 {t('tech_tracker.pause')}
               </Button>
-              <div className="col-span-1 h-12 rounded-xl grid place-items-center text-sm text-gray-600 dark:text-gray-300">
-                {/* Hint center cell */}
-                <span className="text-[11px] leading-tight text-center">
-                  {t('tech_tracker_hint')}
-                </span>
-              </div>
-              <Button
-                variant="destructive"
-                onClick={endShift}
-                className="col-span-1 h-12 rounded-xl"
-              >
+              <Button variant="destructive" onClick={endShift} className="col-span-2 h-12 rounded-xl">
                 <Square className="w-5 h-5 mr-1" />
                 {t('tech_tracker.end_shift')}
               </Button>
             </>
           ) : (
             <>
-              <Button
-                onClick={() => {
-                  setPaused(false);
-                  if ('vibrate' in navigator) (navigator as any).vibrate?.(10);
-                }}
-                className="col-span-2 h-12 text-base font-semibold bg-[#00d289] hover:bg-emerald-700 rounded-xl"
-              >
+              <Button onClick={resume} className="col-span-2 h-12 text-base font-semibold bg-[#00d289] hover:bg-emerald-700 rounded-xl">
                 <Play className="w-5 h-5 mr-2" />
                 {t('tech_tracker.resume')}
               </Button>
-              <Button
-                variant="destructive"
-                onClick={endShift}
-                className="col-span-1 h-12 rounded-xl"
-              >
+              <Button variant="destructive" onClick={endShift} className="col-span-1 h-12 rounded-xl">
                 <Square className="w-5 h-5 mr-1" />
                 {t('tech_tracker.end_shift')}
               </Button>
@@ -176,12 +167,13 @@ export default function MobileStickyTrackerBar({ className = '' }: { className?:
           )}
         </div>
 
-        {/* Error line */}
-        {error && (
-          <div className="px-3 pb-2 text-[12px] text-rose-600">
-            {error}
-          </div>
-        )}
+        <div className="px-3 pb-3">
+          <p className="w-full text-center text-[11px] leading-tight text-gray-600 dark:text-gray-300">
+            {t('tech_tracker_hint')}
+          </p>
+        </div>
+
+        {error && <div className="px-3 pb-2 text-[12px] text-rose-600">{error}</div>}
       </div>
     </div>
   );
