@@ -9,14 +9,13 @@ type Options = {
   techId: string;
   name?: string;
   companyName?: string;
-  /** ✅ NEW */
   avatarUrl?: string | null;
 
   sessionId: string;
   enabled: boolean;
-  presenceIntervalMs?: number;
-  trackMinTimeMs?: number;
-  trackMinDistanceM?: number;
+  presenceIntervalMs?: number; // tần suất cập nhật presence
+  trackMinTimeMs?: number;     // khoảng thời gian tối thiểu giữa 2 điểm track
+  trackMinDistanceM?: number;  // khoảng cách tối thiểu giữa 2 điểm track (m)
 };
 
 function haversine(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
@@ -34,7 +33,6 @@ export function useTechLivePublisher({
   techId,
   name,
   companyName,
-  /** ✅ destructure avatarUrl vào đây */
   avatarUrl,
   sessionId,
   enabled,
@@ -47,6 +45,15 @@ export function useTechLivePublisher({
   const lastPresenceRef = useRef<number>(0);
   const lastTrackRef = useRef<{ t: number; lat: number; lng: number } | null>(null);
   const stillRef = useRef<{ since: number; lastSpd: number | null }>({ since: 0, lastSpd: null });
+  const pageVisibleRef = useRef<boolean>(true);
+
+  // ⏸ pause khi tab ẩn để tiết kiệm pin
+  useEffect(() => {
+    const onVis = () => { pageVisibleRef.current = document.visibilityState === 'visible'; };
+    document.addEventListener('visibilitychange', onVis);
+    onVis();
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
 
   useEffect(() => {
     if (!enabled || !techId || !sessionId) return;
@@ -63,38 +70,44 @@ export function useTechLivePublisher({
       // ---- Presence: cập nhật mỗi n giây ----
       if (now - lastPresenceRef.current >= presenceIntervalMs) {
         lastPresenceRef.current = now;
-        await setDoc(
-          doc(db, COLLECTIONS.presence, techId),
-          {
-            techId,
-            name: name ?? null,
-            companyName: companyName ?? null,
-            /** ✅ ghi avatarUrl vào presence */
-            avatarUrl: avatarUrl ?? null,
+        try {
+          await setDoc(
+            doc(db, COLLECTIONS.presence, techId), // ✅ dùng key 'presence'
+            {
+              techId,
+              type: 'mobile',
+              status: 'online',
+              sessionId,
+              name: name ?? null,
+              companyName: companyName ?? null,
+              avatarUrl: avatarUrl ?? null,
+              lastLocation: {
+                geo: { latitude: lat, longitude: lng },
+                address: null,
+              },
+              lat,
+              lng,
+              heading: heading ?? null,
+              speed: speed ?? null,
+              accuracy: accuracy ?? null,
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
 
-            lat,
-            lng,
-            heading: heading ?? null,
-            speed: speed ?? null,
-            accuracy: accuracy ?? null,
-            updatedAt: serverTimestamp(),
-            sessionId,
-            status: 'online',
-          },
-          { merge: true }
-        );
+        } catch (e: any) {
+          console.error('presence setDoc error', e);
+          setError(e?.message || 'Failed to update presence');
+        }
       }
 
-      // ---- Downsample: bỏ qua khi đứng yên đủ lâu ----
-      const s = typeof speed === 'number' ? speed : null; // m/s
+      // ---- Downsample track ----
+      const s = typeof speed === 'number' ? speed : null;
       const last = lastTrackRef.current;
 
       if ((s ?? 0) < 1) {
         if (!stillRef.current.since) stillRef.current.since = now;
-        if (now - stillRef.current.since > 60000) {
-          // đứng yên > 60s => không ghi track point
-          return;
-        }
+        if (now - stillRef.current.since > 60_000) return; // đứng yên > 60s => bỏ
       } else {
         stillRef.current.since = 0;
       }
@@ -104,14 +117,19 @@ export function useTechLivePublisher({
 
       if (byTime && byDistance) {
         lastTrackRef.current = { t: now, lat, lng };
-        await addDoc(collection(db, COLLECTIONS.points(techId, sessionId)), {
-          t: new Date(now),
-          lat,
-          lng,
-          speed: s ?? null,
-          heading: heading ?? null,
-          acc: accuracy ?? null,
-        });
+        try {
+          await addDoc(collection(db, COLLECTIONS.points(techId, sessionId)), {
+            t: new Date(now),
+            lat,
+            lng,
+            speed: s ?? null,
+            heading: heading ?? null,
+            acc: accuracy ?? null,
+          });
+        } catch (e: any) {
+          console.error('track addDoc error', e);
+          setError(e?.message || 'Failed to add track point');
+        }
       }
     };
 
@@ -135,7 +153,6 @@ export function useTechLivePublisher({
     sessionId,
     name,
     companyName,
-    /** ✅ thêm avatarUrl vào deps để khi đổi ảnh sẽ cập nhật */
     avatarUrl,
     presenceIntervalMs,
     trackMinTimeMs,

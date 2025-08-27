@@ -52,34 +52,42 @@ function avatarDivIcon(
   const fallback = initials(name);
   const hasImg = !!url;
 
-  const html = `
+const html = `
   <div style="
     position: relative;
-    width: 48px; height: 48px;
+    width: 24px; height: 24px;
     border-radius: 9999px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.25);
-    outline: 3px solid ${ring};
+    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+    outline: 2px solid ${ring};
     background: white;
     display: grid; place-items: center;
     overflow: hidden;
+    font-size: 11px; font-weight:600; color:#374151;
   ">
     ${hasImg
-      ? `<img src="${url}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover"/>`
-      : `<div style="width:100%;height:100%;display:grid;place-items:center;font-weight:700;color:#374151;background:#E5E7EB;">${fallback}</div>`
+      ? `<img src="${url}" referrerpolicy="no-referrer"
+              style="width:100%;height:100%;object-fit:cover"/>`
+      : `<div style="width:100%;height:100%;
+                     display:grid;place-items:center;
+                     background:#E5E7EB;">${fallback}</div>`
     }
     <div style="
-      position:absolute; right:-2px; bottom:-2px;
-      width: 18px; height: 18px; border-radius:9999px;
-      background: ${ring}; border:2px solid white;
+      position:absolute; right:-1px; bottom:-1px;
+      width: 8px; height: 8px;
+      border-radius:9999px;
+      background:${ring};
+      border:1.5px solid white;
+      box-shadow:0 0 2px rgba(0,0,0,.2);
     "></div>
   </div>`;
+
 
   return divIcon({
     html,
     className: 'tech-avatar-marker',
-    iconSize: [48, 48] as PointExpression,
-    iconAnchor: [24, 24],
-    popupAnchor: [0, -28],
+    iconSize: [24, 24] as PointExpression,
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -20],
   });
 }
 

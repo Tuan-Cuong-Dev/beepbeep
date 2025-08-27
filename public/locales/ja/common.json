@@ -2823,8 +2823,8 @@
     "description": "ユーザー位置、技術パートナー、不具合をリアルタイムで監視"
   },
   "tech_live_map": {
-    "title": "Bản đồ trực tuyến kỹ thuật viên",
-    "description": "Theo dõi vị trí và trạng thái thời gian thực của kỹ thuật viên lưu động."
+    "title": "技術者ライブマップ",
+    "description": "モバイル技術者の位置とステータスをリアルタイムで追跡します。"
   }
 },
 
