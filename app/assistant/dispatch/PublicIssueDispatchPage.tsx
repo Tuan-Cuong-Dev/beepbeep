@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
@@ -17,13 +18,34 @@ import ProposalPopup from '@/src/components/public-vehicle-issues/ProposalPopup'
 import ActualResultPopup from '@/src/components/public-vehicle-issues/ActualResultPopup';
 import ViewProposalDialog from '@/src/components/public-vehicle-issues/ViewProposalDialog';
 import ApproveProposalDialog from '@/src/components/public-vehicle-issues/ApproveProposalDialog';
-import NearbySupportMap from '@/src/components/public-vehicle-issues/NearbySupportMap';
 import { usePublicIssuesToDispatch } from '@/src/hooks/usePublicIssuesToDispatch';
 import { Timestamp } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
 
-/** ✅ NEW: Bản đồ kỹ thuật viên thời gian thực (Admin/Assistant) */
-import TechnicianLiveMap from '@/src/components/admin/TechnicianLiveMap';
+/** ✅ Dynamic import các component bản đồ để tránh SSR dùng window */
+const TechnicianLiveMap = dynamic(
+  () => import('@/src/components/admin/TechnicianLiveMap'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 md:h-80 w-full grid place-items-center text-sm text-gray-500">
+        Loading technician live map…
+      </div>
+    ),
+  }
+);
+
+const NearbySupportMap = dynamic(
+  () => import('@/src/components/public-vehicle-issues/NearbySupportMap'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 md:h-80 w-full grid place-items-center text-sm text-gray-500">
+        Loading nearby supports…
+      </div>
+    ),
+  }
+);
 
 type LatLng = { lat: number; lng: number };
 type Status = 'All' | PublicVehicleIssue['status'];
