@@ -1,3 +1,4 @@
+// src/components/my-business/services/ServiceListItem.tsx
 'use client';
 
 import { useTranslation } from 'react-i18next';
@@ -15,8 +16,10 @@ interface Props {
 
 type SimpleField = { name: string; label: string };
 
-/** 🏷️ Fallback labels nếu field không có trong config */
+/** 🏷️ Fallback labels đúng theo JSON */
 const FALLBACK_LABELS: Record<string, string> = {
+  name: 'fields.name.label',
+  description: 'fields.description.label',
   location: 'fields.location.label',
   storeLocation: 'fields.storeLocation.label',
   workingHours: 'fields.workingHours.label',
@@ -39,7 +42,6 @@ const FALLBACK_LABELS: Record<string, string> = {
   region: 'fields.region.label',
   duration: 'fields.duration.label',
   price: 'fields.price.label',
-
   // multi
   vehicleTypes: 'fields.vehicleTypes.label',
   supportedVehicles: 'fields.supportedVehicles.label',
@@ -47,10 +49,13 @@ const FALLBACK_LABELS: Record<string, string> = {
   insuranceTypes: 'fields.insuranceTypes.label',
 };
 
-/** 🧹 Field meta không hiển thị */
+/** 🧹 Field meta KHÔNG hiển thị */
 const META_KEYS = new Set<string>([
   'id',
   'userId',
+  'businessId',     // ⬅️ mới
+  'companyId',      // ⬅️ mới
+  'businessType',   // ⬅️ mới
   'category',
   'serviceType',
   'status',
@@ -61,36 +66,35 @@ const META_KEYS = new Set<string>([
   'name',
   'description',
   'partnerType',
+  'approveStatus',
+  'approveComment',
 ]);
 
-/** 🔖 Style theo status ('active' | 'pending' | 'inactive') */
+/** 🔖 Style theo status */
 const STATUS_CLASS: Record<ServiceStatus, string> = {
   active: 'bg-green-100 text-green-700',
   pending: 'bg-yellow-100 text-yellow-700',
   inactive: 'bg-gray-200 text-gray-600',
 };
 
-/** 🔁 Chuẩn hoá hiển thị giá trị option (vehicle/insurance) — KHÔNG map code ngôn ngữ */
+/** 🔁 Map option code → i18n key */
 function mapOptionValue(t: TFunction<'common'>, v: string): string {
   const SHORT_MAP: Record<string, string> = {
-    // vehicle types
     motorbike: 'options.vehicleType.motorbike',
     car: 'options.vehicleType.car',
     van: 'options.vehicleType.van',
     bus: 'options.vehicleType.bus',
-    // insurance types
     accident: 'options.insuranceType.accident',
     liability: 'options.insuranceType.liability',
     theft: 'options.insuranceType.theft',
     comprehensive: 'options.insuranceType.comprehensive',
   };
-
   if (v.startsWith('options.')) return t(v, { defaultValue: v.split('.').pop() });
   if (SHORT_MAP[v]) return t(SHORT_MAP[v], { defaultValue: v });
-  return v; // en/vi/ko/ja hoặc text thường giữ nguyên
+  return v;
 }
 
-/** 🧭 Resolve field config theo service (kể cả nhánh partnerType) */
+/** 🧭 Lấy config field theo service (kể cả nhánh partnerType) */
 function resolveFieldsByService(service: UserService): SimpleField[] {
   const raw = (serviceFieldConfig as any)?.[service.category]?.[service.serviceType];
   if (Array.isArray(raw)) return raw as SimpleField[];
@@ -99,9 +103,17 @@ function resolveFieldsByService(service: UserService): SimpleField[] {
   return (byPartner as SimpleField[]) ?? [];
 }
 
+/** ❌ Ẩn khóa hệ thống, *Id, _private */
+function shouldShowKey(key: string, value: unknown): boolean {
+  if (META_KEYS.has(key)) return false;
+  if (key.endsWith('Id')) return false;     // ẩn mọi xxxId
+  if (key.startsWith('_')) return false;    // ẩn khóa nội bộ
+  if (value === undefined || value === null || value === '') return false;
+  return true;
+}
+
 export default function ServiceListItem({ service, onEdit, onDelete }: Props) {
   const { t } = useTranslation('common');
-
   const statusStyle = STATUS_CLASS[service.status] ?? 'bg-gray-200 text-gray-600';
 
   // 1) Field từ config
@@ -122,18 +134,16 @@ export default function ServiceListItem({ service, onEdit, onDelete }: Props) {
           .join(', ')
       : '';
 
-  // 5) Gom field hiển thị (primary từ config + extra từ object)
+  // 5) Gom field hiển thị
   const svcObj = service as Record<string, unknown>;
 
   const primaryEntries: Array<[string, unknown]> = resolvedFields
     .map((f) => [f.name, svcObj[f.name]] as [string, unknown])
-    .filter(([, v]) => v !== undefined && v !== '');
+    .filter(([k, v]) => shouldShowKey(k, v));
 
-  const extraEntries: Array<[string, unknown]> = Object.entries(
-    svcObj as Record<string, unknown>
-  )
-    .filter(([k]: [string, unknown]) => !META_KEYS.has(k) && !shownKeys.has(k) && !labelIndex.has(k))
-    .filter(([, v]: [string, unknown]) => v !== undefined && v !== '');
+  const extraEntries: Array<[string, unknown]> = Object
+    .entries(svcObj)
+    .filter(([k, v]) => shouldShowKey(k, v) && !shownKeys.has(k) && !labelIndex.has(k));
 
   const entriesToRender: Array<[string, unknown]> = [...primaryEntries, ...extraEntries];
 
@@ -143,12 +153,8 @@ export default function ServiceListItem({ service, onEdit, onDelete }: Props) {
   };
 
   const formatValue = (val: unknown): string => {
-    if (Array.isArray(val)) {
-      return (val as unknown[]).map((v: unknown) => mapOptionValue(t, String(v))).join(', ');
-    }
-    if (typeof val === 'boolean') {
-      return t(val ? 'common.yes' : 'common.no', { defaultValue: val ? 'Yes' : 'No' });
-    }
+    if (Array.isArray(val)) return (val as unknown[]).map((v) => mapOptionValue(t, String(v))).join(', ');
+    if (typeof val === 'boolean') return t(val ? 'common.yes' : 'common.no', { defaultValue: val ? 'Yes' : 'No' });
     if (typeof val === 'number') return String(val);
     if (typeof val === 'string') {
       if (val.startsWith('options.')) return t(val, { defaultValue: val.split('.').pop() });
@@ -187,7 +193,7 @@ export default function ServiceListItem({ service, onEdit, onDelete }: Props) {
           {/* Dynamic + Extra fields */}
           {entriesToRender.length > 0 && (
             <div className="space-y-1">
-              {entriesToRender.map(([key, value]: [string, unknown]) => (
+              {entriesToRender.map(([key, value]) => (
                 <div key={key} className="text-sm text-gray-600">
                   <span className="font-medium">{translateLabel(key)}:</span>{' '}
                   {formatValue(value)}

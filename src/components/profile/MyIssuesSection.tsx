@@ -27,6 +27,7 @@ function toDate(value?: any): Date | null {
   const d = new Date(value);
   return isNaN(d.getTime()) ? null : d;
 }
+
 function formatDateTime(value?: any, locale = 'vi-VN'): string {
   const d = toDate(value);
   if (!d) return '-';
@@ -59,24 +60,35 @@ export default function MyIssuesSection({ issues }: Props) {
     <div className="p-4 border-t space-y-4">
       {/* Quick stats */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h2 className="text-lg font-semibold">{t('my_issues_section.title', 'My Issues')}</h2>
+        <h2 className="text-lg font-semibold">{t('my_issues_section.title')}</h2>
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="px-2 py-1 rounded bg-gray-100">Total: {stats.total}</span>
-          <span className="px-2 py-1 rounded bg-yellow-100 text-yellow-800">Pending: {stats.pending}</span>
-          <span className="px-2 py-1 rounded bg-sky-100 text-sky-800">In Progress: {stats.in_progress}</span>
-          <span className="px-2 py-1 rounded bg-green-100 text-green-800">Resolved: {stats.resolved}</span>
-          <span className="px-2 py-1 rounded bg-gray-200 text-gray-800">Closed: {stats.closed}</span>
+          <span className="px-2 py-1 rounded bg-gray-100">
+            {t('my_issues_section.stats.total')}: {stats.total}
+          </span>
+          <span className="px-2 py-1 rounded bg-yellow-100 text-yellow-800">
+            {t('status.pending', 'Pending')}: {stats.pending}
+          </span>
+          <span className="px-2 py-1 rounded bg-sky-100 text-sky-800">
+            {t('status.in_progress', 'In Progress')}: {stats.in_progress}
+          </span>
+          <span className="px-2 py-1 rounded bg-green-100 text-green-800">
+            {t('status.resolved', 'Resolved')}: {stats.resolved}
+          </span>
+          <span className="px-2 py-1 rounded bg-gray-200 text-gray-800">
+            {t('status.closed', 'Closed')}: {stats.closed}
+          </span>
         </div>
       </div>
 
       {issues.length === 0 ? (
-        <p className="text-sm text-gray-500">{t('my_issues_section.no_issues', 'No issues yet')}</p>
+        <p className="text-sm text-gray-500">{t('my_issues_section.no_issues')}</p>
       ) : (
         <>
           {/* 📱 Mobile cards */}
           <div className="grid gap-3 md:hidden">
             {issues.map((i) => {
               const statusLabel = t(`status.${i.status}`, i.status);
+              const approveStatusLabel = i.approveStatus ? t(`approve_status.${i.approveStatus}`, i.approveStatus) : NA;
               const vehicleName = [i.vehicleBrand, i.vehicleModel, i.vehicleLicensePlate].filter(Boolean).join(' ') || NA;
               return (
                 <div key={i.id} className="rounded-lg border bg-white p-3 shadow-sm">
@@ -92,6 +104,7 @@ export default function MyIssuesSection({ issues }: Props) {
                     <div>{t('my_issues_section.table.assigned_to')}: {i.assignedToName || NA}</div>
                     <div>{t('my_issues_section.table.proposed_cost')}: {i.proposedCost != null ? formatCurrency(i.proposedCost, locale) : NA}</div>
                     <div>{t('my_issues_section.table.actual_cost')}: {i.actualCost != null ? formatCurrency(i.actualCost, locale) : NA}</div>
+                    <div>{t('my_issues_section.table.approve_status')}: {approveStatusLabel}</div>
                     <div className="text-gray-500">
                       {t('my_issues_section.table.reported_at')}: {formatDateTime(i.createdAt, locale)}
                       {i.updatedAt ? ` • ${t('my_issues_section.table.updated_at')}: ${formatDateTime(i.updatedAt, locale)}` : ''}
@@ -107,20 +120,22 @@ export default function MyIssuesSection({ issues }: Props) {
             <table className="w-full text-sm border bg-white">
               <thead>
                 <tr className="bg-gray-50 text-left">
-                  <th className="p-2 border">{t('my_issues_section.table.vehicle', 'Vehicle')}</th>
-                  <th className="p-2 border">{t('my_issues_section.table.title', 'Title')}</th>
-                  <th className="p-2 border">{t('my_issues_section.table.location', 'Location')}</th>
-                  <th className="p-2 border">{t('my_issues_section.table.status', 'Status')}</th>
-                  <th className="p-2 border">{t('my_issues_section.table.assigned_to', 'Assigned to')}</th>
-                  <th className="p-2 border">{t('my_issues_section.table.proposed_cost', 'Proposed cost')}</th>
-                  <th className="p-2 border">{t('my_issues_section.table.actual_cost', 'Actual cost')}</th>
-                  <th className="p-2 border">{t('my_issues_section.table.reported_at', 'Reported at')}</th>
-                  <th className="p-2 border">{t('my_issues_section.table.updated_at', 'Updated at')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.vehicle')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.title')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.location')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.status')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.assigned_to')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.proposed_cost')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.actual_cost')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.approve_status')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.reported_at')}</th>
+                  <th className="p-2 border">{t('my_issues_section.table.updated_at')}</th>
                 </tr>
               </thead>
               <tbody>
                 {issues.map((i) => {
                   const statusLabel = t(`status.${i.status}`, i.status);
+                  const approveStatusLabel = i.approveStatus ? t(`approve_status.${i.approveStatus}`, i.approveStatus) : NA;
                   const vehicleName = [i.vehicleBrand, i.vehicleModel, i.vehicleLicensePlate].filter(Boolean).join(' ') || NA;
                   return (
                     <tr key={i.id} className="border-t align-top">
@@ -135,6 +150,7 @@ export default function MyIssuesSection({ issues }: Props) {
                       <td className="p-2 border-r text-xs">{i.assignedToName || NA}</td>
                       <td className="p-2 border-r text-xs">{i.proposedCost != null ? formatCurrency(i.proposedCost, locale) : NA}</td>
                       <td className="p-2 border-r text-xs">{i.actualCost != null ? formatCurrency(i.actualCost, locale) : NA}</td>
+                      <td className="p-2 border-r text-xs">{approveStatusLabel}</td>
                       <td className="p-2 border-r text-xs">{formatDateTime(i.createdAt, locale)}</td>
                       <td className="p-2 text-xs">{i.updatedAt ? formatDateTime(i.updatedAt, locale) : '-'}</td>
                     </tr>

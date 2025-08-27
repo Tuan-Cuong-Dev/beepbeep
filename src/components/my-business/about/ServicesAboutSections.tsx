@@ -4,14 +4,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  collection,
-  getDocs,
-  query,
-  where,
-  doc,
-  getDoc,
-  type FirestoreDataConverter,
-  type QuerySnapshot,
+  collection, getDocs, query, where, doc, getDoc,
+  type FirestoreDataConverter, type QuerySnapshot,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import type { UserService, ServiceStatus } from '@/src/lib/vehicle-services/userServiceTypes';
@@ -24,32 +18,71 @@ import { serviceFieldConfig } from '@/src/lib/vehicle-services/serviceFieldConfi
 type ServiceDoc = UserService & { id: string };
 
 interface Props {
-  businessId?: string;  // nếu services gắn business/company
-  userId?: string;      // nếu services gắn user
+  businessId?: string;
+  userId?: string;
   className?: string;
-  statusIn?: ServiceStatus[]; // mặc định: active + pending
+  statusIn?: ServiceStatus[];
   limit?: number;
 }
 
+/** ✅ Nhãn dự phòng đúng theo JSON bạn gửi */
 const FALLBACK_LABELS: Record<string, string> = {
+  name: 'fields.name.label',
+  description: 'fields.description.label',
   location: 'fields.location.label',
-  storeLocation: 'fields.storeLocation.label',
+  specialties: 'fields.specialties.label',
   workingHours: 'fields.workingHours.label',
-  rentalTerms: 'fields.rentalTerms.label',
+  storeLocation: 'fields.storeLocation.label',
+  equipment: 'fields.equipment.label',
   vehicleTypes: 'fields.vehicleTypes.label',
-  supportedVehicles: 'fields.supportedVehicles.label',
-  pricePerKm: 'fields.pricePerKm.label',
+  pickupLocation: 'fields.pickupLocation.label',
+  rentalTerms: 'fields.rentalTerms.label',
+  driverExperience: 'fields.driverExperience.label',
+  languages: 'fields.languages.label',
+  region: 'fields.region.label',
+  duration: 'fields.duration.label',
+  price: 'fields.price.label',
+  swapLocation: 'fields.swapLocation.label',
+  supportedModels: 'fields.supportedModels.label',
   availableBatteries: 'fields.availableBatteries.label',
+  deliveryArea: 'fields.deliveryArea.label',
+  deliveryTime: 'fields.deliveryTime.label',
+  rescueArea: 'fields.rescueArea.label',
+  maxWeight: 'fields.maxWeight.label',
+  routes: 'fields.routes.label',
+  pricePerKm: 'fields.pricePerKm.label',
+  cleaningPackages: 'fields.cleaningPackages.label',
+  priceRange: 'fields.priceRange.label',
+  accessoryTypes: 'fields.accessoryTypes.label',
+  deliveryAvailable: 'fields.deliveryAvailable.label',
+  insuranceTypes: 'fields.insuranceTypes.label',
+  supportedVehicles: 'fields.supportedVehicles.label',
+  policyTerms: 'fields.policyTerms.label',
+  registrationArea: 'fields.registrationArea.label',
+  processingTime: 'fields.processingTime.label',
 };
 
+/** 🔒 Loại bỏ các khóa hệ thống không nên hiển thị */
 const META_KEYS = new Set<string>([
-  'id', 'userId', 'businessId', 'companyId',
-  'category', 'serviceType', 'status',
-  'createdAt', 'updatedAt', 'creatorName', 'creatorPhotoURL',
-  'partnerType', 'description', 'name',
+  'id','userId','businessId','companyId','ownerId','approverId',
+  'category','serviceType','businessType','partnerType','status',
+  'createdAt','updatedAt','creatorName','creatorPhotoURL',
+  'name','description','coverImage','icon',
+  'approveStatus','approveComment',
 ]);
 
-// ---------- helpers ----------
+/** 🏷️ Badge trạng thái dịch qua i18n */
+function statusPill(status?: ServiceStatus, t?: TFunction<'common'>) {
+  const label = t ? t(`my_service_list.status.${status}`, { defaultValue: status }) : status;
+  switch (status) {
+    case 'active':   return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">{label}</span>;
+    case 'pending':  return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800">{label}</span>;
+    case 'inactive': return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700">{label}</span>;
+    default:         return null;
+  }
+}
+
+/** 🔁 Map option ngắn → i18n */
 function mapOptionValue(t: TFunction<'common'>, v: string): string {
   const SHORT_MAP: Record<string, string> = {
     motorbike: 'options.vehicleType.motorbike',
@@ -66,6 +99,7 @@ function mapOptionValue(t: TFunction<'common'>, v: string): string {
   return v;
 }
 
+/** 🧩 Lấy label từ serviceFieldConfig (nếu có), fallback sang FALLBACK_LABELS */
 function resolveFieldsByService(svc: ServiceDoc): Array<{ name: string; label: string }> {
   const raw = (serviceFieldConfig as any)?.[svc.category]?.[svc.serviceType];
   if (Array.isArray(raw)) return raw as Array<{ name: string; label: string }>;
@@ -86,34 +120,20 @@ function InfoRow({ icon, label, value }: { icon?: React.ReactNode; label: string
   );
 }
 
-// Firestore converter cho services → đảm bảo .data() có kiểu UserService
 const serviceConverter: FirestoreDataConverter<UserService> = {
-  toFirestore(svc: UserService) {
-    // Không dùng để write ở đây
-    const { id, ...rest } = svc as any;
-    return rest;
-  },
-  fromFirestore(snapshot, options) {
-    return snapshot.data(options) as UserService;
-  },
+  toFirestore(svc: UserService) { const { id, ...rest } = svc as any; return rest; },
+  fromFirestore(snapshot, options) { return snapshot.data(options) as UserService; },
 };
 
-// lấy ownerId từ company (nếu cần)
 async function getOwnerIdFromCompany(companyId?: string): Promise<string | undefined> {
   if (!companyId) return undefined;
   const snap = await getDoc(doc(db, 'rentalCompanies', companyId));
   if (!snap.exists()) return undefined;
-  const data = snap.data() as { ownerId?: string };
-  return data?.ownerId;
+  return (snap.data() as { ownerId?: string })?.ownerId;
 }
 
-// ---------- component ----------
 export default function ServicesAboutSection({
-  businessId,
-  userId,
-  className,
-  statusIn = ['active', 'pending'],
-  limit = 4,
+  businessId, userId, className, statusIn = ['active','pending'], limit = 4,
 }: Props) {
   const { t } = useTranslation('common');
   const [services, setServices] = useState<ServiceDoc[]>([]);
@@ -126,13 +146,10 @@ export default function ServicesAboutSection({
 
   useEffect(() => {
     let mounted = true;
-
     (async () => {
       setLoading(true);
       try {
         const col = collection(db, 'services').withConverter(serviceConverter);
-
-        // đồng nhất generic: mọi getDocs trả về QuerySnapshot<UserService>
         const tasks: Array<Promise<QuerySnapshot<UserService>>> = [];
 
         if (businessId) {
@@ -141,30 +158,15 @@ export default function ServicesAboutSection({
         }
 
         let userIdToUse = userId;
-        if (!userIdToUse && businessId) {
-          userIdToUse = await getOwnerIdFromCompany(businessId);
-        }
-        if (userIdToUse) {
-          tasks.push(getDocs(query(col, where('userId', '==', userIdToUse))));
-        }
+        if (!userIdToUse && businessId) userIdToUse = await getOwnerIdFromCompany(businessId);
+        if (userIdToUse) tasks.push(getDocs(query(col, where('userId', '==', userIdToUse))));
 
-        if (tasks.length === 0) {
-          if (mounted) {
-            setServices([]);
-            setLoading(false);
-          }
-          return;
-        }
+        if (!tasks.length) { if (mounted) { setServices([]); setLoading(false); } return; }
 
         const snapshots = await Promise.all(tasks);
-
-        // map + dedup theo id
-        const docs = snapshots.flatMap(s =>
-          s.docs.map(d => ({ ...d.data(), id: d.id } as ServiceDoc))
-        );
+        const docs = snapshots.flatMap(s => s.docs.map(d => ({ ...d.data(), id: d.id } as ServiceDoc)));
         const uniq = Array.from(new Map(docs.map(d => [d.id, d])).values());
 
-        // lọc status an toàn (thiếu status => coi như active)
         const filtered = statusKey
           ? uniq.filter(s => (statusIn as ServiceStatus[]).includes((s.status ?? 'active') as ServiceStatus))
           : uniq;
@@ -176,10 +178,7 @@ export default function ServicesAboutSection({
         if (mounted) setLoading(false);
       }
     })();
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [businessId, userId, statusKey]);
 
   const items = useMemo(() => services.slice(0, limit), [services, limit]);
@@ -199,17 +198,49 @@ export default function ServicesAboutSection({
   if (!items.length) {
     return (
       <section className={cn('bg-white border border-gray-200 rounded-lg p-5 shadow-sm', className)}>
-        <p className="text-sm text-gray-500">
-          {t('services_about.empty', { defaultValue: 'No services yet.' })}
-        </p>
+        <p className="text-sm text-gray-500">{t('services_about.empty', { defaultValue: 'No services yet.' })}</p>
       </section>
     );
   }
 
+  /** ✅ Toàn bộ keys ưu tiên hiển thị (khớp JSON) */
+  const preferredKeys = [
+    'location','storeLocation','workingHours','rentalTerms',
+    'vehicleTypes','supportedVehicles','availableBatteries','pricePerKm',
+    'specialties','equipment','pickupLocation','driverExperience',
+    'languages','region','duration','price','swapLocation',
+    'supportedModels','deliveryArea','deliveryTime','rescueArea',
+    'maxWeight','routes','cleaningPackages','priceRange',
+    'accessoryTypes','deliveryAvailable','insuranceTypes',
+    'policyTerms','registrationArea','processingTime',
+  ];
+
+  const shouldShow = (k: string, v: unknown) => {
+    if (META_KEYS.has(k)) return false;
+    if (k.endsWith('Id')) return false;       // ẩn mọi *Id
+    if (k.startsWith('_')) return false;
+    if (v === undefined || v === null || v === '') return false;
+    return true;
+  };
+
+  const translateLabel = (t: TFunction<'common'>, labelIndex: Map<string,string>, key: string) =>
+    t(labelIndex.get(key) || FALLBACK_LABELS[key] || key, { defaultValue: key });
+
+  const formatValue = (t: TFunction<'common'>, val: unknown): string => {
+    if (Array.isArray(val)) return (val as unknown[]).map(v => mapOptionValue(t, String(v))).join(', ');
+    if (typeof val === 'boolean') return t(val ? 'common.yes' : 'common.no', { defaultValue: val ? 'Yes' : 'No' });
+    if (typeof val === 'number') return String(val);
+    if (typeof val === 'string') {
+      if (val.startsWith('options.')) return t(val, { defaultValue: val.split('.').pop() });
+      return val;
+    }
+    return String(val ?? '');
+  };
+
   return (
     <section className={cn('bg-white border border-gray-200 rounded-lg shadow-sm p-5 sm:p-6', className)}>
       <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-snug">
-        {t('services_about.title', { defaultValue: 'Services' })}
+        {t('services_about.title', { defaultValue: 'Dịch vụ của bạn' })}
       </h2>
 
       <div className="mt-4 space-y-5">
@@ -218,38 +249,17 @@ export default function ServicesAboutSection({
           const labelIndex = new Map<string, string>();
           fields.forEach((f) => labelIndex.set(f.name, f.label));
 
-          const preferredKeys = [
-            'location', 'storeLocation', 'workingHours', 'rentalTerms',
-            'vehicleTypes', 'supportedVehicles', 'availableBatteries', 'pricePerKm',
-          ];
-
-          const entries: Array<[string, unknown]> = preferredKeys
+          const baseEntries: Array<[string, unknown]> = preferredKeys
             .map((k) => [k, (svc as any)[k]] as [string, unknown])
-            .filter(([, v]) => v !== undefined && v !== '' && v !== null);
+            .filter(([k, v]) => shouldShow(k, v));
 
-          if (entries.length < 3) {
-            const extras = Object.entries(svc as Record<string, unknown>)
-              .filter(([k, v]) => !META_KEYS.has(k) && v !== undefined && v !== '')
-              .filter(([k]) => !preferredKeys.includes(k))
-              .slice(0, 3 - entries.length);
-            entries.push(...extras);
+          let extras: Array<[string, unknown]> = [];
+          if (baseEntries.length < 3) {
+            extras = Object.entries(svc as Record<string, unknown>)
+              .filter(([k, v]) => shouldShow(k, v) && !preferredKeys.includes(k))
+              .slice(0, 3 - baseEntries.length);
           }
-
-          const translateLabel = (key: string) =>
-            t(labelIndex.get(key) || FALLBACK_LABELS[key] || key, { defaultValue: key });
-
-          const formatValue = (val: unknown): string => {
-            if (Array.isArray(val)) {
-              return (val as unknown[]).map((v) => mapOptionValue(t, String(v))).join(', ');
-            }
-            if (typeof val === 'boolean') return t(val ? 'common.yes' : 'common.no', { defaultValue: val ? 'Yes' : 'No' });
-            if (typeof val === 'number') return String(val);
-            if (typeof val === 'string') {
-              if (val.startsWith('options.')) return t(val, { defaultValue: val.split('.').pop() });
-              return val;
-            }
-            return String(val ?? '');
-          };
+          const entries = [...baseEntries, ...extras];
 
           return (
             <div key={svc.id} className="rounded-lg border border-gray-100 p-4">
@@ -259,14 +269,8 @@ export default function ServicesAboutSection({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
-                      {svc.name}
-                    </h3>
-                    {svc.status === 'active' && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">
-                        {t('my_service_list.status.active', { defaultValue: 'Active' })}
-                      </span>
-                    )}
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">{svc.name}</h3>
+                    {statusPill(svc.status, t)}
                   </div>
 
                   {svc.description && (
@@ -277,19 +281,20 @@ export default function ServicesAboutSection({
                 </div>
               </div>
 
-              <div className="mt-3 grid grid-cols-1 gap-2">
-                {entries.map(([k, v]) => {
-                  const label = translateLabel(k);
-                  const text  = formatValue(v);
-                  const icon =
-                    k === 'location' || k === 'storeLocation' ? <MapPin className="size-3.5" /> :
-                    k === 'workingHours' ? <Clock className="size-3.5" /> :
-                    k === 'rentalTerms' ? <FileText className="size-3.5" /> :
-                    undefined;
-
-                  return <InfoRow key={k} icon={icon} label={label} value={text} />;
-                })}
-              </div>
+              {entries.length > 0 && (
+                <div className="mt-3 grid grid-cols-1 gap-2">
+                  {entries.map(([k, v]) => {
+                    const label = translateLabel(t, labelIndex, k);
+                    const text  = formatValue(t, v);
+                    const icon =
+                      k === 'location' || k === 'storeLocation' ? <MapPin className="size-3.5" /> :
+                      k === 'workingHours' ? <Clock className="size-3.5" /> :
+                      k === 'rentalTerms' ? <FileText className="size-3.5" /> :
+                      undefined;
+                    return <InfoRow key={k} icon={icon} label={label} value={text} />;
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
