@@ -2,19 +2,36 @@
 'use client';
 
 import { useMemo } from 'react';
+import nextDynamic from 'next/dynamic'; // 👈 đổi tên import để không đụng 'dynamic' của Next
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-import TechnicianLiveMap from '@/src/components/admin/TechnicianLiveMap';
 import { useUser } from '@/src/context/AuthContext';
 import { useTranslation } from 'react-i18next';
+
+// ✅ Tắt prerender tĩnh để tránh đụng window khi build
+export const dynamic = 'force-dynamic'; // hoặc: export const revalidate = 0;
+
+// ✅ Dynamic import component bản đồ (client-only)
+const TechnicianLiveMap = nextDynamic(
+  () => import('@/src/components/admin/TechnicianLiveMap'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[70vh] rounded border grid place-items-center text-sm text-gray-600">
+        Đang tải bản đồ…
+      </div>
+    ),
+  }
+);
 
 export default function AdminTechnicianLiveMapPage() {
   const { t } = useTranslation('common');
   const { role } = useUser();
 
   const normalizedRole = (role || '').toLowerCase();
+  // Nếu muốn cho Assistant xem luôn, thêm điều kiện dưới
   const canView = useMemo(
-    () => normalizedRole === 'admin',
+    () => normalizedRole === 'admin', // || normalizedRole === 'technician_assistant'
     [normalizedRole]
   );
 
@@ -27,7 +44,7 @@ export default function AdminTechnicianLiveMapPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             🗺️ {t('technician_live_map.map.title')}
           </h1>
-          <p className="text-sm text-gray-600">{t('technician_live_map.map.hint')}</p>
+        <p className="text-sm text-gray-600">{t('technician_live_map.map.hint')}</p>
         </div>
 
         {!canView ? (
