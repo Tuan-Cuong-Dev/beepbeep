@@ -3313,7 +3313,13 @@
     },
     "loading": "⏳ Đang tải...",
     "no_permission": "🚫 Bạn không có quyền truy cập trang này.",
-    "subtitle": "Phân công kỹ thuật viên để xử lý sự cố do khách hàng gửi lên."
+    "subtitle": "Phân công kỹ thuật viên để xử lý sự cố do khách hàng gửi lên.",
+    "admin_live_map_page": {
+      "map": {
+        "title": "Bản đồ kỹ thuật viên (thời gian thực)",
+        "hint_click": "Bấm vào biểu tượng để xem chi tiết kỹ thuật viên"
+      }
+    }
   },
 
   "public_issues_summary_card": {
@@ -3825,7 +3831,29 @@
   "estimated_cost": "Chi phí ước tính",
   "close": "Đóng",
   "unknown": "Không rõ"
-}
+},
+
+"tech_tracker": {
+    "go_online": "Go Online / Bắt đầu ca",
+    "pause": "Pause / Tạm dừng",
+    "resume": "Resume / Tiếp tục",
+    "end_shift": "End Shift / Kết thúc ca",
+    "status_online": "Online / Đang theo dõi",
+    "status_paused": "Paused / Đã tạm dừng"
+  },
+  "tech_tracker_hint": "🔒 Cho phép quyền truy cập vị trí. Hệ thống chỉ ghi dữ liệu khi bạn bắt đầu ca và có thể tạm dừng/kết thúc bất kỳ lúc nào.",
+  "admin_live_map_page": {
+    "map": {
+      "title": "Bản đồ kỹ thuật viên (thời gian thực)",
+      "hint_click": "Nhấp vào marker để xem chi tiết và đường đi của ca hiện tại."
+    },
+    "popup": {
+      "company": "Công ty",
+      "status": "Trạng thái",
+      "session": "Ca",
+      "view_path": "Xem đường đi"
+    }
+  }
 
 
 

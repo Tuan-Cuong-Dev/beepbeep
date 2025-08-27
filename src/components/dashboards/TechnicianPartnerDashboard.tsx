@@ -14,10 +14,15 @@ import ProposalPopup from '@/src/components/public-vehicle-issues/ProposalPopup'
 import ActualResultPopup from '@/src/components/public-vehicle-issues/ActualResultPopup';
 import PublicIssueTable from '@/src/components/public-vehicle-issues/PublicIssueTable';
 
-import { Wrench, ClipboardList, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Wrench, ClipboardList, CheckCircle, AlertTriangle, Satellite } from 'lucide-react';
 import Link from 'next/link';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
+
+/** ✅ Toggle theo dõi vị trí (card desktop) */
+import TrackerToggle from '@/src/components/techinicianPartner/TrackerToggle';
+/** ✅ Sticky bar cho mobile (nút to, dễ bấm) */
+import MobileStickyTrackerBar from '@/src/components/techinicianPartner/MobileStickyTrackerBar';
 
 export default function TechnicianPartnerDashboard() {
   const { t } = useTranslation('common');
@@ -108,6 +113,32 @@ export default function TechnicianPartnerDashboard() {
           🛠️ {t('technician_partner_dashboard.title')}
         </h1>
 
+        {/* ✅ Live Tracking
+            - Desktop: hiển thị card đẹp + TrackerToggle
+            - Mobile: card ẩn, dùng Sticky bar cố định dưới (render ở cuối trang) */}
+        <section className="hidden sm:block bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-[#e6fff5] text-[#00d289]">
+                <Satellite className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {t('admin_live_map_page.map.title')}
+                </h2>
+                <p className="text-xs text-gray-500">
+                  {t('tech_tracker_hint')}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Nút bật/tắt tracking (desktop) */}
+          <div className="flex items-center">
+            <TrackerToggle />
+          </div>
+        </section>
+
         {/* Summary cards */}
         <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <DashboardCard
@@ -168,6 +199,7 @@ export default function TechnicianPartnerDashboard() {
 
       <Footer />
 
+      {/* 🔔 Notification */}
       <NotificationDialog
         open={!!notification}
         type="success"
@@ -176,7 +208,7 @@ export default function TechnicianPartnerDashboard() {
         onClose={() => setNotification(null)}
       />
 
-      {/* Popup nộp đề xuất & kết quả thực tế */}
+      {/* 🧩 Popup nộp đề xuất & kết quả thực tế */}
       <ProposalPopup
         open={!!proposingIssue}
         onClose={() => setProposingIssue(null)}
@@ -187,6 +219,9 @@ export default function TechnicianPartnerDashboard() {
         onClose={() => setUpdatingActualIssue(null)}
         onSubmit={handleActualSubmit}
       />
+
+      {/* 📌 Sticky tracker bar chỉ mobile (tránh ghi trùng với card) */}
+      <MobileStickyTrackerBar className="sm:hidden" />
     </div>
   );
 }

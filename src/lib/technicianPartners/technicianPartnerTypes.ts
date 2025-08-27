@@ -8,6 +8,10 @@ export interface TechnicianPartner {
   id?: string;
   userId?: string;
 
+  /** Liên kết công ty (tùy chọn, hữu ích khi lọc/nhóm trên map) */
+  companyId?: string;
+  companyName?: string;
+
   name: string;
   phone: string;
   email?: string;

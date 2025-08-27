@@ -3253,7 +3253,13 @@
     },
     "loading": "⏳ 読み込み中...",
     "no_permission": "🚫 このページを表示する権限がありません。",
-    "subtitle": "顧客から報告された問題を処理するために技術者を割り当てます。"
+    "subtitle": "顧客から報告された問題を処理するために技術者を割り当てます。",
+    "admin_live_map_page": {
+      "map": {
+        "title": "技術者ライブマップ",
+        "hint_click": "アイコンをクリックすると技術者の詳細が表示されます"
+      }
+    }
   },
 
    "public_issues_summary_card": {

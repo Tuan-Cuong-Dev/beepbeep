@@ -22,6 +22,9 @@ import { usePublicIssuesToDispatch } from '@/src/hooks/usePublicIssuesToDispatch
 import { Timestamp } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
 
+/** ✅ NEW: Bản đồ kỹ thuật viên thời gian thực (Admin/Assistant) */
+import TechnicianLiveMap from '@/src/components/admin/TechnicianLiveMap';
+
 type LatLng = { lat: number; lng: number };
 type Status = 'All' | PublicVehicleIssue['status'];
 
@@ -77,7 +80,8 @@ export default function PublicIssueDispatchPage() {
   const [viewingProposal, setViewingProposal] = useState<PublicVehicleIssue | null>(null);
   const [approvingProposal, setApprovingProposal] = useState<PublicVehicleIssue | null>(null);
 
-  const { issues, loading, fetchVehicleIssues, updateIssue } = usePublicIssuesToDispatch();
+  // ⬇️ Refactor: dùng refresh thay cho fetchVehicleIssues
+  const { issues, loading, updateIssue, refresh } = usePublicIssuesToDispatch();
 
   const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
     setDialog({ open: true, type, title, description });
@@ -159,7 +163,7 @@ export default function PublicIssueDispatchPage() {
       showDialog('success', t('messages.assign_success'));
       setShowForm(false);
       setEditingIssue(null);
-      await fetchVehicleIssues();
+      await refresh(); // ⬅️ refetch khi không bật realtime
     } catch {
       showDialog('error', t('messages.assign_failed'));
     }
@@ -177,6 +181,7 @@ export default function PublicIssueDispatchPage() {
     setCloseDialogOpen(false);
     setClosingIssue(null);
     setCloseComment('');
+    await refresh(); // ⬅️
   };
 
   const handlePropose = async (solution: string, cost: number) => {
@@ -188,6 +193,7 @@ export default function PublicIssueDispatchPage() {
     });
     showDialog('success', t('messages.proposal_success'));
     setProposingIssue(null);
+    await refresh(); // ⬅️
   };
 
   const handleActualSubmit = async (solution: string, cost: number) => {
@@ -199,6 +205,7 @@ export default function PublicIssueDispatchPage() {
     });
     showDialog('success', t('messages.actual_success'));
     setUpdatingActualIssue(null);
+    await refresh(); // ⬅️
   };
 
   const handleApprove = async () => {
@@ -206,16 +213,15 @@ export default function PublicIssueDispatchPage() {
     await updateIssue(approvingProposal.id, { status: 'confirmed' });
     showDialog('success', t('messages.approve_success'));
     setApprovingProposal(null);
+    await refresh(); // ⬅️
   };
 
   const handleReject = async (reason: string) => {
     if (!approvingProposal?.id) return;
-    await updateIssue(approvingProposal.id, {
-      status: 'rejected',
-      closeComment: reason,
-    });
+    await updateIssue(approvingProposal.id, { status: 'rejected', closeComment: reason });
     showDialog('success', t('messages.reject_success'));
     setApprovingProposal(null);
+    await refresh(); // ⬅️
   };
 
   // ===== Render =====
@@ -223,13 +229,30 @@ export default function PublicIssueDispatchPage() {
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       <UserTopMenu />
-      <main className="flex-1 p-6 space-y-6">
+      <main className="flex-1 p-6 space-y-6 max-w-7xl mx-auto">
         <div className="text-center space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             {t('title')}
           </h1>
           <p className="text-sm text-gray-600">{t('subtitle')}</p>
         </div>
+
+        {/* ✅ NEW: Bản đồ kỹ thuật viên thời gian thực (chỉ Admin & Assistant) */}
+        {(isAdmin || isTechAssistant) && (
+          <section className="bg-white rounded-2xl shadow p-4 md:p-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {t('admin_live_map_page.map.title', { ns: 'common' })}
+                </h2>
+                <p className="text-xs text-gray-500">
+                  {t('admin_live_map_page.map.hint_click', { ns: 'common' })}
+                </p>
+              </div>
+            </div>
+            <TechnicianLiveMap />
+          </section>
+        )}
 
         {/* Summary dùng scopedIssues để khớp quyền */}
         <PublicIssuesSummaryCard issues={scopedIssues} />

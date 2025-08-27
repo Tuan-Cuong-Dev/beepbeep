@@ -3237,7 +3237,13 @@
     },
     "loading": "⏳ Loading...",
     "no_permission": "🚫 You do not have permission to view this page.",
-    "subtitle": "Assign technicians to handle issues reported by customers."
+    "subtitle": "Assign technicians to handle issues reported by customers.",
+    "admin_live_map_page": {
+      "map": {
+        "title": "Technician Live Map",
+        "hint_click": "Click on an icon to view technician details"
+      }
+    }
   },
 
   "public_issues_summary_card": {
@@ -3756,8 +3762,29 @@
   "estimated_cost": "Estimated Cost",
   "close": "Close",
   "unknown": "Unknown"
-}
+},
 
+  "tech_tracker": {
+    "go_online": "Go Online / Start Shift",
+    "pause": "Pause",
+    "resume": "Resume",
+    "end_shift": "End Shift",
+    "status_online": "Online / Tracking",
+    "status_paused": "Paused"
+  },
+  "tech_tracker_hint": "🔒 Please allow location permission. The system only records when you start a shift, and you can pause or end anytime.",
+  "admin_live_map_page": {
+    "map": {
+      "title": "Technicians Live Map",
+      "hint_click": "Click a marker to view details and the current shift path."
+    },
+    "popup": {
+      "company": "Company",
+      "status": "Status",
+      "session": "Session",
+      "view_path": "View path"
+    }
+  }
 
 
 
