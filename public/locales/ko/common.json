@@ -3804,7 +3804,37 @@
   "estimated_cost": "예상 비용",
   "close": "닫기",
   "unknown": "알 수 없음"
+},
+
+"technician_live_map": {
+  "map": {
+    "title": "모바일 기술자 지도",
+    "hint": "아바타를 클릭하면 상세 정보와 경로를 볼 수 있습니다"
+  },
+  "popup": {
+    "company": "회사",
+    "status": "상태",
+    "session": "근무 교대",
+    "view_path": "경로 보기",
+    "hide_path": "경로 숨기기"
+  },
+  "legend": {
+    "online": "온라인",
+    "paused": "일시 중지",
+    "offline": "오프라인 / 오래됨",
+    "reset_view": "화면 재설정"
+  },
+  "status": {
+    "online": "온라인",
+    "paused": "일시 중지",
+    "offline": "오프라인"
+  },
+  "common": {
+    "updated": "업데이트됨",
+    "copy": "복사"
+  }
 }
+
 
 
 

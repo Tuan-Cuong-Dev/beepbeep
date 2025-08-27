@@ -177,6 +177,13 @@ export default function AdminDashboard() {
           description: t('admin_dashboard.live_map.description'),
           route: '/admin/map',
         },
+        // Live Map của Kỹ thuật viên lưu động
+        {
+          icon: <FaMapMarkedAlt className="w-6 h-6 text-[#00d289]" />,
+          title: t('admin_dashboard.tech_live_map.title'),
+          description: t('admin_dashboard.tech_live_map.description'),
+          route: '/admin/technician-live-map',
+        },
         {
           icon: <FaClipboardList className="w-6 h-6 text-[#00d289]" />,
           title: t('admin_dashboard.pending_contributions.title'),

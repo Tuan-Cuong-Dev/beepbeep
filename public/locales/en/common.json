@@ -3773,18 +3773,35 @@
     "status_paused": "Paused"
   },
   "tech_tracker_hint": "🔒 Please allow location permission. The system only records when you start a shift, and you can pause or end anytime.",
-  "admin_live_map_page": {
-    "map": {
-      "title": "Technicians Live Map",
-      "hint_click": "Click a marker to view details and the current shift path."
-    },
-    "popup": {
-      "company": "Company",
-      "status": "Status",
-      "session": "Session",
-      "view_path": "View path"
-    }
+"technician_live_map": {
+  "map": {
+    "title": "Mobile Technician Map",
+    "hint": "Click on an avatar to view details and the route"
+  },
+  "popup": {
+    "company": "Company",
+    "status": "Status",
+    "session": "Work Shift",
+    "view_path": "View Route",
+    "hide_path": "Hide Route"
+  },
+  "legend": {
+    "online": "Online",
+    "paused": "Paused",
+    "offline": "Offline / Stale",
+    "reset_view": "Reset View"
+  },
+  "status": {
+    "online": "Online",
+    "paused": "Paused",
+    "offline": "Offline"
+  },
+  "common": {
+    "updated": "Updated",
+    "copy": "Copy"
   }
+}
+
 
 
 

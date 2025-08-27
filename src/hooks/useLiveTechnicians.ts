@@ -10,6 +10,7 @@ import {
   query,
   orderBy,
   limit,
+  type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { COLLECTIONS } from '@/src/lib/tracking/collections';
@@ -21,10 +22,21 @@ type Presence = {
   techId: string;
   name?: string | null;
   companyName?: string | null;
-  /** Ghi trực tiếp bởi publisher vào collection presence (nếu có) */
+
+  /** Avatar ưu tiên từ presence; nếu không có sẽ fallback users.photoURL (ở dưới) */
   avatarUrl?: string | null;
+
+  /** Toạ độ hiện tại */
   lat: number;
   lng: number;
+
+  /** Độ chính xác (m) — nếu có, dùng để vẽ vòng sai số */
+  accuracy?: number | null;
+
+  /** Thời điểm cập nhật cuối cùng (millis) — convert từ serverTimestamp() nếu có */
+  updatedAt?: number | null;
+
+  /** Trạng thái & ca hiện tại */
   status?: LiveStatus;
   sessionId?: string | null;
 };
@@ -35,35 +47,67 @@ type UserLite = {
   companyName?: string | null;
 };
 
-/** Lấy danh sách kỹ thuật viên đang online (kèm avatar).
- *  Ưu tiên ảnh từ presence.avatarUrl, nếu không có sẽ fallback users.photoURL. */
-export function useTechnicianPresence() {
+type PresenceOptions = {
+  /** Mặc định: true — kết hợp với bảng users để lấy photoURL */
+  joinUsers?: boolean;
+  /** Mặc định: false — nếu true sẽ chỉ trả về online */
+  onlineOnly?: boolean;
+};
+
+/** Lấy danh sách kỹ thuật viên đang hoạt động (kèm avatar).
+ *  Ưu tiên ảnh từ presence.avatarUrl; nếu trống, fallback users.photoURL. */
+export function useTechnicianPresence(opts: PresenceOptions = {}) {
+  const { joinUsers = true, onlineOnly = false } = opts;
+
   const [presence, setPresence] = useState<Presence[]>([]);
   const [userMap, setUserMap] = useState<Record<string, UserLite>>({}); // key = users.doc.id (uid)
 
   // Realtime presence
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, 'technician_presence'), (snap) => {
+    let unsub: Unsubscribe | null = null;
+
+    unsub = onSnapshot(collection(db, 'technician_presence'), (snap) => {
       const arr: Presence[] = snap.docs.map((d) => {
         const x = d.data() as any;
+
+        // Convert updatedAt -> millis nếu có
+        const updatedAt =
+          typeof x?.updatedAt?.toMillis === 'function'
+            ? x.updatedAt.toMillis()
+            : typeof x?.updatedAt === 'number'
+            ? x.updatedAt
+            : null;
+
+        const lat = Number(x.lat);
+        const lng = Number(x.lng);
+
         return {
           techId: x.techId || d.id, // đảm bảo là uid
           name: x.name ?? null,
           companyName: x.companyName ?? null,
           avatarUrl: x.avatarUrl ?? null,
-          lat: Number(x.lat),
-          lng: Number(x.lng),
+          lat: Number.isFinite(lat) ? lat : 0,
+          lng: Number.isFinite(lng) ? lng : 0,
+          accuracy: Number.isFinite(Number(x.accuracy)) ? Number(x.accuracy) : null,
+          updatedAt,
           status: (x.status as LiveStatus) ?? 'offline',
           sessionId: x.sessionId ?? null,
         };
       });
-      setPresence(arr);
+
+      // Tuỳ chọn lọc online
+      setPresence(onlineOnly ? arr.filter((p) => p.status === 'online') : arr);
     });
-    return () => unsub();
-  }, []);
+
+    return () => {
+      if (unsub) unsub();
+    };
+  }, [onlineOnly]);
 
   // One-shot: load users để lấy photoURL
   useEffect(() => {
+    if (!joinUsers) return;
+
     (async () => {
       const snap = await getDocs(collection(db, 'users'));
       const map: Record<string, UserLite> = {};
@@ -77,12 +121,12 @@ export function useTechnicianPresence() {
       });
       setUserMap(map);
     })();
-  }, []);
+  }, [joinUsers]);
 
   // Merge presence + users
   const merged = useMemo(() => {
     return presence.map((p) => {
-      const extra = userMap[p.techId] || {};
+      const extra = joinUsers ? userMap[p.techId] || {} : {};
       return {
         ...p,
         name: p.name ?? extra.name ?? p.techId,
@@ -91,7 +135,7 @@ export function useTechnicianPresence() {
         avatarUrl: p.avatarUrl ?? extra.photoURL ?? null,
       };
     });
-  }, [presence, userMap]);
+  }, [presence, userMap, joinUsers]);
 
   return merged;
 }
@@ -106,6 +150,9 @@ export function useTrackPolyline(techId: string, sessionId?: string) {
       return;
     }
 
+    // Ghi chú:
+    // - Bạn đã lưu t: Date (JS date) trong publisher → orderBy('t','asc') sẽ hoạt động
+    // - Nếu t là Firestore Timestamp: orderBy('t','asc') vẫn OK
     const q = query(
       collection(db, COLLECTIONS.points(techId, sessionId)),
       orderBy('t', 'asc'),
@@ -116,7 +163,12 @@ export function useTrackPolyline(techId: string, sessionId?: string) {
       setPoints(
         snap.docs.map((d) => {
           const v = d.data() as any;
-          return { lat: Number(v.lat), lng: Number(v.lng) };
+          const lat = Number(v.lat);
+          const lng = Number(v.lng);
+          return {
+            lat: Number.isFinite(lat) ? lat : 0,
+            lng: Number.isFinite(lng) ? lng : 0,
+          };
         })
       );
     });

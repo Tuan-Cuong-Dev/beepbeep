@@ -3784,7 +3784,37 @@
   "estimated_cost": "見積もり費用",
   "close": "閉じる",
   "unknown": "不明"
+},
+
+"technician_live_map": {
+  "map": {
+    "title": "モバイル技術者マップ",
+    "hint": "アバターをクリックすると詳細と経路が表示されます"
+  },
+  "popup": {
+    "company": "会社",
+    "status": "ステータス",
+    "session": "勤務シフト",
+    "view_path": "経路を見る",
+    "hide_path": "経路を隠す"
+  },
+  "legend": {
+    "online": "オンライン",
+    "paused": "一時停止",
+    "offline": "オフライン / 古い",
+    "reset_view": "表示をリセット"
+  },
+  "status": {
+    "online": "オンライン",
+    "paused": "一時停止",
+    "offline": "オフライン"
+  },
+  "common": {
+    "updated": "更新",
+    "copy": "コピー"
+  }
 }
+
 
 
 
