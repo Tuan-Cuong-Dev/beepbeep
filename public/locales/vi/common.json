@@ -2756,9 +2756,9 @@
     "phone": "Số điện thoại"
   },
   "open_in_google_maps": "Mở bằng Google Maps",
-  "title": "Bảng Điều Khiển Quản Trị",
+  "title": "Bảng điều khiển Admin",
   "groups": {
-    "business": "Loại hình kinh doanh & người dùng",
+    "business": "Loại hình kinh doanh & Người dùng",
     "vehicles": "Phương tiện & Pin",
     "services": "Dịch vụ & Phụ kiện",
     "bookings": "Đơn thuê & Gói dịch vụ",
@@ -2774,107 +2774,111 @@
     "description": "Quản lý đối tác sửa chữa bên ngoài"
   },
   "users": {
-    "title": "Quản lý người dùng",
-    "description": "Kiểm soát tài khoản và quyền truy cập"
+    "title": "Quản lý Người dùng",
+    "description": "Quản lý tài khoản và quyền truy cập"
   },
   "staff": {
-    "title": "Quản lý nhân sự",
-    "description": "Quản lý tất cả nhân sự trong hệ thống"
+    "title": "Quản lý Nhân viên",
+    "description": "Quản lý toàn bộ nhân viên trong hệ thống"
   },
   "customers": {
-    "title": "Quản lý khách hàng",
+    "title": "Quản lý Khách hàng",
     "description": "Xem và quản lý dữ liệu khách hàng"
   },
   "vehicle_models": {
-    "title": "Quản lý mẫu xe",
-    "description": "Quản lý tất cả các mẫu xe trong hệ thống"
+    "title": "Mẫu xe",
+    "description": "Quản lý tất cả mẫu xe trong hệ thống"
   },
   "vehicles": {
-    "title": "Quản lý phương tiện",
-    "description": "Quản lý tất cả phương tiện trong hệ thống"
+    "title": "Phương tiện",
+    "description": "Quản lý toàn bộ phương tiện trong hệ thống"
   },
   "vehicle_issues": {
-    "title": "Quản lý sự cố xe",
-    "description": "Theo dõi và xử lý các sự cố phương tiện"
+    "title": "Sự cố xe",
+    "description": "Theo dõi và xử lý sự cố phương tiện"
   },
   "batteries": {
-    "title": "Quản lý pin",
-    "description": "Theo dõi kho pin và trạng thái hoạt động"
+    "title": "Pin",
+    "description": "Theo dõi tồn kho và trạng thái hoạt động của pin"
   },
   "battery_stations": {
     "title": "Trạm đổi pin",
-    "description": "Quản lý địa điểm trạm đổi pin"
+    "description": "Quản lý vị trí các trạm đổi pin"
   },
   "battery_charging_stations": {
     "title": "Trạm sạc pin",
-    "description": "Quản lý địa điểm trạm sạc pin"
+    "description": "Quản lý vị trí các trạm sạc pin"
   },
   "accessories": {
-    "title": "Quản lý phụ kiện",
-    "description": "Quản lý phụ kiện và linh kiện"
+    "title": "Phụ kiện",
+    "description": "Quản lý phụ kiện và phụ tùng"
   },
   "accessory_export": {
-    "title": "Xuất phụ kiện",
+    "title": "Xuất kho phụ kiện",
     "description": "Quản lý xuất kho phụ kiện"
   },
   "bookings": {
-    "title": "Đơn thuê xe",
+    "title": "Đơn thuê",
     "description": "Xem và quản lý tất cả đơn thuê"
   },
   "packages": {
-    "title": "Gói thuê xe",
-    "description": "Thiết lập giá thuê và các gói dịch vụ"
+    "title": "Gói thuê",
+    "description": "Thiết lập giá thuê và gói dịch vụ"
   },
   "programs": {
     "title": "Chương trình",
-    "description": "Quản lý các chương trình và khuyến mãi"
+    "description": "Quản lý chương trình và khuyến mãi"
   },
   "form_builder": {
-    "title": "Tùy chỉnh biểu mẫu",
-    "description": "Tùy chỉnh biểu mẫu thuê xe cho các đối tác"
+    "title": "Trình tạo Form",
+    "description": "Tùy chỉnh form thuê xe cho đối tác"
   },
   "insurance_products": {
-    "title": "Sản phẩm bảo hiểm",
-    "description": "Tạo và quản lý các gói bảo hiểm cho người dùng"
+    "title": "Sản phẩm Bảo hiểm",
+    "description": "Tạo và quản lý gói bảo hiểm cho người dùng"
   },
   "insurance_approvals": {
-    "title": "Phê duyệt bảo hiểm",
-    "description": "Xét duyệt yêu cầu mua bảo hiểm của khách hàng"
+    "title": "Duyệt Bảo hiểm",
+    "description": "Xem xét yêu cầu mua bảo hiểm của khách hàng"
   },
   "pending_contributions": {
-    "title": "Dữ liệu chờ duyệt",
-    "description": "Xét duyệt dữ liệu do người dùng đóng góp"
+    "title": "Đóng góp chờ duyệt",
+    "description": "Xem xét dữ liệu do người dùng đóng góp"
   },
-   "live_map": {
-      "toggles":{
-        "users": "Người dùng",
-        "tech_shops": "Cửa hàng sửa xe",
-        "tech_mobiles": "Kỹ thuật viên di động",
-        "open_issues": "Sự cố đang mở"
-      },
-      "stats": {
-        "users_with_location": "Người dùng có vị trí",
-        "tech_shops": "Cửa hàng kỹ thuật",
-        "tech_mobiles": "Kỹ thuật viên di động",
-        "open_issues": "Sự cố mở"
-      },
-      "map": {
-        "title": "Bản đồ trực tiếp",
-        "hint_click": "Nhấn vào các điểm để xem chi tiết"
-      },
-      "legend": {
-        "tech_shop": "Cửa hàng kỹ thuật",
-        "tech_mobile": "Kỹ thuật viên di động",
-        "user": "Người dùng"
-      },
-      "hints": {
-        "realtime": "Dữ liệu được cập nhật theo thời gian thực từ Firestore.",
-        "optimize": "Chỉ bật lớp dữ liệu cần thiết để tối ưu hiệu suất.",
-        "colors": "Màu sắc biểu thị vai trò và trạng thái sự cố."
-      },
-      "title": "Bản đồ giám sát",
-      "description": "Giám sát thời gian thực vị trí người dùng, đối tác kỹ thuật và các sự cố đang mở."
-    }
+  "live_map": {
+    "toggles": {
+      "users": "Người dùng",
+      "tech_shops": "Kỹ thuật viên Cửa hàng",
+      "tech_mobiles": "Kỹ thuật viên lưu động",
+      "open_issues": "Sự cố đang mở"
+    },
+    "stats": {
+      "users_with_location": "Người dùng có vị trí",
+      "tech_shops": "Kỹ thuật viên Cửa hàng",
+      "tech_mobiles": "Kỹ thuật viên lưu động",
+      "open_issues": "Sự cố đang mở"
+    },
+    "map": {
+      "title": "Bản đồ trực tuyến",
+      "hint_click": "Bấm vào điểm để xem chi tiết"
+    },
+    "legend": {
+      "tech_shop": "Kỹ thuật viên Cửa hàng",
+      "tech_mobile": "Kỹ thuật viên lưu động",
+      "user": "Người dùng"
+    },
+    "hints": {
+      "realtime": "Dữ liệu được cập nhật theo thời gian thực từ Firestore.",
+      "optimize": "Chỉ bật lớp cần thiết để tối ưu hiệu năng.",
+      "colors": "Màu sắc thể hiện vai trò và trạng thái sự cố."
+    },
+    "title": "Bản đồ giám sát",
+    "description": "Giám sát theo thời gian thực vị trí người dùng, đối tác kỹ thuật và sự cố mở."
+  },
+  "tech_live_map": {
+    "title": "Bản đồ kỹ thuật viên",
+    "description": "Theo dõi vị trí và trạng thái của kỹ thuật viên lưu động."
+  }
 },
 
 "vehicle_model_management_page": {
