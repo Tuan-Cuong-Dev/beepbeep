@@ -32,7 +32,13 @@ const menuItems: MenuItem[] = [
   },
   {
     key: 'rental_companies',
-    path: '/rental-companies',
+    path: '/admin/rental-companies',
+    icon: FaStore,
+    roles: ['admin'],
+  },
+  {
+    key: 'rental_stations',
+    path: '/admin/rental-stations',
     icon: FaStore,
     roles: ['admin'],
   },

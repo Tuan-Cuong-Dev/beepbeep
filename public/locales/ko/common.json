@@ -647,6 +647,7 @@
 "user_top_menu": {
   "bookings": "예약 내역",
   "rental_companies": "대여 업체",
+  "rental_stations": "대여소",
   "vehicle_management": "차량 관리",
   "users_management": "사용자 관리",
   "customers_management": "고객 관리",
@@ -2252,16 +2253,28 @@
 },
 
 "rental_station_form": {
-  "edit_title": "스테이션 편집",
-  "station_name": "스테이션 이름",
+  "add_title": "대여소 추가",
+  "update_title": "대여소 업데이트",
+  "editing": "편집 중",
+  "name": "대여소 이름",
+  "location": "위치",
+  "total_ebikes": "총 전동 바이크 수",
+  "company": "회사",
+  "select_company": "회사 선택",
+  "add": "대여소 추가",
+  "update": "대여소 업데이트",
+  "cancel": "취소",
+  "detecting": "좌표 감지 중...",
+  "edit_title": "대여소 편집",
+  "station_name": "대여소 이름",
   "display_address": "표시 주소",
-  "map_address": "지도 주소 (구글 링크 또는 전체 주소)",
+  "map_address": "지도 주소 (Google 링크 또는 전체 주소)",
   "contact_phone": "연락처 전화번호 (예: 090-xxx-xxxx)",
-  "coordinates": "위치 (자동 입력됨)",
+  "coordinates": "좌표 (자동 입력)",
   "status_label": "상태",
   "status_active": "활성",
   "status_inactive": "비활성",
-  "detecting_coords": "📍 위치를 감지 중...",
+  "detecting_coords": "📍 좌표 감지 중...",
   "actions": {
     "cancel": "취소",
     "save_changes": "변경 사항 저장"
@@ -2732,6 +2745,10 @@
     "bookings": "예약 및 패키지",
     "insurance": "보험 관리",
     "tools": "도구 및 기여"
+  },
+  "rental-stations": {
+    "title": "대여소",
+    "description": "모든 대여소 관리"
   },
   "rental_companies": {
     "title": "렌탈 회사",
@@ -3879,9 +3896,130 @@
 
     "working_start_time": "시작 시간",
     "working_end_time": "종료 시간"
+  },
+"rental_company_form": {
+    "add_title": "렌털 회사 추가",
+    "update_title": "렌털 회사 업데이트",
+    "subtitle": "회사 정보를 입력하세요. Google Maps 링크나 위도,경도를 붙여넣으면 좌표가 자동으로 입력됩니다.",
+    "name_label": "회사 이름 *",
+    "name_placeholder": "회사 이름",
+    "name_hint": "공개적으로 표시됩니다.",
+    "email_label": "이메일",
+    "email_placeholder": "이메일",
+    "phone_label": "전화번호",
+    "phone_placeholder": "전화번호",
+    "display_address_label": "표시 주소 *",
+    "display_address_placeholder": "표시 주소",
+    "display_address_hint": "고객에게 표시되는 주소입니다.",
+    "map_address_label": "지도 주소",
+    "map_address_placeholder": "Google Maps 링크 또는 \"위도,경도\" (예: 16.047079,108.206230)",
+    "locating": "위치를 확인 중...",
+    "location_label": "위치 (자동 입력)",
+    "location_placeholder": "위치 (자동 입력)",
+    "cancel": "취소",
+    "add_btn": "회사 추가",
+    "update_btn": "회사 업데이트"
+  },
+  "rental_company_table": {
+    "section_companies_title": "🏢 렌털 회사",
+    "columns": {
+      "name": "이름",
+      "email": "이메일",
+      "phone": "전화번호",
+      "address": "주소",
+      "actions": "작업"
+    },
+    "actions": {
+      "edit": "수정",
+      "delete": "삭제"
+    },
+    "pagination": {
+      "prev": "이전",
+      "next": "다음",
+      "page_of": "{{current}} / {{total}} 페이지"
+    },
+    "empty_companies": "표시할 회사가 없습니다.",
+    "na": "없음"
+  },
+
+  "rental_search_ie": {
+    "search_placeholder": "🔍 회사 이름 검색...",
+    "search_aria": "렌털 회사 검색",
+    "export_button": "📤 엑셀로 내보내기",
+    "export_button_mobile": "📤 내보내기",
+    "export_filename": "Rental_Companies"
+  },
+"rental_companies_page": {
+    "title": "렌털 회사 관리",
+    "messages": {
+      "add_success": "✅ 회사가 성공적으로 추가되었습니다!",
+      "update_success": "✅ 회사가 성공적으로 업데이트되었습니다!",
+      "save_failed": "❌ 회사를 저장하지 못했습니다.",
+      "delete_success": "🗑️ 회사가 삭제되었습니다.",
+      "delete_failed": "❌ 회사를 삭제하지 못했습니다.",
+      "station_add_success": "✅ 지점이 성공적으로 추가되었습니다!",
+      "station_update_success": "✅ 지점이 성공적으로 업데이트되었습니다!",
+      "station_save_failed": "❌ 지점을 저장하지 못했습니다.",
+      "station_delete_success": "🗑️ 지점이 삭제되었습니다.",
+      "station_delete_failed": "❌ 지점을 삭제하지 못했습니다."
+    },
+    "confirm_delete": {
+      "title": "회사를 삭제하시겠습니까?",
+      "description": "이 회사를 삭제하시겠습니까?"
+    },
+    "confirm_delete_station": {
+      "title": "지점을 삭제하시겠습니까?",
+      "description": "이 지점을 삭제하시겠습니까?"
+    }
+  },
+
+  "rental_station_table": {
+  "companies_title": "🏢 대여 회사",
+  "stations_title": "📍 대여소",
+  "company": "회사",
+  "station_name": "대여소 이름",
+  "address": "주소",
+  "location": "위치",
+  "contact_phone": "연락처 전화번호",
+  "actions": "작업",
+  "name": "이름",
+  "email": "이메일",
+  "phone": "전화번호",
+  "unknown": "알 수 없음",
+  "edit": "수정",
+  "delete": "삭제",
+  "previous": "이전",
+  "next": "다음",
+  "page": "{{current}} / {{total}} 페이지"
+},
+
+"rental_stations_page": {
+  "title": "대여소 관리",
+  "add_title": "새 대여소 추가",
+  "edit_title": "대여소 편집",
+  "search_placeholder": "이름, 주소, 전화번호로 대여소 검색…",
+  "messages": {
+    "station_add_success": "대여소가 성공적으로 추가되었습니다",
+    "station_update_success": "대여소가 성공적으로 업데이트되었습니다",
+    "station_delete_success": "대여소가 성공적으로 삭제되었습니다",
+    "station_save_failed": "대여소 저장에 실패했습니다",
+    "station_delete_failed": "대여소 삭제에 실패했습니다"
+  },
+  "confirm_delete_station": {
+    "title": "대여소를 삭제하시겠습니까?",
+    "description": "이 작업은 되돌릴 수 없습니다."
+  },
+  "filters": {
+    "search": "검색",
+    "company": "회사",
+    "all_companies": "모든 회사",
+    "clear": "필터 지우기"
+  },
+  "actions": {
+    "refresh_companies": "회사 새로고침",
+    "refresh_stations": "대여소 새로고침"
   }
-
-
+}
 
 
 

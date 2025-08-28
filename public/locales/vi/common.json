@@ -674,6 +674,7 @@
 "user_top_menu": {
   "bookings": "Quản lý đơn thuê",
   "rental_companies": "Quản lý công ty cho thuê",
+  "rental_stations": "Quản lý trạm cho thuê",
   "vehicle_management": "Quản lý xe",
   "users_management": "Quản lý người dùng",
   "customers_management": "Quản lý khách hàng",
@@ -2298,6 +2299,18 @@
 },
 
 "rental_station_form": {
+  "add_title": "Thêm trạm cho thuê",
+  "update_title": "Cập nhật trạm cho thuê",
+  "editing": "Đang chỉnh sửa",
+  "name": "Tên trạm",
+  "location": "Tọa độ",
+  "total_ebikes": "Tổng số xe điện",
+  "company": "Công ty",
+  "select_company": "Chọn công ty",
+  "add": "Thêm trạm",
+  "update": "Cập nhật trạm",
+  "cancel": "Hủy",
+  "detecting": "Đang xác định tọa độ...",
   "edit_title": "Chỉnh sửa trạm",
   "station_name": "Tên trạm",
   "display_address": "Địa chỉ hiển thị",
@@ -2783,6 +2796,10 @@
   "rental_companies": {
     "title": "Công ty cho thuê",
     "description": "Quản lý tất cả doanh nghiệp cho thuê"
+  },
+  "rental-stations": {
+    "title": "Trạm cho thuê",
+    "description": "Quản lý tất cả trạm cho thuê"
   },
   "technician_partners": {
     "title": "Đối tác kỹ thuật",
@@ -3897,7 +3914,132 @@
     "shop": "Kỹ thuật viên tại cửa hàng",
     "mobile": "Kỹ thuật viên lưu động",
     "no_address": "Chưa có địa chỉ"
+  },
+"rental_company_form": {
+    "add_title": "Thêm doanh nghiệp cho thuê",
+    "update_title": "Cập nhật doanh nghiệp cho thuê",
+    "subtitle": "Nhập thông tin doanh nghiệp của bạn. Tọa độ sẽ tự động điền khi bạn dán liên kết Google Maps hoặc “vĩ độ,kinh độ”.",
+    "name_label": "Tên doanh nghiệp *",
+    "name_placeholder": "Tên doanh nghiệp",
+    "name_hint": "Tên sẽ hiển thị công khai.",
+    "email_label": "Email",
+    "email_placeholder": "Email",
+    "phone_label": "Số điện thoại",
+    "phone_placeholder": "Số điện thoại",
+    "display_address_label": "Địa chỉ hiển thị *",
+    "display_address_placeholder": "Địa chỉ hiển thị",
+    "display_address_hint": "Địa chỉ được hiển thị cho khách hàng.",
+    "map_address_label": "Địa chỉ bản đồ",
+    "map_address_placeholder": "Liên kết Google Maps hoặc \"vĩ độ,kinh độ\" (vd: 16.047079,108.206230)",
+    "locating": "Đang xác định tọa độ...",
+    "location_label": "Tọa độ (tự động điền)",
+    "location_placeholder": "Tọa độ (tự động điền)",
+    "cancel": "Hủy",
+    "add_btn": "Thêm doanh nghiệp",
+    "update_btn": "Cập nhật doanh nghiệp"
+  },
+
+  "rental_company_table": {
+    "section_companies_title": "🏢 Doanh nghiệp cho thuê",
+    "columns": {
+      "name": "Tên",
+      "email": "Email",
+      "phone": "Điện thoại",
+      "address": "Địa chỉ",
+      "actions": "Thao tác"
+    },
+    "actions": {
+      "edit": "Sửa",
+      "delete": "Xóa"
+    },
+    "pagination": {
+      "prev": "Trước",
+      "next": "Sau",
+      "page_of": "Trang {{current}} / {{total}}"
+    },
+    "empty_companies": "Chưa có doanh nghiệp nào.",
+    "na": "Không có"
+  },
+
+"rental_search_ie": {
+    "search_placeholder": "🔍 Tìm tên doanh nghiệp...",
+    "search_aria": "Tìm doanh nghiệp cho thuê",
+    "export_button": "📤 Xuất Excel",
+    "export_button_mobile": "📤 Xuất",
+    "export_filename": "Doanh_nghiep_Cho_thue"
+  },
+"rental_companies_page": {
+    "title": "Quản lý Doanh nghiệp cho thuê",
+    "messages": {
+      "add_success": "✅ Thêm doanh nghiệp thành công!",
+      "update_success": "✅ Cập nhật doanh nghiệp thành công!",
+      "save_failed": "❌ Lưu doanh nghiệp thất bại.",
+      "delete_success": "🗑️ Đã xóa doanh nghiệp.",
+      "delete_failed": "❌ Xóa doanh nghiệp thất bại.",
+      "station_add_success": "✅ Thêm trạm thành công!",
+      "station_update_success": "✅ Cập nhật trạm thành công!",
+      "station_save_failed": "❌ Lưu trạm thất bại.",
+      "station_delete_success": "🗑️ Đã xóa trạm.",
+      "station_delete_failed": "❌ Xóa trạm thất bại."
+    },
+    "confirm_delete": {
+      "title": "Xóa doanh nghiệp?",
+      "description": "Bạn có chắc chắn muốn xóa doanh nghiệp này?"
+    },
+    "confirm_delete_station": {
+      "title": "Xóa trạm?",
+      "description": "Bạn có chắc chắn muốn xóa trạm này?"
+    }
+  },
+"rental_station_table": {
+  "companies_title": "🏢 Công ty cho thuê",
+  "stations_title": "📍 Trạm cho thuê",
+  "company": "Công ty",
+  "station_name": "Tên trạm",
+  "address": "Địa chỉ",
+  "location": "Tọa độ",
+  "contact_phone": "Số điện thoại liên hệ",
+  "actions": "Hành động",
+  "name": "Tên",
+  "email": "Email",
+  "phone": "Điện thoại",
+  "unknown": "Không xác định",
+  "edit": "Chỉnh sửa",
+  "delete": "Xóa",
+  "previous": "Trước",
+  "next": "Tiếp",
+  "page": "Trang {{current}} trên {{total}}"
+},
+
+"rental_stations_page": {
+  "title": "Quản lý trạm cho thuê",
+  "add_title": "Thêm trạm mới",
+  "edit_title": "Chỉnh sửa trạm",
+  "search_placeholder": "Tìm trạm theo tên, địa chỉ, số điện thoại…",
+  "messages": {
+    "station_add_success": "Thêm trạm thành công",
+    "station_update_success": "Cập nhật trạm thành công",
+    "station_delete_success": "Xóa trạm thành công",
+    "station_save_failed": "Lưu trạm thất bại",
+    "station_delete_failed": "Xóa trạm thất bại"
+  },
+  "confirm_delete_station": {
+    "title": "Xóa trạm?",
+    "description": "Hành động này không thể hoàn tác."
+  },
+  "filters": {
+    "search": "Tìm kiếm",
+    "company": "Công ty",
+    "all_companies": "Tất cả công ty",
+    "clear": "Xóa bộ lọc"
+  },
+  "actions": {
+    "refresh_companies": "Làm mới công ty",
+    "refresh_stations": "Làm mới trạm"
   }
+}
+
+
 
 
 

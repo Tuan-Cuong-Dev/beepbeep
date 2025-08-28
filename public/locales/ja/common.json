@@ -628,6 +628,7 @@
 "user_top_menu": {
   "bookings": "予約管理",
   "rental_companies": "レンタル会社の管理",
+  "rental_stations": "レンタルステーション",
   "vehicle_management": "車両管理",
   "users_management": "ユーザー管理",
   "customers_management": "顧客管理",
@@ -2230,16 +2231,28 @@
 },
 
 "rental_station_form": {
+  "add_title": "レンタルステーションを追加",
+  "update_title": "レンタルステーションを更新",
+  "editing": "編集中",
+  "name": "ステーション名",
+  "location": "位置情報",
+  "total_ebikes": "電動バイクの合計台数",
+  "company": "会社",
+  "select_company": "会社を選択",
+  "add": "ステーションを追加",
+  "update": "ステーションを更新",
+  "cancel": "キャンセル",
+  "detecting": "位置情報を検出中...",
   "edit_title": "ステーションを編集",
   "station_name": "ステーション名",
   "display_address": "表示住所",
-  "map_address": "地図の住所（Googleリンクまたは完全な住所）",
-  "contact_phone": "連絡先電話番号（例：090-xxx-xxxx）",
-  "coordinates": "位置情報（自動入力）",
+  "map_address": "マップ住所（Googleリンクまたは完全な住所）",
+  "contact_phone": "連絡先電話番号（例: 090-xxx-xxxx）",
+  "coordinates": "座標（自動入力）",
   "status_label": "ステータス",
-  "status_active": "有効",
-  "status_inactive": "無効",
-  "detecting_coords": "📍 位置情報を検出中...",
+  "status_active": "稼働中",
+  "status_inactive": "停止中",
+  "detecting_coords": "📍 座標を検出中...",
   "actions": {
     "cancel": "キャンセル",
     "save_changes": "変更を保存"
@@ -2715,6 +2728,10 @@
   "rental_companies": {
     "title": "レンタル会社",
     "description": "すべてのレンタル事業を管理"
+  },
+  "rental-stations": {
+    "title": "レンタルステーション",
+    "description": "すべてのレンタルステーションを管理"
   },
   "technician_partners": {
     "title": "技術パートナー",
@@ -3859,7 +3876,132 @@
 
     "working_start_time": "시작 시간",
     "working_end_time": "종료 시간"
+  },
+  "rental_company_form": {
+    "add_title": "レンタル会社を追加",
+    "update_title": "レンタル会社を更新",
+    "subtitle": "会社情報を入力してください。Google マップのリンクまたは「緯度,経度」を貼り付けると座標が自動入力されます。",
+    "name_label": "会社名 *",
+    "name_placeholder": "会社名",
+    "name_hint": "公開されます。",
+    "email_label": "メール",
+    "email_placeholder": "メール",
+    "phone_label": "電話番号",
+    "phone_placeholder": "電話番号",
+    "display_address_label": "表示住所 *",
+    "display_address_placeholder": "表示住所",
+    "display_address_hint": "お客様に表示される住所です。",
+    "map_address_label": "マップ住所",
+    "map_address_placeholder": "Google マップリンク または \"緯度,経度\" (例: 16.047079,108.206230)",
+    "locating": "位置を検出中...",
+    "location_label": "位置 (自動入力)",
+    "location_placeholder": "位置 (自動入力)",
+    "cancel": "キャンセル",
+    "add_btn": "会社を追加",
+    "update_btn": "会社を更新"
+  },
+
+   "rental_company_table": {
+    "section_companies_title": "🏢 レンタル会社",
+    "columns": {
+      "name": "名称",
+      "email": "メール",
+      "phone": "電話番号",
+      "address": "住所",
+      "actions": "操作"
+    },
+    "actions": {
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "pagination": {
+      "prev": "前へ",
+      "next": "次へ",
+      "page_of": "{{current}} / {{total}} ページ"
+    },
+    "empty_companies": "表示する会社がありません。",
+    "na": "なし"
+  },
+  "rental_search_ie": {
+    "search_placeholder": "🔍 会社名を検索...",
+    "search_aria": "レンタル会社を検索",
+    "export_button": "📤 Excel にエクスポート",
+    "export_button_mobile": "📤 エクスポート",
+    "export_filename": "Rental_Companies"
+  },
+"rental_companies_page": {
+    "title": "レンタル会社管理",
+    "messages": {
+      "add_success": "✅ 会社を追加しました！",
+      "update_success": "✅ 会社を更新しました！",
+      "save_failed": "❌ 会社を保存できませんでした。",
+      "delete_success": "🗑️ 会社を削除しました。",
+      "delete_failed": "❌ 会社を削除できませんでした。",
+      "station_add_success": "✅ ステーションを追加しました！",
+      "station_update_success": "✅ ステーションを更新しました！",
+      "station_save_failed": "❌ ステーションを保存できませんでした。",
+      "station_delete_success": "🗑️ ステーションを削除しました。",
+      "station_delete_failed": "❌ ステーションを削除できませんでした。"
+    },
+    "confirm_delete": {
+      "title": "会社を削除しますか？",
+      "description": "この会社を本当に削除しますか？"
+    },
+    "confirm_delete_station": {
+      "title": "ステーションを削除しますか？",
+      "description": "このステーションを本当に削除しますか？"
+    }
+  },
+
+"rental_station_table": {
+  "companies_title": "🏢 レンタル会社",
+  "stations_title": "📍 レンタルステーション",
+  "company": "会社",
+  "station_name": "ステーション名",
+  "address": "住所",
+  "location": "位置情報",
+  "contact_phone": "連絡先電話番号",
+  "actions": "操作",
+  "name": "名前",
+  "email": "メール",
+  "phone": "電話番号",
+  "unknown": "不明",
+  "edit": "編集",
+  "delete": "削除",
+  "previous": "前へ",
+  "next": "次へ",
+  "page": "ページ {{current}} / {{total}}"
+},
+
+"rental_stations_page": {
+  "title": "レンタルステーション管理",
+  "add_title": "新しいステーションを追加",
+  "edit_title": "ステーションを編集",
+  "search_placeholder": "ステーション名、住所、電話番号で検索…",
+  "messages": {
+    "station_add_success": "ステーションを追加しました",
+    "station_update_success": "ステーションを更新しました",
+    "station_delete_success": "ステーションを削除しました",
+    "station_save_failed": "ステーションの保存に失敗しました",
+    "station_delete_failed": "ステーションの削除に失敗しました"
+  },
+  "confirm_delete_station": {
+    "title": "ステーションを削除しますか？",
+    "description": "この操作は元に戻せません。"
+  },
+  "filters": {
+    "search": "検索",
+    "company": "会社",
+    "all_companies": "すべての会社",
+    "clear": "フィルターをクリア"
+  },
+  "actions": {
+    "refresh_companies": "会社を更新",
+    "refresh_stations": "ステーションを更新"
   }
+}
+
+
 
 
 

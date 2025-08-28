@@ -2,14 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useUser } from '@/src/context/AuthContext';
-import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompanyTypes';
-import {
-  getMyRentalCompany,
-  updateRentalCompany,
-} from '@/src/components/rental-management/rental-companies/rentalCompanyService';
+import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 import RentalCompanyForm, {
   RentalCompanyFormData,
-} from '@/src/components/rental-management/rental-company/RentalCompanyForm';
+} from '@/src/components/rental-management/rental-companies/RentalCompanyForm(xóa)';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Header from '@/src/components/landingpage/Header';

@@ -6,7 +6,7 @@ import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
 import { Label } from '@/src/components/ui/label';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
-import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompanyTypes';
+import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 
 export type RentalCompanyFormData = {
   name: string;

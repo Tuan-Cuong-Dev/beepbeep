@@ -665,6 +665,7 @@
   "user_top_menu": {
   "bookings": "Bookings",
   "rental_companies": "Rental Companies",
+  "rental_stations": "Rental Stations",
   "vehicle_management": "Vehicle Management",
   "users_management": "Users Management",
   "customers_management": "Customers Management",
@@ -2270,16 +2271,28 @@
   },
 
 "rental_station_form": {
+  "add_title": "Add Rental Station",
+  "update_title": "Update Rental Station",
+  "editing": "Editing",
+  "name": "Station Name",
+  "location": "Location",
+  "total_ebikes": "Total eBikes",
+  "company": "Company",
+  "select_company": "Select company",
+  "add": "Add Station",
+  "update": "Update Station",
+  "cancel": "Cancel",
+  "detecting": "Detecting coordinates...",
   "edit_title": "Edit Station",
   "station_name": "Station Name",
   "display_address": "Display Address",
   "map_address": "Map Address (Google link or full address)",
-  "contact_phone": "Contact Phone (e.g. 090-xxx-xxxx)",
-  "coordinates": "Location (auto-filled)",
+  "contact_phone": "Contact Phone (e.g., 090-xxx-xxxx)",
+  "coordinates": "Coordinates (auto-filled)",
   "status_label": "Status",
   "status_active": "Active",
   "status_inactive": "Inactive",
-  "detecting_coords": "📍 Detecting location...",
+  "detecting_coords": "📍 Detecting coordinates...",
   "actions": {
     "cancel": "Cancel",
     "save_changes": "Save Changes"
@@ -2756,6 +2769,10 @@
   "rental_companies": {
     "title": "Rental Companies",
     "description": "Manage all rental businesses"
+  },
+  "rental-stations": {
+    "title": "Rental Stations",
+    "description": "Manage all rental stations"
   },
   "technician_partners": {
     "title": "Technician Partners",
@@ -3827,7 +3844,133 @@
     "shop": "Shop technician",
     "mobile": "Mobile technician",
     "no_address": "N/A"
+  },
+"rental_company_form": {
+    "add_title": "Add Rental Company",
+    "update_title": "Update Rental Company",
+    "subtitle": "Enter your company details. Coordinates will auto-fill when you paste a Google Maps link or latitude,longitude.",
+    "name_label": "Company Name *",
+    "name_placeholder": "Company Name",
+    "name_hint": "Displayed publicly.",
+    "email_label": "Email",
+    "email_placeholder": "Email",
+    "phone_label": "Phone",
+    "phone_placeholder": "Phone",
+    "display_address_label": "Display Address *",
+    "display_address_placeholder": "Display Address",
+    "display_address_hint": "Shown to customers.",
+    "map_address_label": "Map Address",
+    "map_address_placeholder": "Google Maps link or \"lat,lng\" (e.g., 16.047079,108.206230)",
+    "locating": "Detecting location...",
+    "location_label": "Location (auto-filled)",
+    "location_placeholder": "Location (auto-filled)",
+    "cancel": "Cancel",
+    "add_btn": "Add Company",
+    "update_btn": "Update Company"
+  },
+"rental_company_table": {
+    "section_companies_title": "🏢 Rental Companies",
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next",
+      "page_of": "Page {{current}} of {{total}}"
+    },
+    "empty_companies": "No companies to display.",
+    "na": "N/A"
+  },
+
+  "rental_search_ie": {
+    "search_placeholder": "🔍 Search company name...",
+    "search_aria": "Search rental companies",
+    "export_button": "📤 Export to Excel",
+    "export_button_mobile": "📤 Export",
+    "export_filename": "Rental_Companies"
+  },
+
+  "rental_companies_page": {
+    "title": "Rental Company Management",
+    "messages": {
+      "add_success": "✅ Company added successfully!",
+      "update_success": "✅ Company updated successfully!",
+      "save_failed": "❌ Failed to save company.",
+      "delete_success": "🗑️ Company deleted.",
+      "delete_failed": "❌ Failed to delete company.",
+      "station_add_success": "✅ Station added successfully!",
+      "station_update_success": "✅ Station updated successfully!",
+      "station_save_failed": "❌ Failed to save station.",
+      "station_delete_success": "🗑️ Station deleted.",
+      "station_delete_failed": "❌ Failed to delete station."
+    },
+    "confirm_delete": {
+      "title": "Delete company?",
+      "description": "Are you sure you want to delete this company?"
+    },
+    "confirm_delete_station": {
+      "title": "Delete station?",
+      "description": "Are you sure you want to delete this station?"
+    }
+  },
+
+  "rental_station_table": {
+  "companies_title": "🏢 Rental Companies",
+  "stations_title": "📍 Rental Stations",
+  "company": "Company",
+  "station_name": "Station Name",
+  "address": "Address",
+  "location": "Location",
+  "contact_phone": "Contact Phone",
+  "actions": "Actions",
+  "name": "Name",
+  "email": "Email",
+  "phone": "Phone",
+  "unknown": "Unknown",
+  "edit": "Edit",
+  "delete": "Delete",
+  "previous": "Previous",
+  "next": "Next",
+  "page": "Page {{current}} of {{total}}"
+},
+
+"rental_stations_page": {
+  "title": "Rental Stations Management",
+  "add_title": "Add New Station",
+  "edit_title": "Edit Station",
+  "search_placeholder": "Search stations by name, address, phone…",
+  "messages": {
+    "station_add_success": "Station added successfully",
+    "station_update_success": "Station updated successfully",
+    "station_delete_success": "Station deleted successfully",
+    "station_save_failed": "Failed to save station",
+    "station_delete_failed": "Failed to delete station"
+  },
+  "confirm_delete_station": {
+    "title": "Delete station?",
+    "description": "This action cannot be undone."
+  },
+  "filters": {
+    "search": "Search",
+    "company": "Company",
+    "all_companies": "All companies",
+    "clear": "Clear filters"
+  },
+  "actions": {
+    "refresh_companies": "Refresh Companies",
+    "refresh_stations": "Refresh Stations"
   }
+}
+
+
 
 
 

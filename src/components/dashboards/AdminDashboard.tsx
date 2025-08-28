@@ -35,7 +35,13 @@ export default function AdminDashboard() {
           icon: <FaStore className="w-6 h-6 text-[#00d289]" />,
           title: t('admin_dashboard.rental_companies.title'),
           description: t('admin_dashboard.rental_companies.description'),
-          route: '/rental-companies',
+          route: '/admin/rental-companies',
+        },
+        {
+          icon: <FaStore className="w-6 h-6 text-[#00d289]" />,
+          title: t('admin_dashboard.rental-stations.title'),
+          description: t('admin_dashboard.rental-stations.description'),
+          route: '/admin/rental-stations',
         },
         {
           icon: <FaWrench className="w-6 h-6 text-[#00d289]" />,

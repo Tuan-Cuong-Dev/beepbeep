@@ -1,4 +1,4 @@
-// 📄 src/app/services/page.tsx
+// 📄 src/app/rental-staions/page.tsx
 import { Suspense } from 'react';
 import StationPage from './StationPage';
 
