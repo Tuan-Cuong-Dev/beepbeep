@@ -8,6 +8,7 @@ import Header from '@/src/components/landingpage/Header';
 import VehicleSwitcher from './VehicleSwitcher';
 import { useTranslation } from 'react-i18next';
 
+// ✅ Giữ ssr: false như cũ
 const MapWrapper = dynamic(() => import('./MapWrapper'), { ssr: false });
 const TechnicianMarkers = dynamic(() => import('./TechnicianMarkers'), { ssr: false });
 const RentalStationMarkers = dynamic(() => import('./RentalStationMarkers'), { ssr: false });
@@ -28,7 +29,8 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
   const showAll = activeTab === 'all';
 
   return (
-    <div className="h-full w-full relative flex flex-col">
+    // 🔧 Quan trọng: đảm bảo chiều cao màn hình
+    <div className="min-h-screen w-full relative flex flex-col">
       {onClose && (
         <button
           onClick={onClose}
@@ -43,21 +45,25 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
 
       <VehicleSwitcher vehicleType={vehicleType} onChange={setVehicleType} />
 
-      <div className="flex-1 relative">
-        <MapWrapper key={activeTab + '-' + vehicleType}>
-          {(showAll || activeTab === 'rental') && (
-            <RentalStationMarkers vehicleType={showAll ? undefined : vehicleType} />
-          )}
-          {(showAll || activeTab === 'battery') && (
-            <BatteryStationMarkers vehicleType={showAll ? undefined : vehicleType} />
-          )}
-          {(showAll || activeTab === 'battery_charging') && (
-            <BatteryChargingStationMarkers vehicleType={showAll ? undefined : vehicleType} />
-          )}
-          {(showAll || activeTab === 'maintenance') && (
-            <TechnicianMarkers vehicleType={showAll ? undefined : vehicleType} />
-          )}
-        </MapWrapper>
+      {/* 🔧 Vùng map phải chiếm hết phần còn lại */}
+      <div className="relative flex-1">
+        {/* Gợi ý: để MapWrapper absolute full-size cho chắc */}
+        <div className="absolute inset-0">
+          <MapWrapper key={activeTab + '-' + vehicleType}>
+            {(showAll || activeTab === 'rental') && (
+              <RentalStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+            )}
+            {(showAll || activeTab === 'battery') && (
+              <BatteryStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+            )}
+            {(showAll || activeTab === 'battery_charging') && (
+              <BatteryChargingStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+            )}
+            {(showAll || activeTab === 'maintenance') && (
+              <TechnicianMarkers vehicleType={showAll ? undefined : vehicleType} />
+            )}
+          </MapWrapper>
+        </div>
       </div>
 
       <div className="bg-white border-t py-2">
