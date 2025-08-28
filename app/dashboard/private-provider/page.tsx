@@ -8,7 +8,7 @@ import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 import {
   getMyRentalCompany,
   updateRentalCompany,
-} from '@/src/components/rental-management/rental-companies/rentalCompanyService';
+} from '@/src/components/rental-management/private-provider/rentalCompanyService';
 import PrivateProviderForm, {
   PrivateProviderFormData,
 } from '@/src/components/rental-management/private-provider/PrivateProviderForm';
