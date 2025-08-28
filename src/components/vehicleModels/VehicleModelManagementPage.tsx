@@ -151,6 +151,13 @@ export default function VehicleModelManagementPage() {
           </div>
         </div>
 
+        <VehicleModelTable
+          companyId="admin-global"
+          models={filteredModels}
+          onEdit={handleEdit}
+          onReload={fetchModels}
+        />
+        
         <VehicleModelForm
           companyId="admin-global"
           newModel={newModel}
@@ -158,13 +165,6 @@ export default function VehicleModelManagementPage() {
           handleSave={handleSave}
           isUpdateModeModel={isUpdateMode}
           loading={loadingData}
-        />
-
-        <VehicleModelTable
-          companyId="admin-global"
-          models={filteredModels}
-          onEdit={handleEdit}
-          onReload={fetchModels}
         />
       </main>
 

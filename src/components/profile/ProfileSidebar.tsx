@@ -1,4 +1,6 @@
 // components/profile/ProfileSidebar.tsx
+// Hiển thị Doanh nghiệp / Dịch vụ phía bên trái màn hình
+
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -59,6 +61,9 @@ export default function ProfileSidebar({
   const [staffBusinessId, setStaffBusinessId] = useState<string | undefined>();
   const [staffBusinessType, setStaffBusinessType] = useState<BusinessType | undefined>();
   const [loadingAutoDetect, setLoadingAutoDetect] = useState(false);
+
+  // ⬇️ Riêng cho private_provider: lưu ownerId để truyền sang ServicesAboutSection
+  const [ownerUserId, setOwnerUserId] = useState<string | undefined>(undefined);
 
   // Có nguồn businessId/businessType từ parent không?
   const hasParentBusiness = useMemo(
@@ -139,7 +144,6 @@ export default function ProfileSidebar({
 
         if (!techSnap.empty) {
           const d = techSnap.docs[0];
-          const data = d.data() as any;
           setStaffBusinessId(d.id);
           setStaffBusinessType('technician_partner');
           setLoadingAutoDetect(false);
@@ -171,6 +175,27 @@ export default function ProfileSidebar({
   const finalBusinessId = hasParentBusiness ? businessId : staffBusinessId;
   const finalBusinessType = hasParentBusiness ? businessType : staffBusinessType;
 
+  // ⬇️ Khi đã biết businessId + businessType, nếu là private_provider thì lấy ownerId
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setOwnerUserId(undefined);
+      if (!finalBusinessId || finalBusinessType !== 'private_provider') return;
+
+      try {
+        const snap = await getDoc(doc(db, 'privateProviders', finalBusinessId));
+        if (!mounted) return;
+        if (snap.exists()) {
+          const { ownerId } = snap.data() as { ownerId?: string };
+          if (ownerId) setOwnerUserId(ownerId);
+        }
+      } catch (e) {
+        console.warn('fetch ownerId (privateProviders) failed:', e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [finalBusinessId, finalBusinessType]);
+
   return (
     <div className="w-full space-y-6 rounded-lg">
       {finalBusinessId && finalBusinessType ? (
@@ -179,10 +204,20 @@ export default function ProfileSidebar({
             businessId={finalBusinessId}
             businessType={finalBusinessType}
           />
-          <ServicesAboutSection
-            businessId={finalBusinessId}
-            statusIn={['active', 'pending', 'inactive']}
-          />
+
+          {finalBusinessType === 'private_provider' ? (
+            // ✅ Riêng private_provider: services lưu theo userId = ownerId
+            <ServicesAboutSection
+              userId={ownerUserId || currentUserId}
+              statusIn={['active', 'pending', 'inactive']}
+            />
+          ) : (
+            // ✅ Các loại khác: giữ nguyên logic businessId
+            <ServicesAboutSection
+              businessId={finalBusinessId}
+              statusIn={['active', 'pending', 'inactive']}
+            />
+          )}
         </>
       ) : (
         <div className="bg-white p-4 rounded-lg shadow-sm">
