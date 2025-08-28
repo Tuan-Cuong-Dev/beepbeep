@@ -3498,6 +3498,7 @@
 
   "report_issue": {
   "title": "차량 고장 신고",
+  "subtitle": "고장 신고를 더 쉽게 하려면 먼저 시스템에 휴대폰 번호와 개인 차량을 등록하세요.",
   "name": "이름",
   "name_placeholder": "홍길동",
   "phone": "전화번호",

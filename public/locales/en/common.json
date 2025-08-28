@@ -3479,6 +3479,7 @@
 
   "report_issue": {
   "title": "Report Vehicle Issue",
+  "subtitle": "Please set up your phone number and personal vehicle in the system first to make reporting an issue easier.",
   "name": "Full Name",
   "name_placeholder": "John Doe",
   "phone": "Phone Number",

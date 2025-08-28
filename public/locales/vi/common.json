@@ -3551,6 +3551,7 @@
 
 "report_issue": {
   "title": "Báo Hỏng Xe",
+  "subtitle": "Hãy cài số điện thoại và xe cá nhân vào hệ thống trước để việc báo \"Hỏng xe\" trở nên dễ dàng.",
   "name": "Họ tên",
   "name_placeholder": "Nguyễn Văn A",
   "phone": "Số điện thoại",

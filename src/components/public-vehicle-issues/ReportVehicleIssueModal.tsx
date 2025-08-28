@@ -3,7 +3,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/src/components/ui/dialog';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
@@ -150,8 +150,11 @@ export default function ReportVehicleIssueModal({ open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t('title')}</DialogTitle>
-        </DialogHeader>
+        <DialogTitle>{t('title')}</DialogTitle>
+        <DialogDescription className="text-sm text-gray-600">
+          {t('subtitle')}
+        </DialogDescription>
+      </DialogHeader>
 
         <div className="grid grid-cols-1 gap-3">
           <div>
