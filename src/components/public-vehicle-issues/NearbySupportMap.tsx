@@ -590,6 +590,8 @@ export default function NearbySupportMap({
                     background: white;
                     display: grid; place-items: center;
                     overflow: hidden;
+                    cursor: pointer;                 /* ✅ */
+                    pointer-events: auto;            /* ✅ */
                   ">
                     ${p.avatarUrl
                       ? `<img src="${p.avatarUrl}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover"/>`
@@ -619,16 +621,24 @@ export default function NearbySupportMap({
                       <Circle
                         center={[coord.lat, coord.lng]}
                         radius={acc}
+                        interactive={false}                 // ✅ để không chặn tap
                         pathOptions={{ color: '#93C5FD', fillColor: '#DBEAFE', fillOpacity: 0.3, weight: 1 }}
                       />
                     ) : null}
 
-                    <Marker position={[coord.lat, coord.lng]} icon={avatarIcon}
+                    <Marker
+                      position={[coord.lat, coord.lng]}
+                      icon={avatarIcon}
+                      zIndexOffset={1000}                 // ✅ nổi lên trên các layer khác
+                      riseOnHover                         // ✅ hữu ích khi có nhiều marker
                       eventHandlers={{
                         click: () => {
                           setSelected({ techId: p.techId, sessionId: p.sessionId || undefined });
                           setShowTrack(true);
                         },
+                        // (tuỳ chọn) bắt thêm touchstart cho iOS “khó tính”
+                        // @ts-ignore
+                        touchstart: () => {},
                       }}
                     >
                       <Popup>
