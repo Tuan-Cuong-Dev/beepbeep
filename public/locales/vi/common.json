@@ -252,25 +252,40 @@
     "check_location_on_maps": "🔗 Hướng dẫn lấy tọa độ từ Google Maps"
   },
 
-  "repair_shop_form": {
-    "technician_name": "Tên thợ sửa xe",
-    "phone_number": "Số điện thoại",
-    "shop_name_optional": "Tên cửa hàng (không bắt buộc)",
-    "shop_address": "Địa chỉ cửa hàng",
-    "map_address": "Địa chỉ Google Maps (không bắt buộc)",
-    "latitude": "Vĩ độ",
-    "longitude": "Kinh độ",
-    "select_vehicle_type": "Chọn loại xe",
-    "vehicle_bike": "Xe đạp",
-    "vehicle_motorbike": "Xe máy",
-    "vehicle_car": "Ô tô",
-    "submit_repair_shop": "Gửi thông tin cửa hàng",
-    "submitting": "Đang gửi...",
-    "thank_you": "Cảm ơn bạn đã đóng góp!",
-    "submission_received": "Chúng tôi đã nhận được thông tin và sẽ xem xét trong thời gian sớm nhất.",
-    "working_start_time": "Giờ bắt đầu",
-    "working_end_time": "Giờ kết thúc"
+"repair_shop_form": {
+  "title": "Thêm cửa hàng / thợ sửa xe",
+  "subtitle": "Cung cấp thông tin liên hệ và vị trí chính xác để khách hàng dễ tìm.",
+  "section_technician": "Thông tin thợ",
+  "section_location": "Vị trí",
+  "section_services": "Loại xe",
+
+  "technician_name": "Tên thợ sửa xe",
+  "phone_number": "Số điện thoại",
+  "shop_name_optional": "Tên cửa hàng (không bắt buộc)",
+  "shop_name_hint": "Để trống nếu bạn là thợ di động.",
+  "shop_address": "Địa chỉ cửa hàng",
+  "map_address": "Địa chỉ Google Maps (không bắt buộc)",
+  "map_address_hint": "Dán liên kết Google Maps hoặc \"vĩ độ,kinh độ\". Tọa độ sẽ tự động cập nhật.",
+
+  "latitude": "Vĩ độ",
+  "longitude": "Kinh độ",
+  "coords_placeholder": "Tọa độ (vd: 16.07, 108.22)",
+
+  "select_vehicle_type": "Chọn loại xe",
+  "vehicle_type":{
+    "bike": "Xe đạp",
+    "motorbike": "Xe máy",
+    "car": "Ô tô"
   },
+  "action_hint": "Kiểm tra lại thông tin trước khi gửi",
+  "submit_repair_shop": "Gửi thông tin cửa hàng",
+  "submitting": "Đang gửi...",
+  "thank_you": "Cảm ơn bạn đã đóng góp!",
+  "submission_received": "Chúng tôi đã nhận thông tin và sẽ xem xét sớm nhất.",
+
+  "working_start_time": "Giờ bắt đầu",
+  "working_end_time": "Giờ kết thúc"
+},
 
   "rental_shop_form": {
     "shop_name": "Tên cửa hàng",
@@ -3876,11 +3891,13 @@
       "updated": "Cập nhật",
       "copy": "Sao chép"
     }
+  },
+
+   "technician_markers": {
+    "shop": "Kỹ thuật viên tại cửa hàng",
+    "mobile": "Kỹ thuật viên lưu động",
+    "no_address": "Chưa có địa chỉ"
   }
-
-
-
-
 
 
 

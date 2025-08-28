@@ -242,24 +242,40 @@
   "check_location_on_maps": "🔗 How to get coordinates from Google Maps"
 },
 
-  "repair_shop_form":{
-    "technician_name": "Technician Name",
-    "phone_number": "Phone Number",
-    "shop_name_optional": "Shop Name (optional)",
-    "shop_address": "Shop Address",
-    "map_address": "Google Maps Address (optional)",
+"repair_shop_form": {
+    "title": "Add Repair Shop / Technician",
+    "subtitle": "Provide accurate contact details and location so customers can find you easily.",
+    "section_technician": "Technician",
+    "section_location": "Location",
+    "section_services": "Vehicle",
+
+    "technician_name": "Technician name",
+    "phone_number": "Phone number",
+    "shop_name_optional": "Shop name (optional)",
+    "shop_name_hint": "Leave blank if you are a mobile technician.",
+    "shop_address": "Shop address",
+    "map_address": "Google Maps address (optional)",
+    "map_address_hint": "Paste a Google Maps link or \"latitude,longitude\". Coordinates will update automatically.",
+
     "latitude": "Latitude",
     "longitude": "Longitude",
-    "select_vehicle_type": "Select Vehicle Type",
-    "vehicle_bike": "Bicycle",
-    "vehicle_motorbike": "Motorbike",
-    "vehicle_car": "Car",
-    "submit_repair_shop": "Submit Repair Shop",
+    "coords_placeholder": "Coordinates (e.g., 16.07, 108.22)",
+
+    "select_vehicle_type": "Select vehicle type",
+    "vehicle_type": {
+      "bike": "Bicycle",
+      "motorbike": "Motorbike",
+      "car": "Car"
+    },
+
+    "action_hint": "Review details before submitting",
+    "submit_repair_shop": "Submit shop information",
     "submitting": "Submitting...",
     "thank_you": "Thank you for your contribution!",
-    "submission_received": "We’ve received your submission and will review it shortly.",
-    "working_start_time": "Start Time",
-    "working_end_time": "End Time"
+    "submission_received": "We have received your information and will review it as soon as possible.",
+
+    "working_start_time": "Start time",
+    "working_end_time": "End time"
   },
 
   "rental_shop_form": {
@@ -3805,7 +3821,13 @@
     "updated": "Updated",
     "copy": "Copy"
   }
-}
+},
+
+"technician_markers": {
+    "shop": "Shop technician",
+    "mobile": "Mobile technician",
+    "no_address": "N/A"
+  }
 
 
 

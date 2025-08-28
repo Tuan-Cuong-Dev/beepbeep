@@ -1,28 +1,23 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
-import type { LocationCore } from '@/src/lib/locations/locationTypes';
-import { Input } from '@/src/components/ui/input';
-import { Button } from '@/src/components/ui/button';
-import { Textarea } from '@/src/components/ui/textarea';
-import { SimpleSelect } from '@/src/components/ui/select';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { Input } from '@/src/components/ui/input';
+import { Textarea } from '@/src/components/ui/textarea';
+import { Button } from '@/src/components/ui/button';
+import type { TechnicianPartner, VehicleType } from '@/src/lib/technicianPartners/technicianPartnerTypes';
+import type { LocationCore } from '@/src/lib/locations/locationTypes';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import { useTranslation } from 'react-i18next';
+import {
+  MapPin, Navigation, Phone, User2, Store, Clock, Wrench, Car, Bike, Siren
+} from 'lucide-react';
 
-const Select = dynamic(() => import('react-select'), { ssr: false });
+const MapPreview = dynamic(() => import('@/src/components/map/MapPreview'), { ssr: false });
 
-// ===== Helpers =====
+/* ===================== Helpers ===================== */
 type LatLng = { lat: number; lng: number };
-type MaybeLatLng = { lat?: number; lng?: number } | null | undefined;
 
-function isFiniteNumber(n: unknown): n is number {
-  return typeof n === 'number' && Number.isFinite(n);
-}
-function hasFiniteLatLng(v: MaybeLatLng): v is LatLng {
-  return !!v && isFiniteNumber(v.lat) && isFiniteNumber(v.lng);
-}
 function parseLatLngString(s?: string): LatLng | null {
   if (!s) return null;
   const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
@@ -32,16 +27,87 @@ function parseLatLngString(s?: string): LatLng | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
 }
 
-// ===== Legacy-safe cho seed form (không ghi ra DB) =====
-type LegacyData = TechnicianPartner & {
-  workingHours?: { isWorking?: boolean; startTime?: string; endTime?: string }[];
-  workingStartTime?: string;
-  workingEndTime?: string;
-  coordinates?: { lat?: number; lng?: number } | null;
+/** Lấy lat,lng từ URL Google Maps: “…/@lat,lng,…” hoặc “…?q=lat,lng|query|ll=lat,lng …” */
+function parseLatLngFromMapUrl(url?: string): LatLng | null {
+  if (!url) return null;
+  try {
+    const mAt = url.match(/@(-?\d+(\.\d+)?),(-?\d+(\.\d+)?)(,|$)/);
+    if (mAt) {
+      const lat = parseFloat(mAt[1]);
+      const lng = parseFloat(mAt[3]);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+    }
+    const u = new URL(url);
+    for (const key of ['q', 'query', 'll']) {
+      const v = u.searchParams.get(key);
+      const m = v?.match?.(/(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)/);
+      if (m) {
+        const lat = parseFloat(m[1]);
+        const lng = parseFloat(m[3]);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+      }
+    }
+    return parseLatLngString(url);
+  } catch {
+    return null;
+  }
+}
+
+/** HH:MM -> minutes (invalid -> null) */
+function parseTimeToMinutes(t: string): number | null {
+  if (typeof t !== 'string') return null;
+  const m = t.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+  if (!m) return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
+
+/** Dọn undefined (deep) */
+function stripUndefined<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') return obj as T;
+  if (Array.isArray(obj)) {
+    return obj.map(stripUndefined).filter((v) => v !== undefined) as unknown as T;
+  }
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj as Record<string, any>)) {
+    if (v === undefined) continue;
+    out[k] = stripUndefined(v);
+  }
+  return out as T;
+}
+
+/* ===================== Types ===================== */
+type FormLocation = {
+  address?: string;
+  mapAddress?: string;
+  location?: string; // "lat,lng"
 };
 
-// Payload gửi ra ngoài (form “lite” – không có GeoPoint/updatedAt)
-type SavePayload = Partial<
+type FormState = {
+  id?: string;
+  userId?: string;
+  role: 'technician_partner';
+  type: 'shop' | 'mobile';
+  name: string;
+  phone: string;
+  shopName?: string;
+  assignedRegions: string[];
+  serviceCategories: string[];
+  vehicleType: VehicleType;
+  isActive: boolean;
+  workingStartTime: string;
+  workingEndTime: string;
+  averageRating: number;
+  ratingCount: number;
+  avatarUrl?: string | null;
+
+  location: FormLocation;
+
+  _lat?: string;
+  _lng?: string;
+};
+
+/** Payload form trả cho parent (lite-location) */
+export type SavePayload = Partial<
   Omit<TechnicianPartner, 'location'> & {
     location?: Partial<Pick<LocationCore, 'address' | 'location' | 'mapAddress'>>;
     role: 'technician_partner';
@@ -53,420 +119,489 @@ interface Props {
   onSave: (data: SavePayload) => Promise<void>;
 }
 
-// 🧹 Dọn undefined đệ quy
-function stripUndefinedDeep<T>(obj: T): T {
-  if (obj === null || typeof obj !== 'object') return obj as T;
-  if (Array.isArray(obj)) {
-    return obj.map(stripUndefinedDeep).filter((v) => v !== undefined) as unknown as T;
-  }
-  const out: Record<string, any> = {};
-  for (const [k, v] of Object.entries(obj as Record<string, any>)) {
-    if (v === undefined) continue;
-    out[k] = stripUndefinedDeep(v);
-  }
-  return out as T;
-}
-
+/* ===================== Component ===================== */
 export default function TechnicianPartnerForm({ initialData, onSave }: Props) {
-  const { t } = useTranslation<'common'>('common');
-  const isEditMode = !!initialData?.id;
-  const [submitting, setSubmitting] = useState(false);
+  const { t } = useTranslation('common');
+  const { coords, geocode } = useGeocodeAddress();
+  const geocodeRef = useRef(geocode);
+  geocodeRef.current = geocode;
 
-  type FormShape = Partial<Omit<TechnicianPartner, 'location'>> & {
-    role: 'technician_partner';
-    workingStartTime?: string;
-    workingEndTime?: string;
-    // “lite” location, chỉ address/location/mapAddress (string)
-    location?: Partial<Pick<LocationCore, 'address' | 'location' | 'mapAddress'>>;
-  };
-
-  const [formData, setFormData] = useState<FormShape>(() => ({
+  const [form, setForm] = useState<FormState>({
     role: 'technician_partner',
-    type: 'mobile',
-    isActive: true,
-    assignedRegions: [],
-    serviceCategories: [],
-    workingStartTime: '',
-    workingEndTime: '',
-    location: { address: '', location: '', mapAddress: '' },
+    type: 'shop',
     name: '',
     phone: '',
     shopName: '',
+    location: { address: '', location: '', mapAddress: '' },
+    assignedRegions: [],
+    serviceCategories: [],
     vehicleType: 'motorbike',
-  }));
+    isActive: false,
+    workingStartTime: '',
+    workingEndTime: '',
+    averageRating: 0,
+    ratingCount: 0,
+  });
 
-  const { geocode, coords } = useGeocodeAddress();
+  const [submitting, setSubmitting] = useState(false);
+  const [workingTimeError, setWorkingTimeError] = useState('');
 
-  const serviceOptions = useMemo(
-    () => [
-      { label: t('technician_partner_form.service.battery', { defaultValue: 'Battery' }), value: 'battery' },
-      { label: t('technician_partner_form.service.brake', { defaultValue: 'Brake' }), value: 'brake' },
-      { label: t('technician_partner_form.service.flat_tire', { defaultValue: 'Flat Tire' }), value: 'flat_tire' },
-      { label: t('technician_partner_form.service.motor', { defaultValue: 'Motor' }), value: 'motor' },
-      { label: t('technician_partner_form.service.electrical', { defaultValue: 'Electrical' }), value: 'electrical' },
-    ],
-    [t]
-  );
-
-  // ===== Seed form từ initialData (legacy-safe) =====
+  /* ---------- Seed from initialData ---------- */
   useEffect(() => {
-    const legacy = (initialData || {}) as LegacyData;
-    const firstWorking = legacy.workingHours?.find?.((d) => d?.isWorking);
-
-    const legacyLoc: Partial<LocationCore> = {};
-    // Ưu tiên string có sẵn
-    if (legacy.location?.location) legacyLoc.location = legacy.location.location;
-    if (legacy.location?.address) legacyLoc.address = legacy.location.address;
-    if ((legacy.location as any)?.mapAddress) legacyLoc.mapAddress = (legacy.location as any).mapAddress;
-    // Rớt xuống coordinates (legacy)
-    type LegacyData = Omit<
-      TechnicianPartner,
-      'coordinates' | 'mapAddress' | 'geo' | 'workingHours'
-    > & {
-      // các field legacy có thể vẫn còn trong doc cũ
-      coordinates?: { lat?: number; lng?: number } | null;
-      mapAddress?: string;
-      geo?: { lat?: number; lng?: number } | null;
-      workingHours?: { isWorking?: boolean; startTime?: string; endTime?: string }[];
-    };
-
-    // Helpers
-      type LatLng = { lat: number; lng: number };
-      type MaybeLatLng = { lat?: number; lng?: number } | null | undefined;
-      const isFiniteNumber = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n);
-      const hasFiniteLatLng = (v: MaybeLatLng): v is LatLng => !!v && isFiniteNumber(v.lat) && isFiniteNumber(v.lng);
-
-      // Rớt xuống coordinates (legacy)
-      if (!legacyLoc.location) {
-        const coords = legacy.coordinates ?? legacy.geo; // <-- giờ không còn là never
-        if (hasFiniteLatLng(coords)) {
-          legacyLoc.location = `${coords.lat},${coords.lng}`;
-        }
-      }
-
-
-    setFormData({
-      id: legacy.id,
-      userId: legacy.userId,
-      name: legacy.name ?? '',
-      phone: legacy.phone ?? '',
-      shopName: legacy.shopName ?? '',
-      type: legacy.type ?? 'mobile',
-      assignedRegions: Array.isArray(legacy.assignedRegions) ? legacy.assignedRegions : [],
-      serviceCategories: Array.isArray(legacy.serviceCategories) ? legacy.serviceCategories : [],
-      vehicleType: legacy.vehicleType ?? 'motorbike',
-      isActive: legacy.isActive ?? true,
-      workingStartTime: legacy.workingStartTime ?? firstWorking?.startTime ?? '',
-      workingEndTime: legacy.workingEndTime ?? firstWorking?.endTime ?? '',
+    if (!initialData) return;
+    const loc = (initialData.location as any) ?? {};
+    const p = parseLatLngString(loc?.location);
+    setForm((prev) => ({
+      ...prev,
+      id: initialData.id,
+      userId: initialData.userId,
       role: 'technician_partner',
+      type: initialData.type ?? 'shop',
+      name: initialData.name ?? '',
+      phone: initialData.phone ?? '',
+      shopName: initialData.shopName ?? '',
+      assignedRegions: Array.isArray(initialData.assignedRegions) ? initialData.assignedRegions : [],
+      serviceCategories: Array.isArray(initialData.serviceCategories) ? initialData.serviceCategories : [],
+      vehicleType: initialData.vehicleType ?? 'motorbike',
+      isActive: !!initialData.isActive,
+      workingStartTime: initialData.workingStartTime ?? '',
+      workingEndTime: initialData.workingEndTime ?? '',
+      averageRating: Number(initialData.averageRating ?? 0),
+      ratingCount: Number(initialData.ratingCount ?? 0),
+      avatarUrl: initialData.avatarUrl ?? null,
       location: {
-        address: legacyLoc.address ?? '',
-        location: legacyLoc.location ?? '',
-        mapAddress: legacyLoc.mapAddress ?? '',
+        address: loc.address ?? '',
+        mapAddress: loc.mapAddress ?? '',
+        location: loc.location ?? '',
       },
-    });
+      _lat: p ? String(p.lat) : '',
+      _lng: p ? String(p.lng) : '',
+    }));
   }, [initialData]);
 
-  // Geocode từ address -> cập nhật location.location (lat,lng)
+  /* ---------- Auto resolve mapAddress/address -> location.location ---------- */
+  useEffect(() => {
+    const raw = form.location.mapAddress?.trim() || form.location.address?.trim();
+    if (!raw) return;
+
+    const setPos = (lat: number, lng: number) => {
+      const latStr = String(lat);
+      const lngStr = String(lng);
+      const locStr = `${lat},${lng}`;
+      setForm((prev) => {
+        if (prev._lat === latStr && prev._lng === lngStr && prev.location.location === locStr) return prev;
+        return {
+          ...prev,
+          _lat: latStr,
+          _lng: lngStr,
+          location: { ...prev.location, location: locStr },
+        };
+      });
+    };
+
+    const byPair = parseLatLngString(raw);
+    if (byPair) { setPos(byPair.lat, byPair.lng); return; }
+    const byUrl = parseLatLngFromMapUrl(raw);
+    if (byUrl) { setPos(byUrl.lat, byUrl.lng); return; }
+
+    const id = setTimeout(() => geocodeRef.current(raw), 300);
+    return () => clearTimeout(id);
+  }, [form.location.mapAddress, form.location.address]);
+
+  /* ---------- Apply geocode coords ---------- */
   useEffect(() => {
     if (!coords) return;
-    setFormData((prev) => ({
-      ...prev,
-      location: {
-        ...(prev.location || {}),
-        location: `${coords.lat},${coords.lng}`,
-      },
-    }));
+    const locStr = `${coords.lat},${coords.lng}`;
+    setForm((prev) => {
+      if (prev.location.location === locStr && prev._lat === String(coords.lat) && prev._lng === String(coords.lng)) {
+        return prev;
+      }
+      return {
+        ...prev,
+        _lat: String(coords.lat),
+        _lng: String(coords.lng),
+        location: { ...prev.location, location: locStr },
+      };
+    });
   }, [coords]);
 
-  const updateField = useCallback(
-    (field: keyof FormShape, value: unknown) => {
-      setFormData((prev) => ({ ...prev, [field]: value as any }));
+  /* ---------- Updaters ---------- */
+  const setField = useCallback(<K extends keyof FormState>(field: K, value: FormState[K]) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const setLocationField = useCallback((key: keyof FormLocation, value: string) => {
+    setForm((prev) => ({ ...prev, location: { ...prev.location, [key]: value } }));
+  }, []);
+
+  const updateWorkingTimeField = useCallback(
+    (key: 'workingStartTime' | 'workingEndTime', value: string) => {
+      setForm((prev) => {
+        const next = { ...prev, [key]: value };
+        const s = next.workingStartTime || '';
+        const e = next.workingEndTime || '';
+        let err = '';
+        if (s && !parseTimeToMinutes(s)) err = 'Invalid start time';
+        if (!err && e && !parseTimeToMinutes(e)) err = 'Invalid end time';
+        if (!err && s && e) {
+          const sm = parseTimeToMinutes(s)!;
+          const em = parseTimeToMinutes(e)!;
+          if (em <= sm) err = 'End must be after start';
+        }
+        setWorkingTimeError(err);
+        return next;
+      });
     },
     []
   );
 
-  const updateLocationField = useCallback((key: 'address' | 'location' | 'mapAddress', value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      location: {
-        ...(prev.location || {}),
-        [key]: value,
-      },
-    }));
-  }, []);
-
-  const handleRegionInput = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const regions = e.target.value.split('\n').map((r) => r.trim()).filter(Boolean);
-      updateField('assignedRegions', regions);
-    },
-    [updateField]
+  /* ---------- Validation ---------- */
+  const canSubmit = useMemo(
+    () =>
+      Boolean(
+        (form.name || '').trim() &&
+        (form.phone || '').trim() &&
+        (form.location.address || '').trim() &&
+        !workingTimeError
+      ),
+    [form.name, form.phone, form.location.address, workingTimeError]
   );
 
-  const handleGeocode = useCallback(() => {
-    const addr = (formData.location?.address || '').trim();
-    if (addr) geocode(addr);
-  }, [formData.location?.address, geocode]);
+  /* ---------- Submit ---------- */
+  const handleSubmit = useCallback(async () => {
+    if (!canSubmit) return;
 
-  const parseCoordinates = useCallback(
-    (raw: string) => {
-      const text = raw.trim();
-      if (!text) {
-        updateLocationField('location', '');
-        return;
-      }
-      const parsed = parseLatLngString(text);
-      if (parsed) {
-        updateLocationField('location', `${parsed.lat},${parsed.lng}`);
-      }
-    },
-    [updateLocationField]
-  );
+    // chuẩn hoá lat,lng cuối
+    let lat = form._lat ? parseFloat(form._lat) : undefined;
+    let lng = form._lng ? parseFloat(form._lng) : undefined;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      const parsed = parseLatLngString(form.location.location);
+      if (parsed) ({ lat, lng } = parsed);
+    }
 
-  const resetForm = useCallback(() => {
-    setFormData({
-      assignedRegions: [],
-      type: 'mobile',
-      location: { address: '', location: '', mapAddress: '' },
-      name: '',
-      phone: '',
+    const payload: SavePayload = stripUndefined({
+      id: form.id,
+      userId: form.userId,
       role: 'technician_partner',
-      serviceCategories: [],
-      shopName: '',
-      isActive: true,
-      workingStartTime: '',
-      workingEndTime: '',
-      vehicleType: 'motorbike',
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      type: form.type,
+      shopName: form.shopName || undefined,
+      assignedRegions: form.assignedRegions,
+      serviceCategories: form.serviceCategories,
+      vehicleType: form.vehicleType,
+      isActive: form.isActive,
+      workingStartTime: form.workingStartTime || '',
+      workingEndTime: form.workingEndTime || '',
+      averageRating: form.averageRating,
+      ratingCount: form.ratingCount,
+      avatarUrl: form.avatarUrl ?? null,
+      location: {
+        address: form.location.address || undefined,
+        mapAddress: form.location.mapAddress || undefined,
+        location:
+          lat != null && lng != null
+            ? `${lat},${lng}`
+            : form.location.location || undefined,
+      },
     });
-  }, []);
 
-  const canSubmit = useMemo(() => {
-    const nameOk = (formData.name || '').trim().length > 0;
-    const phoneOk = (formData.phone || '').trim().length > 0;
-    return nameOk && phoneOk && !submitting;
-  }, [formData.name, formData.phone, submitting]);
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!canSubmit) return;
-
-      try {
-        setSubmitting(true);
-
-        // Chuẩn hoá "lat,lng" lần cuối (string)
-        const parsed = parseLatLngString(formData.location?.location);
-        const locationOut: SavePayload['location'] =
-          formData.location && (formData.location.address || formData.location.mapAddress || parsed)
-            ? {
-                address: formData.location.address || undefined,
-                mapAddress: formData.location.mapAddress || undefined,
-                location: parsed ? `${parsed.lat},${parsed.lng}` : undefined,
-              }
-            : undefined;
-
-        const payload: SavePayload = stripUndefinedDeep({
-          // giữ các field hợp lệ theo schema
-          id: formData.id,
-          userId: formData.userId,
-          name: (formData.name || '').trim(),
-          phone: (formData.phone || '').trim(),
-          shopName: (formData.shopName || '')?.trim() || undefined,
-          type: formData.type || 'mobile',
-          assignedRegions: formData.assignedRegions,
-          serviceCategories: formData.serviceCategories,
-          vehicleType: formData.vehicleType,
-          isActive: !!formData.isActive,
-          workingStartTime: formData.workingStartTime || '',
-          workingEndTime: formData.workingEndTime || '',
+    try {
+      setSubmitting(true);
+      await onSave(payload);
+      if (!form.id) {
+        // reset khi tạo mới
+        setForm({
           role: 'technician_partner',
-          location: locationOut,
-          // dọn legacy (không gửi ra)
-          workingHours: undefined as any,
-          coordinates: undefined as any,
+          type: 'shop',
+          name: '',
+          phone: '',
+          shopName: '',
+          location: { address: '', location: '', mapAddress: '' },
+          assignedRegions: [],
+          serviceCategories: [],
+          vehicleType: 'motorbike',
+          isActive: false,
+          workingStartTime: '',
+          workingEndTime: '',
+          averageRating: 0,
+          ratingCount: 0,
+          _lat: '',
+          _lng: '',
         });
-
-        await onSave(payload);
-        if (!isEditMode) resetForm();
-      } finally {
-        setSubmitting(false);
       }
-    },
-    [canSubmit, formData, isEditMode, onSave, resetForm]
-  );
+    } finally {
+      setSubmitting(false);
+    }
+  }, [canSubmit, form, onSave]);
 
-  const previewCoords = useMemo(
-    () => parseLatLngString(formData.location?.location || ''),
-    [formData.location?.location]
-  );
+  /* ---------- Preview coords ---------- */
+  const previewLatLng: LatLng | null = useMemo(() => {
+    if (
+      form._lat &&
+      form._lng &&
+      Number.isFinite(parseFloat(form._lat)) &&
+      Number.isFinite(parseFloat(form._lng))
+    ) {
+      return { lat: parseFloat(form._lat), lng: parseFloat(form._lng) };
+    }
+    const parsed = parseLatLngString(form.location.location);
+    return parsed ?? null;
+  }, [form._lat, form._lng, form.location.location]);
 
+  /* ===================== UI (cards/grid + sticky bar) ===================== */
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="mx-auto w-full max-w-5xl">
+      {/* Header card */}
+      <div className="mb-4 rounded-2xl border bg-white p-4 md:p-6 shadow-sm">
+        <div className="flex items-start gap-3">
+          <Siren className="size-6 md:size-7 text-emerald-500" />
+          <div>
+            <h2 className="text-lg md:text-xl font-semibold">
+              {t('repair_shop_form.title', { defaultValue: 'Add Repair Shop / Technician' })}
+            </h2>
+            <p className="text-xs md:text-sm text-gray-600">
+              {t('repair_shop_form.subtitle', { defaultValue: 'Provide location and contact so customers can find you quickly.' })}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Main grid */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Input
-          placeholder={t('technician_partner_form.name')}
-          value={formData.name || ''}
-          onChange={(e) => updateField('name', e.target.value)}
-        />
-        <Input
-          placeholder={t('technician_partner_form.phone')}
-          value={formData.phone || ''}
-          onChange={(e) => updateField('phone', e.target.value)}
-        />
+        {/* Left column */}
+        <div className="space-y-4">
+          {/* Technician Info */}
+          <section className="rounded-2xl border bg-white p-4 md:p-6 shadow-sm">
+            <h3 className="mb-3 flex items-center gap-2 text-base md:text-lg font-semibold">
+              <User2 className="size-5 text-emerald-500" />
+              {t('repair_shop_form.section_technician', { defaultValue: 'Technician' })}
+            </h3>
+            <div className="grid grid-cols-1 gap-3">
+              <div className="relative">
+                <User2 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+                <Input
+                  className="pl-10"
+                  placeholder={t('repair_shop_form.technician_name')}
+                  value={form.name}
+                  onChange={(e) => setField('name', e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <Phone className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+                <Input
+                  className="pl-10"
+                  placeholder={t('repair_shop_form.phone_number')}
+                  value={form.phone}
+                  onChange={(e) => setField('phone', e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <Store className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+                <Input
+                  className="pl-10"
+                  placeholder={t('repair_shop_form.shop_name_optional')}
+                  value={form.shopName || ''}
+                  onChange={(e) => setField('shopName', e.target.value)}
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {t('repair_shop_form.shop_name_hint', { defaultValue: 'Leave blank if you are a mobile technician.' })}
+                </p>
+              </div>
+            </div>
+          </section>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">
-            {t('technician_partner_form.technician_type')}
-          </label>
-          <SimpleSelect
-            placeholder={t('technician_partner_form.select_type')}
-            options={[
-              { label: t('technician_partner_form.type.shop'), value: 'shop' },
-              { label: t('technician_partner_form.type.mobile'), value: 'mobile' },
-            ]}
-            value={formData.type || ''}
-            onChange={(val: string) => updateField('type', val)}
-          />
+          {/* Working Time */}
+          <section className="rounded-2xl border bg-white p-4 md:p-6 shadow-sm">
+            <h3 className="mb-3 flex items-center gap-2 text-base md:text-lg font-semibold">
+              <Clock className="size-5 text-emerald-500" />
+              {t('technician_partner_form.working_time')}
+            </h3>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-xs font-medium">
+                  {t('technician_partner_form.start_time')}
+                </label>
+                <input
+                  type="time"
+                  step="60"
+                  value={form.workingStartTime}
+                  className="w-full rounded border px-2 py-2"
+                  onChange={(e) => updateWorkingTimeField('workingStartTime', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium">
+                  {t('technician_partner_form.end_time')}
+                </label>
+                <input
+                  type="time"
+                  step="60"
+                  value={form.workingEndTime}
+                  className="w-full rounded border px-2 py-2"
+                  onChange={(e) => updateWorkingTimeField('workingEndTime', e.target.value)}
+                />
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              {t('technician_partner_form.working_time_note')}
+            </p>
+            {workingTimeError && (
+              <p className="mt-2 text-xs text-rose-600">{workingTimeError}</p>
+            )}
+          </section>
         </div>
 
-        {/* 🏪 Shop-only fields */}
-        {formData.type === 'shop' && (
-          <>
-            <Input
-              placeholder={t('technician_partner_form.shop_name')}
-              value={formData.shopName || ''}
-              onChange={(e) => updateField('shopName', e.target.value)}
-            />
-            {/* Địa chỉ hiển thị → location.address */}
-            <Textarea
-              placeholder={t('technician_partner_form.shop_address')}
-              value={formData.location?.address || ''}
-              onChange={(e) => updateLocationField('address', e.target.value)}
-              onBlur={handleGeocode}
-            />
-            {/* Link Google Maps (optional) → location.mapAddress */}
-            <Input
-              placeholder={t('technician_partner_form.map_address_hint')}
-              value={formData.location?.mapAddress || ''}
-              onChange={(e) => updateLocationField('mapAddress', e.target.value)}
-            />
-            {/* Tọa độ → location.location ("lat,lng") */}
-            <Input
-              placeholder={t('technician_partner_form.coordinates_placeholder')}
-              value={formData.location?.location || ''}
-              onChange={(e) => parseCoordinates(e.target.value)}
-            />
-          </>
-        )}
+        {/* Right column */}
+        <div className="space-y-4">
+          {/* Location */}
+          <section className="rounded-2xl border bg-white p-4 md:p-6 shadow-sm">
+            <h3 className="mb-3 flex items-center gap-2 text-base md:text-lg font-semibold">
+              <MapPin className="size-5 text-emerald-500" />
+              {t('repair_shop_form.section_location', { defaultValue: 'Location' })}
+            </h3>
+
+            <div className="grid grid-cols-1 gap-3">
+              {/* address */}
+              <div>
+                <label className="mb-1 block text-xs font-medium">
+                  {t('repair_shop_form.shop_address')}
+                </label>
+                <Textarea
+                  placeholder={t('repair_shop_form.shop_address')}
+                  value={form.location.address || ''}
+                  onChange={(e) => setLocationField('address', e.target.value)}
+                />
+              </div>
+
+              {/* mapAddress */}
+              <div className="relative">
+                <Navigation className="pointer-events-none absolute left-3 top-3 size-4 text-gray-400" />
+                <Input
+                  className="pl-10"
+                  placeholder={t('repair_shop_form.map_address')}
+                  value={form.location.mapAddress || ''}
+                  onChange={(e) => setLocationField('mapAddress', e.target.value)}
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {t('repair_shop_form.map_address_hint', {
+                    defaultValue: 'Paste Google Maps link or "lat,lng". Coordinates update automatically.',
+                  })}
+                </p>
+              </div>
+
+              {/* one-line coords input (optional) */}
+              <Input
+                placeholder={t('repair_shop_form.coords_placeholder', { defaultValue: 'Coordinates (e.g., 16.07, 108.22)' })}
+                value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const m = value.match(/(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/);
+                  if (m) {
+                    const latStr = m[1];
+                    const lngStr = m[3];
+                    setForm((prev) => ({
+                      ...prev,
+                      _lat: latStr,
+                      _lng: lngStr,
+                      location: { ...prev.location, location: `${latStr},${lngStr}` },
+                    }));
+                  } else {
+                    setForm((prev) => ({ ...prev, _lat: '', _lng: '' }));
+                  }
+                }}
+              />
+
+              {/* Map preview */}
+              {previewLatLng && (
+                <div className="h-48 rounded-xl overflow-hidden border">
+                  <MapPreview coords={previewLatLng} />
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Vehicle */}
+          <section className="rounded-2xl border bg-white p-4 md:p-6 shadow-sm">
+            <h3 className="mb-3 flex items-center gap-2 text-base md:text-lg font-semibold">
+              <Wrench className="size-5 text-emerald-500" />
+              {t('repair_shop_form.section_services', { defaultValue: 'Vehicle' })}
+            </h3>
+
+            <div>
+              <label className="mb-1 block text-xs font-medium">
+                {t('repair_shop_form.select_vehicle_type')}
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setField('vehicleType', 'bike')}
+                  className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm transition
+                    ${form.vehicleType === 'bike' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'hover:bg-gray-50'}`}
+                >
+                  <Bike className="size-4" />
+                  {t('repair_shop_form.vehicle_type.bike', { defaultValue: 'Bike' })}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setField('vehicleType', 'motorbike')}
+                  className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm transition
+                    ${form.vehicleType === 'motorbike' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'hover:bg-gray-50'}`}
+                >
+                  <MotorbikeIcon />
+                  {t('repair_shop_form.vehicle_type.motorbike', { defaultValue: 'Motorbike' })}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setField('vehicleType', 'car')}
+                  className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm transition
+                    ${form.vehicleType === 'car' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'hover:bg-gray-50'}`}
+                >
+                  <Car className="size-4" />
+                  {t('repair_shop_form.vehicle_type.car', { defaultValue: 'Car' })}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
 
-      {formData.type === 'shop' && previewCoords && (
-        <>
-          <p className="text-sm text-gray-600">
-            {t('technician_partner_form.detected_coords', {
-              lat: String(previewCoords.lat),
-              lng: String(previewCoords.lng),
-            })}
+      {/* Spacer for mobile sticky bar */}
+      <div className="md:hidden h-16" />
+
+      {/* Sticky action bar (mobile) */}
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/70 md:hidden">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
+          <p className="text-xs text-gray-600">
+            {t('repair_shop_form.action_hint', { defaultValue: 'Review details then submit' })}
           </p>
-          <iframe
-            title="Map Preview"
-            width="100%"
-            height="200"
-            className="rounded-xl"
-            style={{ border: 0 }}
-            loading="lazy"
-            allowFullScreen
-            src={`https://www.google.com/maps?q=${previewCoords.lat},${previewCoords.lng}&hl=vi&z=16&output=embed`}
-          />
-        </>
-      )}
-
-      <div>
-        <label className="font-medium">{t('technician_partner_form.assigned_regions_label')}</label>
-        <Textarea
-          rows={4}
-          placeholder={t('technician_partner_form.assigned_regions_placeholder')}
-          value={(formData.assignedRegions || []).join('\n')}
-          onChange={handleRegionInput}
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block font-medium">
-          {t('technician_partner_form.service_categories')}
-        </label>
-        <Select
-          isMulti
-          options={serviceOptions}
-          value={serviceOptions.filter((opt) =>
-            (formData.serviceCategories || []).includes(opt.value)
-          )}
-          onChange={(selected) => {
-            const selectedOptions = (selected || []) as { label: string; value: string }[];
-            updateField(
-              'serviceCategories',
-              selectedOptions.map((s) => s.value)
-            );
-          }}
-        />
-      </div>
-
-      {/* ⏰ Working time */}
-      <div>
-        <label className="mb-2 block font-medium">
-          {t('technician_partner_form.working_time')}
-        </label>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <div className="flex-1">
-            <label className="block text-xs font-medium">
-              {t('technician_partner_form.start_time')}
-            </label>
-            <input
-              type="time"
-              step="60"
-              value={formData.workingStartTime || ''}
-              className="w-full rounded border px-2 py-1"
-              onChange={(e) => updateField('workingStartTime', e.target.value)}
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-xs font-medium">
-              {t('technician_partner_form.end_time')}
-            </label>
-            <input
-              type="time"
-              step="60"
-              value={formData.workingEndTime || ''}
-              className="w-full rounded border px-2 py-1"
-              onChange={(e) => updateField('workingEndTime', e.target.value)}
-            />
-          </div>
+          <Button onClick={handleSubmit} disabled={submitting || !canSubmit} className="min-w-28">
+            {submitting
+              ? t('common_actions.processing', { defaultValue: 'Processing…' })
+              : t('repair_shop_form.submit_repair_shop')}
+          </Button>
         </div>
-        <p className="mt-1 text-xs text-gray-500">
-          {t('technician_partner_form.working_time_note')}
-        </p>
       </div>
 
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          className="form-checkbox"
-          checked={!!formData.isActive}
-          onChange={(e) => updateField('isActive', e.target.checked)}
-        />
-        <label className="text-sm font-medium">
-          {t('technician_partner_form.is_active')}
-        </label>
+      {/* Desktop action */}
+      <div className="hidden md:flex items-center justify-end gap-3 pt-4">
+        <Button onClick={handleSubmit} disabled={submitting || !canSubmit}>
+          {submitting
+            ? t('common_actions.processing', { defaultValue: 'Processing…' })
+            : t('repair_shop_form.submit_repair_shop')}
+        </Button>
       </div>
+    </div>
+  );
+}
 
-      <Button type="submit" disabled={!canSubmit}>
-        {submitting
-          ? t('common_actions.processing', { defaultValue: 'Processing…' })
-          : isEditMode
-          ? t('technician_partner_form.update_btn')
-          : t('technician_partner_form.create_btn')}
-      </Button>
-    </form>
+/** Icon “motorbike” đơn giản (lucide chưa có) */
+function MotorbikeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M5 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path d="M19 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path d="M7 14h5l3-4 2 2h3" />
+    </svg>
   );
 }

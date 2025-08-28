@@ -6,6 +6,7 @@ import L from 'leaflet';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import type { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   vehicleType?: 'car' | 'motorbike' | 'bike'; // optional filter
@@ -28,22 +29,17 @@ function parseLatLngString(s?: string): [number, number] | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
 }
 
-/** Lấy toạ độ từ LocationCore (ưu tiên chuẩn mới), có fallback nhẹ cho legacy */
+/** Lấy toạ độ từ LocationCore (ưu tiên chuẩn mới), có fallback cho legacy */
 function extractLatLngFromPartner(p: TechnicianPartner): [number, number] | null {
   const loc: any = p.location;
 
-  // ✅ Chuẩn mới: GeoPoint
   if (loc?.geo && typeof loc.geo.latitude === 'number' && typeof loc.geo.longitude === 'number') {
     return [loc.geo.latitude, loc.geo.longitude];
   }
-
-  // ✅ Chuẩn mới: chuỗi "lat,lng"
   if (typeof loc?.location === 'string') {
     const parsed = parseLatLngString(loc.location);
     if (parsed) return parsed;
   }
-
-  // ♻️ Legacy rất cũ: {lat,lng} hoặc location.coordinates: "lat,lng"
   if (typeof loc?.lat === 'number' && typeof loc?.lng === 'number') {
     if (Number.isFinite(loc.lat) && Number.isFinite(loc.lng)) return [loc.lat, loc.lng];
   }
@@ -51,18 +47,18 @@ function extractLatLngFromPartner(p: TechnicianPartner): [number, number] | null
     const parsed = parseLatLngString(loc.coordinates);
     if (parsed) return parsed;
   }
-  const legacyCoords = (p as any)?.coordinates; // chỉ để đọc doc cũ
+  const legacyCoords = (p as any)?.coordinates;
   if (legacyCoords && typeof legacyCoords.lat === 'number' && typeof legacyCoords.lng === 'number') {
     if (Number.isFinite(legacyCoords.lat) && Number.isFinite(legacyCoords.lng)) {
       return [legacyCoords.lat, legacyCoords.lng];
     }
   }
-
   return null;
 }
 
 export default function TechnicianMarkers({ vehicleType }: Props) {
   const [technicians, setTechnicians] = useState<TechnicianPartner[]>([]);
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     let mounted = true;
@@ -83,7 +79,6 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
   }, []);
 
   // Optional filter theo vehicleType (client-side)
-  // Nếu bản ghi chưa set vehicleType → coi như 'motorbike'
   const visibleTechs = useMemo(() => {
     const base = technicians.filter((t) => !!extractLatLngFromPartner(t));
     if (!vehicleType) return base;
@@ -104,11 +99,12 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
               <div className="text-sm leading-snug max-w-[220px]">
                 <p className="font-semibold">{tech.name}</p>
                 <p className="text-xs text-gray-700">
-                  {tech.type === 'shop' ? 'Shop technician' : 'Mobile technician'}
+                  {tech.type === 'shop'
+                    ? t('technician_markers.shop')
+                    : t('technician_markers.mobile')}
                 </p>
-                {/* ✅ Địa chỉ theo chuẩn mới: location.address */}
                 <p className="text-xs text-gray-600">
-                  📍 {tech.location?.address || 'N/A'}
+                  📍 {tech.location?.address || t('technician_markers.no_address')}
                 </p>
                 {tech.phone && (
                   <p className="text-xs text-gray-600">
