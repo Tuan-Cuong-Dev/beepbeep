@@ -83,7 +83,7 @@ export default function PublicVehicleIssuesManagementPage() {
   const [viewingProposal, setViewingProposal] = useState<PublicVehicleIssue | null>(null);
   const [approvingProposal, setApprovingProposal] = useState<PublicVehicleIssue | null>(null);
 
-  const { issues, loading, fetchVehicleIssues, updateIssue } = usePublicIssuesToDispatch();
+  const { issues, loading, refresh, updateIssue } = usePublicIssuesToDispatch();
 
   const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
     setDialog({ open: true, type, title, description });
@@ -168,7 +168,7 @@ export default function PublicVehicleIssuesManagementPage() {
       showDialog('success', t('messages.assign_success'));
       setShowForm(false);
       setEditingIssue(null);
-      await fetchVehicleIssues();
+      await refresh();
     } catch {
       showDialog('error', t('messages.assign_failed'));
     }
