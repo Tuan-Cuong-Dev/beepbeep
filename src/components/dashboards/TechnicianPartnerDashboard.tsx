@@ -263,7 +263,7 @@ function QuickAction({
       className={[
         'relative block text-center font-medium px-4 py-3 rounded-xl transition',
         'text-white bg-[#00d289] hover:bg-[#00b67a]',
-        highlight ? 'ring-2 ring-[#00d289] ring-offset-2 animate-pulse' : '',
+        highlight ? 'ring-2 ring-[#FFD700] bg-[#FFD700] ring-offset-2 animate-pulse' : '',
       ].join(' ')}
       aria-live="polite"
     >

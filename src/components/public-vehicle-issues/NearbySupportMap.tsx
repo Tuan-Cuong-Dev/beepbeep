@@ -364,6 +364,20 @@ export default function NearbySupportMap({
 
   const now = Date.now();
 
+  // ✅ Issue gần nhất với vị trí đang focus (để lấy phone, address...)
+  const focusedIssue = useMemo<PublicVehicleIssue | null>(() => {
+    if (!issueCoords || !issues?.length) return null;
+    let best: { issue: PublicVehicleIssue; d: number } | null = null;
+    for (const it of issues) {
+      const c = extractLatLngFromIssueLocation(it);
+      if (!c) continue;
+      const d = distanceKm(issueCoords, c);
+      if (!best || d < best.d) best = { issue: it, d };
+    }
+    return best?.issue ?? null;
+  }, [issueCoords, issues]);
+
+
   // ngay trước return của Marker issueCoords
   const nearestMobileKm =
     showNearestMobiles && topMobiles.length
@@ -456,33 +470,45 @@ export default function NearbySupportMap({
             {/* Sự cố đang xem (pulse) */}
             
             {issueCoords && pulseIcon && (
-            <Marker position={[issueCoords.lat, issueCoords.lng]} icon={pulseIcon}>
-              <Popup>
-                <div className="text-sm">
-                  <div className="font-semibold">{t('focus_issue')}</div>
+              <Marker position={[issueCoords.lat, issueCoords.lng]} icon={pulseIcon}>
+                <Popup>
+                  <div className="text-sm">
+                    <div className="font-semibold">{t('focus_issue')}</div>
 
-                  {/* ✅ Khoảng cách KTV gần nhất tới sự cố đang xem */}
-                  {nearestMobileKm != null && (
-                    <div className="text-xs mt-1">
-                      {t('distance_km', { val: nearestMobileKm.toFixed(2) })}
+                    {/* ✅ Khoảng cách KTV gần nhất */}
+                    {nearestMobileKm != null && (
+                      <div className="text-xs mt-1">
+                        {t('distance_km', { val: nearestMobileKm.toFixed(2) })}
+                      </div>
+                    )}
+
+                    {/* ✅ SĐT khách hàng */}
+                      {focusedIssue?.phone && (
+                        <div className="text-xs text-gray-600 mt-1">
+                          {t('phone_short')}: <a className="underline" href={`tel:${focusedIssue.phone}`}>{focusedIssue.phone}</a>
+                        </div>
+                      )}
+                    {/* (tuỳ chọn) địa chỉ nếu có */}
+                    {focusedIssue?.location?.issueAddress && (
+                      <div className="text-xs mt-1">{focusedIssue.location.issueAddress}</div>
+                    )}
+
+                    <div className="mt-1 font-mono text-xs">
+                      {issueCoords.lat.toFixed(6)}, {issueCoords.lng.toFixed(6)}
                     </div>
-                  )}
-
-                  <div className="mt-1 font-mono text-xs">
-                    {issueCoords.lat.toFixed(6)}, {issueCoords.lng.toFixed(6)}
+                    <a
+                      className="text-blue-600 underline text-xs"
+                      href={`https://www.google.com/maps/search/?api=1&query=${issueCoords.lat},${issueCoords.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t('open_on_maps')}
+                    </a>
                   </div>
-                  <a
-                    className="text-blue-600 underline text-xs"
-                    href={`https://www.google.com/maps/search/?api=1&query=${issueCoords.lat},${issueCoords.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t('open_on_maps')}
-                  </a>
-                </div>
-              </Popup>
-            </Marker>
+                </Popup>
+              </Marker>
             )}
+
 
 
             {/* Các sự cố “mở” (pulse) */}
