@@ -3590,30 +3590,42 @@
 },
 
 "map": {
-  "title": "Bản đồ hỗ trợ gần khách hàng",
-  "loading_partners": "Đang tải đối tác…",
-  "no_location_data": "Không có dữ liệu vị trí để hiển thị bản đồ.",
-  "focus_issue": "Khách hàng báo lỗi (đang xem)",
+  "title": "Hỗ trợ gần bạn",
+  "no_location_data": "Chưa có dữ liệu vị trí",
+  "loading_partners": "Đang tải dữ liệu...",
+  "focus_issue": "Sự cố đang xem",
   "open_on_maps": "Mở trên Google Maps",
-  "phone_short": "ĐT",
-  "shop_fallback": "Cửa hàng sửa xe",
-  "mobile_fallback": "Kỹ thuật viên lưu động",
-  "distance_km": "Khoảng cách: {{val}} km",
   "legend": {
     "viewing_issue": "Sự cố đang xem",
     "nearest_shop": "Cửa hàng gần nhất",
-    "nearest_mobile": "Kỹ thuật viên lưu động gần nhất"
+    "nearest_mobile": "KTV lưu động gần nhất"
   },
   "status": {
+    "online": "Đang trực tuyến",
+    "paused": "Tạm dừng",
+    "offline": "Ngoại tuyến",
     "pending": "Chờ xử lý",
     "assigned": "Đã phân công",
     "proposed": "Đề xuất",
-    "confirmed": "Xác nhận",
-    "rejected": "Từ chối",
+    "confirmed": "Đã xác nhận",
+    "rejected": "Bị từ chối",
     "in_progress": "Đang xử lý",
-    "resolved": "Đã giải quyết",
+    "resolved": "Đã xử lý",
     "closed": "Đã đóng"
-  }
+  },
+  "popup": {
+    "company": "Công ty",
+    "status": "Trạng thái",
+    "hide_path": "Ẩn lộ trình",
+    "view_path": "Xem lộ trình"
+  },
+  "updated": "cập nhật",
+  "phone_short": "ĐT",
+  "distance_km": "{{val}} km",
+  "enter_fullscreen": "Mở rộng bản đồ",
+  "exit_fullscreen": "Thoát toàn màn hình",
+  "expand": "Mở rộng",
+  "shrink": "Thu nhỏ"
 },
 
 "user_form": {

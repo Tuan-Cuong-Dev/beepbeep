@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PublicVehicleIssue, PublicIssueStatus } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import type { TechnicianPartner } from '@/src/lib/technicianPartners/technicianPartnerTypes';
@@ -177,6 +177,18 @@ function FitToMarkers({ center, others }: { center?: LatLng; others: LatLng[] })
   return null;
 }
 
+/** ⤴️ Invalidate size khi chuyển fullscreen để Leaflet render đúng kích thước */
+function InvalidateOnToggle({ dep }: { dep: any }) {
+  const map = useLeafletMap();
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try { map.invalidateSize(); } catch {}
+    }, 0);
+    return () => clearTimeout(id);
+  }, [dep, map]);
+  return null;
+}
+
 /* ---------------------------------------------------
  * Main component
  * --------------------------------------------------- */
@@ -191,6 +203,41 @@ export default function NearbySupportMap({
 
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
+
+  // 🔳 Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Khóa cuộn khi fullscreen (mobile thân thiện)
+  useEffect(() => {
+    if (!isClient) return;
+    const html = document.documentElement;
+    const body = document.body;
+    if (isFullscreen) {
+      const prevHtml = html.style.overflow;
+      const prevBody = body.style.overflow;
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      // cleanup
+      return () => {
+        html.style.overflow = prevHtml;
+        body.style.overflow = prevBody;
+      };
+    }
+  }, [isFullscreen, isClient]);
+
+  // Thoát bằng phím ESC
+  useEffect(() => {
+    if (!isClient) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullscreen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isClient]);
+
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(v => !v);
+  }, []);
 
   /* 1) Realtime KTV lưu động từ presence */
   const presence = (useTechnicianPresence() || []) as any[];
@@ -218,10 +265,8 @@ export default function NearbySupportMap({
 
   const liveMobiles = useMemo(() => {
     const out = (presence || []).map(normalizePresenceItem).filter(Boolean) as PresenceItem[];
-    // ⚠️ Không filter theo role để khỏi loại nhầm
-    return out;
+    return out; // Không filter role để tránh loại nhầm
   }, [presence]);
-
 
   /* 2) Optional: load “Cửa hàng” (shop) từ collection */
   const [shops, setShops] = useState<TechnicianPartner[]>([]);
@@ -298,17 +343,19 @@ export default function NearbySupportMap({
   }, [showNearestShops, showNearestMobiles, topShops, topMobiles, openIssuePoints]);
 
   /* 6) Pulse icon (client-only) */
-    const pulseIcon = useMemo(() => {
-    if (!isClient) return null;
+  const [isClientReady, setIsClientReady] = useState(false);
+  useEffect(() => { if (isClient) setIsClientReady(true); }, [isClient]);
+
+  const pulseIcon = useMemo(() => {
+    if (!isClientReady) return null;
     const L = require('leaflet');
     return L.divIcon({
       className: 'pulse-marker',
       html: '<span class="pulse-dot"></span>',
-      iconSize: [24, 24],   // đồng bộ 24px
+      iconSize: [24, 24],
       iconAnchor: [12, 12],
     });
-  }, [isClient]);
-
+  }, [isClientReady]);
 
   /* 7) Theo dõi đường đi KTV (khi cần) */
   const [selected, setSelected] = useState<{ techId: string; sessionId?: string | null } | null>(null);
@@ -316,6 +363,12 @@ export default function NearbySupportMap({
   const poly = useTrackPolyline(selected?.techId || '', selected?.sessionId || undefined);
 
   const now = Date.now();
+
+  // ngay trước return của Marker issueCoords
+  const nearestMobileKm =
+    showNearestMobiles && topMobiles.length
+      ? topMobiles[0].d
+      : null;
 
   /* 8) UI */
   if (!issueCoords && openIssuePoints.length === 0) {
@@ -326,14 +379,56 @@ export default function NearbySupportMap({
     );
   }
 
+
   return (
     <div className="rounded-xl border bg-white">
       <div className="flex items-center justify-between p-3">
         <div className="font-semibold">{t('title')}</div>
-        {loadingShops && <div className="text-xs text-gray-500">{t('loading_partners')}</div>}
+        <div className="flex items-center gap-2">
+          {/* Nút fullscreen: ưu tiên hiện trên mobile, vẫn dùng được trên desktop */}
+          <button
+            type="button"
+            aria-label={isFullscreen ? t('exit_fullscreen') : t('enter_fullscreen')}
+            onClick={toggleFullscreen}
+            className="inline-flex items-center rounded-lg border px-3 py-1.5 text-xs font-medium hover:bg-gray-50 active:scale-[.98]"
+          >
+            {isFullscreen ? t('shrink') : t('expand')}
+          </button>
+          {loadingShops && <div className="text-xs text-gray-500">{t('loading_partners')}</div>}
+        </div>
       </div>
 
-      <div className="h-[460px] w-full">
+      {/* Map wrapper:
+          - Normal: chiều cao cố định (460px)
+          - Fullscreen: cố định phủ toàn màn hình, tôn trọng safe area (iOS) */}
+      <div
+        className={
+          isFullscreen
+            ? 'fixed inset-0 z-[9999] bg-white'
+            : 'relative h-[460px] w-full'
+        }
+        style={
+          isFullscreen
+            ? {
+                paddingTop: 'env(safe-area-inset-top)',
+                paddingBottom: 'env(safe-area-inset-bottom)',
+                paddingLeft: 'env(safe-area-inset-left)',
+                paddingRight: 'env(safe-area-inset-right)',
+              }
+            : undefined
+        }
+      >
+        {/* Nút thoát nhanh khi fullscreen (overlay, góc trên phải) */}
+        {isFullscreen && (
+          <button
+            type="button"
+            onClick={() => setIsFullscreen(false)}
+            className="absolute right-3 top-3 z-[10000] rounded-full bg-black/70 px-3 py-1.5 text-xs font-medium text-white backdrop-blur hover:bg-black/80 active:scale-[.98]"
+          >
+            {t('exit_fullscreen')}
+          </button>
+        )}
+
         {isClient && (
           <MapContainer
             center={
@@ -345,6 +440,9 @@ export default function NearbySupportMap({
             style={{ height: '100%', width: '100%' }}
             scrollWheelZoom
           >
+            {/* invalidate size khi toggle */}
+            <InvalidateOnToggle dep={isFullscreen} />
+
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution="&copy; OpenStreetMap contributors"
@@ -356,30 +454,49 @@ export default function NearbySupportMap({
             />
 
             {/* Sự cố đang xem (pulse) */}
+            
             {issueCoords && pulseIcon && (
-              <Marker position={[issueCoords.lat, issueCoords.lng]} icon={pulseIcon}>
-                <Popup>
-                  <div className="text-sm">
-                    <div className="font-semibold">{t('focus_issue')}</div>
-                    <div className="mt-1 font-mono text-xs">
-                      {issueCoords.lat.toFixed(6)}, {issueCoords.lng.toFixed(6)}
+            <Marker position={[issueCoords.lat, issueCoords.lng]} icon={pulseIcon}>
+              <Popup>
+                <div className="text-sm">
+                  <div className="font-semibold">{t('focus_issue')}</div>
+
+                  {/* ✅ Khoảng cách KTV gần nhất tới sự cố đang xem */}
+                  {nearestMobileKm != null && (
+                    <div className="text-xs mt-1">
+                      {t('distance_km', { val: nearestMobileKm.toFixed(2) })}
                     </div>
-                    <a
-                      className="text-blue-600 underline text-xs"
-                      href={`https://www.google.com/maps/search/?api=1&query=${issueCoords.lat},${issueCoords.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('open_on_maps')}
-                    </a>
+                  )}
+
+                  <div className="mt-1 font-mono text-xs">
+                    {issueCoords.lat.toFixed(6)}, {issueCoords.lng.toFixed(6)}
                   </div>
-                </Popup>
-              </Marker>
+                  <a
+                    className="text-blue-600 underline text-xs"
+                    href={`https://www.google.com/maps/search/?api=1&query=${issueCoords.lat},${issueCoords.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('open_on_maps')}
+                  </a>
+                </div>
+              </Popup>
+            </Marker>
             )}
+
 
             {/* Các sự cố “mở” (pulse) */}
             {openIssuePoints.map(({ issue, coord }) => {
               const eff = getEffectiveStatus(issue);
+
+              // ✅ tính KTV gần nhất tới sự cố này
+              const nearestMobileKm =
+                showNearestMobiles && liveMobiles.length
+                  ? Math.min(
+                      ...liveMobiles.map(m => distanceKm(coord, { lat: m.lat, lng: m.lng }))
+                    )
+                  : null;
+
               return (
                 <Marker
                   key={`open-${issue.id}-${coord.lat}-${coord.lng}`}
@@ -391,6 +508,14 @@ export default function NearbySupportMap({
                       <div className="font-semibold">
                         {issue.customerName} — <span className="capitalize">{t(`status.${eff}`)}</span>
                       </div>
+
+                      {/* ✅ Khoảng cách KTV gần nhất tới sự cố này */}
+                      {nearestMobileKm != null && (
+                        <div className="text-xs mt-1">
+                          {t('distance_km', { val: nearestMobileKm.toFixed(2) })}
+                        </div>
+                      )}
+
                       {issue.phone && (
                         <div className="text-xs text-gray-600">
                           {t('phone_short')}: {issue.phone}
@@ -416,16 +541,16 @@ export default function NearbySupportMap({
               );
             })}
 
+
             {/* Cửa hàng gần nhất (shop) */}
             {showNearestShops &&
               topShops.map(({ p, coord, d }) => (
                 <CircleMarker
                   key={`shop-${p.id}`}
                   center={[coord.lat, coord.lng]}
-                  radius={12}   // đồng bộ 24px đường kính
+                  radius={12}
                   pathOptions={{ color: '#2563eb', weight: 2, fillOpacity: 0.5 }}
                 >
-
                   <Popup>
                     <div className="text-sm">
                       <div className="font-semibold">{p.shopName || p.name || t('shop_fallback')}</div>
@@ -452,33 +577,29 @@ export default function NearbySupportMap({
             {/* KTV lưu động gần nhất (realtime presence) */}
             {showNearestMobiles &&
               topMobiles.map(({ p, coord, d }) => {
-                // p là PresenceItem ở đây; reuse kiểu hiển thị “avatar vòng trạng thái”
-                // vẽ accuracy nếu có
                 const acc = typeof p.accuracy === 'number' ? Math.min(p.accuracy, 120) : null;
-
-                // tạo divIcon avatar
                 const { divIcon } = require('leaflet');
-                const ring = '#10B981'; // màu viền tuỳ status
+                const ring = '#10B981';
                 const html = `
                   <div style="
                     position: relative;
-                    width: 24px; height: 24px;
+                    width: 32px; height: 32px;   /* ✅ tăng gấp đôi từ 24px */
                     border-radius: 9999px;
-                    box-shadow: 0 1px 4px rgba(0,0,0,.25);
-                    outline: 2px solid ${ring};
+                    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+                    outline: 3px solid ${ring}; /* ✅ đường viền to hơn một chút */
                     background: white;
                     display: grid; place-items: center;
                     overflow: hidden;
                   ">
                     ${p.avatarUrl
                       ? `<img src="${p.avatarUrl}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover"/>`
-                      : `<div style="width:100%;height:100%;display:grid;place-items:center;font-weight:600;font-size:12px;color:#374151;background:#E5E7EB;">
+                      : `<div style="width:100%;height:100%;display:grid;place-items:center;font-weight:600;font-size:16px;color:#374151;background:#E5E7EB;">
                           ${(p.name || p.techId || 'KTV').slice(0,2).toUpperCase()}
                         </div>`
                     }
                     <div style="
-                      position:absolute; right:-2px; bottom:-2px;
-                      width: 10px; height: 10px; border-radius:9999px;
+                      position:absolute; right:-4px; bottom:-4px;
+                      width: 14px; height: 14px; border-radius:9999px;
                       background: ${ring}; border:2px solid white;
                     "></div>
                   </div>`;
@@ -486,9 +607,9 @@ export default function NearbySupportMap({
                 const avatarIcon = divIcon({
                   html,
                   className: 'tech-avatar-marker',
-                  iconSize: [32, 32],   // 👈 chỉnh lại size
-                  iconAnchor: [16, 16], // 👈 tâm icon
-                  popupAnchor: [0, -20],
+                  iconSize: [48, 48],   // ✅ tăng từ [32, 32]
+                  iconAnchor: [24, 24], // ✅ anchor giữa icon
+                  popupAnchor: [0, -24],
                 });
 
 
@@ -505,7 +626,6 @@ export default function NearbySupportMap({
                     <Marker position={[coord.lat, coord.lng]} icon={avatarIcon}
                       eventHandlers={{
                         click: () => {
-                          // chọn để xem track
                           setSelected({ techId: p.techId, sessionId: p.sessionId || undefined });
                           setShowTrack(true);
                         },
@@ -560,7 +680,6 @@ export default function NearbySupportMap({
                               onClick={() => {
                                 setSelected({ techId: p.techId, sessionId: p.sessionId || undefined });
                                 setShowTrack(prev => {
-                                  // nếu đang chọn cùng tech/session thì toggle, còn lại bật
                                   if (selected?.techId === p.techId && (selected?.sessionId||undefined) === (p.sessionId||undefined)) {
                                     return !prev;
                                   }
@@ -604,39 +723,41 @@ export default function NearbySupportMap({
         )}
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 p-3 text-xs text-gray-600">
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#f59e0b' }} />
-          {t('legend.viewing_issue')}
+      {/* Legend: tự ẩn khi fullscreen để nhường chỗ cho map */}
+      {!isFullscreen && (
+        <div className="flex flex-wrap items-center gap-4 p-3 text-xs text-gray-600">
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#f59e0b' }} />
+            {t('legend.viewing_issue')}
+          </div>
+
+          {(['pending','assigned','proposed','confirmed','rejected','in_progress'] as PublicIssueStatus[]).map(st => (
+            <div className="flex items-center gap-2" key={st}>
+              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: statusColor[st] }} />
+              {t(`status.${st}`)}
+            </div>
+          ))}
+
+          {showNearestShops && (
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#2563eb' }} />
+              {t('legend.nearest_shop')}
+            </div>
+          )}
+          {showNearestMobiles && (
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#00d289' }} />
+              {t('legend.nearest_mobile')}
+            </div>
+          )}
         </div>
-
-        {(['pending','assigned','proposed','confirmed','rejected','in_progress'] as PublicIssueStatus[]).map(st => (
-          <div className="flex items-center gap-2" key={st}>
-            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: statusColor[st] }} />
-            {t(`status.${st}`)}
-          </div>
-        ))}
-
-        {showNearestShops && (
-          <div className="flex items-center gap-2">
-            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#2563eb' }} />
-            {t('legend.nearest_shop')}
-          </div>
-        )}
-        {showNearestMobiles && (
-          <div className="flex items-center gap-2">
-            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: '#00d289' }} />
-            {t('legend.nearest_mobile')}
-          </div>
-        )}
-      </div>
+      )}
 
       {/* CSS pulse cho marker sự cố */}
       <style jsx global>{`
         .pulse-marker { position: relative; }
         .pulse-marker .pulse-dot {
-          position: relative; display: block; width: 16px; height: 16px; border-radius: 9999px;
+          position: relative; display: block; width: 32px; height: 32px; border-radius: 9999px;
           background: #f59e0b;
           box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6);
           animation: pulse-dot 1.5s infinite;

@@ -59,6 +59,10 @@ export default function TechnicianPartnerDashboard() {
     return init;
   }, [myIssues]);
 
+  // ✅ Tính số việc cần KTV ưu tiên (ảnh hưởng tới QuickAction)
+  const todoCount = (counts.assigned ?? 0) + (counts.in_progress ?? 0) + (counts.confirmed ?? 0);
+  const shouldBlink = todoCount > 0;
+
   useEffect(() => {
     if (!notification) return;
     const timer = setTimeout(() => setNotification(null), 3000);
@@ -113,9 +117,7 @@ export default function TechnicianPartnerDashboard() {
           🛠️ {t('technician_partner_dashboard.title')}
         </h1>
 
-        {/* ✅ Live Tracking
-            - Desktop: hiển thị card đẹp + TrackerToggle
-            - Mobile: card ẩn, dùng Sticky bar cố định dưới (render ở cuối trang) */}
+        {/* ✅ Live Tracking (Desktop) */}
         <section className="hidden sm:block bg-white rounded-2xl shadow p-4 sm:p-6 border border-gray-200">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-3">
@@ -165,7 +167,12 @@ export default function TechnicianPartnerDashboard() {
 
         {/* Lối tắt */}
         <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">
-          <QuickAction label={t('technician_partner_dashboard.quick_actions.my_issues')} href="/public-vehicle-issues" />
+          <QuickAction
+            label={t('technician_partner_dashboard.quick_actions.my_issues')}
+            href="/public-vehicle-issues"
+            highlight={shouldBlink}
+            badgeCount={todoCount}
+          />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.proposal_history')} href="/proposed" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.suggest_error_fix')} href="/vehicle-issues/suggest-error" />
           <QuickAction label={t('technician_partner_dashboard.quick_actions.error_codes')} href="/vehicle-issues/error-codes" />
@@ -221,7 +228,7 @@ export default function TechnicianPartnerDashboard() {
       />
 
       {/* 📌 Sticky tracker bar chỉ mobile (tránh ghi trùng với card) */}
-      <MobileStickyTrackerBar className="sm:hidden" />
+      <MobileStickyTrackerBar className="sm:hidden" user={undefined} />
     </div>
   );
 }
@@ -239,13 +246,49 @@ function DashboardCard({ icon, title, value }: { icon: JSX.Element; title: strin
   );
 }
 
-function QuickAction({ label, href }: { label: string; href: string }) {
+function QuickAction({
+  label,
+  href,
+  highlight = false,
+  badgeCount,
+}: {
+  label: string;
+  href: string;
+  highlight?: boolean;
+  badgeCount?: number;
+}) {
   return (
     <Link
       href={href}
-      className="block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition"
+      className={[
+        'relative block text-center font-medium px-4 py-3 rounded-xl transition',
+        'text-white bg-[#00d289] hover:bg-[#00b67a]',
+        highlight ? 'ring-2 ring-[#00d289] ring-offset-2 animate-pulse' : '',
+      ].join(' ')}
+      aria-live="polite"
     >
+      {/* Chấm đỏ nhấp nháy góc phải trên khi highlight */}
+      {highlight && (
+        <span className="absolute -top-1 -right-1 inline-flex h-3 w-3">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+        </span>
+      )}
+
+      {/* Badge số lượng công việc */}
+      {typeof badgeCount === 'number' && badgeCount > 0 && (
+        <span className="absolute -top-2 -left-2 select-none">
+          <span className="px-2 py-[2px] text-xs rounded-full bg-white text-[#00a66d] shadow border border-[#c9f5e6]">
+            {badgeCount}
+          </span>
+        </span>
+      )}
+
+      {/* Văn bản chính */}
       {label}
+
+      {/* SR-only để hỗ trợ screen reader khi có highlight */}
+      {highlight && <span className="sr-only">— có công việc cần xử lý</span>}
     </Link>
   );
 }

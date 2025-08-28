@@ -10,6 +10,7 @@ import {
   doc,
   updateDoc,
   Unsubscribe,
+  serverTimestamp
 } from 'firebase/firestore';
 import type { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 
@@ -200,7 +201,16 @@ export function usePublicIssuesToDispatch(opts: Options = {}) {
   const refresh = useCallback(() => attachOrFetch(), [attachOrFetch]);
 
   const updateIssue = useCallback(async (id: string, data: Partial<PublicVehicleIssue>) => {
-    await updateDoc(doc(db, 'publicVehicleIssues', id), data as any);
+    // Sao chép và làm sạch payload trước khi ghi
+    const payload: any = { ...data };
+
+    // ❌ Không bao giờ cho client đè 2 field thời điểm gốc
+    delete payload.createdAt; // "Thời gian báo cáo" – giữ nguyên
+
+    // ✅ Luôn set "Cập nhật" bằng serverTimestamp
+    payload.updatedAt = serverTimestamp();
+
+    await updateDoc(doc(db, 'publicVehicleIssues', id), payload);
   }, []);
 
   return useMemo(

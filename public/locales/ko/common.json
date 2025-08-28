@@ -3537,31 +3537,44 @@
 },
 
 "map": {
-  "title": "근처 지원 맵",
-  "loading_partners": "파트너 불러오는 중…",
-  "no_location_data": "지도를 표시할 위치 데이터가 없습니다.",
-  "focus_issue": "고객 고장 신고(보기)",
+  "title": "주변 지원",
+  "no_location_data": "위치 데이터 없음",
+  "loading_partners": "불러오는 중...",
+  "focus_issue": "현재 보고 있는 문제",
   "open_on_maps": "Google 지도에서 열기",
-  "phone_short": "전화",
-  "shop_fallback": "정비소",
-  "mobile_fallback": "출장 기사",
-  "distance_km": "거리: {{val}} km",
   "legend": {
-    "viewing_issue": "현재 보고 있는 고장",
-    "nearest_shop": "가장 가까운 매장",
-    "nearest_mobile": "가장 가까운 출장 기사"
+    "viewing_issue": "보고 있는 문제",
+    "nearest_shop": "가까운 매장",
+    "nearest_mobile": "가까운 출장 기술자"
   },
   "status": {
-    "pending": "대기",
-    "assigned": "배정됨",
+    "online": "온라인",
+    "paused": "일시중지",
+    "offline": "오프라인",
+    "pending": "대기 중",
+    "assigned": "할당됨",
     "proposed": "제안됨",
-    "confirmed": "확정",
+    "confirmed": "확인됨",
     "rejected": "거절됨",
     "in_progress": "처리 중",
-    "resolved": "해결됨",
-    "closed": "종료"
-  }
+    "resolved": "처리 완료",
+    "closed": "종료됨"
+  },
+  "popup": {
+    "company": "회사",
+    "status": "상태",
+    "hide_path": "경로 숨기기",
+    "view_path": "경로 보기"
+  },
+  "updated": "업데이트됨",
+  "phone_short": "전화",
+  "distance_km": "{{val}} km",
+  "enter_fullscreen": "전체 화면으로",
+  "exit_fullscreen": "전체 화면 종료",
+  "expand": "확대",
+  "shrink": "축소"
 },
+
 "user_form": {
   "add_user": "새 사용자 추가",
   "update_user": "사용자 업데이트",

@@ -3517,30 +3517,42 @@
 },
 
 "map": {
-  "title": "近隣サポートマップ",
-  "loading_partners": "パートナーを読み込み中…",
-  "no_location_data": "地図を表示する位置情報がありません。",
-  "focus_issue": "通報中の故障（閲覧中）",
-  "open_on_maps": "Googleマップで開く",
-  "phone_short": "TEL",
-  "shop_fallback": "修理工場",
-  "mobile_fallback": "出張メカニック",
-  "distance_km": "距離: {{val}} km",
+  "title": "Nearby Support",
+  "no_location_data": "No location data available",
+  "loading_partners": "Loading...",
+  "focus_issue": "Current issue",
+  "open_on_maps": "Open on Google Maps",
   "legend": {
-    "viewing_issue": "閲覧中の故障",
-    "nearest_shop": "最寄りの店舗",
-    "nearest_mobile": "最寄りの出張メカ"
+    "viewing_issue": "Viewing issue",
+    "nearest_shop": "Nearest shop",
+    "nearest_mobile": "Nearest mobile technician"
   },
   "status": {
-    "pending": "保留",
-    "assigned": "担当割り当て済み",
-    "proposed": "提案済み",
-    "confirmed": "確定",
-    "rejected": "却下",
-    "in_progress": "対応中",
-    "resolved": "解決",
-    "closed": "クローズ"
-  }
+    "online": "Online",
+    "paused": "Paused",
+    "offline": "Offline",
+    "pending": "Pending",
+    "assigned": "Assigned",
+    "proposed": "Proposed",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "in_progress": "In progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "popup": {
+    "company": "Company",
+    "status": "Status",
+    "hide_path": "Hide path",
+    "view_path": "View path"
+  },
+  "updated": "updated",
+  "phone_short": "Tel",
+  "distance_km": "{{val}} km",
+  "enter_fullscreen": "Enter fullscreen",
+  "exit_fullscreen": "Exit fullscreen",
+  "expand": "Expand",
+  "shrink": "Shrink"
 },
 
 "user_form": {

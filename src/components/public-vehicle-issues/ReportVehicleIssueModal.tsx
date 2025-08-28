@@ -16,9 +16,12 @@ import { useUser } from '@/src/context/AuthContext';
 import { usePersonalVehicles } from '@/src/hooks/usePersonalVehicles';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 
-import type { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes'; 
+import type { PublicVehicleIssue } from '@/src/lib/publicVehicleIssues/publicVehicleIssueTypes';
 import type { PersonalVehicle } from '@/src/lib/personalVehicles/personalVehiclesTypes';
 import { useTranslation } from 'react-i18next';
+
+// ✅ Thêm router để điều hướng sau khi submit
+import { useRouter } from 'next/navigation';
 
 interface Props {
   open: boolean;
@@ -29,6 +32,9 @@ export default function ReportVehicleIssueModal({ open, onClose }: Props) {
   const { t } = useTranslation('common', { keyPrefix: 'report_issue' });
   const { user } = useUser();
   const uid = user?.uid;
+
+  // ✅ Khởi tạo router
+  const router = useRouter();
 
   // --- state ---
   const { vehicles, loading: loadingVehicles } = usePersonalVehicles(uid);
@@ -44,7 +50,7 @@ export default function ReportVehicleIssueModal({ open, onClose }: Props) {
   const [customerName, setCustomerName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
 
-// 🔁 NEW: Sync lại khi user đã load xong hoặc khi modal mở
+  // 🔁 NEW: Sync lại khi user đã load xong hoặc khi modal mở
   useEffect(() => {
     if (open) {
       setCustomerName(user?.name || '');
@@ -121,18 +127,22 @@ export default function ReportVehicleIssueModal({ open, onClose }: Props) {
         ...(selected?.brand ? { vehicleBrand: selected.brand } : {}),
         ...(selected?.model ? { vehicleModel: selected.model } : {}),
         ...(selected?.licensePlate ? { vehicleLicensePlate: selected.licensePlate } : {}),
-
-        // ❌ KHÔNG thêm các field assigned*, closed*, proposed/actual nếu chưa có
       };
 
       setSubmitting(true);
       await addDoc(collection(db, 'publicVehicleIssues'), payload);
-      setSubmitting(false);
+
+      // ✅ Điều hướng ngay sau khi submit thành công
+      // Dùng absolute URL đúng như yêu cầu
+      router.push('https://www.beepbeep.vn/profile?tab=issues');
+
+      // (Tuỳ chọn) đóng modal và reset form — sẽ không thấy vì đã điều hướng
       resetForm();
       onClose();
     } catch (err: any) {
       setSubmitting(false);
       setErrorMsg(err?.message || t('errors.submit_failed'));
+      return;
     }
   };
 
