@@ -2867,7 +2867,14 @@
 },
 
 "vehicle_model_management_page": {
-    "title": "차량 모델 관리"
+     "title": "차량 모델 관리",
+    "search_placeholder": "이름 또는 설명으로 모델 검색…",
+    "count": "{{count}}개 모델",
+    "refresh_models": "모델 새로고침"
+  },
+  "filters": {
+    "search": "검색",
+    "clear": "필터 지우기"
   },
   "loading": "로딩 중...",
   "access_denied": "접근이 거부되었습니다",

@@ -1,6 +1,6 @@
 // app/vehicle_models/page.tsx
 import { Suspense } from 'react';
-import VehicleModelManagementPage from '@/src/components/vehicleModels_new/VehicleModelManagementPage';
+import VehicleModelManagementPage from '@/src/components/vehicleModels/VehicleModelManagementPage';
 
 export default function Page() {
   return (

@@ -2914,8 +2914,15 @@
 },
 
 "vehicle_model_management_page": {
-    "title": "Quản lý mẫu xe"
-  },
+     "title": "Quản lý mẫu xe",
+      "search_placeholder": "Tìm mẫu xe theo tên hoặc mô tả…",
+      "count": "{{count}} mẫu xe",
+      "refresh_models": "Làm mới danh sách xe"
+    },
+    "filters": {
+      "search": "Tìm kiếm",
+      "clear": "Xóa bộ lọc"
+    },
   "loading": "Đang tải...",
   "access_denied": "Không có quyền truy cập",
 

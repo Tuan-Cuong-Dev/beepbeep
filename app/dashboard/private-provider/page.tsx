@@ -1,6 +1,7 @@
 'use client';
 
 // ✅ Trang quản lý công ty tư nhân (Private Provider)
+// 28/08 Có nhìn qua. Nhưng có thể phải viết lại vì giờ nó có collection riêng chứ ko dùng chung với RentalCompany
 
 import { useEffect, useState } from 'react';
 import { useUser } from '@/src/context/AuthContext';

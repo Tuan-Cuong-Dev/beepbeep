@@ -2846,7 +2846,14 @@
 },
 
 "vehicle_model_management_page": {
-    "title": "車両モデル管理"
+    "title": "車両モデル管理",
+    "search_placeholder": "モデル名または説明で検索…",
+    "count": "{{count}} 件のモデル",
+    "refresh_models": "モデルを更新"
+  },
+  "filters": {
+    "search": "検索",
+    "clear": "フィルターをクリア"
   },
   "loading": "読み込み中...",
   "access_denied": "アクセスが拒否されました",

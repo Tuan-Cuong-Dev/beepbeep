@@ -2887,7 +2887,14 @@
 },
 
   "vehicle_model_management_page": {
-    "title": "Vehicle Model Management"
+      "title": "Vehicle Model Management",
+    "search_placeholder": "Search models by name or description…",
+    "count": "{{count}} models",
+    "refresh_models": "Refresh Models"
+  },
+  "filters": {
+    "search": "Search",
+    "clear": "Clear filters"
   },
   "loading": "Loading...",
   "access_denied": "Access denied",
