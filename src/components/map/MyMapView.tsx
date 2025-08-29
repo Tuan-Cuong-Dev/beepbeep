@@ -8,24 +8,23 @@ import Header from '@/src/components/landingpage/Header';
 import VehicleSwitcher from './VehicleSwitcher';
 import { useTranslation } from 'react-i18next';
 
-// ✅ Dynamic imports (SSR off) + fallback để tránh giật layout
 const MapWrapper = dynamic(() => import('./MapWrapper'), { ssr: false, loading: () => <div className="h-full w-full" /> });
 const TechnicianMarkers = dynamic(() => import('./TechnicianMarkers'), { ssr: false });
 const RentalStationMarkers = dynamic(() => import('./RentalStationMarkers'), { ssr: false });
 const BatteryStationMarkers = dynamic(() => import('./BatteryStationMarkers'), { ssr: false });
 const BatteryChargingStationMarkers = dynamic(() => import('./BatteryChargingStationMarkers'), { ssr: false });
 
+// ✅ Thêm LayerGroup để nhóm từng loại marker, tránh so sánh key lẫn nhau
+const LayerGroup = dynamic(() => import('react-leaflet').then(m => m.LayerGroup), { ssr: false });
+
 type TabKey = 'all' | 'rental' | 'battery' | 'battery_charging' | 'maintenance';
 type VehicleType = 'car' | 'motorbike' | 'bike';
 
-interface MyMapViewProps {
-  onClose?: () => void;
-}
+interface MyMapViewProps { onClose?: () => void; }
 
-const SPACER_H = 76;   // khoảng trống cho thanh tabs cố định
-const Z_TABS   = 1200; // tabs (nổi trên map)
-const Z_CLOSE  = 1100; // nút X (trên map)
-const Z_SWITCH = 900;  // VehicleSwitcher (dưới toast/dialog)
+const SPACER_H = 76;
+const Z_TABS   = 1200; // tabs đáy
+const Z_CLOSE  = 1100; // nút X
 
 export default function MyMapView({ onClose }: MyMapViewProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('all');
@@ -49,19 +48,13 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
 
   return (
     <div className="min-h-screen w-full relative flex flex-col">
-      {/* khóa z-index cho Leaflet & UI ngay tại đây để chắc ăn */}
       <style jsx global>{`
-        :root{
-          --z-map:0;
-          --z-leaflet-overlay:20;
-        }
+        :root{ --z-map:0; --z-leaflet-overlay:20; }
         .leaflet-container { z-index: var(--z-map) !important; }
         .leaflet-pane,.leaflet-pane * { z-index: var(--z-map) !important; }
         .leaflet-popup,.leaflet-top,.leaflet-bottom,.leaflet-marker-pane,.leaflet-tooltip-pane,.leaflet-control {
           z-index: var(--z-leaflet-overlay) !important;
         }
-        /* Nếu VehicleSwitcher có class này, ép hạ z-index kể cả khi fixed */
-        .bb-vehicle-switcher { z-index: ${Z_SWITCH} !important; }
       `}</style>
 
       {onClose && (
@@ -78,41 +71,51 @@ export default function MyMapView({ onClose }: MyMapViewProps) {
 
       <Header />
 
-      {/* Bọc switcher để kiểm soát z-index; 
-         ➜ thêm className="bb-vehicle-switcher" trong VehicleSwitcher nếu nó dùng position: fixed */}
-      <div className="relative" style={{ zIndex: Z_SWITCH }}>
-        <VehicleSwitcher
-          vehicleType={vehicleType}
-          onChange={setVehicleType}
-          // đảm bảo không đè modal/toast:
-          zIndex={900}
-          position="fixed"
-          className="bb-vehicle-switcher"
-        />
-      </div>
-
-      {/* Vùng map chiếm phần còn lại, luôn dưới thanh tabs */}
+      {/* KHU VỰC MAP + SWITCHER CÙNG STACKING CONTEXT */}
       <main className="relative flex-1 z-0">
         <div className="absolute inset-0 z-0">
+          {/* Switcher ABSOLUTE TRONG MAP → luôn dưới mọi popup/panel bên ngoài */}
+          <VehicleSwitcher
+            vehicleType={vehicleType}
+            onChange={setVehicleType}
+            position="absolute"
+            top={96}    // ~ top-24
+            right={16}  // ~ right-4
+            zIndex={10} // nhỏ hơn mọi overlay/panel
+          />
+
+          {/* ✅ Duy trì remount khi đổi tab/vehicle */}
           <MapWrapper key={`${activeTab}-${vehicleType}`}>
+            {/* ✅ Mỗi nhóm markers nằm trong 1 LayerGroup tách biệt → không còn đụng key nhau */}
             {(showAll || activeTab === 'rental') && (
-              <RentalStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+              <LayerGroup key="group-rental">
+                <RentalStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+              </LayerGroup>
             )}
+
             {(showAll || activeTab === 'battery') && (
-              <BatteryStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+              <LayerGroup key="group-battery">
+                <BatteryStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+              </LayerGroup>
             )}
+
             {(showAll || activeTab === 'battery_charging') && (
-              <BatteryChargingStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+              <LayerGroup key="group-battery-charging">
+                <BatteryChargingStationMarkers vehicleType={showAll ? undefined : vehicleType} />
+              </LayerGroup>
             )}
+
             {(showAll || activeTab === 'maintenance') && (
-              <TechnicianMarkers vehicleType={showAll ? undefined : vehicleType} />
+              <LayerGroup key="group-maintenance">
+                <TechnicianMarkers vehicleType={showAll ? undefined : vehicleType} />
+              </LayerGroup>
             )}
           </MapWrapper>
         </div>
         <div style={{ height: SPACER_H }} className="sm:h-[76px]" />
       </main>
 
-      {/* Tabs cố định đáy (trên Map, dưới modal/toast) */}
+      {/* Tabs cố định đáy */}
       <div
         className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg py-2 pointer-events-auto pb-[calc(env(safe-area-inset-bottom,0px)+8px)]"
         style={{ zIndex: Z_TABS }}

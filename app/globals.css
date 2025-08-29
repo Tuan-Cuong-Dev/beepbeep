@@ -88,19 +88,19 @@ html, body {
 .react-datepicker__navigation--previous { left: 10px; }
 .react-datepicker__navigation--next { right: 10px; }
 
-/* ============= Leaflet: luôn dưới UI khác ============= */
-.leaflet-container { z-index: var(--z-map) !important; }
-.leaflet-pane, .leaflet-pane * { z-index: var(--z-map) !important; }
+/* Leaflet: trật tự lớp rõ ràng */
+.leaflet-container { z-index: 0 !important; }
 
-/* Popup/tooltip/controls cao hơn tile chút, nhưng vẫn dưới app UI */
-.leaflet-popup,
-.leaflet-top,
-.leaflet-bottom,
-.leaflet-marker-pane,
-.leaflet-tooltip-pane,
-.leaflet-control {
-  z-index: var(--z-leaflet-overlay) !important;
-}
+/* panes theo đúng thứ tự */
+.leaflet-tile-pane        { z-index: 10 !important; }
+.leaflet-overlay-pane     { z-index: 20 !important; }
+.leaflet-marker-pane      { z-index: 800 !important; }   /* marker dưới popup */
+.leaflet-tooltip-pane     { z-index: 900 !important; }
+.leaflet-popup-pane       { z-index: 1000 !important; }  /* ⬅️ popup cao nhất */
+
+/* controls cũng dưới popup */
+.leaflet-top, .leaflet-bottom, .leaflet-control { z-index: 700 !important; }
+
 
 /* ============= App UI layers (tiện ích) ============= */
 /* Vehicle switcher (nếu component gắn class này) */
