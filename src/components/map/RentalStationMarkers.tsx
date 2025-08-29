@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { collection, getDocs } from 'firebase/firestore';
@@ -9,6 +9,8 @@ import { Station } from '@/src/lib/stations/stationTypes';
 
 interface Props {
   vehicleType?: 'car' | 'motorbike' | 'bike'; // Optional for 'all'
+  /** ✅ Namespace để key luôn duy nhất giữa các layer */
+  keyPrefix?: string;
 }
 
 // Icon for rental station marker
@@ -23,9 +25,9 @@ const rentalStationIcon = L.icon({
 function parseLocationString(locationStr: string): [number, number] | null {
   try {
     const [latPart, lngPart] = locationStr.split(',');
-    const lat = parseFloat(latPart);
-    const lng = parseFloat(lngPart);
-    if (isNaN(lat) || isNaN(lng)) return null;
+    const lat = parseFloat(String(latPart).trim());
+    const lng = parseFloat(String(lngPart).trim());
+    if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
     return [lat, lng];
   } catch {
     console.warn('❌ Error parsing location string:', locationStr);
@@ -37,7 +39,24 @@ function isMatchingType(station: Station, vehicleType?: string) {
   return !vehicleType || !station.vehicleType || station.vehicleType === vehicleType;
 }
 
-export default function RentalStationMarkers({ vehicleType }: Props) {
+/** ✅ Khử trùng lặp theo id (phòng trường hợp sau này gộp nhiều nguồn) */
+function uniqById<T extends { id?: string }>(arr: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const x of arr) {
+    if (!x?.id) continue;
+    if (!seen.has(x.id)) {
+      seen.add(x.id);
+      out.push(x);
+    }
+  }
+  return out;
+}
+
+export default function RentalStationMarkers({
+  vehicleType,
+  keyPrefix = 'rental',
+}: Props) {
   const [stations, setStations] = useState<Station[]>([]);
 
   useEffect(() => {
@@ -62,17 +81,32 @@ export default function RentalStationMarkers({ vehicleType }: Props) {
     };
   }, []);
 
+  /** ✅ Lọc đúng loại + valid tọa độ + khử trùng lặp */
+  const data = useMemo(() => {
+    const filtered = (stations || []).filter((station) => {
+      if (!isMatchingType(station, vehicleType)) return false;
+      const coords =
+        typeof station.location === 'string'
+          ? parseLocationString(station.location)
+          : null;
+      return !!coords;
+    });
+    return uniqById(filtered);
+  }, [stations, vehicleType]);
+
   return (
     <>
-      {stations.map((station) => {
-        if (!isMatchingType(station, vehicleType)) return null;
-        const coords = typeof station.location === 'string' ? parseLocationString(station.location) : null;
+      {data.map((station) => {
+        const coords = parseLocationString(station.location as unknown as string);
         if (!coords) return null;
-
         const [lat, lng] = coords;
 
         return (
-          <Marker key={station.id} position={[lat, lng]} icon={rentalStationIcon}>
+          <Marker
+            key={`${keyPrefix}:${station.id}`} // ✅ key có namespace
+            position={[lat, lng]}
+            icon={rentalStationIcon}
+          >
             <Popup>
               <strong>{station.name}</strong>
               <br />

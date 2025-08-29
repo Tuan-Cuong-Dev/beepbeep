@@ -10,6 +10,8 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   vehicleType?: 'car' | 'motorbike' | 'bike'; // optional filter
+  /** ✅ Namespace để đảm bảo key duy nhất tuyệt đối giữa các layer */
+  keyPrefix?: string;
 }
 
 const technicianIcon = L.icon({
@@ -22,10 +24,10 @@ const technicianIcon = L.icon({
 // ===== Helpers =====
 function parseLatLngString(s?: string): [number, number] | null {
   if (!s) return null;
-  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  const m = s.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
   if (!m) return null;
   const lat = parseFloat(m[1]);
-  const lng = parseFloat(m[3]);
+  const lng = parseFloat(m[2]);
   return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
 }
 
@@ -56,7 +58,24 @@ function extractLatLngFromPartner(p: TechnicianPartner): [number, number] | null
   return null;
 }
 
-export default function TechnicianMarkers({ vehicleType }: Props) {
+/** ✅ Khử trùng lặp theo id (phòng trường hợp gộp nhiều nguồn sau này) */
+function uniqById<T extends { id?: string }>(arr: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const x of arr) {
+    if (!x?.id) continue;
+    if (!seen.has(x.id)) {
+      seen.add(x.id);
+      out.push(x);
+    }
+  }
+  return out;
+}
+
+export default function TechnicianMarkers({
+  vehicleType,
+  keyPrefix = 'tech',
+}: Props) {
   const [technicians, setTechnicians] = useState<TechnicianPartner[]>([]);
   const { t } = useTranslation('common');
 
@@ -78,13 +97,15 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
     };
   }, []);
 
-  // Optional filter theo vehicleType (client-side)
+  // ✅ Chuẩn hoá danh sách: có tọa độ hợp lệ + filter theo vehicleType + uniq
   const visibleTechs = useMemo(() => {
-    const base = technicians.filter((t) => !!extractLatLngFromPartner(t));
-    if (!vehicleType) return base;
-    return base.filter(
-      (t) => t.vehicleType === vehicleType || (!t.vehicleType && vehicleType === 'motorbike')
-    );
+    const withCoords = (technicians || []).filter((t) => !!extractLatLngFromPartner(t));
+    const typed = !vehicleType
+      ? withCoords
+      : withCoords.filter(
+          (t) => t.vehicleType === vehicleType || (!t.vehicleType && vehicleType === 'motorbike')
+        );
+    return uniqById(typed);
   }, [technicians, vehicleType]);
 
   return (
@@ -94,7 +115,11 @@ export default function TechnicianMarkers({ vehicleType }: Props) {
         if (!coord) return null;
 
         return (
-          <Marker key={tech.id ?? `${coord[0]}-${coord[1]}`} position={coord} icon={technicianIcon}>
+          <Marker
+            key={`${keyPrefix}:${tech.id ?? `${coord[0]}-${coord[1]}`}`} // ✅ key có namespace
+            position={coord}
+            icon={technicianIcon}
+          >
             <Popup>
               <div className="text-sm leading-snug max-w-[220px]">
                 <p className="font-semibold">{tech.name}</p>
