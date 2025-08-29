@@ -28,6 +28,17 @@ import { useTranslation } from 'react-i18next';
 
 type LatLng = { lat: number; lng: number };
 
+// Ẩn trên MAP nếu đã đóng hoặc bị từ chối (kể cả 'proposed' nhưng approveStatus = 'rejected')
+// Ẩn marker "Sự cố đang xem" nếu issue đã closed hoặc rejected
+function isHiddenOnMap(i: PublicVehicleIssue): boolean {
+  const approveRejected = (i as any)?.approveStatus === 'rejected';
+  const effective =
+    i.status === 'proposed' && approveRejected ? 'rejected' : i.status;
+  return effective === 'closed' || effective === 'rejected';
+}
+
+
+
 function normalizeCoords(coords: any): LatLng | null {
   if (!coords) return null;
   if (typeof coords === 'object' && 'lat' in coords && 'lng' in coords) {
@@ -105,6 +116,15 @@ export default function PublicVehicleIssuesManagementPage() {
     // admin & technician_assistant thấy tất cả
     return issues;
   }, [issues, isTechnicianPartner, user?.uid]);
+
+  // Chỉ dữ liệu cho MAP: loại closed/rejected
+  // Chỉ dữ liệu cho MAP: loại closed/rejected
+  const issuesForMap = useMemo(
+    () => scopedIssues.filter((i) => !isHiddenOnMap(i)),
+    [scopedIssues]
+  );
+
+
 
   // ===== Lọc theo UI (search/status/station) =====
   const filteredIssues = useMemo(() => {
@@ -255,15 +275,16 @@ export default function PublicVehicleIssuesManagementPage() {
 
         {/* Map: dựa trên scopedIssues đã lọc */}
           {mapCenter && (
-            <NearbySupportMap
-              issueCoords={mapCenter}
-              issues={scopedIssues}
-              limitPerType={5}
-              // Admin & Technician Assistant: hiện cả shop + mobile
-              showNearestShops={isAdmin || isTechAssistant}
-              showNearestMobiles={true} // luôn cho hiện mobile
-            />
-          )}
+          <NearbySupportMap
+            issueCoords={mapCenter}
+            issues={issuesForMap}          // ✅ chỉ gửi “open” cho MAP
+            limitPerType={5}
+            showNearestShops={isAdmin || isTechAssistant}
+            showNearestMobiles={true}
+            restrictToTechId={isTechnicianPartner ? (user?.uid ?? null) : null}  // 👈 NEW
+          />
+        )}
+
 
 
         {/* Bảng issues: hiển thị filteredIssues (đã lọc theo quyền + UI) */}

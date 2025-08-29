@@ -229,6 +229,75 @@ function PublicIssueTableBase({
     </div>
   );
 
+  // Đưa vào để sắp xếp thứ tự issues cho dễ hiểu : 
+    const STATUS_ORDER: Record<PublicIssueStatus, number> = {
+    pending: 0,
+    assigned: 1,
+    proposed: 2,
+    confirmed: 3,
+    in_progress: 4,
+    resolved: 5,
+    rejected: 6,
+    closed: 7,
+  };
+
+  const toMs = (ts?: any) => {
+    if (!ts) return 0;
+    try {
+      return ts?.toDate ? ts.toDate().getTime() : (ts instanceof Date ? ts.getTime() : 0);
+    } catch {
+      return 0;
+    }
+  };
+
+  const hasCoords = (issue: PublicVehicleIssue) => {
+    const s = getCoordString(issue.location);
+    return !!s && s.trim().length > 0;
+  };
+
+  const ACTIVE_STATUSES: PublicIssueStatus[] = [
+    'pending', 'assigned', 'proposed', 'confirmed', 'in_progress',
+  ];
+
+  const sortedIssues = useMemo(() => {
+    const arr = (issues || []).slice();
+
+    arr.sort((a, b) => {
+      // 1) trạng thái
+      const ra = STATUS_ORDER[a.status] ?? 99;
+      const rb = STATUS_ORDER[b.status] ?? 99;
+      if (ra !== rb) return ra - rb;
+
+      // 2) ưu tiên có toạ độ trước
+      const ca = hasCoords(a) ? 0 : 1;
+      const cb = hasCoords(b) ? 0 : 1;
+      if (ca !== cb) return ca - cb;
+
+      // 3) theo thời gian: active -> createdAt asc; done -> updatedAt desc
+      const aIsActive = ACTIVE_STATUSES.includes(a.status);
+      const bIsActive = ACTIVE_STATUSES.includes(b.status);
+
+      if (aIsActive && bIsActive) {
+        const ta = toMs(a.createdAt);
+        const tb = toMs(b.createdAt);
+        if (ta !== tb) return ta - tb; // cũ hơn trước
+      } else if (!aIsActive && !bIsActive) {
+        const ta = toMs(a.updatedAt);
+        const tb = toMs(b.updatedAt);
+        if (ta !== tb) return tb - ta; // mới cập nhật trước
+      } else {
+        // (hiếm) nếu một active, một done => active trước
+        if (aIsActive !== bIsActive) return aIsActive ? -1 : 1;
+      }
+
+      // 4) tie-break ổn định
+      return (a.customerName || '').localeCompare(b.customerName || '');
+    });
+
+    return arr;
+  }, [issues]);
+
+
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* Desktop table */}
@@ -268,7 +337,13 @@ function PublicIssueTableBase({
                 </tr>
               )}
 
-              {issues.map((issue, idx) => (
+              {sortedIssues.length === 0 && (
+                <tr>
+                  <td colSpan={19}>{Empty}</td>
+                </tr>
+              )}
+
+                {sortedIssues.map((issue, idx) => (
                 <tr
                   key={issue.id}
                   className={clsx('hover:bg-gray-50', idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50')}
@@ -338,6 +413,7 @@ function PublicIssueTableBase({
                   </td>
                 </tr>
               ))}
+              
             </tbody>
           </table>
         </div>
@@ -347,9 +423,11 @@ function PublicIssueTableBase({
       <div className="divide-y divide-gray-100 lg:hidden">
         {issues.length === 0 && Empty}
 
-        {issues.map((issue) => {
-          const coordStr = getCoordString(issue.location);
-          return (
+        {sortedIssues.length === 0 && Empty}
+
+          {sortedIssues.map((issue) => {
+            const coordStr = getCoordString(issue.location);
+            return (
             <div key={issue.id} className="p-4">
               <div className="rounded-lg border bg-white p-4 shadow-sm">
                 {/* Header */}

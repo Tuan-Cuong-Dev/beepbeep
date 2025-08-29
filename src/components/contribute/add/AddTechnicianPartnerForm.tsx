@@ -383,9 +383,9 @@ export default function AddTechnicianPartnerForm() {
         onChange={(e) => setField('vehicleType', e.target.value as any)}
       >
         <option value="">{t('repair_shop_form.select_vehicle_type')}</option>
-        <option value="bike">{t('repair_shop_form.vehicle_bike')}</option>
-        <option value="motorbike">{t('repair_shop_form.vehicle_motorbike')}</option>
-        <option value="car">{t('repair_shop_form.vehicle_car')}</option>
+        <option value="bike">{t('repair_shop_form.vehicle_type.bike')}</option>
+        <option value="motorbike">{t('repair_shop_form.vehicle_type.motorbike')}</option>
+        <option value="car">{t('repair_shop_form.vehicle_type.car')}</option>
       </select>
 
       {/* ⏰ Working time */}
