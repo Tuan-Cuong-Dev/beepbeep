@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
+  DialogOverlay, // ⬅️ dùng riêng để set z-index cao cho overlay
 } from '@/src/components/ui/dialog';
 import { Button } from '@/src/components/ui/button';
 import { CheckCircle, AlertCircle, Info, Trash2 } from 'lucide-react';
@@ -54,9 +55,12 @@ export default function NotificationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
+      {/* ⬇️ Overlay phải cao hơn mọi floating UI khác */}
+      <DialogOverlay className="fixed inset-0 z-[3000] bg-black/40 data-[state=open]:animate-in data-[state=closed]:animate-out" />
       <DialogContent
         className={cn(
-          'w-full max-w-md rounded-2xl px-6 py-8',
+          // ⬇️ Content cao hơn overlay 1 nấc
+          'z-[3001] w-full max-w-md rounded-2xl px-6 py-8',
           'space-y-6 transition-none duration-0 data-[state=open]:animate-none'
         )}
       >

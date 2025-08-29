@@ -2,140 +2,133 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 🌞 Default: Light mode */
+/* ================= Theme ================= */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Z-index policy */
+  --z-map: 0;                /* Map & tiles */
+  --z-leaflet-overlay: 20;   /* Leaflet popup/tooltip/controls */
+  --z-switcher: 900;         /* Vehicle switcher */
+  --z-tabs: 1200;            /* Bottom tabs bar */
+  --z-pop: 1600;             /* dropdown/select popovers */
+  --z-toast: 2000;           /* Toaster */
+  --z-dialog: 3000;          /* Modal/Dialog */
 }
 
-/* 🌙 Dark mode support (tự động theo thiết bị) */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
 
-  /* 💡 DatePicker tối màu trong dark mode */
+  /* DatePicker dark mode */
   .react-datepicker,
   .react-datepicker__header {
     background-color: #1a1a1a !important;
     color: #00d289 !important;
   }
-
-  .react-datepicker__day {
-    color: #dddddd !important;
-  }
-
+  .react-datepicker__day { color: #dddddd !important; }
   .react-datepicker__day--selected {
     background-color: #00d289 !important;
     color: #ffffff !important;
   }
-
   .react-datepicker__day--today {
-    color: #00d289 !important;
+    color: #00d289 !important; /* 🔧 tránh chữ trắng */
     font-weight: bold;
   }
-
   .react-datepicker__day:hover {
     background-color: #00d289 !important;
     color: #ffffff !important;
   }
-
   .react-datepicker__day-name,
-  .react-datepicker__current-month {
-    color: #00d289 !important;
-  }
+  .react-datepicker__current-month { color: #00d289 !important; }
 }
 
-html,
-body {
+/* ================ Base layout ================ */
+html, body, #__next, #root { height: 100%; }
+html, body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   overflow-x: hidden;
 }
 
-/* 📅 Style chuẩn cho DatePicker (áp dụng cả sáng/tối) */
+/* ============= DatePicker (light + dark) ============= */
 .react-datepicker {
-  background-color: white !important;
+  background-color: #fff !important;
   color: #00d289 !important;
   border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-
 .react-datepicker__header {
-  background-color: white !important;
+  background-color: #fff !important;
   color: #00d289 !important;
   border-bottom: 2px solid #00d289;
 }
-
-.react-datepicker__day {
-  color: #333;
-}
-
+.react-datepicker__day { color: #333; }
 .react-datepicker__day--selected {
   background-color: #00d289 !important;
-  color: white !important;
+  color: #fff !important;
   border-radius: 50%;
 }
-
 .react-datepicker__current-month,
 .react-datepicker-time__header,
-.react-datepicker-year-header {
-  color: #00d289 !important;
-}
-
-.react-datepicker__day-name {
-  color: #00d289 !important;
-}
-
-.react-datepicker__day--today {
-  font-weight: bold;
-  color: white !important;
-}
-
+.react-datepicker-year-header,
+.react-datepicker__day-name { color: #00d289 !important; }
+/* 🔧 sửa màu today ở light mode (trước đang để trắng) */
+.react-datepicker__day--today { font-weight: bold; color: #00d289 !important; }
 .react-datepicker__day:hover {
   background-color: #00d289 !important;
-  color: white !important;
+  color: #fff !important;
+}
+.react-datepicker__navigation { top: 12px; }
+.react-datepicker__navigation--previous { left: 10px; }
+.react-datepicker__navigation--next { right: 10px; }
+
+/* ============= Leaflet: luôn dưới UI khác ============= */
+.leaflet-container { z-index: var(--z-map) !important; }
+.leaflet-pane, .leaflet-pane * { z-index: var(--z-map) !important; }
+
+/* Popup/tooltip/controls cao hơn tile chút, nhưng vẫn dưới app UI */
+.leaflet-popup,
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-control {
+  z-index: var(--z-leaflet-overlay) !important;
 }
 
-.react-datepicker__navigation {
-  top: 12px;
+/* ============= App UI layers (tiện ích) ============= */
+/* Vehicle switcher (nếu component gắn class này) */
+.bb-vehicle-switcher { z-index: var(--z-switcher) !important; }
+
+/* Tabs cố định đáy */
+.bb-tabs-bottom {
+  z-index: var(--z-tabs) !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
 }
 
-.react-datepicker__navigation--previous {
-  left: 10px;
-}
-
-.react-datepicker__navigation--next {
-  right: 10px;
-}
-
-/* 🗺️ Fix bản đồ Leaflet đè lên các dropdown hoặc select */
-.leaflet-container {
-  z-index: 0 !important;
-}
-
-/* 📍 Nếu dropdown hoặc popup cần nổi lên trên map */
+/* Popovers của dropdown/select */
 .dropdown-menu,
 .select-popover,
 .react-select__menu {
-  z-index: 1000 !important;
   position: relative;
+  z-index: var(--z-pop) !important;
 }
 
-/* ✅ Ẩn thanh cuộn ngang trên Tabs nếu cần */
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE và Edge */
-  scrollbar-width: none; /* Firefox */
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+/* Toaster/sonner */
+.bb-toast { z-index: var(--z-toast) !important; }
+
+/* Dialog/Modal/Notifications */
+.bb-dialog,
+[data-radix-poppers-content-wrapper] {
+  z-index: var(--z-dialog) !important;
 }
 
-#__next {
-  height: 100%;
-}
+/* ============= Misc ============= */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
