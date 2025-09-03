@@ -1,3 +1,4 @@
+// 📁 lib/organizations/getUserOrganizations.ts
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { OrganizationType } from './organizationTypes';
@@ -10,63 +11,72 @@ export interface OrgCardData {
   userRoleInOrg: 'owner';
   logoUrl?: string;
   subtype?: 'mobile' | 'shop'; // phân biệt loại hình technician
-  ownerId: string; // 👈 THÊM DÒNG NÀY
+  ownerId: string;
 }
 
+// ✅ Đồng bộ 10/11 loại lấy trực tiếp theo collection (trừ technicianPartner riêng)
 const businessCollections: { collection: string; type: OrganizationType }[] = [
-  { collection: 'rentalCompanies', type: 'rental_company' },
-  { collection: 'privateProviders', type: 'private_provider' },
-  { collection: 'agents', type: 'agent' },
+  { collection: 'rentalCompanies',       type: 'rental_company' },
+  { collection: 'privateProviders',      type: 'private_provider' },
+  { collection: 'agents',                type: 'agent' },
+  { collection: 'cityDrivers',           type: 'city_driver' },        // ✅ mới
+  { collection: 'intercityDrivers',      type: 'intercity_driver' },   // ✅ mới
+  { collection: 'deliveryPartners',      type: 'delivery_partner' },   // ✅ mới
   { collection: 'intercityBusCompanies', type: 'intercity_bus' },
-  { collection: 'vehicleTransporters', type: 'vehicle_transport' },
-  { collection: 'tourGuides', type: 'tour_guide' },
+  { collection: 'vehicleTransporters',   type: 'vehicle_transport' },
+  { collection: 'tourGuides',            type: 'tour_guide' },
+  // technicianPartners xử lý riêng bên dưới để lấy subtype
 ];
 
 export async function getUserOrganizations(uid: string): Promise<OrgCardData[]> {
   const results: OrgCardData[] = [];
 
-  // 🏢 Load các collection thông thường
-  for (const { collection: colName, type } of businessCollections) {
-    const q = query(collection(db, colName), where('ownerId', '==', uid));
-    const snap = await getDocs(q);
-
-    snap.forEach((doc) => {
-      const d = doc.data();
-      results.push({
-        id: doc.id,
-        name: d.name || 'Untitled',
-        type,
-        displayAddress: d.displayAddress || '',
-        userRoleInOrg: 'owner',
-        logoUrl: d.logoUrl || undefined,
-        ownerId: d.ownerId, // 👈 THÊM DÒNG NÀY
+  // 🏎️ Chạy song song tất cả query (trừ technician)
+  const queries = businessCollections.map(({ collection: colName, type }) =>
+    getDocs(query(collection(db, colName), where('ownerId', '==', uid))).then((snap) => {
+      snap.forEach((docSnap) => {
+        const d = docSnap.data() as any;
+        results.push({
+          id: docSnap.id,
+          name: d.name || 'Untitled',
+          type,
+          displayAddress: d.displayAddress || '',
+          userRoleInOrg: 'owner',
+          logoUrl: d.logoUrl || undefined,
+          ownerId: d.ownerId,
+        });
       });
-    });
-  }
-
-  // 🛠️ Load riêng collection technicianPartners
-  const techSnap = await getDocs(
-    query(collection(db, 'technicianPartners'), where('ownerId', '==', uid))
+    })
   );
 
-  techSnap.forEach((doc) => {
-    const d = doc.data();
-    const subtype = (d.subtype || d.type || '').toLowerCase();
+  // 🛠️ Technician partner (cần subtype)
+  const technicianQuery = getDocs(
+    query(collection(db, 'technicianPartners'), where('ownerId', '==', uid))
+  ).then((snap) => {
+    snap.forEach((docSnap) => {
+      const d = docSnap.data() as any;
+      const subtypeRaw = (d.subtype || d.type || '').toString().toLowerCase();
+      const subtype = subtypeRaw === 'shop' ? 'shop' : subtypeRaw === 'mobile' ? 'mobile' : undefined;
 
-    // Chỉ chấp nhận mobile/shop
-    if (subtype === 'mobile' || subtype === 'shop') {
-      results.push({
-        id: doc.id,
-        name: d.name || 'Untitled',
-        type: 'technician_partner',
-        subtype,
-        displayAddress: d.displayAddress || '',
-        userRoleInOrg: 'owner',
-        logoUrl: d.logoUrl || undefined,
-        ownerId: d.ownerId, // 👈 THÊM DÒNG NÀY
-      });
-    }
+      if (subtype) {
+        results.push({
+          id: docSnap.id,
+          name: d.name || 'Untitled',
+          type: 'technician_partner',
+          subtype,
+          displayAddress: d.displayAddress || '',
+          userRoleInOrg: 'owner',
+          logoUrl: d.logoUrl || undefined,
+          ownerId: d.ownerId,
+        });
+      }
+    });
   });
+
+  await Promise.all([...queries, technicianQuery]);
+
+  // (tuỳ chọn) Sắp xếp cho đẹp mắt — theo tên
+  results.sort((a, b) => a.name.localeCompare(b.name));
 
   return results;
 }
