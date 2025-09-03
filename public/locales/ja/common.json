@@ -2752,6 +2752,10 @@
     "title": "レンタルステーション",
     "description": "すべてのレンタルステーションを管理"
   },
+  "private-providers": {
+    "title": "個人レンタル提供者",
+    "description": "個人のレンタル車両を管理します"
+  },
   "technician_partners": {
     "title": "技術パートナー",
     "description": "外部修理パートナーを管理"

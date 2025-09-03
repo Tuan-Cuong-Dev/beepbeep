@@ -2773,6 +2773,10 @@
     "title": "렌탈 회사",
     "description": "모든 렌탈 비즈니스를 관리"
   },
+  "private-providers": {
+    "title": "개인 차량 대여",
+    "description": "개인 차량 대여를 관리합니다"
+  },
   "technician_partners": {
     "title": "기술 파트너",
     "description": "외부 수리 파트너를 관리"

@@ -71,7 +71,7 @@ function IconTile({ option }: { option: OrgOption }) {
 /* ----------------------------- Fallback titles ----------------------------- */
 function fallbackTitle(o: OrgOption) {
   if (o.type === 'technician_partner')
-    return o.subtype === 'shop' ? 'Cửa hàng sửa xe' : 'Kỹ thuật viên độc lập';
+    return o.subtype === 'shop' ? 'Cửa hàng sửa xe' : 'Kỹ thuật viên lưu động';
   switch (o.type) {
     case 'rental_company': return 'Công ty cho thuê xe';
     case 'private_provider': return 'Chủ xe cá nhân';

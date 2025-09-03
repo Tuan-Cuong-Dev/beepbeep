@@ -44,6 +44,12 @@ export default function AdminDashboard() {
           route: '/admin/rental-stations',
         },
         {
+          icon: <FaStore className="w-6 h-6 text-[#00d289]" />,
+          title: t('admin_dashboard.private-providers.title'),
+          description: t('admin_dashboard.private-providers.description'),
+          route: '/admin/private-providers',
+        },
+        {
           icon: <FaWrench className="w-6 h-6 text-[#00d289]" />,
           title: t('admin_dashboard.technician_partners.title'),
           description: t('admin_dashboard.technician_partners.description'),

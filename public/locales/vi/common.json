@@ -2820,6 +2820,10 @@
     "title": "Trạm cho thuê",
     "description": "Quản lý tất cả trạm cho thuê"
   },
+  "private-providers": {
+    "title": "Cá nhân cho thuê xe",
+    "description": "Quản lý cho thuê xe cá nhân"
+  },
   "technician_partners": {
     "title": "Đối tác kỹ thuật",
     "description": "Quản lý đối tác sửa chữa bên ngoài"
