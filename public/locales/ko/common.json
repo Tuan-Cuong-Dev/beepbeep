@@ -1029,40 +1029,56 @@
 },
 
 "organization_create_chooser": {
-  "intro": "아직 참여하거나 생성한 조직이 없습니다. 시작하려면 역할을 선택하세요:",
-  "technician_partner": {
-    "mobile": {
-      "title": "독립 기술자",
-      "description": "현장 수리를 제공하는 이동식 기술자"
-    },
-    "shop": {
-      "title": "수리점",
-      "description": "배터리, 브레이크, 일반 수리를 제공하는 정비소"
-    }
+  "intro": "아직 어떤 조직에도 참여하거나 생성하지 않았습니다. 시작하려면 역할을 선택하세요:",
+  "search_placeholder": "조직 유형 검색…",
+  "no_results": "결과가 없습니다. 다른 키워드를 시도해 보세요.",
+
+  "technician_partner_mobile": {
+    "title": "개인 기술자",
+    "description": "현장에서 수리 서비스를 제공하는 이동식 기술자."
   },
+  "technician_partner_shop": {
+    "title": "수리점",
+    "description": "차고 서비스: 배터리, 브레이크 및 차량 수리."
+  },
+
   "rental_company": {
     "title": "렌탈 회사",
-    "description": "차량, 스테이션, 예약 및 직원을 관리"
+    "description": "차량, 지점, 예약 및 직원을 관리합니다."
   },
   "private_provider": {
-    "title": "개인 소유자",
-    "description": "개인 차량을 렌트하거나 서비스를 제공"
+    "title": "개인 차량 제공자",
+    "description": "본인의 차량이나 서비스를 대여합니다."
   },
   "agent": {
-    "title": "에이전트 / 추천인",
-    "description": "고객을 추천하고 커미션을 획득"
+    "title": "에이전트 / 소개 파트너",
+    "description": "고객을 소개하고 수수료를 받습니다."
+  },
+
+  "city_driver": {
+    "title": "도시 운전사",
+    "description": "도시 내에서 승객을 운송합니다."
+  },
+  "intercity_driver": {
+    "title": "도시간 운전사",
+    "description": "도시간 승객을 운송합니다."
+  },
+  "delivery_partner": {
+    "title": "배송 파트너",
+    "description": "도시 내에서 소형 화물(20kg 이하)을 배송합니다."
   },
   "intercity_bus": {
-    "title": "시외버스 운영자",
-    "description": "노선을 관리하고 지역 간 승객을 운송"
+    "title": "도시간 버스 회사",
+    "description": "노선을 운영하고 도시간 승객을 운송합니다."
   },
   "vehicle_transport": {
-    "title": "운송업체",
-    "description": "화물과 차량을 도심 및 장거리로 운송하는 서비스를 제공합니다."
+    "title": "운송 업체",
+    "description": "도시 내외에서 화물 및 차량 운송 서비스를 제공합니다."
   },
+
   "tour_guide": {
-    "title": "투어 가이드",
-    "description": "자전거 투어나 셀프 드라이브 투어 제공"
+    "title": "관광 가이드",
+    "description": "투어나 셀프 드라이브 여행 일정을 조직합니다."
   }
 },
 
@@ -1142,12 +1158,15 @@
     "private_provider": "개인 제공자를 생성",
     "agent": "에이전트를 생성",
     "technician_partner": "기술 파트너를 생성",
-    "intercity_bus": "시외버스 회사를 생성",
-    "vehicle_transport": "차량 운송 회사를 생성",
-    "tour_guide": "가이드를 생성"
+    "city_driver": "도시 운전사를 생성",
+    "intercity_driver": "도시간 운전사를 생성",
+    "delivery_partner": "배송 파트너를 생성",
+    "intercity_bus": "도시간 버스 회사를 생성",
+    "vehicle_transport": "운송 업체를 생성",
+    "tour_guide": "관광 가이드를 생성"
   },
   "subtitle": "시작하려면 아래 정보를 입력하세요.",
-  "invalid_type": "프로필로 이동하여 비즈니스를 생성하세요"
+  "invalid_type": "프로필에서 사업을 생성하세요."
 },
 
 "create_business_form": {
@@ -4040,7 +4059,15 @@
     "refresh_companies": "회사 새로고침",
     "refresh_stations": "대여소 새로고침"
   }
+},
+
+"organization_group": {
+  "technical_services": "기술 서비스 및 수리",
+  "rental_supply": "차량 대여 및 공급",
+  "transport_delivery": "운송 및 배송",
+  "support_tourism": "지원 및 관광"
 }
+
 
 
 

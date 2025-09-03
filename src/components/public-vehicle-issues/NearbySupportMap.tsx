@@ -43,75 +43,8 @@ const Polyline      = dynamic(() => import('react-leaflet').then(m => m.Polyline
 // Avatar kỹ thuật viên lưu động
 const DEFAULT_MOBILE_AVATAR = '/assets/images/techinicianPartner_mobile.png';
 
-/** DEV: Monkey-patch để log mọi NaN bơm vào Leaflet (latLng / setView / fitBounds) */
-if (typeof window !== 'undefined') {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const L = require('leaflet');
-  if (!L.__debugPatched) {
-    // latLng factory + ctor
-    const _latLng = L.latLng.bind(L);
-    L.latLng = (...args:any[]) => {
-      const [a, b] = args;
-      const la = Number(typeof a === 'object' ? a?.lat : a);
-      const ln = Number(typeof a === 'object' ? a?.lng ?? a?.lon : b);
-      if (!Number.isFinite(la) || !Number.isFinite(ln)) {
-        console.error('[Leaflet DEBUG] L.latLng NaN', { a, b, la, ln });
-        console.trace();
-      }
-      return _latLng(...args);
-    };
-    const _LatLng = L.LatLng;
-    // @ts-ignore
-    L.LatLng = function(this:any, lat:any, lng:any, alt?:any) {
-      const la = Number(lat), ln = Number(lng);
-      if (!Number.isFinite(la) || !Number.isFinite(ln)) {
-        console.error('[Leaflet DEBUG] new L.LatLng NaN', { lat, lng, la, ln });
-        console.trace();
-      }
-      // @ts-ignore
-      return new _LatLng(lat, lng, alt);
-    };
-    // @ts-ignore
-    L.LatLng.prototype = _LatLng.prototype;
-
-    // setView
-    const _setView = L.Map.prototype.setView;
-    L.Map.prototype.setView = function(center:any, zoom:any, options:any){
-      const la = Number(center?.lat ?? center?.[0]);
-      const ln = Number(center?.lng ?? center?.[1]);
-      if (!Number.isFinite(la) || !Number.isFinite(ln) || (zoom != null && !Number.isFinite(+zoom))) {
-        console.error('[Leaflet DEBUG] map.setView NaN', { center, zoom });
-        console.trace();
-      }
-      return _setView.call(this, center, zoom, options);
-    };
-
-    // fitBounds
-    const _fitBounds = L.Map.prototype.fitBounds;
-    L.Map.prototype.fitBounds = function(bounds:any, options:any){
-      try {
-        const sw = bounds?.[0] ?? bounds?.getSouthWest?.();
-        const ne = bounds?.[1] ?? bounds?.getNorthEast?.();
-        const la1 = Number(sw?.lat ?? sw?.[0]), ln1 = Number(sw?.lng ?? sw?.[1]);
-        const la2 = Number(ne?.lat ?? ne?.[0]), ln2 = Number(ne?.lng ?? ne?.[1]);
-        if (![la1,ln1,la2,ln2].every(Number.isFinite)) {
-          console.error('[Leaflet DEBUG] map.fitBounds NaN', { bounds });
-          console.trace();
-        }
-      } catch (e) {
-        console.error('[Leaflet DEBUG] map.fitBounds check error', e, { bounds });
-      }
-      return _fitBounds.call(this, bounds, options);
-    };
-
-    L.__debugPatched = true;
-    console.info('%c[NearbySupportMap] debug patch installed', 'color:#22c55e');
-  }
-}
-
 // types
 type LatLng = { lat: number; lng: number };
-
 type LiveStatus = 'online' | 'paused' | 'offline';
 
 type PresenceItem = {
@@ -134,11 +67,11 @@ export interface NearbySupportMapProps {
   limitPerType?: number;
   showNearestShops?: boolean;
   showNearestMobiles?: boolean;
-  renderFocusMarker?: boolean;     // (nếu bạn đã thêm trước đó)
-  restrictToTechId?: string | null; // 👈 NEW
+  renderFocusMarker?: boolean;
+  restrictToTechId?: string | null;
 }
 
-/** ✅ FIX TYPE: phải là PublicIssueStatus[] */
+/** ✅ PublicIssueStatus[] */
 const OPEN_STATUSES: PublicIssueStatus[] = [
   'pending','assigned','proposed','confirmed','in_progress',
 ];
@@ -158,7 +91,7 @@ export default function NearbySupportMap({
   showNearestShops = true,
   showNearestMobiles = true,
   renderFocusMarker = true,
-  restrictToTechId = null,           // 👈 NEW
+  restrictToTechId = null,
 }: NearbySupportMapProps) {
   const { t } = useTranslation('common', { keyPrefix: 'map' });
 
@@ -189,14 +122,13 @@ export default function NearbySupportMap({
   // presence realtime
   const rawPresence = (useTechnicianPresence() || []) as any[];
   const normalizePresenceItem = (p: any): PresenceItem | null => {
-  const lat = toNum(p.lat ?? p.latitude);
-  const lng = toNum(p.lng ?? p.longitude);
-  if (!isValidLatLng(lat, lng)) return null;
+    const lat = toNum(p.lat ?? p.latitude);
+    const lng = toNum(p.lng ?? p.longitude);
+    if (!isValidLatLng(lat, lng)) return null;
     return {
       techId: p.techId || p.uid || p.id || '',
       name: p.name ?? null,
       companyName: p.companyName ?? null,
-      // 👇 ưu tiên p.avatarUrl -> p.photoURL -> ảnh mặc định
       avatarUrl: (p.avatarUrl ?? p.photoURL ?? DEFAULT_MOBILE_AVATAR),
       lat, lng,
       accuracy: typeof p.accuracy === 'number' ? p.accuracy : (toNum(p.accuracy) || null),
@@ -221,7 +153,6 @@ export default function NearbySupportMap({
     return liveMobilesBase;
   }, [liveMobilesBase, restrictToTechId]);
 
-
   // shops collection
   const [shops, setShops] = useState<TechnicianPartner[]>([]);
   const [loadingShops, setLoadingShops] = useState(false);
@@ -240,7 +171,6 @@ export default function NearbySupportMap({
     (async () => {
       setLoadingShops(true);
       try { const res = await loadShops(); if (mounted) setShops(res); }
-      catch (e) { console.error('Load shops failed', e); }
       finally { if (mounted) setLoadingShops(false); }
     })();
     return () => { mounted = false; };
@@ -339,48 +269,12 @@ export default function NearbySupportMap({
     [centerCandidate]
   );
 
-  // Ép center & zoom an toàn, log nếu có vấn đề
   const SAFE_CENTER: [number, number] = [Number(mapCenter[0]), Number(mapCenter[1])];
   const SAFE_ZOOM = Number.isFinite(+DEFAULT_ZOOM) ? +DEFAULT_ZOOM : 13;
-  if (!Number.isFinite(SAFE_CENTER[0]) || !Number.isFinite(SAFE_CENTER[1])) {
-    console.error('[NSM] BAD mapCenter before render', { SAFE_CENTER, mapCenter, centerCandidate });
-  }
-  if (!Number.isFinite(SAFE_ZOOM)) {
-    console.error('[NSM] BAD zoom before render', { DEFAULT_ZOOM });
-  }
 
   const { containerRef, containerOk } = useContainerReady();
   const hasValidCenter = Number.isFinite(SAFE_CENTER[0]) && Number.isFinite(SAFE_CENTER[1]);
   const [mapReady, setMapReady] = useState(false);
-
-  // 🔎 Dev-only: scan để chỉ ra phần tử NaN
-  useEffect(() => {
-    const bads: any[] = [];
-    const check = (label: string, arr: any[], picker: (x:any)=>{lat:number;lng:number}) => {
-      (arr || []).forEach((it, i) => {
-        const c = picker(it) as any;
-        const la = Number(c?.lat), ln = Number(c?.lng);
-        if (!Number.isFinite(la) || !Number.isFinite(ln)) bads.push({ label, index: i, lat: la, lng: ln, item: it });
-      });
-    };
-    check('topShops', topShops, x => x.coord);
-    check('topMobiles', topMobiles, x => x.coord);
-    check('openIssuePoints', openIssuePoints, x => x.coord);
-    check('poly', poly, x => x);
-    if (!Number.isFinite(SAFE_CENTER[0]) || !Number.isFinite(SAFE_CENTER[1])) {
-      bads.push({ label: 'SAFE_CENTER', lat: SAFE_CENTER[0], lng: SAFE_CENTER[1], candidate: centerCandidate });
-    }
-    if (bads.length) {
-      console.group('%cNaN detector','color:#f00;font-weight:700');
-      console.table(bads);
-      console.groupEnd();
-    }
-  }, [topShops, topMobiles, openIssuePoints, poly, SAFE_CENTER[0], SAFE_CENTER[1], centerCandidate]);
-
-  // Dev: log cờ render
-  useEffect(() => {
-    console.debug('[MapFlags]', { containerOk, hasValidCenter, SAFE_CENTER, SAFE_ZOOM, mapReady });
-  }, [containerOk, hasValidCenter, SAFE_CENTER.toString(), SAFE_ZOOM, mapReady]);
 
   return (
     <div className="rounded-xl border bg-white">
@@ -421,21 +315,14 @@ export default function NearbySupportMap({
 
         {isClient && containerOk && hasValidCenter && (
           <MapContainer
-              center={SAFE_CENTER}
-              zoom={SAFE_ZOOM}
-              minZoom={3}
-              maxZoom={19}
-              style={{ height: '100%', width: '100%' }}
-              scrollWheelZoom
-              whenReady={() => setMapReady(true)}
-            >
-              {/* LẤY map instance ở đây */}
-              <MapReadyProbe
-                onMap={(map) => {
-                  (window as any).__nsm = map; // debug nhanh
-                  try { console.info('[MapReady]', map.getCenter(), 'zoom=', map.getZoom()); } catch {}
-                }}
-              />
+            center={SAFE_CENTER}
+            zoom={SAFE_ZOOM}
+            minZoom={3}
+            maxZoom={19}
+            style={{ height: '100%', width: '100%' }}
+            scrollWheelZoom
+            whenReady={() => setMapReady(true)}
+          >
             {mapReady && <InvalidateOnMount />}
             {mapReady && <InvalidateOnToggle dep={isFullscreen} />}
 
@@ -452,17 +339,17 @@ export default function NearbySupportMap({
                 />
 
                 {/* Focus issue */}
-                  {renderFocusMarker && safeIssue && (
-                    <FocusIssueLayer
-                      Marker={Marker}
-                      Popup={Popup}
-                      pulseIcon={pulseIcon}
-                      safeIssue={safeIssue}
-                      nearestMobileKm={nearestMobileKm}
-                      focusedIssue={focusedIssue}
-                      t={t}
-                    />
-                  )}
+                {renderFocusMarker && safeIssue && (
+                  <FocusIssueLayer
+                    Marker={Marker}
+                    Popup={Popup}
+                    pulseIcon={pulseIcon}
+                    safeIssue={safeIssue}
+                    nearestMobileKm={nearestMobileKm}
+                    focusedIssue={focusedIssue}
+                    t={t}
+                  />
+                )}
 
                 {/* Open issues */}
                 <OpenIssuesLayer
@@ -546,13 +433,3 @@ export default function NearbySupportMap({
     </div>
   );
 }
-
-function MapReadyProbe({ onMap }: { onMap: (map: any) => void }) {
-  const { useMap } = require('react-leaflet');
-  const map = useMap();
-  React.useEffect(() => {
-    onMap(map);
-  }, [map, onMap]);
-  return null;
-}
-

@@ -11,10 +11,10 @@ import StationSection from '@/src/components/landingpage/StationSection';
 import TechnicianPartnerSection from '@/src/components/landingpage/TechnicianPartnerSection';
 import ServicePricingSection from '@/src/components/landingpage/ServicePricingSection';
 import Bipbip365Section from '@/src/components/landingpage/Bipbip365Section';
-import VehicleModelsSection from '@/src/components/landingpage/VehicleModelsSection';
+import WhyChooseUs from '@/src/components/landingpage/WhyChooseUs';
 import BatteryStationCounter from '@/src/components/landingpage/BatteryStationCounter';
 import BatteryChargingStationCounter from '@/src/components/landingpage/BatteryChargingStationCounter';
-import WhyChooseUs from '@/src/components/landingpage/WhyChooseUs';
+import PartnerSignupSection from '@/src/components/landingpage/PartnerSignupSection';
 import FAQ from '@/src/components/landingpage/FAQ';
 import Footer from '@/src/components/landingpage/Footer';
 
@@ -35,13 +35,11 @@ const Home: React.FC = () => {
       <Hero />
       <StationSection />
       <TechnicianPartnerSection />
-      {/*<VehicleModelsSection /> - Xây dựng xong hãy đưa lên cho bài bản*/}
       <BatteryStationCounter />
       <BatteryChargingStationCounter />
       <ServicePricingSection />
       <Bipbip365Section />
-      <WhyChooseUs />
-      <FAQ />
+      <PartnerSignupSection/>
       <Footer />
     </>
   );

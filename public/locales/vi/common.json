@@ -1057,42 +1057,58 @@
 },
 
 "organization_create_chooser": {
-  "intro": "Bạn chưa tham gia hoặc tạo bất kỳ tổ chức nào. Hãy chọn vai trò để bắt đầu:",
-  "technician_partner": {
-    "mobile": {
+    "intro": "Bạn chưa tham gia hoặc tạo bất kỳ tổ chức nào. Hãy chọn vai trò để bắt đầu:",
+    "search_placeholder": "Tìm loại hình tổ chức…",
+    "no_results": "Không tìm thấy kết quả. Hãy thử từ khoá khác.",
+
+    "technician_partner_mobile": {
       "title": "Kỹ thuật viên độc lập",
       "description": "Kỹ thuật viên di động cung cấp sửa chữa tận nơi."
     },
-    "shop": {
+    "technician_partner_shop": {
       "title": "Cửa hàng sửa xe",
       "description": "Dịch vụ tại garage: sửa pin, phanh, và xe."
+    },
+
+    "rental_company": {
+      "title": "Công ty cho thuê xe",
+      "description": "Quản lý đội xe, trạm, đơn đặt và nhân sự."
+    },
+    "private_provider": {
+      "title": "Chủ xe cá nhân",
+      "description": "Cho thuê xe cá nhân hoặc cung cấp dịch vụ."
+    },
+    "agent": {
+      "title": "Cộng tác viên / Người giới thiệu",
+      "description": "Giới thiệu khách hàng và nhận hoa hồng."
+    },
+
+    "city_driver": {
+      "title": "Tài xế thành phố",
+      "description": "Chở hành khách nội thành."
+    },
+    "intercity_driver": {
+      "title": "Tài xế liên tỉnh",
+      "description": "Chở hành khách giữa các tỉnh."
+    },
+    "delivery_partner": {
+      "title": "Đối tác giao hàng",
+      "description": "Giao kiện hàng nhỏ (≤20kg) trong nội thành."
+    },
+    "intercity_bus": {
+      "title": "Nhà xe liên tỉnh",
+      "description": "Quản lý tuyến đường và vận chuyển hành khách giữa các tỉnh."
+    },
+    "vehicle_transport": {
+      "title": "Đơn vị vận chuyển",
+      "description": "Cung cấp dịch vụ vận chuyển hàng hóa và xe cộ trong và ngoài thành phố."
+    },
+
+    "tour_guide": {
+      "title": "Hướng dẫn viên du lịch",
+      "description": "Tổ chức tour xe hoặc hành trình tự lái."
     }
   },
-  "rental_company": {
-    "title": "Công ty cho thuê xe",
-    "description": "Quản lý đội xe, trạm, đơn đặt và nhân sự."
-  },
-  "private_provider": {
-    "title": "Chủ xe cá nhân",
-    "description": "Cho thuê xe cá nhân hoặc cung cấp dịch vụ."
-  },
-  "agent": {
-    "title": "Cộng tác viên / Người giới thiệu",
-    "description": "Giới thiệu khách hàng và nhận hoa hồng."
-  },
-  "intercity_bus": {
-    "title": "Nhà xe liên tỉnh",
-    "description": "Quản lý tuyến đường và vận chuyển hành khách giữa các tỉnh."
-  },
-  "vehicle_transport": {
-    "title": "Đơn vị vận chuyển",
-    "description": "Cung cấp dịch vụ vận chuyển hàng hóa và xe cộ trong và ngoài thành phố."
-  },
-  "tour_guide": {
-    "title": "Hướng dẫn viên du lịch",
-    "description": "Tổ chức tour xe hoặc hành trình tự lái."
-  }
-},
 
 "add_battery_charging_station_form": {
   "station_name": "Tên trạm sạc",
@@ -1171,7 +1187,10 @@
     "rental_company": "Tạo Công ty cho thuê xe",
     "private_provider": "Tạo Nhà cung cấp cá nhân",
     "agent": "Tạo Cộng tác viên",
-    "technician_partner": "Tạo Kỹ thuật viên đối tác", 
+    "technician_partner": "Tạo Kỹ thuật viên đối tác",
+    "city_driver": "Tạo Tài xế thành phố",
+    "intercity_driver": "Tạo Tài xế liên tỉnh",
+    "delivery_partner": "Tạo Đối tác giao hàng",
     "intercity_bus": "Tạo Đơn vị xe liên tỉnh",
     "vehicle_transport": "Tạo Đơn vị vận chuyển xe",
     "tour_guide": "Tạo Hướng dẫn viên"
@@ -4057,9 +4076,30 @@
     "refresh_companies": "Làm mới công ty",
     "refresh_stations": "Làm mới trạm"
   }
-}
+},
 
+"organization_group": {
+    "technical_services": "Dịch vụ kỹ thuật - sửa chữa",
+    "rental_supply": "Cho thuê xe & cung cấp phương tiện",
+    "transport_delivery": "Vận tải - giao nhận",
+    "support_tourism": "Hỗ trợ - du lịch"
+  },
 
+"partner_signup": {
+    "title": "Đăng ký làm đối tác Bíp Bíp",
+    "subtitle": "Kiếm thu nhập cùng hệ sinh thái di chuyển & cho thuê xe. Chọn vai trò phù hợp và bắt đầu chỉ với vài phút.",
+    "cta_primary": "Đăng ký ngay",
+    "cta_secondary": "Tìm hiểu thêm",
+    "roles_title": "Chọn vai trò phù hợp",
+    "view_all": "Xem tất cả vai trò",
+    "benefit_1": "Không phí khởi tạo, duyệt nhanh.",
+    "benefit_2": "Tự do chọn thời gian và khu vực hoạt động.",
+    "benefit_3": "Quản lý thu nhập và đơn hàng theo thời gian thực.",
+    "stat_1_title": "Đối tác",
+    "stat_2_title": "Thành phố",
+    "stat_3_title": "Đơn/ngày",
+    "stat_4_title": "Điểm 5★"
+  }
 
 
 

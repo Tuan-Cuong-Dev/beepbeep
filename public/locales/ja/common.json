@@ -1010,40 +1010,56 @@
 },
 
 "organization_create_chooser": {
-  "intro": "まだ組織に参加または作成していません。まずは役割を選択してください：",
-  "technician_partner": {
-    "mobile": {
-      "title": "独立系技術者",
-      "description": "出張修理を提供するモバイル技術者。"
-    },
-    "shop": {
-      "title": "修理工場",
-      "description": "バッテリーやブレーキなどのガレージ修理サービス。"
-    }
+  "intro": "まだ組織に参加または作成していません。役割を選択して始めましょう:",
+  "search_placeholder": "組織タイプを検索…",
+  "no_results": "結果が見つかりません。別のキーワードを試してください。",
+
+  "technician_partner_mobile": {
+    "title": "個人技術者",
+    "description": "出張修理サービスを提供するモバイル技術者。"
   },
+  "technician_partner_shop": {
+    "title": "修理工場",
+    "description": "ガレージサービス：バッテリー、ブレーキ、車両修理。"
+  },
+
   "rental_company": {
     "title": "レンタル会社",
-    "description": "車両・拠点・予約・スタッフを管理します。"
+    "description": "車両、ステーション、予約、スタッフを管理します。"
   },
   "private_provider": {
-    "title": "個人オーナー",
-    "description": "自分の車両をレンタルしたり、サービスを提供。"
+    "title": "個人車両提供者",
+    "description": "自分の車両やサービスを貸し出します。"
   },
   "agent": {
-    "title": "紹介者 / エージェント",
-    "description": "顧客を紹介して報酬を得る。"
+    "title": "代理店 / 紹介パートナー",
+    "description": "顧客を紹介してコミッションを得ます。"
+  },
+
+  "city_driver": {
+    "title": "市内ドライバー",
+    "description": "市内で乗客を運びます。"
+  },
+  "intercity_driver": {
+    "title": "都市間ドライバー",
+    "description": "都市間で乗客を運びます。"
+  },
+  "delivery_partner": {
+    "title": "配送パートナー",
+    "description": "市内で小包（20kg以下）を配送します。"
   },
   "intercity_bus": {
-    "title": "長距離バス運行会社",
-    "description": "都道府県間のルートと乗客輸送を管理。"
+    "title": "都市間バス会社",
+    "description": "路線を運営し、都市間の乗客を輸送します。"
   },
   "vehicle_transport": {
     "title": "輸送業者",
-    "description": "貨物や車両を都市内外に輸送するサービスを提供します。"
+    "description": "市内外で貨物や車両の輸送サービスを提供します。"
   },
+
   "tour_guide": {
     "title": "ツアーガイド",
-    "description": "バイクツアーやセルフドライブ体験を提供。"
+    "description": "ツアーやセルフドライブの旅程を企画します。"
   }
 },
 
@@ -1122,14 +1138,17 @@
   "title": {
     "rental_company": "レンタル会社を作成",
     "private_provider": "個人提供者を作成",
-    "agent": "エージェントを作成",
+    "agent": "代理店を作成",
     "technician_partner": "技術パートナーを作成",
-    "intercity_bus": "長距離バス事業者を作成",
-    "vehicle_transport": "車両輸送会社を作成",
+    "city_driver": "市内ドライバーを作成",
+    "intercity_driver": "都市間ドライバーを作成",
+    "delivery_partner": "配送パートナーを作成",
+    "intercity_bus": "都市間バス会社を作成",
+    "vehicle_transport": "輸送業者を作成",
     "tour_guide": "ツアーガイドを作成"
   },
-  "subtitle": "開始するために以下の情報を入力してください。",
-  "invalid_type": "プロフィールに移動してビジネスを作成してください"
+  "subtitle": "以下の情報を入力して開始してください。",
+  "invalid_type": "プロフィールから事業を作成してください。"
 },
 
 "create_business_form": {
@@ -4019,7 +4038,15 @@
     "refresh_companies": "会社を更新",
     "refresh_stations": "ステーションを更新"
   }
+},
+
+"organization_group": {
+  "technical_services": "技術サービス・修理",
+  "rental_supply": "レンタル・車両提供",
+  "transport_delivery": "輸送・配送",
+  "support_tourism": "サポート・観光"
 }
+
 
 
 

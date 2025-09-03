@@ -22,9 +22,15 @@ import { usePublicIssuesToDispatch } from '@/src/hooks/usePublicIssuesToDispatch
 import { Timestamp } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
 
-
 type LatLng = { lat: number; lng: number };
 type Status = 'All' | PublicVehicleIssue['status'];
+
+/** Ẩn trên MAP nếu đã closed hoặc bị reject (kể cả proposed nhưng approveStatus=rejected) */
+function isHiddenOnMap(i: PublicVehicleIssue): boolean {
+  const approveRejected = (i as any)?.approveStatus === 'rejected';
+  const effective = i.status === 'proposed' && approveRejected ? 'rejected' : i.status;
+  return effective === 'closed' || effective === 'rejected';
+}
 
 /** Chuẩn hoá mọi kiểu toạ độ thành {lat,lng} hoặc null */
 function normalizeCoords(coords: any): LatLng | null {
@@ -78,7 +84,6 @@ export default function PublicIssueDispatchPage() {
   const [viewingProposal, setViewingProposal] = useState<PublicVehicleIssue | null>(null);
   const [approvingProposal, setApprovingProposal] = useState<PublicVehicleIssue | null>(null);
 
-  // ⬇️ Refactor: dùng refresh thay cho fetchVehicleIssues
   const { issues, loading, updateIssue, refresh } = usePublicIssuesToDispatch();
 
   const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
@@ -97,7 +102,7 @@ export default function PublicIssueDispatchPage() {
       const uid = user?.uid;
       return issues.filter((i) => i.assignedTo === uid);
     }
-    return issues; // admin & technician_assistant thấy tất cả
+    return issues;
   }, [issues, isTechnicianPartner, user?.uid]);
 
   // 2) Lọc theo UI (search/status/station)
@@ -107,7 +112,6 @@ export default function PublicIssueDispatchPage() {
 
     return scopedIssues.filter((i) => {
       const okStatus = statusFilter === 'All' ? true : i.status === statusFilter;
-
       const stationId =
         (i as any).stationId ||
         (i.location as any)?.stationId ||
@@ -145,6 +149,15 @@ export default function PublicIssueDispatchPage() {
     return normalizeCoords((mapIssue?.location as any)?.coordinates);
   }, [mapIssue]);
 
+  // 4) Dữ liệu cho MAP: loại closed/rejected
+  const issuesForMap = useMemo(
+    () => scopedIssues.filter((i) => !isHiddenOnMap(i)),
+    [scopedIssues]
+  );
+
+  // 5) Ẩn marker "Sự cố đang xem" nếu issue đang focus đã closed/rejected
+  const renderFocusMarker = mapIssue ? !isHiddenOnMap(mapIssue) : true;
+
   if (loading) return <div className="text-center py-10">{t('loading')}</div>;
   if (!canView) return <div className="text-center py-10 text-red-500">{t('no_permission')}</div>;
 
@@ -161,7 +174,7 @@ export default function PublicIssueDispatchPage() {
       showDialog('success', t('messages.assign_success'));
       setShowForm(false);
       setEditingIssue(null);
-      await refresh(); // ⬅️ refetch khi không bật realtime
+      await refresh();
     } catch {
       showDialog('error', t('messages.assign_failed'));
     }
@@ -179,7 +192,7 @@ export default function PublicIssueDispatchPage() {
     setCloseDialogOpen(false);
     setClosingIssue(null);
     setCloseComment('');
-    await refresh(); // ⬅️
+    await refresh();
   };
 
   const handlePropose = async (solution: string, cost: number) => {
@@ -191,7 +204,7 @@ export default function PublicIssueDispatchPage() {
     });
     showDialog('success', t('messages.proposal_success'));
     setProposingIssue(null);
-    await refresh(); // ⬅️
+    await refresh();
   };
 
   const handleActualSubmit = async (solution: string, cost: number) => {
@@ -203,7 +216,7 @@ export default function PublicIssueDispatchPage() {
     });
     showDialog('success', t('messages.actual_success'));
     setUpdatingActualIssue(null);
-    await refresh(); // ⬅️
+    await refresh();
   };
 
   const handleApprove = async () => {
@@ -211,7 +224,7 @@ export default function PublicIssueDispatchPage() {
     await updateIssue(approvingProposal.id, { status: 'confirmed' });
     showDialog('success', t('messages.approve_success'));
     setApprovingProposal(null);
-    await refresh(); // ⬅️
+    await refresh();
   };
 
   const handleReject = async (reason: string) => {
@@ -219,7 +232,7 @@ export default function PublicIssueDispatchPage() {
     await updateIssue(approvingProposal.id, { status: 'rejected', closeComment: reason });
     showDialog('success', t('messages.reject_success'));
     setApprovingProposal(null);
-    await refresh(); // ⬅️
+    await refresh();
   };
 
   // ===== Render =====
@@ -229,16 +242,12 @@ export default function PublicIssueDispatchPage() {
       <UserTopMenu />
       <main className="flex-1 p-6 space-y-6 max-w-7xl mx-auto">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            {t('title')}
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t('title')}</h1>
           <p className="text-sm text-gray-600">{t('subtitle')}</p>
         </div>
 
-        {/* Summary dùng scopedIssues để khớp quyền */}
         <PublicIssuesSummaryCard issues={scopedIssues} />
 
-        {/* Filters */}
         <PublicIssuesSearchFilter
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -252,20 +261,21 @@ export default function PublicIssueDispatchPage() {
         {mapCenter && (
           <NearbySupportMap
             issueCoords={mapCenter}
-            issues={scopedIssues}
+            issues={issuesForMap}                       // 👈 chỉ các issue còn mở
             limitPerType={5}
-            showNearestShops={isAdmin || isTechAssistant} // chỉ Admin & Assistant thấy Shop
-            showNearestMobiles={true}                      // ai cũng thấy KTV lưu động
+            showNearestShops={isAdmin || isTechAssistant}
+            showNearestMobiles={true}
+            renderFocusMarker={renderFocusMarker}       // 👈 ẩn marker nếu closed/rejected
+            restrictToTechId={isTechnicianPartner ? (user?.uid ?? null) : null}
           />
         )}
 
-        {/* Bảng issues: đã lọc theo quyền + UI */}
         <PublicIssueTable
           issues={filteredIssues}
           updateIssue={updateIssue}
           onEdit={(issue) => {
             setEditingIssue(issue);
-            if (canAssign) setShowForm(true); // chỉ admin/assistant mở form phân công
+            if (canAssign) setShowForm(true);
           }}
           setClosingIssue={setClosingIssue}
           setCloseDialogOpen={setCloseDialogOpen}
@@ -273,14 +283,13 @@ export default function PublicIssueDispatchPage() {
           setShowForm={setShowForm}
           normalizedRole={normalizedRole}
           isAdmin={isAdmin}
-          isTechnician={isTechnicianPartner} // partner như technician ở UI
+          isTechnician={isTechnicianPartner}
           setProposingIssue={setProposingIssue}
           setUpdatingActualIssue={setUpdatingActualIssue}
           setViewingProposal={setViewingProposal}
           setApprovingProposal={setApprovingProposal}
         />
 
-        {/* Form phân công: chỉ admin/assistant */}
         {showForm && editingIssue && canAssign && (
           <div className="bg-white border rounded-xl shadow p-6 space-y-6">
             <h2 className="text-2xl font-bold">{t('assign_title')}</h2>

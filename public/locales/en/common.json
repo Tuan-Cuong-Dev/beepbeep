@@ -1050,40 +1050,56 @@
 },
 
 "organization_create_chooser": {
-  "intro": "You haven’t joined or created any organization yet. Choose a role to get started:",
-  "technician_partner": {
-    "mobile": {
-      "title": "Independent Technician",
-      "description": "Mobile technician offering on-site repairs."
-    },
-    "shop": {
-      "title": "Repair Shop",
-      "description": "Garage-based service for battery, brakes, repairs."
-    }
+  "intro": "You have not joined or created any organization yet. Please choose a role to get started:",
+  "search_placeholder": "Search organization type…",
+  "no_results": "No results found. Please try another keyword.",
+
+  "technician_partner_mobile": {
+    "title": "Independent Technician",
+    "description": "Mobile technician providing on-site repair services."
   },
+  "technician_partner_shop": {
+    "title": "Repair Shop",
+    "description": "Garage services: battery, brakes, and vehicle repairs."
+  },
+
   "rental_company": {
     "title": "Rental Company",
     "description": "Manage fleet, stations, bookings, and staff."
   },
   "private_provider": {
-    "title": "Private Provider",
-    "description": "Rent out your personal vehicle or offer services."
+    "title": "Private Vehicle Provider",
+    "description": "Rent out your personal vehicles or services."
   },
   "agent": {
-    "title": "Agent / Referrer",
-    "description": "Refer customers and earn commissions."
+    "title": "Agent / Referral Partner",
+    "description": "Refer customers and earn commission."
+  },
+
+  "city_driver": {
+    "title": "City Driver",
+    "description": "Transport passengers within the city."
+  },
+  "intercity_driver": {
+    "title": "Intercity Driver",
+    "description": "Transport passengers between cities."
+  },
+  "delivery_partner": {
+    "title": "Delivery Partner",
+    "description": "Deliver small parcels (≤20kg) within the city."
   },
   "intercity_bus": {
-    "title": "Intercity Bus Operator",
-    "description": "Manage routes and transport passengers between provinces."
+    "title": "Intercity Bus Company",
+    "description": "Operate routes and transport passengers between provinces."
   },
   "vehicle_transport": {
     "title": "Vehicle Transporter",
-    "description": "Provide services for transporting goods and vehicles over short and long distances."
+    "description": "Provide cargo and vehicle transport services inside and outside the city."
   },
+
   "tour_guide": {
     "title": "Tour Guide",
-    "description": "Offer bike tours or self-drive experiences."
+    "description": "Organize tours or self-drive itineraries."
   }
 },
 
@@ -1164,12 +1180,15 @@
     "private_provider": "Create Private Provider",
     "agent": "Create Agent",
     "technician_partner": "Create Technician Partner",
-    "intercity_bus": "Create Intercity Bus Operator",
-    "vehicle_transport": "Create Vehicle Transport Company",
+    "city_driver": "Create City Driver",
+    "intercity_driver": "Create Intercity Driver",
+    "delivery_partner": "Create Delivery Partner",
+    "intercity_bus": "Create Intercity Bus Company",
+    "vehicle_transport": "Create Vehicle Transporter",
     "tour_guide": "Create Tour Guide"
   },
   "subtitle": "Please fill in the information below to get started.",
-  "invalid_type": "Go to your Profile to create your business"
+  "invalid_type": "Go to Profile to create your business."
 },
 
 "create_business_form": {
@@ -3976,7 +3995,15 @@
     "refresh_companies": "Refresh Companies",
     "refresh_stations": "Refresh Stations"
   }
+},
+
+"organization_group": {
+  "technical_services": "Technical Services & Repair",
+  "rental_supply": "Vehicle Rental & Supply",
+  "transport_delivery": "Transport & Delivery",
+  "support_tourism": "Support & Tourism"
 }
+
 
 
 

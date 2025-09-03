@@ -20,7 +20,8 @@ export type ButtonVariant =
 
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled' | 'type'> {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -29,6 +30,10 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   loading?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  /** Chỉ dùng khi asChild=false. Mặc định 'button' để tránh submit form ngoài ý muốn */
+  type?: 'button' | 'submit' | 'reset';
+  /** Disabled logic thống nhất cho cả hai chế độ */
+  disabled?: boolean;
 }
 
 const baseClass =
@@ -82,36 +87,45 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   ref
 ) {
   const Comp: any = asChild ? Slot : 'button';
-  const isDisabled = disabled || loading;
+  const isDisabled = Boolean(disabled || loading);
 
+  // Nội dung, đảm bảo spacing đẹp khi có/không có icon & loading
   const content = (
     <>
-      {loading && <Spinner />}
-      {!loading && leftIcon}
+      {loading ? <Spinner /> : leftIcon}
       <span className="inline-flex items-center">{children}</span>
       {!loading && rightIcon}
     </>
   );
 
-  return (
+  // Props chung cho cả hai chế độ
+  const commonProps = {
+    'aria-disabled': isDisabled || undefined,
+    'aria-busy': loading || undefined,
+    'data-variant': variant,
+    'data-size': size,
+    className: cn(
+      baseClass,
+      sizeClass[size],
+      variantClass[variant],
+      fullWidth && 'w-full',
+      loading && 'cursor-wait',
+      // Khi asChild, không có thuộc tính disabled hợp lệ -> dùng lớp & aria để khoá tương tác
+      asChild && isDisabled && 'pointer-events-none opacity-50',
+      className
+    ),
+    ...rest,
+  };
+
+  // Tránh truyền type/disabled vào Fragment/Slot/child
+  return asChild ? (
+    <Comp {...commonProps}>{content}</Comp>
+  ) : (
     <Comp
       ref={ref}
-      type={!asChild ? type : undefined}
-      disabled={!asChild ? isDisabled : undefined}
-      aria-disabled={isDisabled}
-      aria-busy={loading || undefined}
-      data-variant={variant}
-      data-size={size}
-      className={cn(
-        baseClass,
-        sizeClass[size],
-        variantClass[variant],
-        fullWidth && 'w-full',
-        loading && 'cursor-wait',
-        asChild && isDisabled && 'pointer-events-none opacity-50',
-        className
-      )}
-      {...rest}
+      type={type}
+      disabled={isDisabled}
+      {...commonProps}
     >
       {content}
     </Comp>

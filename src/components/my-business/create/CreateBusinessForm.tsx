@@ -15,27 +15,18 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import type { BusinessType } from '@/src/lib/my-business/businessTypes';
+import { BUSINESS_ROUTE_CONFIG } from '@/src/lib/my-business/routeConfig';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  BusinessType: BusinessType;
+  businessType: BusinessType; // ✅ rename prop
 }
 
-const BusinessTypeConfig: Record<
-  BusinessType,
-  { collection: string; role: string; redirect: string; additionalData?: Record<string, any> }
-> = {
-  rental_company:     { collection: 'rentalCompanies',       role: 'company_owner',     redirect: '/profile?tab=business' },
-  private_provider:   { collection: 'privateProviders',      role: 'private_provider',  redirect: '/profile?tab=business' },
-  agent:              { collection: 'agents',                role: 'agent',             redirect: '/profile?tab=business' },
-  technician_partner: { collection: 'technicianPartners',    role: 'technician_partner',redirect: '/profile?tab=business' },
-  intercity_bus:      { collection: 'intercityBusCompanies', role: 'intercity_bus',     redirect: '/profile?tab=business' },
-  vehicle_transport:  { collection: 'vehicleTransporters',   role: 'vehicle_transport', redirect: '/profile?tab=business' },
-  tour_guide:         { collection: 'tourGuides',            role: 'tour_guide',        redirect: '/profile?tab=business' },
-};
+type Coords = { lat: number; lng: number };
+
+const BusinessTypeConfig = BUSINESS_ROUTE_CONFIG; // dùng chung
 
 // Helpers
-type Coords = { lat: number; lng: number };
 function parseLatLng(s?: string): Coords | null {
   if (!s) return null;
   const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
@@ -44,15 +35,17 @@ function parseLatLng(s?: string): Coords | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
 }
 
-export default function CreateBusinessForm({ BusinessType }: Props) {
+export default function CreateBusinessForm({ businessType }: Props) {
   const { t } = useTranslation();
   const router = useRouter();
-  const searchParams = useSearchParams(); // có thể null theo typing ⇒ luôn dùng ?.get
+  const searchParams = useSearchParams();
+
+  // subtype chỉ áp dụng cho technician_partner
   const subtypeParam = (searchParams?.get('subtype') || '').toLowerCase();
   const technicianSubtype = useMemo<'mobile' | 'shop' | undefined>(() => {
-    if (BusinessType !== 'technician_partner') return undefined;
+    if (businessType !== 'technician_partner') return undefined;
     return subtypeParam === 'mobile' || subtypeParam === 'shop' ? subtypeParam : 'mobile';
-  }, [BusinessType, subtypeParam]);
+  }, [businessType, subtypeParam]);
 
   const { geocode, coords, error: geoError, loading: geoLoading } = useGeocodeAddress();
 
@@ -94,7 +87,6 @@ export default function CreateBusinessForm({ BusinessType }: Props) {
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
   const handleBlur = () => {
-    // Cho phép user nhập mapAddress rồi geocode để lấy tọa độ
     if (form.mapAddress.trim()) geocode(form.mapAddress.trim());
   };
 
@@ -108,7 +100,7 @@ export default function CreateBusinessForm({ BusinessType }: Props) {
       );
     }
 
-    const { name, email, phone, displayAddress, mapAddress, location } = form;
+    const { name, phone, displayAddress, mapAddress, location } = form;
     if (!name || !phone || !displayAddress || !mapAddress || !location) {
       return showDialog(
         'error',
@@ -127,20 +119,19 @@ export default function CreateBusinessForm({ BusinessType }: Props) {
       );
     }
 
-    const cfg = BusinessTypeConfig[BusinessType];
+    const cfg = BusinessTypeConfig[businessType];
     setLoading(true);
 
     try {
-      // LocationCore đúng chuẩn
+      // LocationCore
       const locationCore = {
         geo: new GeoPoint(c.lat, c.lng),
         location: `${c.lat},${c.lng}`,
-        mapAddress: mapAddress || undefined,
-        address: displayAddress || undefined,
+        mapAddress: form.mapAddress || undefined,
+        address: form.displayAddress || undefined,
         updatedAt: serverTimestamp(),
       };
 
-      // Meta user thời điểm tạo
       const userMeta = {
         uid: user.uid,
         email: user.email || null,
@@ -153,42 +144,36 @@ export default function CreateBusinessForm({ BusinessType }: Props) {
       const batch = writeBatch(db);
       const docRef = doc(collection(db, cfg.collection)); // tạo sẵn id
 
-      // Tài liệu business (mặc định chung)
-      const baseDoc = {
+      const baseDoc: Record<string, any> = {
         id: docRef.id,
-        name,
-        email,
-        phone,
-        displayAddress,
-        mapAddress,
-        location: locationCore,              // ✅ LocationCore
-        businessType: BusinessType,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        displayAddress: form.displayAddress,
+        mapAddress: form.mapAddress,
+        location: locationCore,
+        businessType: businessType,
         ownerId: user.uid,
         owners: [user.uid],
         members: [user.uid],
-        ownerMeta: userMeta,                 // ✅ đính kèm thông tin user tạo
+        ownerMeta: userMeta,
         status: 'active' as const,
         createdBy: user.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         ...(cfg.additionalData || {}),
-      } as Record<string, any>;
+      };
 
-      // Nếu là technician_partner, thêm trường phân loại
-      if (BusinessType === 'technician_partner') {
-        // Ghi cả hai để tương thích: subtype (mới) + type (shop/mobile) dùng chung với schema technicianPartner
+      if (businessType === 'technician_partner') {
         baseDoc.subtype = technicianSubtype ?? 'mobile';
         baseDoc.type = technicianSubtype ?? 'mobile';
-        // Một số client cũ có thể đọc vehicleType mặc định
         baseDoc.vehicleType = baseDoc.vehicleType || 'motorbike';
-        // Đảm bảo có cờ hoạt động ban đầu
         baseDoc.isActive = baseDoc.isActive ?? true;
       }
 
-      // Ghi business
       batch.set(docRef, baseDoc);
 
-      // Cập nhật user role & business ref
+      // Update user profile with role & business ref
       const userRef = doc(db, 'users', user.uid);
       batch.set(
         userRef,
@@ -196,10 +181,9 @@ export default function CreateBusinessForm({ BusinessType }: Props) {
           role: cfg.role,
           business: {
             id: docRef.id,
-            type: BusinessType,
+            type: businessType,
             collection: cfg.collection,
-            // để client khác biết dạng technician
-            ...(BusinessType === 'technician_partner' && technicianSubtype
+            ...(businessType === 'technician_partner' && technicianSubtype
               ? { subtype: technicianSubtype }
               : {}),
           },
@@ -210,8 +194,8 @@ export default function CreateBusinessForm({ BusinessType }: Props) {
 
       await batch.commit();
 
-      // Với vài role cần custom claims (ví dụ rental_company). Giữ nguyên hành vi cũ nếu bạn muốn.
-      if (BusinessType === 'rental_company') {
+      // Custom claims cho rental_company (nếu dùng)
+      if (businessType === 'rental_company') {
         await fetch('/api/setCustomClaims', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -276,12 +260,10 @@ export default function CreateBusinessForm({ BusinessType }: Props) {
           onChange={handleChange('location')}
         />
 
-        {/* Gợi ý subtype khi là technician_partner */}
-        {BusinessType === 'technician_partner' && (
+        {businessType === 'technician_partner' && (
           <p className="text-xs text-gray-600">
             {t('create_business_form.technician_subtype_hint', {
-              // render label đã dịch thay vì giá trị thô
-              subtype: t(`create_business_form.subtype.${technicianSubtype ?? 'mobile'}`)
+              subtype: t(`create_business_form.subtype.${technicianSubtype ?? 'mobile'}`),
             })}
           </p>
         )}
