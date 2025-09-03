@@ -4086,20 +4086,14 @@
   },
 
 "partner_signup": {
-    "title": "Đăng ký làm đối tác Bíp Bíp",
-    "subtitle": "Kiếm thu nhập cùng hệ sinh thái di chuyển & cho thuê xe. Chọn vai trò phù hợp và bắt đầu chỉ với vài phút.",
-    "cta_primary": "Đăng ký ngay",
-    "cta_secondary": "Tìm hiểu thêm",
-    "roles_title": "Chọn vai trò phù hợp",
-    "view_all": "Xem tất cả vai trò",
-    "benefit_1": "Không phí khởi tạo, duyệt nhanh.",
-    "benefit_2": "Tự do chọn thời gian và khu vực hoạt động.",
-    "benefit_3": "Quản lý thu nhập và đơn hàng theo thời gian thực.",
-    "stat_1_title": "Đối tác",
-    "stat_2_title": "Thành phố",
-    "stat_3_title": "Đơn/ngày",
-    "stat_4_title": "Điểm 5★"
-  }
+  "title": "Đăng ký làm đối tác Bíp Bíp",
+  "subtitle": "Kiếm thu nhập cùng hệ sinh thái di chuyển & cho thuê xe. Chọn vai trò phù hợp và bắt đầu chỉ với vài phút.",
+  "cta_primary": "Đăng ký ngay",
+  "cta_secondary": "Tìm hiểu thêm",
+  "roles_title": "Chọn vai trò phù hợp",
+  "view_all": "Xem tất cả vai trò"
+}
+
 
 
 

@@ -4066,7 +4066,17 @@
   "rental_supply": "차량 대여 및 공급",
   "transport_delivery": "운송 및 배송",
   "support_tourism": "지원 및 관광"
+},
+
+"partner_signup": {
+  "title": "Bíp Bíp 파트너 등록",
+  "subtitle": "모빌리티 & 차량 렌탈 생태계와 함께 수익을 올리세요. 맞는 역할을 선택하고 몇 분 만에 시작할 수 있습니다.",
+  "cta_primary": "지금 등록하기",
+  "cta_secondary": "자세히 보기",
+  "roles_title": "역할 선택",
+  "view_all": "모든 역할 보기"
 }
+
 
 
 

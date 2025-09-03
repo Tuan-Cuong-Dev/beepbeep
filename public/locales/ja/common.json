@@ -4045,7 +4045,17 @@
   "rental_supply": "レンタル・車両提供",
   "transport_delivery": "輸送・配送",
   "support_tourism": "サポート・観光"
+},
+
+"partner_signup": {
+  "title": "Bíp Bípパートナーに登録",
+  "subtitle": "モビリティ＆レンタルエコシステムで収入を得ましょう。自分に合った役割を選び、数分で始められます。",
+  "cta_primary": "今すぐ登録",
+  "cta_secondary": "詳しく見る",
+  "roles_title": "役割を選択",
+  "view_all": "すべての役割を見る"
 }
+
 
 
 

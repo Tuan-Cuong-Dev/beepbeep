@@ -4002,6 +4002,15 @@
   "rental_supply": "Vehicle Rental & Supply",
   "transport_delivery": "Transport & Delivery",
   "support_tourism": "Support & Tourism"
+},
+
+"partner_signup": {
+  "title": "Sign up as a Bíp Bíp Partner",
+  "subtitle": "Earn income with the mobility & vehicle rental ecosystem. Choose your role and get started in just a few minutes.",
+  "cta_primary": "Sign up now",
+  "cta_secondary": "Learn more",
+  "roles_title": "Choose your role",
+  "view_all": "View all roles"
 }
 
 
