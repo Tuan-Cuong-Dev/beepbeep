@@ -167,6 +167,9 @@ export default function PublicVehicleIssuesManagementPage() {
     return filteredIssues.find((i) => !!normalizeCoords((i.location as any)?.coordinates)) || null;
   }, [editingIssue, filteredIssues]);
 
+  // Thêm dòng này ngay sau khi có mapIssue
+  const renderFocusMarker = mapIssue ? !isHiddenOnMap(mapIssue) : true;
+
   const mapCenter = useMemo<LatLng | null>(() => {
     return normalizeCoords((mapIssue?.location as any)?.coordinates);
   }, [mapIssue]);
@@ -277,11 +280,12 @@ export default function PublicVehicleIssuesManagementPage() {
           {mapCenter && (
           <NearbySupportMap
             issueCoords={mapCenter}
-            issues={issuesForMap}          // ✅ chỉ gửi “open” cho MAP
+            issues={issuesForMap}
             limitPerType={5}
             showNearestShops={isAdmin || isTechAssistant}
             showNearestMobiles={true}
-            restrictToTechId={isTechnicianPartner ? (user?.uid ?? null) : null}  // 👈 NEW
+            restrictToTechId={isTechnicianPartner ? (user?.uid ?? null) : null}
+            renderFocusMarker={renderFocusMarker}   // 👈 thêm dòng này
           />
         )}
 

@@ -40,6 +40,9 @@ const CircleMarker  = dynamic(() => import('react-leaflet').then(m => m.CircleMa
 const Circle        = dynamic(() => import('react-leaflet').then(m => m.Circle),        { ssr: false });
 const Polyline      = dynamic(() => import('react-leaflet').then(m => m.Polyline),      { ssr: false });
 
+// Avatar kỹ thuật viên lưu động
+const DEFAULT_MOBILE_AVATAR = '/assets/images/techinicianPartner_mobile.png';
+
 /** DEV: Monkey-patch để log mọi NaN bơm vào Leaflet (latLng / setView / fitBounds) */
 if (typeof window !== 'undefined') {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -186,14 +189,15 @@ export default function NearbySupportMap({
   // presence realtime
   const rawPresence = (useTechnicianPresence() || []) as any[];
   const normalizePresenceItem = (p: any): PresenceItem | null => {
-    const lat = toNum(p.lat ?? p.latitude);
-    const lng = toNum(p.lng ?? p.longitude);
-    if (!isValidLatLng(lat, lng)) return null;
+  const lat = toNum(p.lat ?? p.latitude);
+  const lng = toNum(p.lng ?? p.longitude);
+  if (!isValidLatLng(lat, lng)) return null;
     return {
       techId: p.techId || p.uid || p.id || '',
       name: p.name ?? null,
       companyName: p.companyName ?? null,
-      avatarUrl: p.avatarUrl ?? p.photoURL ?? null,
+      // 👇 ưu tiên p.avatarUrl -> p.photoURL -> ảnh mặc định
+      avatarUrl: (p.avatarUrl ?? p.photoURL ?? DEFAULT_MOBILE_AVATAR),
       lat, lng,
       accuracy: typeof p.accuracy === 'number' ? p.accuracy : (toNum(p.accuracy) || null),
       updatedAt: typeof p.updatedAt === 'number' ? p.updatedAt : (typeof p.ts === 'number' ? p.ts : null),
@@ -202,6 +206,7 @@ export default function NearbySupportMap({
       role: p.role ?? null,
     };
   };
+
   // 1) Chuẩn hoá presence
   const liveMobilesBase = useMemo(
     () => (rawPresence || []).map(normalizePresenceItem).filter(Boolean) as PresenceItem[],
@@ -416,7 +421,7 @@ export default function NearbySupportMap({
 
         {isClient && containerOk && hasValidCenter && (
           <MapContainer
-               center={SAFE_CENTER}
+              center={SAFE_CENTER}
               zoom={SAFE_ZOOM}
               minZoom={3}
               maxZoom={19}
@@ -447,15 +452,17 @@ export default function NearbySupportMap({
                 />
 
                 {/* Focus issue */}
-                <FocusIssueLayer
-                  Marker={Marker}
-                  Popup={Popup}
-                  pulseIcon={pulseIcon}
-                  safeIssue={safeIssue}
-                  nearestMobileKm={nearestMobileKm}
-                  focusedIssue={focusedIssue}
-                  t={t}
-                />
+                  {renderFocusMarker && safeIssue && (
+                    <FocusIssueLayer
+                      Marker={Marker}
+                      Popup={Popup}
+                      pulseIcon={pulseIcon}
+                      safeIssue={safeIssue}
+                      nearestMobileKm={nearestMobileKm}
+                      focusedIssue={focusedIssue}
+                      t={t}
+                    />
+                  )}
 
                 {/* Open issues */}
                 <OpenIssuesLayer
