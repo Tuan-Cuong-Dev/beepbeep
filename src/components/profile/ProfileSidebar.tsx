@@ -1,6 +1,3 @@
-// components/profile/ProfileSidebar.tsx
-// Hiển thị Doanh nghiệp / Dịch vụ phía bên trái màn hình
-
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -13,7 +10,8 @@ import {
   query,
   where,
 } from 'firebase/firestore';
-import { db } from '@/src/firebaseConfig';
+import { db, auth } from '@/src/firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 
 import BusinessAboutSection from '../my-business/about/BusinessAboutSection';
 import ServicesAboutSection from '../my-business/about/ServicesAboutSections';
@@ -23,29 +21,13 @@ import type { Staff } from '@/src/lib/staff/staffTypes';
 import type { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 
 interface ProfileSidebarProps {
-  // ✅ Ưu tiên dùng nếu có (owner / trang doanh nghiệp)
   businessId?: string;
   businessType?: BusinessType;
-
-  // ✅ Dùng để auto phát hiện org khi không truyền businessId/businessType
-  currentUserId?: string;
-
-  // existing (để dành)
+  currentUserId?: string; // nếu không truyền, sẽ fallback lấy từ Auth
   location?: string;
   joinedDate?: string;
   helpfulVotes?: number;
 }
-
-// Map BusinessType -> Firestore collection
-const COLLECTION_BY_TYPE: Record<BusinessType, string> = {
-  rental_company: 'rentalCompanies',
-  private_provider: 'privateProviders',
-  agent: 'agents',
-  technician_partner: 'technicianPartners',
-  intercity_bus: 'intercityBusCompanies',
-  vehicle_transport: 'vehicleTransporters',
-  tour_guide: 'tourGuides',
-};
 
 export default function ProfileSidebar({
   businessId,
@@ -57,15 +39,26 @@ export default function ProfileSidebar({
 }: ProfileSidebarProps) {
   const { t } = useTranslation('common');
 
-  // State nội bộ khi cần tự tìm doanh nghiệp
+  // ✅ Lấy uid từ prop hoặc từ auth listener
+  const [resolvedUserId, setResolvedUserId] = useState<string | undefined>(currentUserId);
+  useEffect(() => {
+    if (currentUserId) {
+      setResolvedUserId(currentUserId);
+      return;
+    }
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setResolvedUserId(u?.uid || undefined);
+    });
+    return () => unsub();
+  }, [currentUserId]);
+
   const [staffBusinessId, setStaffBusinessId] = useState<string | undefined>();
   const [staffBusinessType, setStaffBusinessType] = useState<BusinessType | undefined>();
   const [loadingAutoDetect, setLoadingAutoDetect] = useState(false);
 
-  // ⬇️ Riêng cho private_provider: lưu ownerId để truyền sang ServicesAboutSection
+  // Riêng cho private_provider: lưu ownerId để ServicesAboutSection dùng userId
   const [ownerUserId, setOwnerUserId] = useState<string | undefined>(undefined);
 
-  // Có nguồn businessId/businessType từ parent không?
   const hasParentBusiness = useMemo(
     () => Boolean(businessId && businessType),
     [businessId, businessType]
@@ -77,7 +70,7 @@ export default function ProfileSidebar({
       setStaffBusinessType(undefined);
       return;
     }
-    if (!currentUserId) {
+    if (!resolvedUserId) {
       setStaffBusinessId(undefined);
       setStaffBusinessType(undefined);
       return;
@@ -88,8 +81,8 @@ export default function ProfileSidebar({
     const autoDetectOrg = async () => {
       setLoadingAutoDetect(true);
       try {
-        // 1) Ưu tiên lấy từ users/{uid}.business (đã set khi tạo business)
-        const userRef = doc(db, 'users', currentUserId);
+        // 1) Ưu tiên: users/{uid}.business
+        const userRef = doc(db, 'users', resolvedUserId);
         const userSnap = await getDoc(userRef);
         if (!mounted) return;
 
@@ -105,10 +98,10 @@ export default function ProfileSidebar({
           return;
         }
 
-        // 2) Fallback staff: chỉ lịch sử cho rentalCompanies (như logic cũ)
+        // 2) Fallback staff → rentalCompanies
         const qStaffs = query(
           collection(db, 'staffs'),
-          where('userId', '==', currentUserId),
+          where('userId', '==', resolvedUserId),
           where('accepted', '==', true)
         );
         const staffSnap = await getDocs(qStaffs);
@@ -119,7 +112,6 @@ export default function ProfileSidebar({
           const { id: _dropId, ...rawStaff } = sd.data() as Staff;
           const staffData: Staff = { ...rawStaff, id: sd.id };
 
-          // Lấy company record tương ứng
           const companyRef = doc(db, 'rentalCompanies', staffData.companyId);
           const companySnap = await getDoc(companyRef);
           if (!mounted) return;
@@ -134,10 +126,10 @@ export default function ProfileSidebar({
           }
         }
 
-        // 3) Fallback chủ sở hữu technicianPartners (ownerId == currentUserId)
+        // 3) Fallback owner → technicianPartners
         const qTech = query(
           collection(db, 'technicianPartners'),
-          where('ownerId', '==', currentUserId)
+          where('ownerId', '==', resolvedUserId)
         );
         const techSnap = await getDocs(qTech);
         if (!mounted) return;
@@ -150,7 +142,23 @@ export default function ProfileSidebar({
           return;
         }
 
-        // 4) (tùy chọn) Có thể thêm các collection khác có ownerId == uid nếu muốn
+        // 4) ✅ Fallback owner → privateProviders (BỔ SUNG)
+        const qPrivate = query(
+          collection(db, 'privateProviders'),
+          where('ownerId', '==', resolvedUserId)
+        );
+        const privateSnap = await getDocs(qPrivate);
+        if (!mounted) return;
+
+        if (!privateSnap.empty) {
+          const d = privateSnap.docs[0];
+          setStaffBusinessId(d.id);
+          setStaffBusinessType('private_provider');
+          setLoadingAutoDetect(false);
+          return;
+        }
+
+        // 5) (tùy chọn) thêm các collection khác có ownerId == uid
 
         // Không tìm được
         setStaffBusinessId(undefined);
@@ -169,13 +177,13 @@ export default function ProfileSidebar({
     return () => {
       mounted = false;
     };
-  }, [hasParentBusiness, currentUserId]);
+  }, [hasParentBusiness, resolvedUserId]);
 
   // Ưu tiên nguồn từ parent, nếu không có thì dùng auto-detect
   const finalBusinessId = hasParentBusiness ? businessId : staffBusinessId;
   const finalBusinessType = hasParentBusiness ? businessType : staffBusinessType;
 
-  // ⬇️ Khi đã biết businessId + businessType, nếu là private_provider thì lấy ownerId
+  // Khi đã biết businessId + businessType, nếu là private_provider thì lấy ownerId
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -206,13 +214,11 @@ export default function ProfileSidebar({
           />
 
           {finalBusinessType === 'private_provider' ? (
-            // ✅ Riêng private_provider: services lưu theo userId = ownerId
             <ServicesAboutSection
-              userId={ownerUserId || currentUserId}
+              userId={ownerUserId || resolvedUserId}
               statusIn={['active', 'pending', 'inactive']}
             />
           ) : (
-            // ✅ Các loại khác: giữ nguyên logic businessId
             <ServicesAboutSection
               businessId={finalBusinessId}
               statusIn={['active', 'pending', 'inactive']}
