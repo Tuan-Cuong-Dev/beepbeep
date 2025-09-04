@@ -4058,7 +4058,84 @@
   "cta_secondary": "詳しく見る",
   "roles_title": "役割を選択",
   "view_all": "すべての役割を見る"
-}
+},
+
+"private_provider_table": {
+    "name": "名前",
+    "email": "メール",
+    "phone": "電話番号",
+    "address": "住所",
+    "coordinates": "座標",
+    "actions": "操作",
+    "edit": "編集",
+    "delete": "削除",
+    "no_data": "データがありません"
+  },
+
+  "private_provider_form": {
+    "title": "個人プロバイダー",
+    "subtitle": "システムに表示するための基本情報を入力してください。",
+    "section_titles": {
+      "location": "位置情報"
+    },
+    "labels": {
+      "name": "事業者名",
+      "email": "メールアドレス",
+      "phone": "電話番号",
+      "display_address": "表示用住所",
+      "map_address": "Googleマップリンク／住所の説明",
+      "latlng": "緯度,経度"
+    },
+    "placeholders": {
+      "name": "事業者名",
+      "email": "メールアドレス",
+      "phone": "電話番号",
+      "display_address": "表示用住所",
+      "map_address": "Googleマップのリンクまたは住所の説明",
+      "latlng": "緯度,経度（例：16.0613026,108.2110477）"
+    },
+    "helpers": {
+      "map_address_hint": "Googleマップのリンクまたは簡単な説明を貼り付けてください。",
+      "latlng_hint": "緯度,経度の形式で入力してください。例：16.0613026,108.2110477"
+    },
+    "errors": {
+      "name_required": "名前を入力してください。",
+      "phone_required": "電話番号を入力してください。",
+      "display_address_required": "表示用住所を入力してください。",
+      "location_required": "有効な緯度,経度（例：16.0613026,108.2110477）を入力するか、位置情報を選択してください。",
+      "missing_geopoint": "位置情報の GeoPoint が必要です。"
+    },
+    "buttons": {
+      "save": "保存",
+      "cancel": "キャンセル"
+    }
+  },
+
+  "private_provider_search": {
+    "placeholder": "名前、メール、電話番号、住所で検索..."
+  },
+
+  "private_providers_page": {
+    "title": "個人レンタル提供者の管理",
+    "add_new": "新規追加",
+    "create_title": "個人レンタル提供者を追加",
+    "edit_title": "個人レンタル提供者を編集",
+    "cancel_edit": "編集をキャンセル",
+
+    "messages": {
+      "load_failed": "データの読み込みに失敗しました",
+      "add_success": "追加しました",
+      "update_success": "更新しました",
+      "save_failed": "保存に失敗しました",
+      "delete_success": "削除しました",
+      "delete_failed": "削除に失敗しました"
+    },
+    "confirm_delete": {
+      "title": "この提供者を削除しますか？",
+      "description": "この操作は元に戻せません。"
+    }
+  }
+
 
 
 

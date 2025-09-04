@@ -4015,7 +4015,84 @@
   "cta_secondary": "Learn more",
   "roles_title": "Choose your role",
   "view_all": "View all roles"
-}
+},
+
+ "private_provider_table": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "coordinates": "Coordinates",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "no_data": "No data"
+  },
+
+  "private_provider_form": {
+    "title": "Private Provider",
+    "subtitle": "Fill in basic details to appear in the system.",
+    "section_titles": {
+      "location": "Location"
+    },
+    "labels": {
+      "name": "Provider name",
+      "email": "Email",
+      "phone": "Phone number",
+      "display_address": "Display address",
+      "map_address": "Google Maps link / Address description",
+      "latlng": "Lat,Lng"
+    },
+    "placeholders": {
+      "name": "Provider name",
+      "email": "Email",
+      "phone": "Phone number",
+      "display_address": "Display address",
+      "map_address": "Google Maps link or address description",
+      "latlng": "Lat,Lng (e.g., 16.0613026,108.2110477)"
+    },
+    "helpers": {
+      "map_address_hint": "Paste a Google Maps link or a short description.",
+      "latlng_hint": "Use latitude,longitude. Example: 16.0613026,108.2110477."
+    },
+    "errors": {
+      "name_required": "Please enter a name.",
+      "phone_required": "Please enter a phone number.",
+      "display_address_required": "Please enter a display address.",
+      "location_required": "Enter a valid Lat,Lng (e.g., 16.0613026,108.2110477) or select a geo point.",
+      "missing_geopoint": "A valid GeoPoint is required for the location."
+    },
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+
+  "private_provider_search": {
+    "placeholder": "Search by name, email, phone, or address..."
+  },
+
+  "private_providers_page": {
+    "title": "Private Vehicle Providers Management",
+    "add_new": "Add New",
+    "create_title": "Add Private Vehicle Provider",
+    "edit_title": "Edit Private Vehicle Provider",
+    "cancel_edit": "Cancel Editing",
+
+    "messages": {
+      "load_failed": "Failed to load data",
+      "add_success": "Added successfully",
+      "update_success": "Updated successfully",
+      "save_failed": "Save failed",
+      "delete_success": "Deleted successfully",
+      "delete_failed": "Delete failed"
+    },
+    "confirm_delete": {
+      "title": "Delete this provider?",
+      "description": "This action cannot be undone."
+    }
+  }
+
 
 
 

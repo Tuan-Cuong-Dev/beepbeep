@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useMemo, useState } from "react";
 import { Button } from "@/src/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/src/components/ui/input";
 import type { PrivateProvider } from "@/src/lib/privateProviders/privateProviderTypes";
 import type { PrivateProviderFormState } from "@/src/lib/privateProviders/privateProviderFormTypes";
 import { GeoPoint, serverTimestamp } from "firebase/firestore";
+import { useTranslation } from "react-i18next";
 
 /* -------- Helpers -------- */
 
@@ -36,7 +37,7 @@ function buildSubmitPayload(form: Partial<PrivateProviderFormState>): Partial<Pr
   const location =
     geo || locState.location || locState.mapAddress || locState.address
       ? {
-          geo: geo!, // (có thể undefined — ta sẽ validate trước khi submit)
+          geo: geo!, // sẽ validate trước khi submit
           location: locState.location,
           mapAddress: locState.mapAddress,
           address: locState.address,
@@ -66,6 +67,8 @@ interface Props {
 }
 
 export default function PrivateProviderForm({ initialData, onSubmit, onCancel }: Props) {
+  const { t } = useTranslation("common");
+
   // Map dữ liệu ban đầu (PrivateProvider) sang state form mềm dẻo
   const initialForm: Partial<PrivateProviderFormState> = useMemo(() => {
     if (!initialData) return {};
@@ -81,7 +84,7 @@ export default function PrivateProviderForm({ initialData, onSubmit, onCancel }:
         location: initialData.location?.location,
         mapAddress: initialData.location?.mapAddress,
         address: initialData.location?.address,
-        updatedAt: initialData.location?.updatedAt as any,
+        updatedAt: initialData.location?.updatedAt,
       },
       businessType: "private_provider",
       createdAt: initialData.createdAt,
@@ -114,19 +117,19 @@ export default function PrivateProviderForm({ initialData, onSubmit, onCancel }:
   const validate = (): boolean => {
     const e: Record<string, string> = {};
 
-    if (!form.name || !form.name.trim()) e.name = "Vui lòng nhập tên.";
-    if (!form.phone || !form.phone.trim()) e.phone = "Vui lòng nhập số điện thoại.";
+    if (!form.name || !form.name.trim()) e.name = t("private_provider_form.errors.name_required");
+    if (!form.phone || !form.phone.trim()) e.phone = t("private_provider_form.errors.phone_required");
     if (!form.displayAddress || !form.displayAddress.trim())
-      e.displayAddress = "Vui lòng nhập địa chỉ hiển thị.";
+      e.displayAddress = t("private_provider_form.errors.display_address_required");
 
-    // Location: chấp nhận một trong các cách: có geo sẵn, hoặc parse được từ location "lat,lng"
+    // Location: chấp nhận có geo sẵn, hoặc parse được từ "lat,lng"
     const loc = form.location;
     let geoOk = !!loc?.geo;
     if (!geoOk && loc?.location) {
       geoOk = !!parseLatLngString(loc.location);
     }
     if (!geoOk) {
-      e.location = "Nhập tọa độ Lat,Lng hợp lệ (vd: 16.0613026,108.2110477) hoặc chọn geo.";
+      e.location = t("private_provider_form.errors.location_required");
     }
 
     setErrors(e);
@@ -139,10 +142,9 @@ export default function PrivateProviderForm({ initialData, onSubmit, onCancel }:
     const payload = buildSubmitPayload(form);
     // Đảm bảo location.geo có thật trước khi submit
     if (!payload.location?.geo) {
-      // (Phòng hờ: validate đã chặn, nhưng ta thêm guard cho chắc)
       setErrors((prev) => ({
         ...prev,
-        location: "Thiếu GeoPoint hợp lệ cho vị trí.",
+        location: t("private_provider_form.errors.missing_geopoint"),
       }));
       return;
     }
@@ -152,65 +154,125 @@ export default function PrivateProviderForm({ initialData, onSubmit, onCancel }:
   /* ------ UI ------ */
 
   return (
-    <div className="space-y-3 p-4">
-      <div>
-        <Input
-          placeholder="Tên nhà cung cấp"
-          value={form.name || ""}
-          onChange={(e) => handleChange("name", e.target.value)}
-        />
-        {errors.name && <p className="text-red-600 text-xs mt-1">{errors.name}</p>}
+    <div className="p-4 md:p-6 bg-white rounded-2xl border shadow-sm">
+      {/* Header */}
+      <div className="mb-4 md:mb-6">
+        <h2 className="text-lg md:text-xl font-semibold">
+          {t("private_provider_form.title")}
+        </h2>
+        <p className="text-sm text-gray-500">
+          {t("private_provider_form.subtitle")}
+        </p>
       </div>
 
-      <Input
-        placeholder="Email"
-        value={form.email || ""}
-        onChange={(e) => handleChange("email", e.target.value)}
-      />
-      <div>
-        <Input
-          placeholder="Số điện thoại"
-          value={form.phone || ""}
-          onChange={(e) => handleChange("phone", e.target.value)}
-        />
-        {errors.phone && <p className="text-red-600 text-xs mt-1">{errors.phone}</p>}
+      {/* Grid 1c mobile / 2c desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Name */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium">
+            {t("private_provider_form.labels.name")} <span className="text-red-500">*</span>
+          </label>
+          <Input
+            placeholder={t("private_provider_form.placeholders.name")}
+            value={form.name || ""}
+            onChange={(e) => handleChange("name", e.target.value)}
+          />
+          {errors.name && <p className="text-red-600 text-xs">{errors.name}</p>}
+        </div>
+
+        {/* Email */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium">
+            {t("private_provider_form.labels.email")}
+          </label>
+          <Input
+            placeholder={t("private_provider_form.placeholders.email")}
+            value={form.email || ""}
+            onChange={(e) => handleChange("email", e.target.value)}
+          />
+        </div>
+
+        {/* Phone */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium">
+            {t("private_provider_form.labels.phone")} <span className="text-red-500">*</span>
+          </label>
+          <Input
+            placeholder={t("private_provider_form.placeholders.phone")}
+            value={form.phone || ""}
+            onChange={(e) => handleChange("phone", e.target.value)}
+          />
+          {errors.phone && <p className="text-red-600 text-xs">{errors.phone}</p>}
+        </div>
+
+        {/* Display address */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium">
+            {t("private_provider_form.labels.display_address")} <span className="text-red-500">*</span>
+          </label>
+          <Input
+            placeholder={t("private_provider_form.placeholders.display_address")}
+            value={form.displayAddress || ""}
+            onChange={(e) => handleChange("displayAddress", e.target.value)}
+          />
+          {errors.displayAddress && (
+            <p className="text-red-600 text-xs">{errors.displayAddress}</p>
+          )}
+        </div>
+
+        {/* Location Group (span 2 cols) */}
+        <div className="md:col-span-2 border rounded-xl p-3 md:p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold">{t("private_provider_form.section_titles.location")}</h3>
+          </div>
+
+          {/* Map address */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium">
+              {t("private_provider_form.labels.map_address")}
+            </label>
+            <Input
+              placeholder={t("private_provider_form.placeholders.map_address")}
+              value={form.location?.mapAddress || ""}
+              onChange={(e) => handleLocationChange("mapAddress", e.target.value)}
+            />
+            <p className="text-[11px] text-gray-500">
+              {t("private_provider_form.helpers.map_address_hint")}
+            </p>
+          </div>
+
+          {/* LatLng */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium">
+              {t("private_provider_form.labels.latlng")} <span className="text-red-500">*</span>
+            </label>
+            <Input
+              placeholder={t("private_provider_form.placeholders.latlng")}
+              value={form.location?.location || ""}
+              onChange={(e) => handleLocationChange("location", e.target.value)}
+            />
+            <p className="text-[11px] text-gray-500">
+              {t("private_provider_form.helpers.latlng_hint")}
+            </p>
+            {errors.location && <p className="text-red-600 text-xs">{errors.location}</p>}
+          </div>
+        </div>
       </div>
 
-      <div>
-        <Input
-          placeholder="Địa chỉ hiển thị"
-          value={form.displayAddress || ""}
-          onChange={(e) => handleChange("displayAddress", e.target.value)}
-        />
-        {errors.displayAddress && (
-          <p className="text-red-600 text-xs mt-1">{errors.displayAddress}</p>
-        )}
-      </div>
-
-      {/* LocationCore (form-state version) */}
-      <Input
-        placeholder="Google Maps link hoặc mô tả địa chỉ"
-        value={form.location?.mapAddress || ""}
-        onChange={(e) => handleLocationChange("mapAddress", e.target.value)}
-      />
-      <div>
-        <Input
-          placeholder="Lat,Lng (vd: 16.0613026,108.2110477)"
-          value={form.location?.location || ""}
-          onChange={(e) => handleLocationChange("location", e.target.value)}
-        />
-        {errors.location && <p className="text-red-600 text-xs mt-1">{errors.location}</p>}
-      </div>
-
-      {/* (Optional) Nếu bạn có UI chọn GeoPoint trực tiếp, bạn có thể set form.location.geo ở đây */}
-
-      <div className="flex gap-2 pt-2">
-        <Button onClick={handleSubmit}>Lưu</Button>
+      {/* Actions */}
+      <div className="mt-4 md:mt-6 flex flex-col-reverse md:flex-row md:justify-end gap-2">
         {onCancel && (
-          <Button variant="outline" onClick={onCancel}>
-            Hủy
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            className="w-full md:w-auto"
+          >
+            {t("private_provider_form.buttons.cancel")}
           </Button>
         )}
+        <Button onClick={handleSubmit} className="w-full md:w-auto">
+          {t("private_provider_form.buttons.save")}
+        </Button>
       </div>
     </div>
   );

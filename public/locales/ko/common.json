@@ -4079,7 +4079,84 @@
   "cta_secondary": "자세히 보기",
   "roles_title": "역할 선택",
   "view_all": "모든 역할 보기"
-}
+},
+
+ "private_provider_table": {
+    "name": "이름",
+    "email": "이메일",
+    "phone": "전화번호",
+    "address": "주소",
+    "coordinates": "좌표",
+    "actions": "작업",
+    "edit": "수정",
+    "delete": "삭제",
+    "no_data": "데이터 없음"
+  },
+
+  "private_provider_form": {
+    "title": "개인 공급업체",
+    "subtitle": "시스템에 표시할 기본 정보를 입력하세요.",
+    "section_titles": {
+      "location": "위치"
+    },
+    "labels": {
+      "name": "공급업체 이름",
+      "email": "이메일",
+      "phone": "전화번호",
+      "display_address": "표시 주소",
+      "map_address": "Google 지도 링크 / 주소 설명",
+      "latlng": "위도,경도"
+    },
+    "placeholders": {
+      "name": "공급업체 이름",
+      "email": "이메일",
+      "phone": "전화번호",
+      "display_address": "표시 주소",
+      "map_address": "Google 지도 링크 또는 주소 설명",
+      "latlng": "위도,경도 (예: 16.0613026,108.2110477)"
+    },
+    "helpers": {
+      "map_address_hint": "Google 지도 링크 또는 간단한 설명을 붙여넣으세요.",
+      "latlng_hint": "위도,경도 형식을 사용하세요. 예: 16.0613026,108.2110477."
+    },
+    "errors": {
+      "name_required": "이름을 입력해 주세요.",
+      "phone_required": "전화번호를 입력해 주세요.",
+      "display_address_required": "표시 주소를 입력해 주세요.",
+      "location_required": "유효한 위도,경도(예: 16.0613026,108.2110477)를 입력하거나 위치를 선택해 주세요.",
+      "missing_geopoint": "위치에 유효한 GeoPoint가 필요합니다."
+    },
+    "buttons": {
+      "save": "저장",
+      "cancel": "취소"
+    }
+  },
+
+  "private_provider_search": {
+    "placeholder": "이름, 이메일, 전화번호 또는 주소로 검색..."
+  },
+
+  "private_providers_page": {
+    "title": "개인 차량 대여 관리",
+    "add_new": "새로 추가",
+    "create_title": "개인 차량 대여자 추가",
+    "edit_title": "개인 차량 대여자 수정",
+    "cancel_edit": "수정 취소",
+
+    "messages": {
+      "load_failed": "데이터 로드 실패",
+      "add_success": "성공적으로 추가됨",
+      "update_success": "성공적으로 업데이트됨",
+      "save_failed": "저장 실패",
+      "delete_success": "성공적으로 삭제됨",
+      "delete_failed": "삭제 실패"
+    },
+    "confirm_delete": {
+      "title": "이 제공자를 삭제하시겠습니까?",
+      "description": "이 작업은 되돌릴 수 없습니다."
+    }
+  }
+
 
 
 

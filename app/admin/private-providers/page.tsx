@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Header from "@/src/components/landingpage/Header";
 import Footer from "@/src/components/landingpage/Footer";
 import UserTopMenu from "@/src/components/landingpage/UserTopMenu";
 import NotificationDialog from "@/src/components/ui/NotificationDialog";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/src/components/ui/button"; // dùng Button hệ thống ở top page
 
 import {
   collection,
@@ -139,37 +140,75 @@ export default function PrivateProvidersManagementPage() {
     );
   };
 
+  // ======= Scroll to form when editing =======
+  const formRef = useRef<HTMLDivElement | null>(null);
+  const handleEdit = (p: PrivateProvider) => {
+    setEditingProvider(p);
+    // scroll mượt tới form
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  const startAddNew = () => {
+    setEditingProvider(null);
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
   // ======= Data hiển thị (ưu tiên filtered) =======
   const data = useMemo(() => filtered ?? providers, [filtered, providers]);
 
+  // ======= UI =======
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <UserTopMenu />
 
       <main className="flex-1 px-6 py-10 space-y-10">
-        <h1 className="text-2xl font-bold border-b-2 border-[#00d289] pb-2">
-          {t("private_providers_page.title", "Private Providers Management")}
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold border-b-2 border-[#00d289] pb-2">
+            {t("private_providers_page.title", "Private Providers Management")}
+          </h1>
+          <Button onClick={startAddNew}>
+            {t("private_providers_page.add_new", "Thêm mới")}
+          </Button>
+        </div>
 
         {/* Search */}
         <PrivateProviderSearch providers={providers} onResult={setFiltered} />
 
-        {/* Table */}
+        {/* List (cards mobile, table desktop) */}
         <PrivateProviderTable
           providers={data}
-          onEdit={(p) => setEditingProvider(p)}
+          onEdit={handleEdit}
           onDelete={handleDeleteProvider}
         />
 
-        {/* Form (giống Rentals: form hiển thị phía dưới) */}
-        <div>
+        {/* Form khu vực chỉnh sửa / thêm */}
+        <section ref={formRef} className="scroll-mt-24">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold">
+              {editingProvider
+                ? t("private_providers_page.edit_title", "Chỉnh sửa cá nhân cho thuê xe")
+                : t("private_providers_page.create_title", "Thêm cá nhân cho thuê xe")}
+            </h2>
+            {editingProvider && (
+              <Button variant="outline" onClick={() => setEditingProvider(null)}>
+                {t("private_providers_page.cancel_edit", "Hủy chỉnh sửa")}
+              </Button>
+            )}
+          </div>
+
+          {/* Key giúp reset form khi đổi chế độ add/edit */}
           <PrivateProviderForm
+            key={editingProvider?.id ?? "create"}
             initialData={editingProvider ?? undefined}
             onSubmit={handleSaveProvider}
             onCancel={() => setEditingProvider(null)}
           />
-        </div>
+        </section>
       </main>
 
       <Footer />

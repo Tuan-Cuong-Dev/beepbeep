@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import { Input } from "@/src/components/ui/input";
 import type { PrivateProvider } from "@/src/lib/privateProviders/privateProviderTypes";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   providers: PrivateProvider[];
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function PrivateProviderSearch({ providers, onResult }: Props) {
+  const { t } = useTranslation("common");
   const [term, setTerm] = useState("");
 
   const handleSearch = (value: string) => {
@@ -28,7 +30,7 @@ export default function PrivateProviderSearch({ providers, onResult }: Props) {
 
   return (
     <Input
-      placeholder="Tìm theo tên, email, điện thoại hoặc địa chỉ..."
+      placeholder={t("private_provider_search.placeholder")}
       value={term}
       onChange={(e) => handleSearch(e.target.value)}
       className="max-w-md"

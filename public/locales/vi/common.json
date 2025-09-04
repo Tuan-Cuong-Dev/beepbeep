@@ -4096,7 +4096,84 @@
   "cta_secondary": "Tìm hiểu thêm",
   "roles_title": "Chọn vai trò phù hợp",
   "view_all": "Xem tất cả vai trò"
-}
+},
+
+"private_provider_table": {
+    "name": "Tên",
+    "email": "Email",
+    "phone": "Điện thoại",
+    "address": "Địa chỉ",
+    "coordinates": "Tọa độ",
+    "actions": "Hành động",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "no_data": "Chưa có dữ liệu"
+  },
+
+  "private_provider_form": {
+    "title": "Nhà cung cấp cá nhân",
+    "subtitle": "Điền thông tin cơ bản để hiển thị trong hệ thống.",
+    "section_titles": {
+      "location": "Vị trí"
+    },
+    "labels": {
+      "name": "Tên nhà cung cấp",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "display_address": "Địa chỉ hiển thị",
+      "map_address": "Liên kết Google Maps / Mô tả địa chỉ",
+      "latlng": "Lat,Lng"
+    },
+    "placeholders": {
+      "name": "Tên nhà cung cấp",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "display_address": "Địa chỉ hiển thị",
+      "map_address": "Google Maps link hoặc mô tả địa chỉ",
+      "latlng": "Lat,Lng (vd: 16.0613026,108.2110477)"
+    },
+    "helpers": {
+      "map_address_hint": "Bạn có thể dán link Google Maps hoặc mô tả ngắn.",
+      "latlng_hint": "Nhập đúng định dạng: vĩ độ,kinh độ. Ví dụ 16.0613026,108.2110477."
+    },
+    "errors": {
+      "name_required": "Vui lòng nhập tên.",
+      "phone_required": "Vui lòng nhập số điện thoại.",
+      "display_address_required": "Vui lòng nhập địa chỉ hiển thị.",
+      "location_required": "Nhập tọa độ Lat,Lng hợp lệ (vd: 16.0613026,108.2110477) hoặc chọn geo.",
+      "missing_geopoint": "Thiếu GeoPoint hợp lệ cho vị trí."
+    },
+    "buttons": {
+      "save": "Lưu",
+      "cancel": "Hủy"
+    }
+  },
+
+  "private_provider_search": {
+    "placeholder": "Tìm theo tên, email, điện thoại hoặc địa chỉ..."
+  },
+
+  "private_providers_page": {
+    "title": "Quản lý cá nhân cho thuê xe",
+    "add_new": "Thêm mới",
+    "create_title": "Thêm cá nhân cho thuê xe",
+    "edit_title": "Chỉnh sửa cá nhân cho thuê xe",
+    "cancel_edit": "Hủy chỉnh sửa",
+
+    "messages": {
+      "load_failed": "Tải dữ liệu thất bại",
+      "add_success": "Thêm mới thành công",
+      "update_success": "Cập nhật thành công",
+      "save_failed": "Lưu thất bại",
+      "delete_success": "Xóa thành công",
+      "delete_failed": "Xóa thất bại"
+    },
+    "confirm_delete": {
+      "title": "Xóa nhà cung cấp này?",
+      "description": "Hành động này không thể hoàn tác."
+    }
+  }
+
 
 
 
