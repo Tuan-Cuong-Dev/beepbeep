@@ -1062,7 +1062,7 @@
     "no_results": "Không tìm thấy kết quả. Hãy thử từ khoá khác.",
 
     "technician_partner_mobile": {
-      "title": "Kỹ thuật viên độc lập",
+      "title": "Kỹ thuật viên lưu động",
       "description": "Kỹ thuật viên di động cung cấp sửa chữa tận nơi."
     },
     "technician_partner_shop": {
@@ -4179,7 +4179,7 @@
   },
 
   "agent_dashboard": {
-    "title": "Bảng điều khiển Agent",
+    "title": "Bảng điều khiển CTV/ Đại lí",
     "referrals": "Khách hàng giới thiệu",
     "total_commission": "Tổng hoa hồng",
     "paid_commission": "Hoa hồng đã thanh toán",
