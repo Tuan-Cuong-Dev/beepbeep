@@ -3704,19 +3704,30 @@
   "note_geopoint_will_be_set_on_submit": "Lưu ý: GeoPoint sẽ được tạo khi gửi dựa trên chuỗi tọa độ."
 },
 
+"user_search": {
+"placeholder": "Tìm theo tên, email, điện thoại, vai trò, địa chỉ, ID…",
+"all_roles": "Tất cả vai trò"
+},
+
 "roles": {
-  "customer": "Khách hàng — Người dùng cuối",
-  "staff": "Nhân viên — Nhân viên trạm",
-  "agent": "Đại lý — Đối tác liên kết",
-  "station_manager": "Quản lý trạm",
-  "company_owner": "Chủ công ty",
-  "technician": "Kỹ thuật viên",
-  "technician_partner": "Đối tác kỹ thuật",
-  "technician_assistant": "Trợ lý kỹ thuật",
-  "private_provider": "Nhà cung cấp cá nhân",
-  "investor": "Nhà đầu tư",
-  "admin": "Quản trị — Toàn quyền truy cập",
-  "other": "Khác"
+"admin": "Quản trị viên",
+"company_owner": "Chủ công ty",
+"station_manager": "Quản lý trạm",
+"staff": "Nhân viên",
+"agent": "Cộng tác viên",
+"technician": "Kỹ thuật viên",
+"technician_partner": "Đối tác kỹ thuật",
+"technician_assistant": "Trợ lý kỹ thuật",
+"private_provider": "Đơn vị cho thuê cá nhân",
+"investor": "Nhà đầu tư",
+"Customer": "Khách hàng",
+"city_driver": "Tài xế nội thành",
+"intercity_driver": "Tài xế liên tỉnh",
+"delivery_partner": "Đối tác giao hàng",
+"intercity_bus": "Xe buýt liên tỉnh",
+"vehicle_transport": "Vận tải xe",
+"tour_guide": "Hướng dẫn viên",
+"other": "Khác"
 },
 
 "user_table": {
@@ -3762,6 +3773,7 @@
   "total": "Tổng số người dùng",
   "by_business_type": "Theo loại hình doanh nghiệp"
 },
+
 "business_types": {
   "rental_company": "Công ty cho thuê xe",
   "private_provider": "Nhà cung cấp xe cá nhân",
@@ -3769,7 +3781,10 @@
   "technician_partner": "Đối tác kỹ thuật",
   "intercity_bus": "Công ty xe buýt liên tỉnh",
   "vehicle_transport": "Đơn vị vận tải xe",
-  "tour_guide": "Hướng dẫn viên du lịch"
+  "tour_guide": "Hướng dẫn viên du lịch",
+  "city_driver": "Tài xế nội thành",
+  "intercity_driver": "Tài xế liên tỉnh",
+  "delivery_partner": "Đối tác giao hàng"
 },
 
 "user_page": {

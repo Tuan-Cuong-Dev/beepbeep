@@ -3620,20 +3620,31 @@
     "note_geopoint_will_be_set_on_submit": "Note: GeoPoint will be set during submit based on the location string."
   },
 
-  "roles": {
-    "customer": "Customer — End-user",
-    "staff": "Staff — Station employee",
-    "agent": "Agent — Affiliate partner",
-    "station_manager": "Station Manager",
-    "company_owner": "Company Owner",
-    "technician": "Technician",
-    "technician_partner": "Technician Partner",
-    "technician_assistant": "Technician Assistant",
-    "private_provider": "Private Provider",
-    "investor": "Investor",
-    "admin": "Admin — Full access",
-    "other": "Other"
-  },
+"user_search": {
+  "placeholder": "Search by name, email, phone, role, address, ID…",
+  "all_roles": "All roles"
+},
+
+"roles": {
+  "admin": "Admin",
+  "company_owner": "Company Owner",
+  "station_manager": "Station Manager",
+  "staff": "Staff",
+  "agent": "Agent",
+  "technician": "Technician",
+  "technician_partner": "Technician Partner",
+  "technician_assistant": "Technician Assistant",
+  "private_provider": "Private Provider",
+  "investor": "Investor",
+  "customer": "Customer",
+  "city_driver": "City Driver",
+  "intercity_driver": "Intercity Driver",
+  "delivery_partner": "Delivery Partner",
+  "intercity_bus": "Intercity Bus",
+  "vehicle_transport": "Vehicle Transport",
+  "tour_guide": "Tour Guide",
+  "other": "Other"
+},
   
    "user_table": {
     "empty": "No users found.",
@@ -3678,15 +3689,18 @@
     "total": "Total Users",
     "by_business_type": "By Business Type"
   },
-  "business_types": {
-    "rental_company": "Rental Company",
-    "private_provider": "Private Vehicle Provider",
-    "agent": "Agent",
-    "technician_partner": "Technician Partner",
-    "intercity_bus": "Intercity Bus Company",
-    "vehicle_transport": "Vehicle Transporter",
-    "tour_guide": "Tour Guide"
-  },
+"business_types": {
+  "rental_company": "Rental Company",
+  "private_provider": "Private Vehicle Provider",
+  "agent": "Agent / Partner",
+  "technician_partner": "Technician Partner",
+  "intercity_bus": "Intercity Bus Company",
+  "vehicle_transport": "Vehicle Transport Company",
+  "tour_guide": "Tour Guide",
+  "city_driver": "City Driver",
+  "intercity_driver": "Intercity Driver",
+  "delivery_partner": "Delivery Partner"
+},
 
   "user_page": {
     "title": "Users Management"

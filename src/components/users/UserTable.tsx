@@ -1,10 +1,23 @@
 'use client';
 
 import { useMemo } from 'react';
-import { User } from '@/src/lib/users/userTypes';
+import type { User } from '@/src/lib/users/userTypes';
 import { Button } from '@/src/components/ui/button';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
+
+// Keep in sync with UserForm & UserSummaryCard
+ type BusinessType =
+  | 'rental_company'
+  | 'private_provider'
+  | 'agent'
+  | 'technician_partner'
+  | 'city_driver'
+  | 'intercity_driver'
+  | 'delivery_partner'
+  | 'intercity_bus'
+  | 'vehicle_transport'
+  | 'tour_guide';
 
 interface Props {
   users: User[];
@@ -12,7 +25,7 @@ interface Props {
   onDelete: (uid: string) => void;
 }
 
-function RoleBadge({ label }: { label: string }) {
+function Badge({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
       {label}
@@ -33,28 +46,53 @@ function formatAddress(u: User): string {
 export default function UserTable({ users, onEdit, onDelete }: Props) {
   const { t } = useTranslation('common');
 
-  // Wrapper i18n an toàn
+  // safe i18n wrapper
   const td = (key: string, def?: string) => (def ? t(key, { defaultValue: def }) : t(key));
 
-  // ⬇️ CẬP NHẬT ROLE: thêm technician_assistant, dùng private_provider
+  // ===== Role labels (extended) =====
   const roleLabel = useMemo(
-  () => ({
-    Customer: t('roles.customer'),
-    staff: t('roles.staff'),
-    agent: t('roles.agent'),
-    station_manager: t('roles.station_manager'),
-    company_owner: t('roles.company_owner'),
-    technician: t('roles.technician'),
-    technician_partner: t('roles.technician_partner'),
-    technician_assistant: t('roles.technician_assistant'),
-    private_provider: t('roles.private_provider'),
-    investor: t('roles.investor'),
-    admin: t('roles.admin'),
-    other: t('roles.other'),
-  }),
-  [t],
-);
+    () => ({
+      Customer: t('roles.Customer'),
+      staff: t('roles.staff'),
+      agent: t('roles.agent'),
+      station_manager: t('roles.station_manager'),
+      company_owner: t('roles.company_owner'),
+      technician: t('roles.technician'),
+      technician_partner: t('roles.technician_partner'),
+      technician_assistant: t('roles.technician_assistant'),
+      private_provider: t('roles.private_provider'),
+      city_driver: t('roles.city_driver'),
+      intercity_driver: t('roles.intercity_driver'),
+      delivery_partner: t('roles.delivery_partner'),
+      intercity_bus: t('roles.intercity_bus'),
+      vehicle_transport: t('roles.vehicle_transport'),
+      tour_guide: t('roles.tour_guide'),
+      investor: t('roles.investor'),
+      admin: t('roles.admin'),
+      other: t('roles.other'),
+    }),
+    [t],
+  );
   const getRoleText = (role: string) => roleLabel[role as keyof typeof roleLabel] ?? role;
+
+  // ===== Business type labels =====
+  const businessTypeLabel = useMemo(
+    () => ({
+      rental_company: td('business_types.rental_company', 'Rental Company'),
+      private_provider: td('business_types.private_provider', 'Private Vehicle Provider'),
+      agent: td('business_types.agent', 'Agent'),
+      technician_partner: td('business_types.technician_partner', 'Technician Partner'),
+      city_driver: td('business_types.city_driver', 'City Driver'),
+      intercity_driver: td('business_types.intercity_driver', 'Intercity Driver'),
+      delivery_partner: td('business_types.delivery_partner', 'Delivery Partner'),
+      intercity_bus: td('business_types.intercity_bus', 'Intercity Bus Company'),
+      vehicle_transport: td('business_types.vehicle_transport', 'Vehicle Transporter'),
+      tour_guide: td('business_types.tour_guide', 'Tour Guide'),
+    }),
+    [t],
+  );
+  const getBusinessTypeText = (bt?: string) =>
+    (bt ? businessTypeLabel[bt as BusinessType] : '') ?? (bt || '');
 
   const formatPrefs = (u: User) => {
     const p = u.preferences;
@@ -67,10 +105,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
     const pts = u.contributionPoints ?? 0;
     const lvl = u.contributionLevel ?? 0;
     const total = u.totalContributions ?? 0;
-    return `${td('user_table.points', 'Pts')}: ${pts} • ${td('user_table.level', 'Lvl')}: ${lvl} • ${td(
-      'user_table.total',
-      'Total',
-    )}: ${total}`;
+    return `${td('user_table.points', 'Pts')}: ${pts} • ${td('user_table.level', 'Lvl')}: ${lvl} • ${td('user_table.total', 'Total')}: ${total}`;
   };
 
   const formatReferral = (u: User) => {
@@ -78,10 +113,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
     const by = u.referredBy || '-';
     const pts = u.referralPoints ?? 0;
     const tot = u.totalReferrals ?? 0;
-    return `${td('user_table.code', 'Code')}: ${code} • ${td('user_table.by', 'By')}: ${by} • ${td(
-      'user_table.points',
-      'Pts',
-    )}: ${pts} • ${td('user_table.total', 'Total')}: ${tot}`;
+    return `${td('user_table.code', 'Code')}: ${code} • ${td('user_table.by', 'By')}: ${by} • ${td('user_table.points', 'Pts')}: ${pts} • ${td('user_table.total', 'Total')}: ${tot}`;
   };
 
   const formatLastLoc = (u: User) => {
@@ -110,6 +142,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
           const referral = formatReferral(u);
           const lastLoc = formatLastLoc(u);
           const roleText = getRoleText(u.role);
+          const btText = getBusinessTypeText((u as any).businessType);
 
           return (
             <div key={u.uid} className="rounded-xl border bg-white p-4 shadow-sm">
@@ -126,8 +159,9 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
                 <div className="min-w-0">
                   <div className="truncate font-semibold">{u.name}</div>
                   <div className="truncate text-sm text-gray-600">{u.email}</div>
-                  <div className="mt-1">
-                    <RoleBadge label={roleText} />
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    <Badge label={roleText} />
+                    {btText && <Badge label={btText} />}
                   </div>
                 </div>
               </div>
@@ -157,9 +191,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
 
                 {(u.idNumber || u.gender || u.dateOfBirth) && (
                   <div className="pt-1">
-                    <p className="text-xs font-semibold text-gray-500">
-                      {t('user_table.extra_info', 'Extra info')}
-                    </p>
+                    <p className="text-xs font-semibold text-gray-500">{t('user_table.extra_info', 'Extra info')}</p>
                     {u.idNumber && (
                       <p>
                         <b>{t('user_table.id_number', 'ID Number')}:</b> {u.idNumber}
@@ -190,10 +222,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
                   </p>
                 )}
 
-                {(u.referralCode ||
-                  u.referredBy ||
-                  (u.referralPoints ?? 0) > 0 ||
-                  (u.totalReferrals ?? 0) > 0) && (
+                {(u.referralCode || u.referredBy || (u.referralPoints ?? 0) > 0 || (u.totalReferrals ?? 0) > 0) && (
                   <p>
                     <b>{t('user_table.referral', 'Referral')}:</b> {referral}
                   </p>
@@ -207,13 +236,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
 
                 {u.coverURL && (
                   <div className="mt-2 overflow-hidden rounded-lg border">
-                    <Image
-                      src={u.coverURL}
-                      alt="Cover"
-                      width={640}
-                      height={160}
-                      className="h-24 w-full object-cover"
-                    />
+                    <Image src={u.coverURL} alt="Cover" width={640} height={160} className="h-24 w-full object-cover" />
                   </div>
                 )}
               </div>
@@ -233,7 +256,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
 
       {/* Desktop Table View */}
       <div className="hidden overflow-x-auto rounded bg-white p-4 shadow md:block">
-        <table className="min-w-[1200px] text-sm">
+        <table className="min-w-[1400px] text-sm">
           <thead className="text-left">
             <tr className="bg-gray-100">
               <th className="px-3 py-2">{td('user_table.col_photo', 'Photo')}</th>
@@ -243,6 +266,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
               <th className="px-3 py-2">{td('user_table.col_email', 'Email')}</th>
               <th className="px-3 py-2">{td('user_table.col_phone', 'Phone')}</th>
               <th className="px-3 py-2">{td('user_table.col_role', 'Role')}</th>
+              <th className="px-3 py-2">{td('user_table.col_business_type', 'Business Type')}</th>
               <th className="px-3 py-2">{td('user_table.col_home_airport', 'Home Airport')}</th>
               <th className="px-3 py-2">{td('user_table.col_address', 'Profile Address')}</th>
               <th className="px-3 py-2">{td('user_table.col_id_number', 'ID Number')}</th>
@@ -264,6 +288,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
               const referral = formatReferral(u);
               const lastLoc = formatLastLoc(u);
               const roleText = getRoleText(u.role);
+              const btText = getBusinessTypeText((u as any).businessType);
 
               return (
                 <tr key={u.uid} className="border-t align-top hover:bg-gray-50">
@@ -282,8 +307,9 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
                   <td className="px-3 py-2">{u.email}</td>
                   <td className="px-3 py-2">{u.phone || '—'}</td>
                   <td className="px-3 py-2">
-                    <RoleBadge label={roleText} />
+                    <Badge label={roleText} />
                   </td>
+                  <td className="px-3 py-2">{btText ? <Badge label={btText} /> : '—'}</td>
                   <td className="px-3 py-2">{u.homeAirport || '—'}</td>
                   <td className="px-3 py-2 max-w-[260px] truncate" title={addr}>
                     {addr || '—'}
@@ -305,13 +331,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
                   </td>
                   <td className="px-3 py-2">
                     {u.coverURL ? (
-                      <Image
-                        src={u.coverURL}
-                        alt="Cover"
-                        width={80}
-                        height={28}
-                        className="h-10 w-20 rounded object-cover"
-                      />
+                      <Image src={u.coverURL} alt="Cover" width={80} height={28} className="h-10 w-20 rounded object-cover" />
                     ) : (
                       '—'
                     )}
@@ -321,11 +341,7 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
                       <Button size="sm" onClick={() => onEdit(u)}>
                         {td('actions.edit', 'Edit')}
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => onDelete(u.uid)}
-                      >
+                      <Button size="sm" variant="destructive" onClick={() => onDelete(u.uid)}>
                         {td('actions.delete', 'Delete')}
                       </Button>
                     </div>

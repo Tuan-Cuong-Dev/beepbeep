@@ -3,32 +3,38 @@
 import { useEffect } from 'react';
 import type { User } from '@/src/lib/users/userTypes';
 import type { AddressCore } from '@/src/lib/locations/addressTypes';
-import type { UserLocation } from '@/src/lib/locations/locationTypes'; // 👈 dùng UserLocation (geo?: GeoPoint)
+import type { UserLocation } from '@/src/lib/locations/locationTypes';
 import { useTranslation } from 'react-i18next';
 
+// Align BusinessType with summary & search components
+type BusinessType =
+  | 'rental_company'
+  | 'private_provider'
+  | 'agent'
+  | 'technician_partner'
+  | 'city_driver'
+  | 'intercity_driver'
+  | 'delivery_partner'
+  | 'intercity_bus'
+  | 'vehicle_transport'
+  | 'tour_guide';
+
 interface Props {
-  user: Partial<User>;
-  setUser: (user: Partial<User>) => void;
+  user: Partial<User> & { businessType?: BusinessType };
+  setUser: (user: Partial<User> & { businessType?: BusinessType }) => void;
   editingUser: User | null;
   setEditingUser: (user: User | null) => void;
   onSubmit: () => Promise<void>;
 }
 
-export default function UserForm({
-  user,
-  setUser,
-  editingUser,
-  setEditingUser,
-  onSubmit,
-}: Props) {
+export default function UserForm({ user, setUser, editingUser, setEditingUser, onSubmit }: Props) {
   const { t } = useTranslation('common');
 
-  // Khi click edit từ bảng -> đổ dữ liệu vào form
+  // Autofill when editing from table
   useEffect(() => {
     if (editingUser) {
       setUser({
         ...editingUser,
-        // đảm bảo luôn có object profileAddress để binding input không lỗi
         profileAddress: editingUser.profileAddress ?? {
           line1: '',
           line2: '',
@@ -38,13 +44,11 @@ export default function UserForm({
           countryCode: '',
           formatted: '',
         },
-        // đảm bảo có preferences rỗng để bind
         preferences: editingUser.preferences ?? {
           language: '',
           region: '',
           currency: '',
         },
-        // đảm bảo có khung lastKnownLocation để bind chuỗi/location (không set geo ở form)
         lastKnownLocation: (editingUser.lastKnownLocation ?? {
           location: '',
           mapAddress: '',
@@ -54,47 +58,28 @@ export default function UserForm({
     }
   }, [editingUser, setUser]);
 
-  // Helper cập nhật địa chỉ hồ sơ (AddressCore)
-  const setProfileAddr = <K extends keyof AddressCore>(
-    field: K,
-    value: AddressCore[K],
-  ) => {
+  // Helpers
+  const setProfileAddr = <K extends keyof AddressCore>(field: K, value: AddressCore[K]) => {
     const current = user ?? {};
     const pa = (current.profileAddress ?? {}) as AddressCore;
-    setUser({
-      ...current,
-      profileAddress: { ...pa, [field]: value },
-    });
+    setUser({ ...current, profileAddress: { ...pa, [field]: value } });
   };
 
-  // Helper cập nhật preferences
   const setPref = <K extends keyof NonNullable<User['preferences']>>(
     field: K,
     value: NonNullable<User['preferences']>[K],
   ) => {
     const current = user ?? {};
-    const pref = (current.preferences ?? {
-      language: '',
-      region: '',
-      currency: '',
-    }) as NonNullable<User['preferences']>;
-    setUser({
-      ...current,
-      preferences: { ...pref, [field]: value },
-    });
+    const pref = (current.preferences ?? { language: '', region: '', currency: '' }) as NonNullable<
+      User['preferences']
+    >;
+    setUser({ ...current, preferences: { ...pref, [field]: value } });
   };
 
-  // Helper cập nhật lastKnownLocation (chỉ các trường chuỗi)
-  const setLastLoc = <K extends keyof UserLocation>(
-    field: K,
-    value: UserLocation[K],
-  ) => {
+  const setLastLoc = <K extends keyof UserLocation>(field: K, value: UserLocation[K]) => {
     const current = user ?? {};
     const loc = (current.lastKnownLocation ?? {}) as UserLocation;
-    setUser({
-      ...current,
-      lastKnownLocation: { ...loc, [field]: value },
-    });
+    setUser({ ...current, lastKnownLocation: { ...loc, [field]: value } });
   };
 
   return (
@@ -103,12 +88,10 @@ export default function UserForm({
         <h2 className="text-xl font-semibold">
           {editingUser ? t('user_form.update_user') : t('user_form.add_user')}
         </h2>
-        {editingUser && (
-          <span className="text-xs text-gray-500">UID: {editingUser.uid}</span>
-        )}
+        {editingUser && <span className="text-xs text-gray-500">UID: {editingUser.uid}</span>}
       </div>
 
-      {/* Thông tin cơ bản */}
+      {/* Basic info */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <input
           type="text"
@@ -171,12 +154,38 @@ export default function UserForm({
           <option value="company_owner">{t('roles.company_owner')}</option>
           <option value="technician">{t('roles.technician')}</option>
           <option value="technician_partner">{t('roles.technician_partner')}</option>
-          <option value="private_owner">{t('roles.private_owner')}</option>
+          <option value="technician_assistant">{t('roles.technician_assistant')}</option>
+          <option value="private_provider">{t('roles.private_provider')}</option>
+          <option value="city_driver">{t('roles.city_driver')}</option>
+          <option value="intercity_driver">{t('roles.intercity_driver')}</option>
+          <option value="delivery_partner">{t('roles.delivery_partner')}</option>
+          <option value="intercity_bus">{t('roles.intercity_bus')}</option>
+          <option value="vehicle_transport">{t('roles.vehicle_transport')}</option>
+          <option value="tour_guide">{t('roles.tour_guide')}</option>
           <option value="investor">{t('roles.investor')}</option>
           <option value="admin">{t('roles.admin')}</option>
         </select>
 
-        {/* Company (tùy vai trò) */}
+        {/* Business Type */}
+        <select
+          value={(user as any).businessType ?? ''}
+          onChange={(e) => setUser({ ...user, businessType: e.target.value as BusinessType })}
+          className="w-full rounded border p-2"
+        >
+          <option value="">{t('business_types.placeholder', 'Business type (optional)')}</option>
+          <option value="rental_company">{t('business_types.rental_company', 'Rental Company')}</option>
+          <option value="private_provider">{t('business_types.private_provider', 'Private Vehicle Provider')}</option>
+          <option value="agent">{t('business_types.agent', 'Agent')}</option>
+          <option value="technician_partner">{t('business_types.technician_partner', 'Technician Partner')}</option>
+          <option value="city_driver">{t('business_types.city_driver', 'City Driver')}</option>
+          <option value="intercity_driver">{t('business_types.intercity_driver', 'Intercity Driver')}</option>
+          <option value="delivery_partner">{t('business_types.delivery_partner', 'Delivery Partner')}</option>
+          <option value="intercity_bus">{t('business_types.intercity_bus', 'Intercity Bus Company')}</option>
+          <option value="vehicle_transport">{t('business_types.vehicle_transport', 'Vehicle Transporter')}</option>
+          <option value="tour_guide">{t('business_types.tour_guide', 'Tour Guide')}</option>
+        </select>
+
+        {/* Company (optional / role-based) */}
         <input
           type="text"
           placeholder={t('user_form.company_id_optional')}
@@ -195,11 +204,9 @@ export default function UserForm({
         />
       </div>
 
-      {/* Địa chỉ hồ sơ (AddressCore) */}
+      {/* Profile Address (AddressCore) */}
       <div className="mt-6 rounded-lg border bg-gray-50 p-4">
-        <p className="mb-3 text-sm font-medium text-gray-700">
-          {t('user_form.profile_address_section')}
-        </p>
+        <p className="mb-3 text-sm font-medium text-gray-700">{t('user_form.profile_address_section')}</p>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <input
             type="text"
@@ -245,9 +252,7 @@ export default function UserForm({
             type="text"
             placeholder={t('address.country_code')}
             value={user.profileAddress?.countryCode ?? ''}
-            onChange={(e) =>
-              setProfileAddr('countryCode', e.target.value.toUpperCase())
-            }
+            onChange={(e) => setProfileAddr('countryCode', e.target.value.toUpperCase())}
             className="w-full rounded border p-2"
           />
           <input
@@ -260,11 +265,9 @@ export default function UserForm({
         </div>
       </div>
 
-      {/* Thông tin mở rộng */}
+      {/* Extra info */}
       <div className="mt-6 rounded-lg border bg-gray-50 p-4">
-        <p className="mb-3 text-sm font-medium text-gray-700">
-          {t('user_form.extra_info_section')}
-        </p>
+        <p className="mb-3 text-sm font-medium text-gray-700">{t('user_form.extra_info_section')}</p>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <input
             type="text"
@@ -275,9 +278,7 @@ export default function UserForm({
           />
           <select
             value={user.gender ?? ''}
-            onChange={(e) =>
-              setUser({ ...user, gender: e.target.value as User['gender'] })
-            }
+            onChange={(e) => setUser({ ...user, gender: e.target.value as User['gender'] })}
             className="w-full rounded border p-2"
           >
             <option value="">{t('user_form.gender_placeholder')}</option>
@@ -304,9 +305,7 @@ export default function UserForm({
 
       {/* Preferences */}
       <div className="mt-6 rounded-lg border bg-gray-50 p-4">
-        <p className="mb-3 text-sm font-medium text-gray-700">
-          {t('user_form.preferences_section')}
-        </p>
+        <p className="mb-3 text-sm font-medium text-gray-700">{t('user_form.preferences_section')}</p>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <input
             type="text"
@@ -332,20 +331,16 @@ export default function UserForm({
         </div>
       </div>
 
-      {/* Đóng góp & Referral */}
+      {/* Contribution & Referral */}
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-lg border bg-gray-50 p-4">
-          <p className="mb-3 text-sm font-medium text-gray-700">
-            {t('user_form.contribution_section')}
-          </p>
+          <p className="mb-3 text-sm font-medium text-gray-700">{t('user_form.contribution_section')}</p>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <input
               type="number"
               placeholder={t('user_form.contribution_points')}
               value={user.contributionPoints ?? 0}
-              onChange={(e) =>
-                setUser({ ...user, contributionPoints: Number(e.target.value) })
-              }
+              onChange={(e) => setUser({ ...user, contributionPoints: Number(e.target.value) })}
               className="w-full rounded border p-2"
             />
             <input
@@ -364,18 +359,14 @@ export default function UserForm({
               type="number"
               placeholder={t('user_form.total_contributions')}
               value={user.totalContributions ?? 0}
-              onChange={(e) =>
-                setUser({ ...user, totalContributions: Number(e.target.value) })
-              }
+              onChange={(e) => setUser({ ...user, totalContributions: Number(e.target.value) })}
               className="w-full rounded border p-2"
             />
           </div>
         </div>
 
         <div className="rounded-lg border bg-gray-50 p-4">
-          <p className="mb-3 text-sm font-medium text-gray-700">
-            {t('user_form.referral_section')}
-          </p>
+          <p className="mb-3 text-sm font-medium text-gray-700">{t('user_form.referral_section')}</p>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <input
               type="text"
@@ -395,33 +386,27 @@ export default function UserForm({
               type="number"
               placeholder={t('user_form.referral_points')}
               value={user.referralPoints ?? 0}
-              onChange={(e) =>
-                setUser({ ...user, referralPoints: Number(e.target.value) })
-              }
+              onChange={(e) => setUser({ ...user, referralPoints: Number(e.target.value) })}
               className="w-full rounded border p-2"
             />
             <input
               type="number"
               placeholder={t('user_form.total_referrals')}
               value={user.totalReferrals ?? 0}
-              onChange={(e) =>
-                setUser({ ...user, totalReferrals: Number(e.target.value) })
-              }
+              onChange={(e) => setUser({ ...user, totalReferrals: Number(e.target.value) })}
               className="w-full rounded border p-2"
             />
           </div>
         </div>
       </div>
 
-      {/* Vị trí gần nhất (nhập chuỗi; GeoPoint xử lý khi submit) */}
+      {/* Last known location (string inputs; GeoPoint set on submit) */}
       <div className="mt-6 rounded-lg border bg-gray-50 p-4">
-        <p className="mb-3 text-sm font-medium text-gray-700">
-          {t('user_form.last_location_section')}
-        </p>
+        <p className="mb-3 text-sm font-medium text-gray-700">{t('user_form.last_location_section')}</p>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <input
             type="text"
-            placeholder={t('location.location_string_example')} // "16.047079,108.206230"
+            placeholder={t('location.location_string_example')}
             value={user.lastKnownLocation?.location ?? ''}
             onChange={(e) => setLastLoc('location', e.target.value)}
             className="w-full rounded border p-2"
@@ -441,9 +426,7 @@ export default function UserForm({
             className="w-full rounded border p-2"
           />
         </div>
-        <p className="mt-2 text-xs text-gray-500">
-          {t('location.note_geopoint_will_be_set_on_submit')}
-        </p>
+        <p className="mt-2 text-xs text-gray-500">{t('location.note_geopoint_will_be_set_on_submit')}</p>
       </div>
 
       {/* Actions */}

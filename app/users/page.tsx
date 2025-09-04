@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import UserTopMenu from '@/src/components/landingpage/UserTopMenu';
@@ -21,11 +21,14 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import UserSummaryCard from '@/src/components/users/UserSummaryCard';
 import type { AddressCore } from '@/src/lib/locations/addressTypes';
 import { useTranslation } from 'react-i18next';
+import UserSearch from '@/src/components/users/UserSearch';
 
 export default function Users() {
   const { t } = useTranslation('common');
 
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+
   const [user, setUser] = useState<Partial<User>>({
     firstName: '',
     lastName: '',
@@ -47,29 +50,18 @@ export default function Users() {
   });
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
+  // ===== Pagination (applies on filtered list) =====
   const USERS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.max(1, Math.ceil(users.length / USERS_PER_PAGE));
-  const paginatedUsers = users.slice(
-    (currentPage - 1) * USERS_PER_PAGE,
-    currentPage * USERS_PER_PAGE
+  const totalPages = Math.max(1, Math.ceil((filteredUsers.length || 0) / USERS_PER_PAGE));
+  const paginatedUsers = useMemo(
+    () =>
+      filteredUsers.slice(
+        (currentPage - 1) * USERS_PER_PAGE,
+        currentPage * USERS_PER_PAGE,
+      ),
+    [filteredUsers, currentPage],
   );
-
-  const [dialog, setDialog] = useState({
-    open: false,
-    title: '',
-    description: '',
-    type: 'info' as 'success' | 'error' | 'info' | 'confirm',
-    onConfirm: undefined as (() => void) | undefined,
-  });
-
-  const notify = (
-    title: string,
-    type: 'success' | 'error' | 'info' | 'confirm' = 'info',
-    onConfirm?: () => void
-  ) => {
-    setDialog({ open: true, title, description: '', type, onConfirm });
-  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -82,9 +74,32 @@ export default function Users() {
         };
       });
       setUsers(list);
+      setFilteredUsers(list); // default filtered = all
+      setCurrentPage(1);
     };
     fetchUsers();
   }, []);
+
+  // Ensure current page stays valid when filter changes
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [totalPages, currentPage]);
+
+  const [dialog, setDialog] = useState({
+    open: false,
+    title: '',
+    description: '',
+    type: 'info' as 'success' | 'error' | 'info' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
+
+  const notify = (
+    title: string,
+    type: 'success' | 'error' | 'info' | 'confirm' = 'info',
+    onConfirm?: () => void,
+  ) => {
+    setDialog({ open: true, title, description: '', type, onConfirm });
+  };
 
   const addOrUpdateUser = async () => {
     const fullName =
@@ -109,8 +124,17 @@ export default function Users() {
           prev.map((u) =>
             u.uid === editingUser.uid
               ? ({ ...u, ...userData, updatedAt: Timestamp.now() } as User)
-              : u
-          )
+              : u,
+          ),
+        );
+
+        // reflect in filtered list, too
+        setFilteredUsers((prev) =>
+          prev.map((u) =>
+            u.uid === editingUser.uid
+              ? ({ ...u, ...userData, updatedAt: Timestamp.now() } as User)
+              : u,
+          ),
         );
 
         notify(t('user_notify.updated', '✅ User updated!'), 'success');
@@ -122,14 +146,17 @@ export default function Users() {
           updatedAt: Timestamp.now(),
         });
 
-        setUsers([
-          ...users,
-          {
-            ...(userData as User),
-            uid: ref.id,
-            createdAt: Timestamp.now(),
-            updatedAt: Timestamp.now(),
-          },
+        const created: User = {
+          ...(userData as User),
+          uid: ref.id,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+        };
+
+        setUsers((prev) => [...prev, created]);
+        setFilteredUsers((prev) => [
+          ...prev,
+          created,
         ]);
 
         notify(t('user_notify.added', '✅ User added!'), 'success');
@@ -165,21 +192,16 @@ export default function Users() {
       open: true,
       type: 'confirm',
       title: t('user_notify.delete_confirm_title', 'Delete user?'),
-      description: t(
-        'user_notify.delete_confirm_desc',
-        'This action cannot be undone.'
-      ),
+      description: t('user_notify.delete_confirm_desc', 'This action cannot be undone.'),
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'users', uid));
-          setUsers(users.filter((u) => u.uid !== uid));
+          setUsers((prev) => prev.filter((u) => u.uid !== uid));
+          setFilteredUsers((prev) => prev.filter((u) => u.uid !== uid));
           notify(t('user_notify.deleted', '🗑️ User deleted.'), 'success');
         } catch (error) {
           console.error('Delete failed:', error);
-          notify(
-            t('user_notify.delete_failed', '❌ Failed to delete user.'),
-            'error'
-          );
+          notify(t('user_notify.delete_failed', '❌ Failed to delete user.'), 'error');
         }
       },
     });
@@ -208,6 +230,12 @@ export default function Users() {
     });
   };
 
+  // ===== Search wiring =====
+  const handleSearchResult = (filtered: User[]) => {
+    setFilteredUsers(filtered);
+    setCurrentPage(1); // reset to first page whenever search changes
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -217,13 +245,19 @@ export default function Users() {
           {t('user_page.title', 'Users Management')}
         </h1>
 
-        <UserSummaryCard users={users} />
+        {/* Search + quick meta */}
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <UserSearch users={users} onResult={handleSearchResult} />
+          <div className="text-sm text-gray-600">
+            {t('user_page.showing', 'Showing')} {paginatedUsers.length} {t('user_page.of', 'of')}{' '}
+            {filteredUsers.length} {t('user_page.filtered_users', 'filtered users')}
+          </div>
+        </div>
 
-        <UserTable
-          users={paginatedUsers}
-          onEdit={handleEditUser}
-          onDelete={deleteUser}
-        />
+        {/* Summary reacts to current filtered list */}
+        <UserSummaryCard users={filteredUsers} />
+
+        <UserTable users={paginatedUsers} onEdit={handleEditUser} onDelete={deleteUser} />
 
         {/* Pagination */}
         <div className="mt-4 flex items-center justify-center gap-4">
@@ -235,14 +269,13 @@ export default function Users() {
                   : 'border-gray-300 text-gray-800 hover:bg-gray-100'
               }`}
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           >
-            {t('pagination.previous', 'previous')}
+            {t('pagination.previous', 'Previous')}
           </button>
 
           <span className="text-sm text-gray-600">
-            {t('pagination.page', 'Page')} {currentPage} {t('pagination.of', 'of')}{' '}
-            {totalPages}
+            {t('pagination.page', 'Page')} {currentPage} {t('pagination.of', 'of')} {totalPages}
           </span>
 
           <button
@@ -253,12 +286,13 @@ export default function Users() {
                   : 'border-gray-300 text-gray-800 hover:bg-gray-100'
               }`}
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
           >
             {t('pagination.next', 'Next')}
           </button>
         </div>
 
+        {/* Form */}
         <UserForm
           user={user}
           setUser={setUser}

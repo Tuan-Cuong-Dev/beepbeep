@@ -3631,18 +3631,29 @@
   "note_geopoint_will_be_set_on_submit": "注意: GeoPointは送信時に位置文字列に基づいて設定されます。"
 },
 
+"user_search": {
+  "placeholder": "名前、メール、電話、役割、住所、IDで検索…",
+  "all_roles": "すべての役割"
+},
+
 "roles": {
-  "customer": "顧客 — エンドユーザー",
-  "staff": "スタッフ — ステーション従業員",
-  "agent": "代理店 — アフィリエイトパートナー",
-  "station_manager": "ステーションマネージャー",
+  "admin": "管理者",
   "company_owner": "会社オーナー",
+  "station_manager": "ステーション管理者",
+  "staff": "スタッフ",
+  "agent": "エージェント",
   "technician": "技術者",
   "technician_partner": "技術パートナー",
-  "technician_assistant": "テクニシャンアシスタント",
+  "technician_assistant": "技術アシスタント",
   "private_provider": "個人提供者",
   "investor": "投資家",
-  "admin": "管理者 — フルアクセス",
+  "customer": "顧客",
+  "city_driver": "市内ドライバー",
+  "intercity_driver": "都市間ドライバー",
+  "delivery_partner": "配送パートナー",
+  "intercity_bus": "都市間バス",
+  "vehicle_transport": "車両輸送",
+  "tour_guide": "ツアーガイド",
   "other": "その他"
 },
 
@@ -3692,11 +3703,14 @@
 "business_types": {
   "rental_company": "レンタル会社",
   "private_provider": "個人車両提供者",
-  "agent": "代理店 / エージェント",
+  "agent": "代理店 / パートナー",
   "technician_partner": "技術パートナー",
   "intercity_bus": "都市間バス会社",
-  "vehicle_transport": "車両輸送業者",
-  "tour_guide": "ツアーガイド"
+  "vehicle_transport": "車両輸送会社",
+  "tour_guide": "ツアーガイド",
+  "city_driver": "市内ドライバー",
+  "intercity_driver": "都市間ドライバー",
+  "delivery_partner": "配送パートナー"
 },
 
 "user_page": {

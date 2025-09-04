@@ -62,12 +62,6 @@ export default function AdminDashboard() {
           route: '/assistant/add-technician-partner',
         },
         {
-          icon: <FaUser className="w-6 h-6 text-[#00d289]" />,
-          title: t('admin_dashboard.users.title'),
-          description: t('admin_dashboard.users.description'),
-          route: '/users',
-        },
-        {
           icon: <FaUserCog className="w-6 h-6 text-[#00d289]" />,
           title: t('admin_dashboard.staff.title'),
           description: t('admin_dashboard.staff.description'),
@@ -78,6 +72,12 @@ export default function AdminDashboard() {
           title: t('admin_dashboard.customers.title'),
           description: t('admin_dashboard.customers.description'),
           route: '/customers',
+        },
+        {
+          icon: <FaUser className="w-6 h-6 text-[#00d289]" />,
+          title: t('admin_dashboard.users.title'),
+          description: t('admin_dashboard.users.description'),
+          route: '/users',
         },
       ],
     },
@@ -246,7 +246,6 @@ export default function AdminDashboard() {
           </section>
         ))}
       </main>
-
       <Footer />
     </div>
   );
