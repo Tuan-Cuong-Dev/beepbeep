@@ -2797,6 +2797,10 @@
     "title": "Private Vehicle Provider",
     "description": "Manage private vehicle rentals"
   },
+  "agents": {
+    "title": "Agents",
+    "description": "Manage agents"
+  },
   "technician_partners": {
     "title": "Technician Partners",
     "description": "Manage external repair partners"
@@ -4089,6 +4093,78 @@
     },
     "confirm_delete": {
       "title": "Delete this provider?",
+      "description": "This action cannot be undone."
+    }
+  },
+
+"agent_dashboard": {
+    "title": "Agent Dashboard",
+    "referrals": "Referrals",
+    "total_commission": "Total Commission",
+    "paid_commission": "Paid Commission",
+    "pending_commission": "Pending Commission",
+    "join_new_program": "Join New Program",
+    "available": "Available",
+    "payment_requests": "Payment Requests",
+    "times": "times",
+    "recent_activity": "Recent Activity",
+    "booking": "Booking",
+    "commission": "Commission",
+    "no_activity": "No activity yet.",
+    "quick_actions": "Quick Actions",
+    "refer_customer": "Refer a Customer",
+    "view_commission_history": "View Commission History",
+    "request_payment": "Request Payment"
+  },
+
+   "agent_form": {
+    "title": "Agent information",
+    "labels": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "display_address": "Display address",
+      "map_address": "Address / Google Maps link",
+      "latlng": "Lat,Lng"
+    },
+    "section_titles": { "location": "Location" },
+    "buttons": { "save": "Save", "cancel": "Cancel" },
+    "errors": {
+      "name_required": "Please enter a name.",
+      "phone_required": "Please enter a phone number.",
+      "display_address_required": "Please enter a display address.",
+      "location_required": "Enter a valid Lat,Lng or pick a point.",
+      "missing_geopoint": "Missing a valid GeoPoint."
+    },
+    "placeholders": { "name": "Agent name" }
+  },
+  "agent_table": {
+    "name": "Name",
+    "phone": "Phone",
+    "address": "Address",
+    "coordinates": "Coordinates",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "no_data": "No data"
+  },
+  "agent_search": { "placeholder": "Search by name, phone, email, address..." },
+  "agents_page": {
+    "title": "Agents management",
+    "add_new": "Add new",
+    "create_title": "Add agent",
+    "edit_title": "Edit agent",
+    "cancel_edit": "Cancel edit",
+    "messages": {
+      "load_failed": "Failed to load data",
+      "add_success": "Added successfully",
+      "update_success": "Updated successfully",
+      "save_failed": "Save failed",
+      "delete_success": "Deleted successfully",
+      "delete_failed": "Delete failed"
+    },
+    "confirm_delete": {
+      "title": "Delete this agent?",
       "description": "This action cannot be undone."
     }
   }

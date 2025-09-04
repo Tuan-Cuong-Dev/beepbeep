@@ -14,6 +14,7 @@ import {
   FileText,
   BarChart2,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ActivityLog {
   bookingId: string;
@@ -30,6 +31,7 @@ interface DashboardData {
 }
 
 export default function AgentDashboard() {
+  const { t } = useTranslation("common");
   const { user } = useUser();
   const [data, setData] = useState<DashboardData>({
     referrals: 0,
@@ -84,43 +86,60 @@ export default function AgentDashboard() {
       <Header />
 
       <main className="flex-1 px-6 py-10 space-y-10">
-        <h1 className="text-3xl font-bold text-center text-gray-800">🤝 Agent Dashboard</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          🤝 {t("agent_dashboard.title")}
+        </h1>
 
         <DashboardGrid>
-          <DashboardCard title="Referrals" value={data.referrals.toString()} href="#" icon={<Users className="w-6 h-6" />} />
-          <DashboardCard title="Total Commission" value={`$${data.totalCommission.toLocaleString()}`} href="#" icon={<DollarSign className="w-6 h-6" />} />
-          <DashboardCard title="Paid Commission" value={`$${data.paidCommission.toLocaleString()}`} href="#" icon={<DollarSign className="w-6 h-6" />} />
-          <DashboardCard title="Pending Commission" value={`$${data.pendingCommission.toLocaleString()}`} href="#" icon={<DollarSign className="w-6 h-6" />} />
-          <DashboardCard title="Join New Program" value="Available" href="/dashboard/programs" icon={<Handshake className="w-6 h-6" />} />
-          <DashboardCard title="Payment Requests" value={`${data.paymentRequests} times`} href="/dashboard/earnings" icon={<BarChart2 className="w-6 h-6" />} />
+          <DashboardCard
+            title={t("agent_dashboard.referrals")}
+            value={data.referrals.toString()}
+            href="#"
+            icon={<Users className="w-6 h-6" />}
+          />
+          <DashboardCard
+            title={t("agent_dashboard.total_commission")}
+            value={`$${data.totalCommission.toLocaleString()}`}
+            href="#"
+            icon={<DollarSign className="w-6 h-6" />}
+          />
+          <DashboardCard
+            title={t("agent_dashboard.paid_commission")}
+            value={`$${data.paidCommission.toLocaleString()}`}
+            href="#"
+            icon={<DollarSign className="w-6 h-6" />}
+          />
+          <DashboardCard
+            title={t("agent_dashboard.pending_commission")}
+            value={`$${data.pendingCommission.toLocaleString()}`}
+            href="#"
+            icon={<DollarSign className="w-6 h-6" />}
+          />
+          <DashboardCard
+            title={t("agent_dashboard.join_new_program")}
+            value={t("agent_dashboard.available")}
+            href="/dashboard/programs"
+            icon={<Handshake className="w-6 h-6" />}
+          />
+          <DashboardCard
+            title={t("agent_dashboard.payment_requests")}
+            value={`${data.paymentRequests} ${t("agent_dashboard.times")}`}
+            href="/dashboard/earnings"
+            icon={<BarChart2 className="w-6 h-6" />}
+          />
         </DashboardGrid>
 
-        <section className="bg-white rounded-2xl p-6 border shadow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 Recent Activity</h2>
-          <ul className="text-sm text-gray-700 space-y-2">
-            {data.activity.length > 0 ? (
-              data.activity.map((log, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <FileText className="mt-0.5" />
-                  <Link href={`/bookings/${log.bookingId}`} className="text-blue-500 underline">
-                    Booking {log.bookingId}
-                  </Link>
-                  <span>- Commission ${log.commission.toLocaleString()}</span>
-                </li>
-              ))
-            ) : (
-              <p className="text-gray-500">No activity yet.</p>
-            )}
-          </ul>
-        </section>
-
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            ⚡ {t("agent_dashboard.quick_actions")}
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <QuickAction label="Refer a Customer" href="/rent" />
-            <QuickAction label="View Commission History" href="/dashboard/earnings" />
-            <QuickAction label="Join New Program" href="/dashboard/programs" />
-            {data.pendingCommission > 0 && <QuickAction label="Request Payment" href="/dashboard/request-payment" />}
+            <QuickAction label={t("agent_dashboard.refer_customer")} href="#" />
+            <QuickAction label={t("agent_dashboard.view_commission_history")} href="/dashboard/earnings" />
+            <QuickAction label={t("agent_dashboard.join_new_program")} href="/dashboard/programs" />
+            {data.pendingCommission > 0 && (
+              <QuickAction label={t("agent_dashboard.request_payment")} href="/dashboard/request-payment" />
+            )}
           </div>
         </section>
       </main>
@@ -134,9 +153,22 @@ function DashboardGrid({ children }: { children: React.ReactNode }) {
   return <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">{children}</section>;
 }
 
-function DashboardCard({ title, value, href, icon }: { title: string; value: string; href: string; icon: JSX.Element }) {
+function DashboardCard({
+  title,
+  value,
+  href,
+  icon,
+}: {
+  title: string;
+  value: string;
+  href: string;
+  icon: JSX.Element;
+}) {
   return (
-    <Link href={href} className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition border border-gray-200 flex items-center gap-4">
+    <Link
+      href={href}
+      className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition border border-gray-200 flex items-center gap-4"
+    >
       <div className="text-[#00d289] bg-[#e6fff5] rounded-full p-3 flex items-center justify-center w-10 h-10">
         {icon}
       </div>
@@ -150,7 +182,10 @@ function DashboardCard({ title, value, href, icon }: { title: string; value: str
 
 function QuickAction({ label, href }: { label: string; href: string }) {
   return (
-    <Link href={href} className="block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition">
+    <Link
+      href={href}
+      className="block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition"
+    >
       {label}
     </Link>
   );

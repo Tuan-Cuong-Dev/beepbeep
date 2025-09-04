@@ -2824,6 +2824,10 @@
     "title": "Cá nhân cho thuê xe",
     "description": "Quản lý cho thuê xe cá nhân"
   },
+  "agents": {
+    "title": "Cộng tác viên",
+    "description": "Quản lý công tác viên"
+  },
   "technician_partners": {
     "title": "Đối tác kỹ thuật",
     "description": "Quản lý đối tác sửa chữa bên ngoài"
@@ -4170,6 +4174,78 @@
     },
     "confirm_delete": {
       "title": "Xóa nhà cung cấp này?",
+      "description": "Hành động này không thể hoàn tác."
+    }
+  },
+
+  "agent_dashboard": {
+    "title": "Bảng điều khiển Agent",
+    "referrals": "Khách hàng giới thiệu",
+    "total_commission": "Tổng hoa hồng",
+    "paid_commission": "Hoa hồng đã thanh toán",
+    "pending_commission": "Hoa hồng đang chờ",
+    "join_new_program": "Tham gia chương trình mới",
+    "available": "Có sẵn",
+    "payment_requests": "Yêu cầu thanh toán",
+    "times": "lần",
+    "recent_activity": "Hoạt động gần đây",
+    "booking": "Đơn thuê",
+    "commission": "Hoa hồng",
+    "no_activity": "Chưa có hoạt động.",
+    "quick_actions": "Thao tác nhanh",
+    "refer_customer": "Giới thiệu khách hàng",
+    "view_commission_history": "Xem lịch sử hoa hồng",
+    "request_payment": "Yêu cầu thanh toán"
+  },
+  
+  "agent_form": {
+    "title": "Thông tin đại lý",
+    "labels": {
+      "name": "Tên",
+      "email": "Email",
+      "phone": "Điện thoại",
+      "display_address": "Địa chỉ hiển thị",
+      "map_address": "Địa chỉ/Google Maps link",
+      "latlng": "Lat,Lng"
+    },
+    "section_titles": { "location": "Vị trí" },
+    "buttons": { "save": "Lưu", "cancel": "Hủy" },
+    "errors": {
+      "name_required": "Vui lòng nhập tên.",
+      "phone_required": "Vui lòng nhập số điện thoại.",
+      "display_address_required": "Vui lòng nhập địa chỉ hiển thị.",
+      "location_required": "Nhập Lat,Lng hợp lệ hoặc chọn điểm.",
+      "missing_geopoint": "Thiếu GeoPoint hợp lệ."
+    },
+    "placeholders": { "name": "Tên đại lý" }
+  },
+  "agent_table": {
+    "name": "Tên",
+    "phone": "Điện thoại",
+    "address": "Địa chỉ",
+    "coordinates": "Tọa độ",
+    "actions": "Hành động",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "no_data": "Không có dữ liệu"
+  },
+  "agent_search": { "placeholder": "Tìm theo tên, sđt, email, địa chỉ..." },
+  "agents_page": {
+    "title": "Quản lý đại lý",
+    "add_new": "Thêm mới",
+    "create_title": "Thêm đại lý",
+    "edit_title": "Chỉnh sửa đại lý",
+    "cancel_edit": "Hủy chỉnh sửa",
+    "messages": {
+      "load_failed": "Tải dữ liệu thất bại",
+      "add_success": "Thêm mới thành công",
+      "update_success": "Cập nhật thành công",
+      "save_failed": "Lưu thất bại",
+      "delete_success": "Xóa thành công",
+      "delete_failed": "Xóa thất bại"
+    },
+    "confirm_delete": {
+      "title": "Xóa đại lý này?",
       "description": "Hành động này không thể hoàn tác."
     }
   }

@@ -2756,6 +2756,10 @@
     "title": "個人レンタル提供者",
     "description": "個人のレンタル車両を管理します"
   },
+  "agents": {
+    "title": "協力者",
+    "description": "協力者を管理"
+  },
   "technician_partners": {
     "title": "技術パートナー",
     "description": "外部修理パートナーを管理"
@@ -4132,6 +4136,78 @@
     },
     "confirm_delete": {
       "title": "この提供者を削除しますか？",
+      "description": "この操作は元に戻せません。"
+    }
+  },
+
+   "agent_dashboard": {
+    "title": "エージェントダッシュボード",
+    "referrals": "紹介数",
+    "total_commission": "合計コミッション",
+    "paid_commission": "支払済みコミッション",
+    "pending_commission": "未払いコミッション",
+    "join_new_program": "新しいプログラムに参加",
+    "available": "利用可能",
+    "payment_requests": "支払いリクエスト",
+    "times": "回",
+    "recent_activity": "最近の活動",
+    "booking": "予約",
+    "commission": "コミッション",
+    "no_activity": "まだ活動はありません。",
+    "quick_actions": "クイック操作",
+    "refer_customer": "顧客を紹介",
+    "view_commission_history": "コミッション履歴を見る",
+    "request_payment": "支払いをリクエスト"
+  },
+
+  "agent_form": {
+    "title": "代理店情報",
+    "labels": {
+      "name": "名前",
+      "email": "メール",
+      "phone": "電話番号",
+      "display_address": "表示住所",
+      "map_address": "住所 / Google Maps リンク",
+      "latlng": "緯度・経度 (Lat,Lng)"
+    },
+    "section_titles": { "location": "位置" },
+    "buttons": { "save": "保存", "cancel": "キャンセル" },
+    "errors": {
+      "name_required": "名前を入力してください。",
+      "phone_required": "電話番号を入力してください。",
+      "display_address_required": "表示住所を入力してください。",
+      "location_required": "正しい緯度・経度を入力するか、地点を選択してください。",
+      "missing_geopoint": "有効な GeoPoint がありません。"
+    },
+    "placeholders": { "name": "代理店名" }
+  },
+  "agent_table": {
+    "name": "名前",
+    "phone": "電話番号",
+    "address": "住所",
+    "coordinates": "座標",
+    "actions": "操作",
+    "edit": "編集",
+    "delete": "削除",
+    "no_data": "データがありません"
+  },
+  "agent_search": { "placeholder": "名前・電話・メール・住所で検索..." },
+  "agents_page": {
+    "title": "代理店の管理",
+    "add_new": "新規追加",
+    "create_title": "代理店を追加",
+    "edit_title": "代理店を編集",
+    "cancel_edit": "編集を取り消す",
+    "messages": {
+      "load_failed": "データの読み込みに失敗しました",
+      "add_success": "追加しました",
+      "update_success": "更新しました",
+      "save_failed": "保存に失敗しました",
+      "delete_success": "削除しました",
+      "delete_failed": "削除に失敗しました"
+    },
+    "confirm_delete": {
+      "title": "この代理店を削除しますか？",
       "description": "この操作は元に戻せません。"
     }
   }

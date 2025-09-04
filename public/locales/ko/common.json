@@ -2777,6 +2777,10 @@
     "title": "개인 차량 대여",
     "description": "개인 차량 대여를 관리합니다"
   },
+   "agents": {
+    "title": "협력자",
+    "description": "협력자 관리"
+  },
   "technician_partners": {
     "title": "기술 파트너",
     "description": "외부 수리 파트너를 관리"
@@ -4154,6 +4158,78 @@
     "confirm_delete": {
       "title": "이 제공자를 삭제하시겠습니까?",
       "description": "이 작업은 되돌릴 수 없습니다."
+    }
+  },
+
+    "agent_dashboard": {
+    "title": "에이전트 대시보드",
+    "referrals": "추천 고객",
+    "total_commission": "총 수수료",
+    "paid_commission": "지급된 수수료",
+    "pending_commission": "대기 중 수수료",
+    "join_new_program": "새 프로그램 참여",
+    "available": "가능",
+    "payment_requests": "지급 요청",
+    "times": "회",
+    "recent_activity": "최근 활동",
+    "booking": "예약",
+    "commission": "수수료",
+    "no_activity": "아직 활동이 없습니다.",
+    "quick_actions": "빠른 작업",
+    "refer_customer": "고객 추천",
+    "view_commission_history": "수수료 내역 보기",
+    "request_payment": "지급 요청"
+  },
+
+  "agent_form": {
+    "title": "대리점 정보",
+    "labels": {
+      "name": "이름",
+      "email": "이메일",
+      "phone": "전화번호",
+      "display_address": "표시 주소",
+      "map_address": "주소 / Google Maps 링크",
+      "latlng": "위도,경도 (Lat,Lng)"
+    },
+    "section_titles": { "location": "위치" },
+    "buttons": { "save": "저장", "cancel": "취소" },
+    "errors": {
+      "name_required": "이름을 입력하세요.",
+      "phone_required": "전화번호를 입력하세요.",
+      "display_address_required": "표시 주소를 입력하세요.",
+      "location_required": "올바른 위도·경도를 입력하거나 지점을 선택하세요.",
+      "missing_geopoint": "유효한 GeoPoint가 없습니다."
+    },
+    "placeholders": { "name": "대리점 이름" }
+  },
+  "agent_table": {
+    "name": "이름",
+    "phone": "전화번호",
+    "address": "주소",
+    "coordinates": "좌표",
+    "actions": "작업",
+    "edit": "편집",
+    "delete": "삭제",
+    "no_data": "데이터가 없습니다"
+  },
+  "agent_search": { "placeholder": "이름, 전화, 이메일, 주소로 검색..." },
+  "agents_page": {
+    "title": "대리점 관리",
+    "add_new": "새로 추가",
+    "create_title": "대리점 추가",
+    "edit_title": "대리점 수정",
+    "cancel_edit": "수정 취소",
+    "messages": {
+      "load_failed": "데이터 로드 실패",
+      "add_success": "성공적으로 추가되었습니다",
+      "update_success": "성공적으로 업데이트되었습니다",
+      "save_failed": "저장 실패",
+      "delete_success": "성공적으로 삭제되었습니다",
+      "delete_failed": "삭제 실패"
+    },
+    "confirm_delete": {
+      "title": "이 대리점을 삭제할까요?",
+      "description": "이 작업은 취소할 수 없습니다."
     }
   }
 

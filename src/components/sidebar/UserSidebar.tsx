@@ -86,12 +86,6 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
     path: '/account',
   };
 
-  const agentItems: MenuItem[] = [
-    { icon: FaUsers, label: t('user_sidebar.menu.agent_dashboard'), path: '/dashboard/agent' },
-    { icon: FaDollarSign, label: t('user_sidebar.menu.earnings'), path: '/dashboard/earnings' },
-    { icon: faFileContract, label: t('user_sidebar.menu.request_payment'), path: '/dashboard/request-payment' },
-  ];
-
   const getCommonItems = (): MenuItem[] => {
     const items: MenuItem[] = [
       { icon: FaPencilAlt, label: t('user_sidebar.menu.write_review'), onClick: () => setShowComingSoon(true) },
@@ -115,11 +109,6 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
   };
 
   const getMenuItems = (): MenuItem[] => {
-    if (normalizedRole === 'agent') {
-      return agentDisabled
-        ? [...getCommonItems(), footerItem]
-        : [...getCommonItems(), ...agentItems, { divider: true }, footerItem];
-    }
     return [...getCommonItems(), footerItem];
   };
 
