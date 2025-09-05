@@ -2319,12 +2319,13 @@
 },
 
 "programs_page": {
-  "title": "Programs",
-  "create_button": "Create New Program",
-  "no_programs": "No programs available.",
+  "title": "Promotional Programs",
+  "subtitle": "Designed to encourage agent participation and drive sales.",
+  "create_button": "Create new program",
+  "no_programs": "There are no programs yet.",
   "joined": "Joined",
-  "join_button": "Join Program",
-  "view_participants": "View Participants",
+  "join_button": "Join program",
+  "view_participants": "View participants",
   "delete_button": "Delete",
   "status": {
     "inactive": "Inactive",
@@ -2366,16 +2367,14 @@
 },
 
 "program_detail_page": {
-    "page_title": "🎯 {{title}}",
-    "valid_until": "Valid until {{date}}",
-    "period": "📅 Period: {{start}} → {{end}}",
-    "company": "🏢 Company: {{name}} ({{email}})",
-    "no_email": "No email",
-    "discount_models": "🚲 Discounted Models:",
-    "stations_applied": "📍 Applicable Stations:",
-    "joined": "✅ You have already joined this program",
-    "join_button": "Join Program"
-  },
+  "active_until": "Active until {{date}}",
+  "period": "Period: {{start}} → {{end}}",
+  "company_info": "Company: {{name}} (Email: {{email}})",
+  "discount_models": "Discounted models:",
+  "stations_applied": "Applicable stations:",
+  "already_joined": "You have already joined this program.",
+  "join_button": "Join program"
+},
 
   "program_participants_page": {
   "title": "Program Participants",
@@ -4194,6 +4193,7 @@
   },
 
  "agent_programs_table": {
+  "view": "View",
   "empty": "No results match the current filters.",
   "suggestion_distance": "Try clearing or loosening the distance filter.",
   "suggestion_keyword": "Check your search keywords (company / station / address).",

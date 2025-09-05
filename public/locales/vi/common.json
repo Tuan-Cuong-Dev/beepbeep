@@ -2395,13 +2395,12 @@
 },
 
 "program_detail_page": {
-  "title": "Chi tiết chương trình",
-  "active_until": "Áp dụng đến hết ngày {{date}}",
-  "period": "📅 Thời gian áp dụng: {{start}} → {{end}}",
-  "company_info": "🏢 Công ty: {{name}} ({{email}})",
-  "discount_models": "🚲 Các mẫu xe được giảm giá:",
-  "stations_applied": "📍 Trạm áp dụng:",
-  "already_joined": "✅ Bạn đã tham gia chương trình này",
+  "active_until": "Hiệu lực đến {{date}}",
+  "period": "Thời gian: {{start}} → {{end}}",
+  "company_info": "Công ty: {{name}} (Email: {{email}})",
+  "discount_models": "Các mẫu áp dụng ưu đãi:",
+  "stations_applied": "Các trạm áp dụng:",
+  "already_joined": "Bạn đã tham gia chương trình này.",
   "join_button": "Tham gia chương trình"
 },
 
@@ -4277,6 +4276,7 @@
 
 
   "agent_programs_table": {
+    "view": "Xem",
     "empty": "Không có kết quả khớp bộ lọc.",
     "suggestion_distance": "Thử xoá hoặc nới lỏng bộ lọc khoảng cách.",
     "suggestion_keyword": "Kiểm tra từ khóa tìm kiếm (công ty / trạm / địa chỉ).",

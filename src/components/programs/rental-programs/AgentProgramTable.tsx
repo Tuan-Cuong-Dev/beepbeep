@@ -486,13 +486,16 @@ export default function AgentProgramsTable({
                   )}
                 </div>
 
-                <Link
-                  href={{ pathname: '/dashboard/programs', query: { companyId: s.companyId, stationId: s.id } }}
-                  className="inline-flex items-center justify-center rounded-md border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  {t('view', 'Xem')}
-                </Link>
+                {hasPromo && ( // 👈 chỉ hiển thị khi có khuyến mại
+                  <Link
+                    href={{ pathname: '/dashboard/programs', query: { companyId: s.companyId, stationId: s.id } }}
+                    className="inline-flex items-center justify-center rounded-md border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    {t('agent_programs_table.view', 'Xem')}
+                  </Link>
+                )}
               </div>
+
             </div>
           )
         })}
@@ -558,15 +561,17 @@ export default function AgentProgramsTable({
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Link
-                      href={{
-                        pathname: '/dashboard/programs',
-                        query: { companyId: s.companyId, stationId: s.id },
-                      }}
-                      className="inline-flex items-center justify-center rounded-md border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      {t('view', 'Xem')}
-                    </Link>
+                    {hasPromo && ( // 👈 chỉ hiển thị khi có khuyến mại
+                      <Link
+                        href={{
+                          pathname: '/dashboard/programs',
+                          query: { companyId: s.companyId, stationId: s.id },
+                        }}
+                        className="inline-flex items-center justify-center rounded-md border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        {t('agent_programs_table.view', 'Xem')}
+                      </Link>
+                    )}
                   </TableCell>
                 </TableRow>
               )
