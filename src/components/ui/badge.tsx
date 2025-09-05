@@ -1,13 +1,25 @@
-// components/ui/badge.tsx
-import React from 'react';
-import clsx from 'clsx';
+/**
+ * Badge component (rounded label), used in tables, status indicators, etc.
+ *
+ * ✅ Compatible with Next.js / CRA (no need for special module config)
+ */
 
-type BadgeVariant = 'default' | 'success' | 'destructive' | 'warning';
+import * as React from 'react'
+import clsx from 'clsx'
 
-interface BadgeProps {
-  children: React.ReactNode;
-  className?: string;
-  variant?: BadgeVariant;
+/** Variants (extendable if needed) */
+type BadgeVariant =
+  | 'default'
+  | 'success'
+  | 'destructive'
+  | 'warning'
+  | 'secondary'
+  | 'brand'
+
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  children: React.ReactNode
+  className?: string
+  variant?: BadgeVariant
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
@@ -15,18 +27,21 @@ const variantClasses: Record<BadgeVariant, string> = {
   success: 'bg-green-100 text-green-800',
   destructive: 'bg-red-100 text-red-800',
   warning: 'bg-yellow-100 text-yellow-800',
-};
+  secondary: 'bg-gray-100 text-gray-600',
+  brand: 'bg-[#00d289] text-white', // ✅ màu thương hiệu Bíp Bíp
+}
 
-export function Badge({ children, className = '', variant = 'default' }: BadgeProps) {
+export function Badge({ children, className = '', variant = 'default', ...props }: BadgeProps) {
   return (
     <span
       className={clsx(
-        'inline-block rounded-full px-2 py-1 text-xs font-semibold',
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap',
         variantClasses[variant],
         className
       )}
+      {...props}
     >
       {children}
     </span>
-  );
+  )
 }

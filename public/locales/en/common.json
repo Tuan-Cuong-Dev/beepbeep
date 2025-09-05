@@ -4181,8 +4181,39 @@
       "title": "Delete this agent?",
       "description": "This action cannot be undone."
     }
-  }
+  },
 
+  "agent_program_filters": {
+    "search": "Search",
+    "placeholder": "Search by company / station / address…",
+    "distance": "Distance",
+    "all_distance": "All distances",
+    "less_equal": "≤ {{km}} km",
+    "include_unknown": "Include stations with unknown distance",
+    "reset": "Reset filters"
+  },
+
+ "agent_programs_table": {
+  "empty": "No results match the current filters.",
+  "suggestion_distance": "Try clearing or loosening the distance filter.",
+  "suggestion_keyword": "Check your search keywords (company / station / address).",
+  "rental_company": "Rental company",
+  "private_provider": "Private provider",
+  "distance": "Distance",
+  "has_promo": "Has promotion",
+  "no_promo": "No promotion",
+  "company": "Company / Provider",
+  "station": "Station",
+  "promo_status": "Promotion",
+  "loading": "Loading…",
+  "actions": "Actions"
+},
+
+"agent_program_table_page": {
+  "title": "Promotional Programs",
+  "loading": "Loading information…",
+  "login_required": "Please log in to view the programs available to you."
+}
 
 
 

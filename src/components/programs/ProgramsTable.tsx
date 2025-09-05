@@ -1,3 +1,6 @@
+// Rental Companies và Private Provider tạo Các chương trình khuyến mãi
+// 05/09/2025
+
 'use client';
 
 import { Program } from '@/src/lib/programs/programsType';

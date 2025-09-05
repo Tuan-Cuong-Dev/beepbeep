@@ -4245,7 +4245,39 @@
       "title": "이 대리점을 삭제할까요?",
       "description": "이 작업은 취소할 수 없습니다."
     }
-  }
+  },
+
+  "agent_program_filters": {
+    "search": "검색",
+    "placeholder": "회사 / 지점 / 주소로 검색…",
+    "distance": "거리",
+    "all_distance": "전체 거리",
+    "less_equal": "≤ {{km}} km",
+    "include_unknown": "거리를 알 수 없는 지점 포함",
+    "reset": "필터 초기화"
+  },
+
+"agent_programs_table": {
+  "empty": "현재 필터와 일치하는 결과가 없습니다.",
+  "suggestion_distance": "거리 필터를 해제하거나 완화해 보세요.",
+  "suggestion_keyword": "검색어(회사 / 지점 / 주소)를 확인하세요.",
+  "rental_company": "렌탈 회사",
+  "private_provider": "개인 제공자",
+  "distance": "거리",
+  "has_promo": "프로모션 있음",
+  "no_promo": "프로모션 없음",
+  "company": "회사 / 제공자",
+  "station": "지점",
+  "promo_status": "프로모션",
+  "loading": "불러오는 중…",
+  "actions": "작업"
+},
+
+"agent_program_table_page": {
+  "title": "프로모션 프로그램",
+  "loading": "정보 불러오는 중…",
+  "login_required": "사용 가능한 프로그램을 보려면 로그인하세요."
+}
 
 
 

@@ -4263,7 +4263,41 @@
       "title": "Xóa đại lý này?",
       "description": "Hành động này không thể hoàn tác."
     }
-  }
+  },
+
+   "agent_program_filters": {
+    "search": "Tìm kiếm",
+    "placeholder": "Tìm theo công ty / trạm / địa chỉ…",
+    "distance": "Khoảng cách",
+    "all_distance": "Tất cả khoảng cách",
+    "less_equal": "≤ {{km}} km",
+    "include_unknown": "Bao gồm trạm chưa rõ khoảng cách",
+    "reset": "Xoá lọc"
+  },
+
+
+  "agent_programs_table": {
+    "empty": "Không có kết quả khớp bộ lọc.",
+    "suggestion_distance": "Thử xoá hoặc nới lỏng bộ lọc khoảng cách.",
+    "suggestion_keyword": "Kiểm tra từ khóa tìm kiếm (công ty / trạm / địa chỉ).",
+    "rental_company": "Công ty cho thuê",
+    "private_provider": "Nhà cung cấp cá nhân",
+    "distance": "Khoảng cách",
+    "has_promo": "Có khuyến mại",
+    "no_promo": "Chưa có",
+    "company": "Công ty / Nhà cung cấp",
+    "station": "Trạm",
+    "promo_status": "Khuyến mại",
+    "loading": "Đang tải dữ liệu…",
+    "actions": "Thao tác"
+  },
+
+"agent_program_table_page": {
+  "title": "Chương trình khuyến mại",
+  "loading": "Đang tải thông tin…",
+  "login_required": "Vui lòng đăng nhập để xem các chương trình phù hợp với bạn."
+}
+
 
 
 

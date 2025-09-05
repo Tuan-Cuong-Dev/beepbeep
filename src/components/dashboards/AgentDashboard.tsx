@@ -118,7 +118,7 @@ export default function AgentDashboard() {
           <DashboardCard
             title={t("agent_dashboard.join_new_program")}
             value={t("agent_dashboard.available")}
-            href="/dashboard/programs"
+            href="dashboard/programs/AgentProgramTable"
             icon={<Handshake className="w-6 h-6" />}
           />
           <DashboardCard
@@ -136,7 +136,7 @@ export default function AgentDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <QuickAction label={t("agent_dashboard.refer_customer")} href="#" />
             <QuickAction label={t("agent_dashboard.view_commission_history")} href="/dashboard/earnings" />
-            <QuickAction label={t("agent_dashboard.join_new_program")} href="/dashboard/programs" />
+            <QuickAction label={t("agent_dashboard.join_new_program")} href="dashboard/programs/AgentProgramTable" />
             {data.pendingCommission > 0 && (
               <QuickAction label={t("agent_dashboard.request_payment")} href="/dashboard/request-payment" />
             )}

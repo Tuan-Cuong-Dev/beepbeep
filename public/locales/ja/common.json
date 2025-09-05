@@ -4224,6 +4224,32 @@
       "title": "この代理店を削除しますか？",
       "description": "この操作は元に戻せません。"
     }
+  },
+
+   "agent_program_filters": {
+    "search": "検索",
+    "placeholder": "会社 / ステーション / 住所で検索…",
+    "distance": "距離",
+    "all_distance": "すべての距離",
+    "less_equal": "≤ {{km}} km",
+    "include_unknown": "距離不明のステーションを含む",
+    "reset": "フィルターをリセット"
+  },
+
+  "error": "エラー",
+  "view": "表示",
+  "agent_programs_table": {
+    "empty": "現在のフィルターに一致する結果はありません。",
+    "suggestion_distance": "距離フィルターを解除するか緩めてみてください。",
+    "suggestion_keyword": "検索キーワード（会社／ステーション／住所）を確認してください。",
+    "rental_company": "レンタル会社",
+    "private_provider": "個人プロバイダー",
+    "distance": "距離",
+    "has_promo": "プロモーションあり",
+    "no_promo": "プロモーションなし",
+    "company": "会社／プロバイダー",
+    "station": "ステーション",
+    "promo_status": "プロモーション"
   }
 
 
