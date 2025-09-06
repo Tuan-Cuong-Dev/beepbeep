@@ -4213,8 +4213,11 @@
   "title": "Promotional Programs",
   "loading": "Loading information…",
   "login_required": "Please log in to view the programs available to you."
-}
+},
 
+ "my_business": {
+    "no_business": "No business found."
+  }
 
 
 

@@ -6,7 +6,7 @@ import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { ProgramParticipant } from '@/src/lib/programs/programsType';
+import { ProgramParticipant } from '@/src/lib/programs/rental-programs/programsType';
 import { User, UserCheck, UserX } from 'lucide-react';
 import { Agent } from '@/src/lib/agents/agentTypes';
 import { useTranslation } from 'react-i18next';

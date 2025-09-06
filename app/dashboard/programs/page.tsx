@@ -10,7 +10,7 @@ import { useUser } from '@/src/context/AuthContext';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Button } from '@/src/components/ui/button';
-import { Program } from '@/src/lib/programs/programsType';
+import { Program } from '@/src/lib/programs/rental-programs/programsType';
 
 export default function ProgramsPage() {
   const { t } = useTranslation('common');

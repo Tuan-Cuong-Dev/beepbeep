@@ -74,6 +74,7 @@ export interface Program {
 /**
  * Người tham gia chương trình
  */
+
 export interface ProgramParticipant {
   id: string;
 

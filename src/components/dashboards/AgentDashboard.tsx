@@ -118,7 +118,7 @@ export default function AgentDashboard() {
           <DashboardCard
             title={t("agent_dashboard.join_new_program")}
             value={t("agent_dashboard.available")}
-            href="dashboard/programs/AgentProgramTable"
+            href="dashboard/programs/rental-programs/AgentProgramTable"
             icon={<Handshake className="w-6 h-6" />}
           />
           <DashboardCard
@@ -133,10 +133,12 @@ export default function AgentDashboard() {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             ⚡ {t("agent_dashboard.quick_actions")}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <QuickAction label={t("agent_dashboard.modelstables")} href="dashboard/programs/rental-programs/AgentJoinedModelsTable" />
+            <QuickAction label={t("agent_dashboard.showcases")} href="dashboard/programs/rental-programs/AgentJoinedModelsShowcase" />
             <QuickAction label={t("agent_dashboard.refer_customer")} href="#" />
             <QuickAction label={t("agent_dashboard.view_commission_history")} href="/dashboard/earnings" />
-            <QuickAction label={t("agent_dashboard.join_new_program")} href="dashboard/programs/AgentProgramTable" />
+            <QuickAction label={t("agent_dashboard.join_new_program")} href="dashboard/programs/rental-programs/AgentProgramTable" />
             {data.pendingCommission > 0 && (
               <QuickAction label={t("agent_dashboard.request_payment")} href="/dashboard/request-payment" />
             )}

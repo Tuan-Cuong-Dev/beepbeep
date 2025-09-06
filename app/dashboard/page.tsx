@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { getDocs, query, where, collection } from 'firebase/firestore'
 import { db } from '@/src/firebaseConfig'
 import { useUser } from '@/src/context/AuthContext'
+import { useTranslation } from 'react-i18next'
 
 import RentalCompanyDashboard from '@/src/components/dashboards/RentalCompanyDashboard'
 import PrivateProviderDashboard from '@/src/components/dashboards/PrivateProviderDashboard'
@@ -39,6 +40,7 @@ type BusinessType =
 export default function MyBusinessPage() {
   const { user, role, loading } = useUser()
   const router = useRouter()
+  const { t } = useTranslation('common')
 
   const [businessType, setBusinessType] = useState<BusinessType>(null)
   const [staffRoles, setStaffRoles] = useState<StaffEntry[]>([])
@@ -128,7 +130,11 @@ export default function MyBusinessPage() {
   }, [user, role, loading, router])
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>
+    return (
+      <div className="flex justify-center items-center h-screen text-gray-500">
+        {t('loading')}
+      </div>
+    )
   }
 
   return (
@@ -143,7 +149,9 @@ export default function MyBusinessPage() {
       {businessType === 'station_manager' && <StationManagerDashboard />}
       {businessType === 'staff' && <StaffDashboard />}
       {businessType === 'technician' && <TechnicianDashboard />}
-      {!businessType && <div className="text-center text-gray-500">No business found.</div>}
+      {!businessType && (
+        <div className="text-center text-gray-500">{t('my_business.no_business')}</div>
+      )}
     </main>
   )
 }

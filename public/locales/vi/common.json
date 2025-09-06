@@ -4296,8 +4296,11 @@
   "title": "Chương trình khuyến mại",
   "loading": "Đang tải thông tin…",
   "login_required": "Vui lòng đăng nhập để xem các chương trình phù hợp với bạn."
-}
+},
 
+"my_business": {
+    "no_business": "Chưa có doanh nghiệp nào."
+  }
 
 
 

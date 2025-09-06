@@ -16,7 +16,7 @@ import {
   ProgramParticipant,
   ProgramType,
   ProgramParticipantStatus,
-} from '@/src/lib/programs/programsType';
+} from '@/src/lib/programs/rental-programs/programsType';
 
 /**
  * Normalize Program data từ Firestore (chống lỗi toMillis)

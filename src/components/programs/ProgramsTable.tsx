@@ -3,7 +3,7 @@
 
 'use client';
 
-import { Program } from '@/src/lib/programs/programsType';
+import { Program } from '@/src/lib/programs/rental-programs/programsType';
 import { Button } from '@/src/components/ui/button';
 import { format } from 'date-fns';
 

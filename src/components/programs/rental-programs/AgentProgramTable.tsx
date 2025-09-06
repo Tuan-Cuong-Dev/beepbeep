@@ -16,7 +16,7 @@ import {
   GeoPoint,
 } from 'firebase/firestore'
 import { db } from '@/src/firebaseConfig'
-import type { Program } from '@/src/lib/programs/programsType'
+import type { Program } from '@/src/lib/programs/rental-programs/programsType'
 import type { Station } from '@/src/lib/stations/stationTypes'
 import type { Agent } from '@/src/lib/agents/agentTypes'
 import type { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes'

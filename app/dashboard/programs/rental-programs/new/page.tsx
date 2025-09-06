@@ -17,7 +17,7 @@ import { SimpleSelect } from '@/src/components/ui/select';
 import { stringToTimestamp } from '@/src/utils/date';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
-import { ProgramType } from '@/src/lib/programs/programsType';
+import { ProgramType } from '@/src/lib/programs/rental-programs/programsType';
 import { useTranslation } from 'react-i18next';
 
 type Company = { id: string; name: string };
