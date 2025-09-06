@@ -4154,25 +4154,27 @@
     }
   },
 
-   "agent_dashboard": {
-    "title": "エージェントダッシュボード",
-    "referrals": "紹介数",
-    "total_commission": "合計コミッション",
-    "paid_commission": "支払済みコミッション",
-    "pending_commission": "未払いコミッション",
-    "join_new_program": "新しいプログラムに参加",
-    "available": "利用可能",
-    "payment_requests": "支払いリクエスト",
-    "times": "回",
-    "recent_activity": "最近の活動",
-    "booking": "予約",
-    "commission": "コミッション",
-    "no_activity": "まだ活動はありません。",
-    "quick_actions": "クイック操作",
-    "refer_customer": "顧客を紹介",
-    "view_commission_history": "コミッション履歴を見る",
-    "request_payment": "支払いをリクエスト"
-  },
+"agent_dashboard": {
+  "title": "エージェント／代理店ダッシュボード",
+  "referrals": "紹介顧客",
+  "total_commission": "総コミッション",
+  "paid_commission": "支払済みコミッション",
+  "pending_commission": "保留中のコミッション",
+  "join_new_program": "新しいプログラムに参加",
+  "modelstables": "モデル一覧表",
+  "showcases": "ショーケース",
+  "available": "利用可",
+  "payment_requests": "支払いリクエスト",
+  "times": "回",
+  "recent_activity": "最近のアクティビティ",
+  "booking": "予約",
+  "commission": "コミッション",
+  "no_activity": "まだアクティビティがありません。",
+  "quick_actions": "クイックアクション",
+  "refer_customer": "顧客を紹介",
+  "view_commission_history": "コミッション履歴を表示",
+  "request_payment": "支払いをリクエスト"
+},
 
   "agent_form": {
     "title": "代理店情報",

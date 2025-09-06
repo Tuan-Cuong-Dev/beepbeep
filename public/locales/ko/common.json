@@ -4175,25 +4175,27 @@
     }
   },
 
-    "agent_dashboard": {
-    "title": "에이전트 대시보드",
-    "referrals": "추천 고객",
-    "total_commission": "총 수수료",
-    "paid_commission": "지급된 수수료",
-    "pending_commission": "대기 중 수수료",
-    "join_new_program": "새 프로그램 참여",
-    "available": "가능",
-    "payment_requests": "지급 요청",
-    "times": "회",
-    "recent_activity": "최근 활동",
-    "booking": "예약",
-    "commission": "수수료",
-    "no_activity": "아직 활동이 없습니다.",
-    "quick_actions": "빠른 작업",
-    "refer_customer": "고객 추천",
-    "view_commission_history": "수수료 내역 보기",
-    "request_payment": "지급 요청"
-  },
+"agent_dashboard": {
+  "title": "에이전트/대리점 대시보드",
+  "referrals": "추천 고객",
+  "total_commission": "총 커미션",
+  "paid_commission": "지급된 커미션",
+  "pending_commission": "대기 중인 커미션",
+  "join_new_program": "새 프로그램 참여",
+  "modelstables": "모델 표",
+  "showcases": "쇼케이스",
+  "available": "사용 가능",
+  "payment_requests": "지급 요청",
+  "times": "회",
+  "recent_activity": "최근 활동",
+  "booking": "예약",
+  "commission": "커미션",
+  "no_activity": "아직 활동이 없습니다.",
+  "quick_actions": "빠른 작업",
+  "refer_customer": "고객 추천",
+  "view_commission_history": "커미션 내역 보기",
+  "request_payment": "지급 요청"
+},
 
   "agent_form": {
     "title": "대리점 정보",
