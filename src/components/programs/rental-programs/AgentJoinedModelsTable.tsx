@@ -1,17 +1,16 @@
 'use client'
 
 /**
- * AgentJoinedModelsTable — refactor
- * - Hiển thị tất cả VehicleModels nằm trong các Program mà agent đã JOINED.
- * - Cột: Tên xe • Cấu hình • Giá (áp KM) • Trạm
- * - Coercer modelDiscounts hỗ trợ nhiều schema:
- *   A) [{ modelId, discountType, discountValue }]
- *   B) ['vm1','vm2']                    // mặc định fixed 0
- *   C) { vm1: 10, vm2: 180000 }         // ≤100 → percentage, >100 → fixed (final price)
- *   D) { vm1: { type:'percentage', value:15 }, vm2: { finalPrice:160000 }, vm3:{ price:200000 } }
+ * AgentJoinedModelsTable — typed refactor + mobile cards
+ * - Table (>= md) và Card (mobile) hiển thị:
+ *   Cty • Trạm • Model • Ảnh • Giá/ngày (base) • Chiết khấu CTV • Khoảng cách
+ * - Giá/ngày = MIN(vehicle.pricePerDay) theo (companyId, modelId, [stationId?])
+ * - Ảnh ưu tiên VehicleModel.imageUrl (có convert Google Drive)
+ * - Khoảng cách nếu truyền userLocation={lat,lng}
  */
 
 import * as React from 'react'
+import Image from 'next/image'
 import {
   collection,
   getDocs,
@@ -24,35 +23,29 @@ import { useTranslation } from 'react-i18next'
 
 import type { Program, ProgramModelDiscount } from '@/src/lib/programs/rental-programs/programsType'
 import type { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes'
+import type { Vehicle, VehicleStatus } from '@/src/lib/vehicles/vehicleTypes'
 
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/src/components/ui/table'
-import { Badge } from '@/src/components/ui/badge'
 
-/* ======================= DEBUG helpers ======================= */
+/* ======================= Config & Utils ======================= */
+const DEBUG = false
+const log  = (...a: unknown[]) => DEBUG && console.log('[AgentJoinedModelsTable]', ...a)
+const warn = (...a: unknown[]) => DEBUG && console.warn('[AgentJoinedModelsTable]', ...a)
 
-const DEBUG = true
-const log  = (...a: any[]) => DEBUG && console.log('[AgentJoinedModelsTable]', ...a)
-const warn = (...a: any[]) => DEBUG && console.warn('[AgentJoinedModelsTable]', ...a)
-const err  = (...a: any[]) => DEBUG && console.error('[AgentJoinedModelsTable]', ...a)
+type AnyRec = Record<string, unknown>
+const isRecord = (x: unknown): x is AnyRec => typeof x === 'object' && x !== null
 
 function chunk<T>(arr: T[], size = 10): T[][] {
   const res: T[][] = []
   for (let i = 0; i < arr.length; i += size) res.push(arr.slice(i, i + size))
   return res
 }
-function toArray<T = any>(v: any): T[] {
-  if (Array.isArray(v)) return v as T[]
-  if (v && typeof v === 'object') {
-    const vals = Object.values(v) as T[]
-    log('toArray: converted object->array, len=', vals.length)
-    return vals
-  }
-  return []
-}
-const safeToMillis = (t?: any): number | null => {
+
+const safeToMillis = (t?: unknown): number | null => {
   try {
+    // @ts-expect-error Firestore Timestamp
     const ms = t?.toMillis?.()
     return typeof ms === 'number' ? ms : null
   } catch {
@@ -61,33 +54,9 @@ const safeToMillis = (t?: any): number | null => {
 }
 function isProgramActiveNow(p: Program): boolean {
   const now = Date.now()
-  const s = safeToMillis((p as any).startDate)
-  const e = safeToMillis((p as any).endDate)
-  const ok = !((s && s > now) || (e && e < now)) && p.isActive !== false
-  if (DEBUG && !ok) {
-    warn('Program filtered (inactive/out-of-time):', {
-      id: (p as any).id, title: p.title, start: s, end: e, isActive: p.isActive,
-    })
-  }
-  return ok
-}
-
-/** Chọn 1 đơn giá ưu tiên để hiển thị (day > hour > week > month) */
-function pickBasePrice(vm: VehicleModel): { label: string; value: number | null } {
-  if (typeof vm.pricePerDay === 'number')   return { label: 'ngày',  value: vm.pricePerDay }
-  if (typeof vm.pricePerHour === 'number')  return { label: 'giờ',   value: vm.pricePerHour }
-  if (typeof vm.pricePerWeek === 'number')  return { label: 'tuần',  value: vm.pricePerWeek }
-  if (typeof vm.pricePerMonth === 'number') return { label: 'tháng', value: vm.pricePerMonth }
-  return { label: '', value: null }
-}
-
-/** Tính giá sau KM: fixed → final price; percentage → giảm % */
-function applyDiscount(base: number | null, md?: ProgramModelDiscount | null): number | null {
-  if (base == null) return null
-  if (!md) return base
-  if (md.discountType === 'fixed')       return Math.max(0, Number(md.discountValue ?? base))
-  if (md.discountType === 'percentage')  return Math.max(0, Math.round((base * (100 - Number(md.discountValue || 0))) / 100))
-  return base
+  const s = safeToMillis((p as unknown as AnyRec).startDate)
+  const e = safeToMillis((p as unknown as AnyRec).endDate)
+  return !((s && s > now) || (e && e < now)) && p.isActive !== false
 }
 
 function formatVND(n?: number | null): string {
@@ -95,29 +64,54 @@ function formatVND(n?: number | null): string {
   try { return new Intl.NumberFormat('vi-VN').format(n) + '₫' } catch { return `${n}₫` }
 }
 
-function basicSpec(vm: VehicleModel): string {
-  const bits: string[] = []
-  if (vm.brand) bits.push(vm.brand)
-  if (vm.modelCode) bits.push(vm.modelCode)
-  if (vm.vehicleType) bits.push(vm.vehicleType.toUpperCase())
-  if (vm.vehicleSubType) bits.push(vm.vehicleSubType)
-  if (typeof vm.capacity === 'number') bits.push(`${vm.capacity} chỗ`)
-  if (vm.fuelType) bits.push(vm.fuelType)
-  return bits.join(' • ')
+function getDirectDriveImageUrl(url?: string): string | undefined {
+  if (!url) return undefined
+  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/)
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+  const id = m1?.[1] || m2?.[1]
+  return id ? `https://drive.google.com/uc?export=view&id=${id}` : url
+}
+
+function resolveModelImage(vm?: VehicleModel): string {
+  const direct = getDirectDriveImageUrl(vm?.imageUrl)
+  return direct || '/no-image.png'
+}
+
+/** Khoảng cách Haversine (km) */
+type LatLng = { lat: number; lng: number }
+function haversineKm(a: LatLng, b: LatLng): number {
+  const R = 6371
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180
+  const s1 = Math.sin(dLat / 2) ** 2
+  const s2 = Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
+  const c = 2 * Math.asin(Math.sqrt(s1 + s2))
+  return R * c
+}
+
+/* ======================= Types ======================= */
+type StationTargetLite = { stationId: string }
+
+type CompanyLite = { id: string; name: string }
+type StationMeta = { id: string; name: string; lat?: number; lng?: number }
+
+/** View row */
+type Row = {
+  key: string
+  companyName: string
+  stationName: string
+  modelName: string
+  model?: VehicleModel
+  modelImgUrl: string
+  baseDayPrice: number | null        // min vehicle.pricePerDay (base) for scope
+  ctvDiscount: string                // human readable
+  distanceKm: number | null          // from userLocation → station
 }
 
 /* ======================= Coercer & Normalizer ======================= */
-
-/** Ăn nhiều schema khác nhau cho modelDiscounts */
-// ==== helpers cho TS ====
-type AnyRec = Record<string, any>;
-const isRecord = (x: unknown): x is AnyRec => typeof x === 'object' && x !== null;
-
-// ==== coerces nhiều schema khác nhau về ProgramModelDiscount[] ====
 function coerceModelDiscounts(raw: unknown, rawDocForLog?: unknown): ProgramModelDiscount[] {
-  const out: ProgramModelDiscount[] = [];
+  const out: ProgramModelDiscount[] = []
 
-  // push an toàn, nhận mọi loại input
   const push = (
     modelId: unknown,
     discountType?: unknown,
@@ -128,119 +122,107 @@ function coerceModelDiscounts(raw: unknown, rawDocForLog?: unknown): ProgramMode
       (typeof modelId === 'string' && modelId) ||
       (isRecord(modelId) && (
         modelId.modelId || modelId.vehicleModelId || modelId.id ||
-        modelId?.model?.id || modelId?.modelRef?.id
-      ));
+        (isRecord(modelId.model) && modelId.model.id) ||
+        (isRecord(modelId.modelRef) && modelId.modelRef.id)
+      ))
 
     if (!mid || typeof mid !== 'string') {
-      warn('⛔ drop item — missing modelId', { ctx });
-      return;
+      warn('⛔ drop item — missing modelId', { ctx })
+      return
     }
 
     let type: 'fixed' | 'percentage' | undefined =
-      (discountType === 'fixed' || discountType === 'percentage') ? discountType : undefined;
+      discountType === 'fixed' || discountType === 'percentage'
+        ? (discountType as 'fixed' | 'percentage')
+        : undefined
 
-    let val = (typeof discountValue === 'number') ? discountValue : NaN;
+    let val = typeof discountValue === 'number' ? discountValue : NaN
 
-    // Đoán type/value từ ctx nếu chưa có
     if (!type) {
       if (isRecord(ctx)) {
-        if (typeof (ctx.percentage ?? ctx.pct ?? ctx.off) === 'number') {
-          type = 'percentage';
-          val = Number(ctx.percentage ?? ctx.pct ?? ctx.off);
-        } else if (typeof (ctx.finalPrice ?? ctx.price ?? ctx.fixed) === 'number') {
-          type = 'fixed';
-          val = Number(ctx.finalPrice ?? ctx.price ?? ctx.fixed);
-        } else if (
-          (ctx.type === 'fixed' || ctx.type === 'percentage') &&
-          typeof ctx.value === 'number'
-        ) {
-          type = ctx.type;
-          val = Number(ctx.value);
+        const pct = ctx.percentage ?? ctx.pct ?? ctx.off
+        const fix = ctx.finalPrice ?? ctx.price ?? ctx.fixed
+        if (typeof pct === 'number') { type = 'percentage'; val = Number(pct) }
+        else if (typeof fix === 'number') { type = 'fixed'; val = Number(fix) }
+        else if ((ctx.type === 'fixed' || ctx.type === 'percentage') && typeof ctx.value === 'number') {
+          type = ctx.type
+          val = Number(ctx.value)
         }
       } else if (typeof ctx === 'number') {
-        // số trần → ≤100% coi là percentage, còn lại fixed (final price)
-        type = ctx <= 100 ? 'percentage' : 'fixed';
-        val = Number(ctx);
+        type = ctx <= 100 ? 'percentage' : 'fixed'
+        val = Number(ctx)
       }
     }
 
-    if (type !== 'fixed' && type !== 'percentage') type = 'fixed';
-    if (Number.isNaN(val)) val = 0;
+    if (type !== 'fixed' && type !== 'percentage') type = 'fixed'
+    if (Number.isNaN(val)) val = 0
 
-    out.push({ modelId: mid, discountType: type, discountValue: val });
-  };
+    out.push({ modelId: mid, discountType: type, discountValue: val })
+  }
 
-  // 1) ARRAY?
   if (Array.isArray(raw)) {
-    (raw as unknown[]).forEach((it, idx) => {
-      if (typeof it === 'string') {
-        push(it, 'fixed', 0, it);
-      } else if (isRecord(it)) {
-        // 👇 Ép kiểu trước khi đọc thuộc tính
-        push(it, it.discountType, it.discountValue, it);
-      } else {
-        warn('⛔ unknown array item in modelDiscounts', { idx, it });
-      }
-    });
-    log('coerceModelDiscounts[array] →', out.length, out.slice(0, 5));
-    return out;
+    raw.forEach((it, idx) => {
+      if (typeof it === 'string') return push(it, 'fixed', 0, it)
+      if (isRecord(it)) return push(it, it.discountType, it.discountValue, it)
+      warn('⛔ unknown array item in modelDiscounts', { idx, it })
+    })
+    return out
   }
 
-  // 2) OBJECT map?  { [modelId]: number | {…} }
   if (isRecord(raw)) {
-    Object.entries(raw as AnyRec).forEach(([k, v]) => {
-      if (typeof v === 'number') {
-        push(k, undefined, undefined, v);
-      } else if (isRecord(v)) {
-        // 👇 Ép kiểu trước khi đọc thuộc tính
-        push({ modelId: k }, v.discountType, v.discountValue, v);
-      } else {
-        warn('⛔ unknown map value in modelDiscounts', { modelId: k, v });
-      }
-    });
+    Object.entries(raw).forEach(([k, v]) => {
+      if (typeof v === 'number') return push(k, undefined, undefined, v)
+      if (isRecord(v)) return push({ modelId: k }, v.discountType, v.discountValue, v)
+      warn('⛔ unknown map value in modelDiscounts', { modelId: k, v })
+    })
 
-    // fallback: schema cũ đặt ở key khác
     if (!out.length && isRecord(rawDocForLog)) {
-      const fb = (rawDocForLog.models || rawDocForLog.vehicleModels) as unknown;
+      const fb = rawDocForLog.models || rawDocForLog.vehicleModels
       if (Array.isArray(fb) && fb.length) {
-        log('coerceModelDiscounts: fallback models[]', fb);
-        fb.forEach((x) => push(x as any, 'fixed', 0, x));
+        ;(fb as unknown[]).forEach((x) => push(x, 'fixed', 0, x))
       }
     }
-
-    log('coerceModelDiscounts[map] →', out.length, out.slice(0, 5));
-    return out;
+    return out
   }
 
-  warn('⛔ modelDiscounts has unknown shape', raw);
-  return out;
+  return out
 }
 
+function extractCompanyId(raw: unknown): string | null {
+  if (!isRecord(raw)) return null
+  return (
+    (raw.companyId as string) ||
+    (raw.organizerCompanyId as string) ||
+    (raw.providerCompanyId as string) ||
+    (isRecord(raw.company) && (raw.company.id as string)) ||
+    (isRecord(raw.companyRef) && (raw.companyRef.id as string)) ||
+    null
+  )
+}
 
-function normalizeProgram(raw: any): Program & {
+function normalizeProgram(raw: unknown): Program & {
   modelDiscounts: ProgramModelDiscount[]
-  stationTargets: { stationId: string }[]
+  stationTargets: StationTargetLite[]
+  companyId?: string | null
+  title?: string
 } {
-  const modelDiscounts = coerceModelDiscounts(raw?.modelDiscounts, raw)
-  const stationTargets = toArray<{ stationId: string }>(raw?.stationTargets)
-    .filter((x) => x && typeof x.stationId === 'string')
-
-  log('[normalizeProgram]', raw?.id, '→ mds len =', modelDiscounts.length, 'sts len =', stationTargets.length)
+  const r = (raw || {}) as AnyRec
+  const modelDiscounts = coerceModelDiscounts(r.modelDiscounts, raw)
+  const stationTargets: StationTargetLite[] = Array.isArray(r.stationTargets)
+    ? (r.stationTargets as StationTargetLite[]).filter((x) => !!x && typeof x.stationId === 'string')
+    : []
 
   return {
-    ...(raw as Program),
+    ...(r as unknown as Program),
     modelDiscounts,
     stationTargets,
+    companyId: extractCompanyId(r),
+    title: (r.title as string) || '',
   }
 }
 
-/* ======================= Firestore loaders (with logs) ======================= */
-
-/** 1) Lấy các Program mà agent đã JOINED */
-async function loadJoinedProgramsForAgent(agentId: string): Promise<
-  (Program & { modelDiscounts: ProgramModelDiscount[]; stationTargets: { stationId: string }[] })[]
-> {
-  log('loadJoinedProgramsForAgent:start', { agentId })
+/* ======================= Firestore loaders ======================= */
+async function loadJoinedProgramsForAgent(agentId: string) {
   const pSnap = await getDocs(
     query(
       collection(db, 'programParticipants'),
@@ -249,112 +231,105 @@ async function loadJoinedProgramsForAgent(agentId: string): Promise<
       where('status', '==', 'joined')
     )
   )
-  log('programParticipants count=', pSnap.size)
-  if (DEBUG) {
-    const rows = pSnap.docs.slice(0, 5).map(d => ({ id: d.id, ...d.data() }))
-    console.table(rows)
-  }
+  const programIds = Array.from(new Set(pSnap.docs.map(d => (d.data() as AnyRec)?.programId).filter(Boolean))) as string[]
+  if (!programIds.length) return [] as ReturnType<typeof normalizeProgram>[]
 
-  const programIds = Array.from(
-    new Set(pSnap.docs.map(d => (d.data() as any)?.programId).filter(Boolean))
-  )
-  log('programIds:', programIds)
-
-  if (!programIds.length) return []
-
-  // Load programs theo batch 10
-  const all: (Program & { modelDiscounts: ProgramModelDiscount[]; stationTargets: { stationId: string }[] })[] = []
+  const all: ReturnType<typeof normalizeProgram>[] = []
   for (const ids of chunk(programIds, 10)) {
-    log('programs batch size=', ids.length, 'for ids=', ids)
     const ps = await getDocs(query(collection(db, 'programs'), where(documentId(), 'in', ids)))
-    log('programs batch snapshot size=', ps.size, 'for batch', ids)
-    ps.docs.forEach((d) => {
-      const raw = { id: d.id, ...(d.data() as any) }
-      const n = normalizeProgram(raw)
-      all.push(n)
-    })
+    ps.docs.forEach((d) => all.push(normalizeProgram({ id: d.id, ...(d.data() as AnyRec) })))
   }
-
-  log('programs total loaded=', all.length)
-  const active = all.filter(isProgramActiveNow)
-  log('programs active=', active.length)
-
-  const withModels = active.filter(p => Array.isArray(p.modelDiscounts) && p.modelDiscounts.length > 0)
-  if (!withModels.length) {
-    warn('No program contains modelDiscounts after normalize. Check keys modelId/vehicleModelId/id…')
-  } else {
-    withModels.forEach((p) => {
-      log('PROGRAM OK:', (p as any).id, p.title, 'modelDiscounts:', p.modelDiscounts.length)
-      console.table(p.modelDiscounts.map((md: any) => ({
-        modelId: md.modelId, type: md.discountType, val: md.discountValue
-      })))
-    })
-  }
-
-  return withModels
+  return all.filter(isProgramActiveNow).filter(p => p.modelDiscounts.length > 0)
 }
 
-/** 2) Load VehicleModels theo id */
-async function loadVehicleModelsByIds(modelIds: string[], vehicleModelCollectionName: string): Promise<Map<string, VehicleModel>> {
-  log('loadVehicleModelsByIds:start', { count: modelIds.length, vehicleModelCollectionName })
+async function loadVehicleModelsByIds(modelIds: string[], coll = 'vehicleModels'): Promise<Map<string, VehicleModel>> {
   const map = new Map<string, VehicleModel>()
   if (!modelIds.length) return map
-  for (const c of chunk(modelIds, 10)) {
-    log('vehicleModels batch size=', c.length, c)
-    const snap = await getDocs(query(collection(db, vehicleModelCollectionName), where(documentId(), 'in', c)))
-    log('vehicleModels batch snapshot size=', snap.size)
-    if (DEBUG) {
-      const rows = snap.docs.slice(0, 5).map(d => ({ id: d.id, ...d.data() }))
-      console.table(rows)
-    }
-    snap.docs.forEach((d) => {
-      map.set(d.id, { id: d.id, ...(d.data() as any) } as VehicleModel)
-    })
+  for (const part of chunk(modelIds, 10)) {
+    const snap = await getDocs(query(collection(db, coll), where(documentId(), 'in', part)))
+    snap.docs.forEach((d) => map.set(d.id, { id: d.id, ...(d.data() as AnyRec) } as VehicleModel))
   }
-  log('vehicleModels total mapped=', map.size)
   return map
 }
 
-/** 3) (Optional) Load tên trạm nếu muốn hiển thị “trạm” theo stationTargets */
-async function loadStationNamesByIds(stationIds: string[], stationCollectionName: string): Promise<Map<string, string>> {
-  log('loadStationNamesByIds:start', { count: stationIds.length, stationCollectionName })
-  const map = new Map<string, string>()
+async function loadCompaniesByIds(companyIds: string[], coll = 'rentalCompanies'): Promise<Map<string, CompanyLite>> {
+  const map = new Map<string, CompanyLite>()
+  if (!companyIds.length) return map
+  for (const part of chunk(companyIds, 10)) {
+    const snap = await getDocs(query(collection(db, coll), where(documentId(), 'in', part)))
+    snap.docs.forEach((d) => {
+      const data = d.data() as AnyRec
+      map.set(d.id, { id: d.id, name: (data.name as string) || (data.title as string) || d.id })
+    })
+  }
+  return map
+}
+
+async function loadStationsByIds(stationIds: string[], coll = 'rentalStations'): Promise<Map<string, StationMeta>> {
+  const map = new Map<string, StationMeta>()
   if (!stationIds.length) return map
-  for (const c of chunk(stationIds, 10)) {
-    const snap = await getDocs(query(collection(db, stationCollectionName), where(documentId(), 'in', c)))
-    log('stations batch snapshot size=', snap.size)
+  for (const part of chunk(stationIds, 10)) {
+    const snap = await getDocs(query(collection(db, coll), where(documentId(), 'in', part)))
     snap.docs.forEach((d) => {
-      const data = d.data() as any
-      map.set(d.id, data?.name || d.id)
+      const data = d.data() as AnyRec
+      const lat = (data.lat as number) ?? (isRecord(data.location) ? (data.location.lat as number) : undefined)
+      const lng = (data.lng as number) ?? (isRecord(data.location) ? (data.location.lng as number) : undefined)
+      map.set(d.id, { id: d.id, name: (data.name as string) || d.id, lat, lng })
     })
   }
-  log('station names mapped=', map.size)
   return map
 }
 
-/* ======================= View Types ======================= */
-type Row = {
-  key: string
-  programId: string
-  programTitle: string
-  modelId: string
-  model?: VehicleModel
-  modelDiscount?: ProgramModelDiscount
-  stationNames: string[] // [] = tất cả trạm
+/** Load vehicles theo (companyId, modelId [, stationId?]) — trả về tất cả để lọc client */
+async function loadVehiclesFor(
+  companyIds: string[],
+  modelIds: string[],
+  coll = 'vehicles',
+  statusFilter?: VehicleStatus
+): Promise<Vehicle[]> {
+  const out: Vehicle[] = []
+  if (!companyIds.length || !modelIds.length) return out
+
+  for (const companyId of companyIds) {
+    for (const part of chunk(modelIds, 10)) {
+      const conds: any[] = [where('companyId', '==', companyId), where('modelId', 'in', part)]
+      if (statusFilter) conds.push(where('status', '==', statusFilter))
+      const q = query(collection(db, coll), ...conds)
+      const snap = await getDocs(q)
+      snap.docs.forEach((d) => out.push({ id: d.id, ...(d.data() as AnyRec) } as Vehicle))
+    }
+  }
+  return out
+}
+
+/* ======================= Discount display ======================= */
+function fmtDiscount(md?: ProgramModelDiscount): string {
+  if (!md) return '—'
+  if (md.discountType === 'percentage') return `-${Number(md.discountValue || 0)}%`
+  // fixed → final price
+  const v = Number(md.discountValue ?? 0)
+  return v > 0 ? `→ ${formatVND(v)}` : '—'
 }
 
 /* ======================= Component ======================= */
-
 interface Props {
   agentId: string
   vehicleModelCollectionName?: string   // default 'vehicleModels'
-  stationCollectionName?: string       // default 'rentalStations'
+  stationCollectionName?: string        // default 'rentalStations'
+  companyCollectionName?: string        // default 'rentalCompanies'
+  vehiclesCollectionName?: string       // default 'vehicles'
+  userLocation?: LatLng | null          // nếu có → tính distance
+  onlyAvailableVehicles?: boolean       // mặc định true
 }
 
 export default function AgentJoinedModelsTable({
   agentId,
   vehicleModelCollectionName = 'vehicleModels',
   stationCollectionName = 'rentalStations',
+  companyCollectionName = 'rentalCompanies',
+  vehiclesCollectionName = 'vehicles',
+  userLocation = null,
+  onlyAvailableVehicles = true,
 }: Props) {
   const { t } = useTranslation('common', { useSuspense: false })
   const [rows, setRows] = React.useState<Row[] | null>(null)
@@ -365,99 +340,136 @@ export default function AgentJoinedModelsTable({
     let mounted = true
     ;(async () => {
       try {
-        log('MOUNT props:', { agentId, vehicleModelCollectionName, stationCollectionName })
         setLoading(true)
 
-        // 1) Programs mà agent đã JOINED (normalized + filter active)
         const programs = await loadJoinedProgramsForAgent(agentId)
         if (!mounted) return
 
-        log('Programs (post-filter) count=', programs.length)
         if (!programs.length) {
           setRows([])
           setLoading(false)
           return
         }
 
-        // 2) Gom modelIds + stationIds
         const modelIds = new Set<string>()
         const stationIds = new Set<string>()
+        const companyIds = new Set<string>()
+
         programs.forEach((p) => {
-          const mds: ProgramModelDiscount[] = Array.isArray((p as any).modelDiscounts)
-            ? (p as any).modelDiscounts
-            : coerceModelDiscounts((p as any).modelDiscounts, p)
-
-          mds.forEach((md) => md?.modelId && modelIds.add(md.modelId))
-
-          const sts = Array.isArray((p as any).stationTargets)
-            ? (p as any).stationTargets
-            : toArray((p as any).stationTargets)
-
-          sts.forEach((st: any) => st?.stationId && stationIds.add(st.stationId))
+          p.modelDiscounts.forEach((md: ProgramModelDiscount) => {
+            if (md?.modelId) modelIds.add(md.modelId)
+          })
+          if (p.companyId) companyIds.add(p.companyId)
+          if (p.stationTargets?.length) {
+            p.stationTargets.forEach((st: StationTargetLite) => st?.stationId && stationIds.add(st.stationId))
+          }
         })
-        log('Unique modelIds count=', modelIds.size, [...modelIds].slice(0, 20))
-        log('Unique stationIds count=', stationIds.size, [...stationIds].slice(0, 20))
 
-        // 3) Load VehicleModels + Station names
-        const [modelMap, stationNameMap] = await Promise.all([
+        const [modelMap, companyMap, stationMap] = await Promise.all([
           loadVehicleModelsByIds([...modelIds], vehicleModelCollectionName),
-          loadStationNamesByIds([...stationIds], stationCollectionName),
+          loadCompaniesByIds([...companyIds], companyCollectionName),
+          loadStationsByIds([...stationIds], stationCollectionName),
         ])
         if (!mounted) return
 
-        // 4) Build rows
-        const built: Row[] = []
+        const vehicles = await loadVehiclesFor(
+          [...companyIds],
+          [...modelIds],
+          vehiclesCollectionName,
+          onlyAvailableVehicles ? 'Available' : undefined
+        )
+        if (!mounted) return
+
+        const acc: Row[] = []
+
         programs.forEach((p) => {
-          const stationNames =
-            (Array.isArray((p as any).stationTargets) && (p as any).stationTargets.length
-              ? (p as any).stationTargets.map((st: any) => stationNameMap.get(st.stationId)).filter(Boolean)
-              : []) as string[] // [] = all stations
+          const companyName = p.companyId ? (companyMap.get(p.companyId)?.name || p.companyId) : t('unknown_company', 'Không rõ')
+          const mds: ProgramModelDiscount[] = p.modelDiscounts || []
 
-          const mds: ProgramModelDiscount[] = Array.isArray((p as any).modelDiscounts)
-            ? (p as any).modelDiscounts
-            : coerceModelDiscounts((p as any).modelDiscounts, p)
-
-          mds.forEach((md) => {
+          mds.forEach((md: ProgramModelDiscount) => {
             const vm = modelMap.get(md.modelId)
-            if (!vm) warn('VehicleModel NOT FOUND:', md.modelId, 'program:', (p as any).id)
-            built.push({
-              key: `${(p as any).id}:${md.modelId}`,
-              programId: (p as any).id,
-              programTitle: p.title,
-              modelId: md.modelId,
-              model: vm,
-              modelDiscount: md,
-              stationNames,
-            })
+            const modelName = vm?.name || md.modelId
+            const modelImgUrl = resolveModelImage(vm)
+
+            const vlist = vehicles.filter((v: Vehicle) => v.companyId === p.companyId && v.modelId === md.modelId)
+
+            if (p.stationTargets?.length) {
+              p.stationTargets.forEach((st: StationTargetLite) => {
+                const stMeta = st.stationId ? stationMap.get(st.stationId) : undefined
+                const stationName = stMeta?.name || st.stationId || t('all_stations', 'Tất cả trạm')
+                const baseDayPrice = getMinPriceDay(vlist.filter((v: Vehicle) => v.stationId === st.stationId))
+                const distanceKm =
+                  userLocation && stMeta?.lat != null && stMeta?.lng != null
+                    ? haversineKm(userLocation, { lat: stMeta.lat, lng: stMeta.lng })
+                    : null
+
+                acc.push({
+                  key: `${p.id}:${md.modelId}:${st.stationId}`,
+                  companyName,
+                  stationName,
+                  modelName,
+                  model: vm,
+                  modelImgUrl,
+                  baseDayPrice,
+                  ctvDiscount: fmtDiscount(md),
+                  distanceKm,
+                })
+              })
+            } else {
+              const baseDayPrice = getMinPriceDay(vlist)
+              acc.push({
+                key: `${p.id}:${md.modelId}:ALL`,
+                companyName,
+                stationName: t('agent_joined_models.all_stations', 'Tất cả trạm'),
+                modelName,
+                model: vm,
+                modelImgUrl,
+                baseDayPrice,
+                ctvDiscount: fmtDiscount(md),
+                distanceKm: null,
+              })
+            }
           })
         })
 
-        log('Built rows count=', built.length)
-        if (DEBUG && built.length) {
-          console.table(built.slice(0, 10).map(b => ({
-            key: b.key,
-            programTitle: b.programTitle,
-            model: b.model?.name || b.modelId,
-            discountType: b.modelDiscount?.discountType,
-            discountValue: b.modelDiscount?.discountValue,
-            stations: b.stationNames.join(', ') || '(all)',
-          })))
-        }
+        acc.sort((a, b) => {
+          const c = a.companyName.localeCompare(b.companyName)
+          if (c !== 0) return c
+          const s = a.stationName.localeCompare(b.stationName)
+          if (s !== 0) return s
+          return a.modelName.localeCompare(b.modelName)
+        })
 
-        // 5) Sort theo tên xe
-        built.sort((a, b) => (a.model?.name || '').localeCompare(b.model?.name || ''))
-        setRows(built)
+        setRows(acc)
         setLoading(false)
-      } catch (e: any) {
-        err('load error', e)
-        setError(e?.message || 'Load failed')
+      } catch (e: unknown) {
+        warn('load error', e)
+        setError((e as Error)?.message || 'Load failed')
         setLoading(false)
       }
     })()
     return () => { mounted = false }
-  }, [agentId, vehicleModelCollectionName, stationCollectionName])
+  }, [
+    agentId,
+    vehicleModelCollectionName,
+    stationCollectionName,
+    companyCollectionName,
+    vehiclesCollectionName,
+    userLocation,
+    onlyAvailableVehicles,
+  ])
 
-  /* ======================= Render ======================= */
+  /* ===== Helpers ===== */
+  function getMinPriceDay(vlist: Vehicle[]): number | null {
+    let min: number | null = null
+    vlist.forEach((v: Vehicle) => {
+      const p = typeof v.pricePerDay === 'number' ? v.pricePerDay : null
+      if (p != null) min = min == null ? p : Math.min(min, p)
+    })
+    return min
+  }
+
+  /* ======================= Render: Cards (mobile) + Table (desktop) ======================= */
 
   if (loading) {
     return <div className="rounded-lg border p-4 text-sm text-gray-600">
@@ -475,81 +487,123 @@ export default function AgentJoinedModelsTable({
     </div>
   }
 
-  return (
-    <div className="w-full overflow-x-auto rounded-xl border bg-white">
+  /** Mobile Card list */
+  const MobileCards = ({ items }: { items: Row[] }) => (
+    <div className="md:hidden grid grid-cols-1 gap-3">
+      {items.map((r) => (
+        <div
+          key={r.key}
+          className="bg-white rounded-2xl border shadow-sm overflow-hidden"
+        >
+          <div className="flex gap-3 p-3">
+            <div className="relative w-28 h-20 rounded-md border bg-gray-50 overflow-hidden shrink-0">
+              <Image
+                src={r.modelImgUrl}
+                alt={r.modelName}
+                fill
+                className="object-contain"
+              />
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="text-[11px] text-gray-500 truncate">{r.companyName}</div>
+              <div className="text-base font-semibold text-gray-900 truncate">{r.modelName}</div>
+
+              <div className="mt-1 flex items-center gap-2 flex-wrap">
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                  🚏 {r.stationName}
+                </span>
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+                  💸 {r.ctvDiscount}
+                </span>
+                {r.distanceKm != null && (
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                    📍 {r.distanceKm.toFixed(1)} km
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-2 text-[#00d289] font-bold">
+                {formatVND(r.baseDayPrice)}{r.baseDayPrice != null ? ' / ngày' : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  /** Desktop Table */
+  const DesktopTable = ({ items }: { items: Row[] }) => (
+    <div className="hidden md:block w-full overflow-x-auto rounded-xl border bg-white">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="min-w-[220px]">{t('agent_joined_models.model', 'Tên xe')}</TableHead>
-            <TableHead className="min-w-[280px]">{t('agent_joined_models.spec', 'Cấu hình cơ bản')}</TableHead>
-            <TableHead className="min-w-[200px]">{t('agent_joined_models.price', 'Giá cho thuê')}</TableHead>
-            <TableHead className="min-w-[220px]">{t('agent_joined_models.station', 'Trạm')}</TableHead>
+            <TableHead className="min-w-[160px]">{t('company_name', 'Tên công ty')}</TableHead>
+            <TableHead className="min-w-[160px]">{t('station_name', 'Tên trạm')}</TableHead>
+            <TableHead className="min-w-[240px]">{t('model_name', 'Tên model')}</TableHead>
+            <TableHead className="min-w-[120px]">{t('image', 'Ảnh xe')}</TableHead>
+            <TableHead className="min-w-[140px]">{t('price_day', 'Giá thuê ngày')}</TableHead>
+            <TableHead className="min-w-[140px]">{t('agent_discount', 'Chiết khấu CTV')}</TableHead>
+            <TableHead className="min-w-[140px]">{t('distance', 'Khoảng cách')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((r) => {
-            const vm = r.model
-            const base = vm ? pickBasePrice(vm) : { label: '', value: null }
-            const finalPrice = applyDiscount(base.value, r.modelDiscount)
+          {items.map((r) => (
+            <TableRow key={r.key}>
+              <TableCell className="font-medium">{r.companyName}</TableCell>
+              <TableCell>{r.stationName}</TableCell>
 
-            return (
-              <TableRow key={r.key}>
-                <TableCell>
-                  <div className="font-medium">{vm?.name || r.modelId}</div>
-                  <div className="mt-1 text-xs text-gray-500 line-clamp-2">
-                    {r.programTitle}
+              <TableCell>
+                <div className="font-medium">{r.modelName}</div>
+                {r.model?.brand && (
+                  <div className="mt-1 text-xs text-gray-500">
+                    {r.model.brand}
                   </div>
-                </TableCell>
+                )}
+              </TableCell>
 
-                <TableCell>
-                  {vm ? (
-                    <div className="text-sm text-gray-700">{basicSpec(vm)}</div>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </TableCell>
+              <TableCell>
+                <div className="w-[80px] h-[60px] relative rounded border bg-gray-50 overflow-hidden">
+                  <Image
+                    src={r.modelImgUrl}
+                    alt={r.modelName}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </TableCell>
 
-                <TableCell>
-                  {finalPrice != null ? (
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{formatVND(finalPrice)}</span>
-                      {base.value != null && finalPrice !== base.value && (
-                        <span className="text-xs text-gray-500 line-through">
-                          {formatVND(base.value)}{base.label ? `/${base.label}` : ''}
-                        </span>
-                      )}
-                      {base.value != null && finalPrice === base.value && (
-                        <span className="text-xs text-gray-500">
-                          {base.label ? `/${base.label}` : ''}
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </TableCell>
+              <TableCell>
+                <span className="font-semibold">
+                  {formatVND(r.baseDayPrice)}
+                </span>
+                {r.baseDayPrice != null && <span className="text-xs text-gray-500">/ngày</span>}
+              </TableCell>
 
-                <TableCell>
-                  {r.stationNames.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {r.stationNames.slice(0, 2).map((name) => (
-                        <Badge key={name} variant="secondary">{name}</Badge>
-                      ))}
-                      {r.stationNames.length > 2 && (
-                        <Badge variant="secondary">+{r.stationNames.length - 2}</Badge>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-gray-600">
-                      {t('agent_joined_models.all_stations', 'Tất cả trạm')}
-                    </span>
-                  )}
-                </TableCell>
-              </TableRow>
-            )
-          })}
+              <TableCell>
+                <span className="text-sm">{r.ctvDiscount}</span>
+              </TableCell>
+
+              <TableCell>
+                {r.distanceKm != null
+                  ? `${r.distanceKm.toFixed(1)} km`
+                  : <span className="text-gray-400">—</span>}
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
+    </div>
+  )
+
+  return (
+    <div className="w-full">
+      {/* Mobile cards */}
+      <MobileCards items={rows} />
+
+      {/* Desktop table */}
+      <DesktopTable items={rows} />
     </div>
   )
 }
