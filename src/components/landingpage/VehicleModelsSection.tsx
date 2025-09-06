@@ -33,7 +33,7 @@ export default function VehicleModelsSection() {
   useEffect(() => {
     const fetchModels = async () => {
       try {
-        const snapshot = await getDocs(collection(db, 'ebikeModels'));
+        const snapshot = await getDocs(collection(db, 'vehicleModels'));
         const data = snapshot.docs.map((doc) => {
           const d = doc.data();
           return {

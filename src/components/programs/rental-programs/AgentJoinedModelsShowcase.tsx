@@ -1,12 +1,8 @@
 'use client'
 
 /**
- * AgentJoinedModelsShowcase (refactor)
- * - Chỉ hiển thị mẫu xe thuộc các chương trình Agent đã JOIN.
- * - Header thương hiệu tối giản (#00d289): logo + tên + tổng mẫu.
- * - Nhóm & render động theo VehicleType: bike/bicycle, motorbike, car, van, bus, other.
- * - Ảnh hỗ trợ Google Drive → direct (uc?export=view&id=...).
- * - Mobile-first, thẻ cuộn ngang, chỉ render nhóm nếu có xe.
+ * AgentJoinedModelsShowcase (dedupe-by-model, show BASE price only) — FIXED COUNTS
+ * - Chuẩn hoá vehicleType để đếm & nhóm chính xác.
  */
 
 import * as React from 'react'
@@ -23,11 +19,12 @@ import { useTranslation } from 'react-i18next'
 
 import type { Program, ProgramModelDiscount } from '@/src/lib/programs/rental-programs/programsType'
 import type { VehicleModel, FuelType } from '@/src/lib/vehicle-models/vehicleModelTypes'
+import type { Vehicle, VehicleStatus } from '@/src/lib/vehicles/vehicleTypes'
 
 /* ===== Brand color ===== */
 const BRAND = '#00d289'
 
-/* ===== Default icons theo VehicleType ===== */
+/* ===== Default icons ===== */
 import bicycleIcon from '@/public/assets/images/vehicles/bicycle.png'
 import motorbikeIcon from '@/public/assets/images/vehicles/motorbike.png'
 import carIcon from '@/public/assets/images/vehicles/car.png'
@@ -52,25 +49,13 @@ function chunk<T>(arr: T[], size = 10): T[][] {
   return out
 }
 const safeToMillis = (t?: any): number | null => {
-  try {
-    const ms = t?.toMillis?.()
-    return typeof ms === 'number' ? ms : null
-  } catch {
-    return null
-  }
+  try { const ms = t?.toMillis?.(); return typeof ms === 'number' ? ms : null } catch { return null }
 }
 function isProgramActiveNow(p: Program): boolean {
   const now = Date.now()
   const s = safeToMillis((p as any).startDate)
   const e = safeToMillis((p as any).endDate)
   return !((s && s > now) || (e && e < now)) && p.isActive !== false
-}
-function applyDiscount(base: number | null, md?: ProgramModelDiscount | null): number | null {
-  if (base == null) return null
-  if (!md) return base
-  if (md.discountType === 'fixed') return Math.max(0, Number(md.discountValue ?? base))
-  if (md.discountType === 'percentage') return Math.max(0, Math.round((base * (100 - Number(md.discountValue || 0))) / 100))
-  return base
 }
 function formatVND(n?: number | null): string {
   if (n == null) return '—'
@@ -86,13 +71,30 @@ function getDirectDriveImageUrl(url?: string): string | undefined {
   return id ? `https://drive.google.com/uc?export=view&id=${id}` : url
 }
 
-/** Ưu tiên imageUrl → default icon theo type */
+/* ===== Chuẩn hoá vehicleType ===== */
+type CanonType = 'bike' | 'motorbike' | 'car' | 'van' | 'bus' | 'other'
+const TYPE_ORDER: CanonType[] = ['bike', 'motorbike', 'car', 'van', 'bus', 'other']
+
+function normalizeVehicleType(input?: string): CanonType {
+  const s = (input || '').trim().toLowerCase()
+  if (!s) return 'other'
+  // aliases
+  if (['bicycle', 'bike', 'ebike', 'cycle', 'xe đạp'].includes(s)) return 'bike'
+  if (['motorbike', 'moto', 'motor', 'scooter', 'motorcycle', 'xe máy', 'xe tay ga'].includes(s)) return 'motorbike'
+  if (['car', 'sedan', 'suv', 'hatchback', 'coupe', 'pickup', 'xe hơi', 'ô tô'].includes(s)) return 'car'
+  if (['van', 'minivan', 'limo', 'limousine'].includes(s)) return 'van'
+  if (['bus', 'coach'].includes(s)) return 'bus'
+  // nếu là 1 key đã hỗ trợ → dùng luôn
+  if ((['bike','motorbike','car','van','bus'] as string[]).includes(s)) return s as CanonType
+  return 'other'
+}
+
+/** Ưu tiên imageUrl → default icon theo type (đã chuẩn hoá) */
 function resolveModelImage(vm: VehicleModel): string | StaticImageData {
   const direct = getDirectDriveImageUrl(vm.imageUrl)
   if (direct) return direct
-  // gộp bicycle → bike để map icon
-  const key = vm.vehicleType === 'bicycle' ? 'bike' : vm.vehicleType
-  return DEFAULT_ICONS[key] || motorbikeIcon
+  const key = normalizeVehicleType(vm.vehicleType)
+  return DEFAULT_ICONS[key] ?? DEFAULT_ICONS.bike
 }
 
 /* ===== Coerce modelDiscounts (đa schema) ===== */
@@ -143,12 +145,28 @@ function coerceModelDiscounts(raw: any, rawDocForLog?: any): ProgramModelDiscoun
   }
   return out
 }
-function normalizeProgram(raw: any): Program & { modelDiscounts: ProgramModelDiscount[] } {
-  const modelDiscounts = coerceModelDiscounts(raw?.modelDiscounts, raw)
-  return { ...(raw as Program), modelDiscounts }
+
+/** extract companyId */
+function extractCompanyId(raw: any): string | null {
+  return (
+    raw?.companyId ||
+    raw?.organizerCompanyId ||
+    raw?.providerCompanyId ||
+    raw?.company?.id ||
+    raw?.companyRef?.id ||
+    null
+  )
 }
 
-/* ===== Firestore ===== */
+function normalizeProgram(raw: any): Program & {
+  modelDiscounts: ProgramModelDiscount[]; companyId?: string | null; title?: string
+} {
+  const modelDiscounts = coerceModelDiscounts(raw?.modelDiscounts, raw)
+  const companyId = extractCompanyId(raw)
+  return { ...(raw as Program), modelDiscounts, companyId, title: (raw as any)?.title }
+}
+
+/* ===== Firestore loaders ===== */
 async function loadJoinedPrograms(agentId: string) {
   const snap = await getDocs(
     query(
@@ -160,34 +178,53 @@ async function loadJoinedPrograms(agentId: string) {
   )
   const programIds = Array.from(new Set(snap.docs.map(d => (d.data() as any)?.programId).filter(Boolean)))
   if (!programIds.length) return []
-  const all: (Program & { modelDiscounts: ProgramModelDiscount[] })[] = []
+
+  const all: (Program & { modelDiscounts: ProgramModelDiscount[]; companyId?: string | null; title?: string })[] = []
   for (const part of chunk(programIds, 10)) {
     const ps = await getDocs(query(collection(db, 'programs'), where(documentId(), 'in', part)))
     ps.docs.forEach(d => all.push(normalizeProgram({ id: d.id, ...(d.data() as any) })))
   }
   return all.filter(isProgramActiveNow).filter(p => p.modelDiscounts.length > 0)
 }
-async function loadVehicleModelsByIds(ids: string[], vehicleModelCollectionName: string) {
+
+async function loadVehicleModelsByIds(ids: string[], collectionName: string) {
   const map = new Map<string, VehicleModel>()
   if (!ids.length) return map
   for (const part of chunk(ids, 10)) {
-    const snap = await getDocs(query(collection(db, vehicleModelCollectionName), where(documentId(), 'in', part)))
+    const snap = await getDocs(query(collection(db, collectionName), where(documentId(), 'in', part)))
     snap.docs.forEach(d => map.set(d.id, { id: d.id, ...(d.data() as any) } as VehicleModel))
   }
   return map
 }
 
-/* ===== Agent brand info (tối giản) ===== */
-type AgentBrandInfo = {
-  name: string
-  logoUrl?: string
-  rating?: number
+async function loadVehiclesFor(
+  companyIds: string[],
+  modelIds: string[],
+  vehicleCollectionName: string,
+  statusFilter?: VehicleStatus
+): Promise<Vehicle[]> {
+  const results: Vehicle[] = []
+  if (!companyIds.length || !modelIds.length) return results
+
+  for (const companyId of companyIds) {
+    for (const part of chunk(modelIds, 10)) {
+      const conds: any[] = [
+        where('companyId', '==', companyId),
+        where('modelId', 'in', part),
+      ]
+      if (statusFilter) conds.push(where('status', '==', statusFilter))
+      const q = query(collection(db, vehicleCollectionName), ...conds)
+      const snap = await getDocs(q)
+      snap.docs.forEach(d => results.push({ id: d.id, ...(d.data() as any) } as Vehicle))
+    }
+  }
+  return results
 }
-function resolveBrandUrl(url?: string) {
-  return getDirectDriveImageUrl(url) || url
-}
+
+/* ===== Agent brand info ===== */
+type AgentBrandInfo = { name: string; logoUrl?: string; rating?: number; tagline?: string }
+function resolveBrandUrl(url?: string) { return getDirectDriveImageUrl(url) || url }
 async function loadAgentBrandInfo(agentId: string): Promise<AgentBrandInfo> {
-  // agents/{agentId}
   const agentRef = doc(db, 'agents', agentId)
   const agentSnap = await getDoc(agentRef)
   if (agentSnap.exists()) {
@@ -196,9 +233,9 @@ async function loadAgentBrandInfo(agentId: string): Promise<AgentBrandInfo> {
       name: d.name || d.displayName || 'Agent',
       logoUrl: resolveBrandUrl(d.logoUrl || d.avatarUrl),
       rating: typeof d.rating === 'number' ? d.rating : undefined,
+      tagline: d.tagline || d.slogan || undefined,
     }
   }
-  // users/{agentId}
   const userRef = doc(db, 'users', agentId)
   const userSnap = await getDoc(userRef)
   if (userSnap.exists()) {
@@ -207,35 +244,41 @@ async function loadAgentBrandInfo(agentId: string): Promise<AgentBrandInfo> {
       name: d.displayName || d.name || 'Agent',
       logoUrl: resolveBrandUrl(d.photoURL || d.avatarUrl),
       rating: typeof d.rating === 'number' ? d.rating : undefined,
+      tagline: d.tagline || d.slogan || undefined,
     }
   }
   return { name: 'Agent' }
 }
 
 /* ===== View types ===== */
-type CardRow = {
+type ModelCardRow = {
   key: string
-  programTitle: string
   model: VehicleModel
-  finalPrice: number | null
-  basePerDay: number | null
+  baseFrom: number | null
+  vehicleCount: number
+  discountedBest?: number | null
+  bestProgramTitle?: string
 }
 
 interface ShowcaseProps {
   agentId: string
   vehicleModelCollectionName?: string
+  vehiclesCollectionName?: string
   limitPerRow?: number
+  onlyAvailable?: boolean
 }
 
 export default function AgentJoinedModelsShowcase({
   agentId,
   vehicleModelCollectionName = 'vehicleModels',
+  vehiclesCollectionName = 'vehicles',
   limitPerRow = 20,
+  onlyAvailable = true,
 }: ShowcaseProps) {
   const { t } = useTranslation('common', { useSuspense: false })
   const router = useRouter()
 
-  const [rows, setRows] = React.useState<CardRow[]>([])
+  const [rows, setRows] = React.useState<ModelCardRow[]>([])
   const [loading, setLoading] = React.useState(true)
   const [noticeOpen, setNoticeOpen] = React.useState(false)
   const [brand, setBrand] = React.useState<AgentBrandInfo | null>(null)
@@ -252,32 +295,44 @@ export default function AgentJoinedModelsShowcase({
         if (!mounted) return
         setBrand(info)
 
+        const companyIds = Array.from(new Set(programs.map(p => p.companyId).filter(Boolean))) as string[]
         const modelIds = Array.from(new Set(programs.flatMap(p => p.modelDiscounts.map(md => md.modelId))))
-        const modelMap = await loadVehicleModelsByIds(modelIds, vehicleModelCollectionName)
+        if (companyIds.length === 0 || modelIds.length === 0) { setRows([]); return }
+
+        const [modelMap, vehicles] = await Promise.all([
+          loadVehicleModelsByIds(modelIds, vehicleModelCollectionName),
+          loadVehiclesFor(companyIds, modelIds, vehiclesCollectionName, onlyAvailable ? 'Available' : undefined),
+        ])
         if (!mounted) return
 
-        const built: CardRow[] = []
-        programs.forEach(p => {
-          p.modelDiscounts.forEach(md => {
-            const vm = modelMap.get(md.modelId)
-            if (!vm) return
-            const basePerDay = typeof vm.pricePerDay === 'number' ? vm.pricePerDay : null
-            const finalPrice = applyDiscount(basePerDay, md)
-            built.push({
-              key: `${p.id}:${md.modelId}`,
-              programTitle: p.title,
+        const byModel = new Map<string, ModelCardRow>()
+        vehicles.forEach(v => {
+          const vm = modelMap.get(v.modelId)
+          if (!vm) return
+          const base = typeof v.pricePerDay === 'number' ? v.pricePerDay : null
+
+          const cur = byModel.get(v.modelId)
+          if (!cur) {
+            byModel.set(v.modelId, {
+              key: v.modelId,
               model: vm,
-              finalPrice,
-              basePerDay,
+              baseFrom: base,
+              vehicleCount: 1,
             })
-          })
+          } else {
+            cur.vehicleCount += 1
+            if (base != null && (cur.baseFrom == null || base < cur.baseFrom)) {
+              cur.baseFrom = base
+            }
+          }
         })
 
-        // Ưu tiên giảm nhiều → tên
+        const built = Array.from(byModel.values())
+
         built.sort((a, b) => {
-          const aDisc = (a.basePerDay ?? Infinity) - (a.finalPrice ?? Infinity)
-          const bDisc = (b.basePerDay ?? Infinity) - (b.finalPrice ?? Infinity)
-          if (aDisc !== bDisc) return bDisc - aDisc
+          const aBase = a.baseFrom ?? Infinity
+          const bBase = b.baseFrom ?? Infinity
+          if (aBase !== bBase) return aBase - bBase
           return (a.model?.name || '').localeCompare(b.model?.name || '')
         })
 
@@ -287,69 +342,137 @@ export default function AgentJoinedModelsShowcase({
       }
     })()
     return () => { mounted = false }
-  }, [agentId, vehicleModelCollectionName])
+  }, [agentId, vehicleModelCollectionName, vehiclesCollectionName, onlyAvailable, limitPerRow])
 
-  /* ==== Group động theo VehicleType (chỉ render khi có xe) ==== */
-  const normalizeType = (t?: string) => (t === 'bicycle' ? 'bike' : (t || 'other'))
+  /* ==== Group theo type (đÃ CHUẨN HOÁ) ==== */
   const grouped = React.useMemo(() => {
-    const g: Record<string, CardRow[]> = {}
+    const g: Record<CanonType, ModelCardRow[]> = { bike:[], motorbike:[], car:[], van:[], bus:[], other:[] }
     rows.forEach(r => {
-      const k = normalizeType(r.model?.vehicleType)
-      ;(g[k] ||= []).push(r)
+      const k = normalizeVehicleType(r.model?.vehicleType)
+      g[k].push(r)
     })
     return g
   }, [rows])
 
-  const TYPE_ORDER = React.useMemo(() => ([
-    { key: 'bike',      label: t('vehicle.bike', 'Xe đạp') },
-    { key: 'motorbike', label: t('vehicle.motorbike', 'Xe máy') },
-    { key: 'car',       label: t('vehicle.car', 'Ô tô') },
-    { key: 'van',       label: t('vehicle.van', 'Van / Limo') },
-    { key: 'bus',       label: t('vehicle.bus', 'Xe bus') },
-    { key: 'other',     label: t('vehicle.other', 'Khác') },
-  ]), [t])
+  /* ==== Thống kê chính xác ==== */
+  const { totalModels, totalVehicles, perTypeModels } = React.useMemo(() => {
+    const totalModels = rows.length // số model duy nhất sau dedupe
+    let totalVehicles = 0
+    const perTypeModels: Record<CanonType, number> = { bike:0, motorbike:0, car:0, van:0, bus:0, other:0 }
+    rows.forEach(r => {
+      const k = normalizeVehicleType(r.model?.vehicleType)
+      perTypeModels[k] += 1          // đếm THEO MODEL
+      totalVehicles += (r.vehicleCount || 0)
+    })
+    return { totalModels, totalVehicles, perTypeModels }
+  }, [rows])
 
-  /* ==== Compact brand header (gọn nhất có thể) ==== */
-  const CompactBrandHeader = () => {
+  /* ==== Header đẹp + đếm đúng ==== */
+  const StatChip = ({ emoji, label, value }: { emoji: string; label: string; value: number }) => (
+    <span
+      className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full border whitespace-nowrap"
+      style={{ borderColor: BRAND, color: BRAND, background: `${BRAND}0D` }}
+    >
+      <span>{emoji}</span>
+      <span className="font-medium">{label}</span>
+      <span className="opacity-70">· {value}</span>
+    </span>
+  )
+
+  const EnhancedBrandHeader = () => {
     const name = brand?.name || 'Agent'
     const logo = brand?.logoUrl
-    const total = rows.length
     const rating = brand?.rating
+    const tagline = brand?.tagline || t('agent.tagline', 'Đối tác cho thuê uy tín')
+
+    const typeMeta: Record<CanonType, { label: string; emoji: string }> = {
+      bike:      { label: t('vehicle.bike', 'Xe đạp'),     emoji: '🚲' },
+      motorbike: { label: t('vehicle.motorbike', 'Xe máy'), emoji: '🛵' },
+      car:       { label: t('vehicle.car', 'Ô tô'),         emoji: '🚗' },
+      van:       { label: t('vehicle.van', 'Van'),          emoji: '🚐' },
+      bus:       { label: t('vehicle.bus', 'Xe bus'),       emoji: '🚌' },
+      other:     { label: t('vehicle.other', 'Khác'),       emoji: '🚘' },
+    }
 
     return (
-      <div className="w-full bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-lg border-2 overflow-hidden" style={{ borderColor: BRAND }}>
-            {logo ? (
-              <Image src={logo} alt={`${name} logo`} fill className="object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center font-bold text-white" style={{ backgroundColor: BRAND }}>
-                {name.charAt(0).toUpperCase()}
+      <div className="font-sans w-full">
+        <div
+          className="w-full h-[120px]"
+          style={{ background: `linear-gradient(135deg, ${BRAND} 0%, #11e8a0 100%)` }}
+        />
+        <div className="bg-white">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="-mt-10 pb-3 flex items-end gap-3">
+              <div className="relative w-16 h-16 rounded-xl ring-4 ring-white overflow-hidden bg-white border"
+                   style={{ borderColor: BRAND }}>
+                {logo ? (
+                  <Image src={logo} alt={`${name} logo`} fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center font-bold text-white"
+                       style={{ backgroundColor: BRAND }}>
+                    {name.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-extrabold truncate" style={{ color: BRAND }}>{name}</h2>
-              {typeof rating === 'number' && (
-                <span className="text-[11px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">⭐ {rating.toFixed(1)}</span>
-              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-extrabold truncate" style={{ color: BRAND }}>{name}</h1>
+                  {typeof rating === 'number' && (
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                      ⭐ {rating.toFixed(1)}
+                    </span>
+                  )}
+                </div>
+                {tagline && <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">{tagline}</p>}
+              </div>
+
+              <div className="shrink-0">
+                <span className="text-xs px-2 py-1 rounded-full"
+                      style={{ background: `${BRAND}1A`, color: BRAND }}>
+                  {t('agent_joined_models.available_models', '{{n}} mẫu', { n: totalModels })}
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div className="shrink-0">
-            <span className="text-xs px-2 py-1 rounded-full" style={{ background: `${BRAND}1A`, color: BRAND }}>
-              {t('agent_joined_models.available_models', '{{n}} mẫu', { n: total })}
-            </span>
+            <div className="-mx-1 overflow-x-auto">
+              <div className="flex gap-2 px-1 pb-2">
+                {/* ✅ Tổng MẪU (không phải tổng xe) */}
+                <StatChip
+                  emoji="📦"
+                  label={t('vehicle.total_models', 'Tổng mẫu')}
+                  value={totalModels}
+                />
+
+                {TYPE_ORDER.map((k) =>
+                  (perTypeModels[k] ?? 0) > 0 ? (
+                    <StatChip
+                      key={k}
+                      emoji={typeMeta[k].emoji}
+                      label={`${typeMeta[k].label} (${t('vehicle.models', 'mẫu')})`}
+                      value={perTypeModels[k]}
+                    />
+                  ) : null
+                )}
+
+                {/*
+                // Nếu vẫn muốn hiển thị thêm tổng số XE (units), mở comment:
+                <StatChip
+                  emoji="🚘"
+                  label={t('vehicle.total_units', 'Tổng xe')}
+                  value={totalVehicles}
+                />
+                */}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     )
   }
 
-  /* ==== Section (thẻ cuộn ngang) ==== */
-  const Section = ({ title, data }: { title: string; data: CardRow[] }) => (
+  /* ==== Section ==== */
+  const Section = ({ title, data }: { title: string; data: ModelCardRow[] }) => (
     <div className="mt-4">
       <div className="px-4">
         <h3 className="text-lg font-semibold" style={{ color: BRAND }}>{title}</h3>
@@ -384,24 +507,12 @@ export default function AgentJoinedModelsShowcase({
                   {r.model.name}
                 </h4>
 
-                {/* Giá theo ngày */}
-                <div className="mt-1 flex items-baseline gap-2">
+                <div className="mt-1">
                   <span className="text-sm font-semibold" style={{ color: BRAND }}>
-                    {formatVND(r.finalPrice)}{r.finalPrice != null ? '/ngày' : ''}
+                    {formatVND(r.baseFrom)}{r.baseFrom != null ? '/ngày' : ''}
                   </span>
-                  {r.basePerDay != null &&
-                    r.finalPrice != null &&
-                    r.finalPrice !== r.basePerDay && (
-                      <span className="text-xs text-gray-500 line-through">
-                        {formatVND(r.basePerDay)}/ngày
-                      </span>
-                  )}
                 </div>
 
-                {/* Mô tả CTKM */}
-                <p className="text-xs text-gray-600 mt-2 line-clamp-2">{r.programTitle}</p>
-
-                {/* Thông số: brand, fuelType, topSpeed, range, maxLoad, capacity */}
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-gray-600 mt-2">
                   {r.model.brand && <div>🏷 {r.model.brand}</div>}
                   {r.model.fuelType && <div>⛽ {String(r.model.fuelType as FuelType)}</div>}
@@ -411,15 +522,19 @@ export default function AgentJoinedModelsShowcase({
                   {typeof r.model.capacity === 'number' && <div>🪑 {r.model.capacity} chỗ</div>}
                 </div>
 
+                <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                  <span>{t('vehicle.available_count', '{{n}} xe khả dụng', { n: r.vehicleCount })}</span>
+                </div>
+
                 <div className="mt-4">
                   <Button
                     size="sm"
                     variant="greenOutline"
                     className="w-full px-4 py-2 text-sm font-semibold border"
                     style={{ color: BRAND, borderColor: BRAND }}
-                    onClick={() => setNoticeOpen(true)}
+                    onClick={() => router.push(`/vehicle-models/${r.model.id}`)}
                   >
-                    {t('vehicleModelSection.rent_button', 'Thuê ngay')}
+                    {t('vehicleModelSection.view_detail', 'Xem chi tiết')}
                   </Button>
                 </div>
               </div>
@@ -432,10 +547,8 @@ export default function AgentJoinedModelsShowcase({
 
   return (
     <section className="pt-0 pb-6">
-      {/* Header thương hiệu tối giản */}
-      <CompactBrandHeader />
+      <EnhancedBrandHeader />
 
-      {/* Skeleton hàng tổng quát khi chưa biết nhóm */}
       {loading && (
         <div className="max-w-7xl mx-auto mt-4 -mx-4 overflow-x-auto">
           <div className="flex w-max gap-3 px-4 py-3">
@@ -444,21 +557,27 @@ export default function AgentJoinedModelsShowcase({
         </div>
       )}
 
-      {/* Nhóm & render động theo VehicleType (chỉ render nhóm có xe) */}
       {!loading && (
         <div className="max-w-7xl mx-auto">
-          {TYPE_ORDER.map(({ key, label }) => {
+          {TYPE_ORDER.map((key) => {
+            const labelMap: Record<CanonType, string> = {
+              bike: t('vehicle.bike', 'Xe đạp'),
+              motorbike: t('vehicle.motorbike', 'Xe máy'),
+              car: t('vehicle.car', 'Ô tô'),
+              van: t('vehicle.van', 'Van / Limo'),
+              bus: t('vehicle.bus', 'Xe bus'),
+              other: t('vehicle.other', 'Khác'),
+            }
             const data = grouped[key] || []
             return data.length > 0 ? (
-              <Section key={key} title={label} data={data} />
+              <Section key={key} title={labelMap[key]} data={data} />
             ) : null
           })}
 
-          {/* Fallback khi không có bất kỳ nhóm nào */}
-          {Object.values(grouped).every((arr) => (arr?.length || 0) === 0) && (
+          {TYPE_ORDER.every((k) => (grouped[k]?.length || 0) === 0) && (
             <div className="px-4 mt-6">
               <div className="rounded-2xl bg-white border p-6 text-sm text-gray-600">
-                {t('agent_joined_models.empty', 'Bạn chưa tham gia chương trình nào có mẫu xe.')}
+                {t('agent_joined_models.empty', 'Không có mẫu phù hợp trong các chương trình bạn đã tham gia.')}
               </div>
             </div>
           )}

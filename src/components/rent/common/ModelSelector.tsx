@@ -19,7 +19,7 @@ export default function ModelSelector({ companyId, value, onChange }: ModelSelec
   useEffect(() => {
     const fetchModels = async () => {
       const snapshot = await getDocs(
-        query(collection(db, 'ebikeModels'), where('companyId', '==', companyId), where('available', '==', true))
+        query(collection(db, 'vehicleModels'), where('companyId', '==', companyId), where('available', '==', true))
       );
       const availableModels = snapshot.docs
         .map(doc => ({ id: doc.id, ...(doc.data() as any) }))

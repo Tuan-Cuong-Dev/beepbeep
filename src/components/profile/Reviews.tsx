@@ -8,7 +8,7 @@ export default function Reviews() {
         Write your first review!
       </h2>
       <p className="text-gray-700 mb-4 text-center">
-        Your opinion matters! Start reviewing brands, stations, ebikes to do & more on eBikeRental.
+        Your opinion matters! Start reviewing brands, stations, vehicles to do & more on vehicleRental.
       </p>
       <Link href="/reviews/new">
         <Button variant="ghost" type="button">Write Review</Button>

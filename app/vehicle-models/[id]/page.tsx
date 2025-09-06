@@ -25,7 +25,7 @@ export default function VehicleModelDetailPage() {
     const fetchModel = async () => {
       if (!modelId) return;
       try {
-        const docSnap = await getDoc(doc(db, 'ebikeModels', modelId));
+        const docSnap = await getDoc(doc(db, 'vehicleModels', modelId));
         if (docSnap.exists()) setModel({ id: docSnap.id, ...docSnap.data() });
       } catch (err) {
         console.error(err);
@@ -41,7 +41,7 @@ export default function VehicleModelDetailPage() {
       if (!model?.companyId || !modelId) return;
       try {
         const snapshot = await getDocs(
-          query(collection(db, 'ebikeModels'), where('companyId', '==', model.companyId))
+          query(collection(db, 'vehicleModels'), where('companyId', '==', model.companyId))
         );
         const filtered = snapshot.docs
           .filter((doc) => doc.id !== modelId)
