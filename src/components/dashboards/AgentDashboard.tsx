@@ -134,7 +134,7 @@ export default function AgentDashboard() {
             ⚡ {t("agent_dashboard.quick_actions")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <QuickAction label={t("agent_dashboard.modelstables")} href="dashboard/programs/rental-programs/AgentJoinedModelsTable" />
+            <QuickAction label={t("agent_dashboard.selections")} href="dashboard/programs/rental-programs/AgentJoinedModelsTable" />
             <QuickAction label={t("agent_dashboard.showcases")} href="dashboard/programs/rental-programs/AgentJoinedModelsShowcase" />
             <QuickAction label={t("agent_dashboard.refer_customer")} href="#" />
             <QuickAction label={t("agent_dashboard.view_commission_history")} href="/dashboard/earnings" />
