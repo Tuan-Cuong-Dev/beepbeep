@@ -1,20 +1,116 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import Image from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { Tabs, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
 import {
   VehicleModel,
-  VehicleType,
   VEHICLE_TYPE_LABELS,
 } from '@/src/lib/vehicle-models/vehicleModelTypes';
 
+/* ---------- Image helpers & fallbacks ---------- */
+import bicycleIcon from '@/public/assets/images/vehicles/bicycle.png';
+import motorbikeIcon from '@/public/assets/images/vehicles/motorbike.png';
+import carIcon from '@/public/assets/images/vehicles/car.png';
+import vanIcon from '@/public/assets/images/vehicles/van.png';
+import busIcon from '@/public/assets/images/vehicles/bus.png';
+
+const DEFAULT_ICONS: Record<string, StaticImageData> = {
+  bike: bicycleIcon,
+  motorbike: motorbikeIcon,
+  car: carIcon,
+  van: vanIcon,
+  bus: busIcon,
+};
+
+const PLACEHOLDER_SVG =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" fill="none">
+  <rect width="320" height="180" fill="#F6F7F9"/>
+  <rect x="20" y="50" width="280" height="80" rx="10" stroke="#CBD5E1" stroke-width="2" fill="none"/>
+  <circle cx="90" cy="130" r="9" fill="#CBD5E1"/>
+  <circle cx="230" cy="130" r="9" fill="#CBD5E1"/>
+</svg>
+`);
+
+const toDirectDriveUrl = (url?: string): string | undefined => {
+  if (!url) return undefined;
+  // match /d/<id>/... or ?id=<id>
+  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  const id = m1?.[1] || m2?.[1];
+  return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
+};
+
+const resolveModelImage = (model: VehicleModel): string | StaticImageData => {
+  const direct = toDirectDriveUrl(model.imageUrl);
+  if (direct) return direct;
+  const vt = (model.vehicleType || '').toLowerCase();
+  const key = vt === 'bicycle' ? 'bike' : vt;
+  return DEFAULT_ICONS[key] ?? PLACEHOLDER_SVG;
+};
+
+/* ---------- Card (tách state fallback ảnh theo từng item) ---------- */
+function ModelCard({ model, onClick }: { model: VehicleModel; onClick: () => void }) {
+  const initialSrc = useMemo(() => resolveModelImage(model), [model]);
+  const [imgSrc, setImgSrc] = useState<string | StaticImageData>(initialSrc);
+
+  return (
+    <div
+      className="bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
+      onClick={onClick}
+    >
+      <div className="bg-white h-[180px] w-full relative flex items-center justify-center p-4">
+        <Image
+          src={imgSrc}
+          alt={model.name || 'Vehicle'}
+          width={320}
+          height={180}
+          className="object-contain w-full h-full transition-transform duration-300 group-hover:scale-105"
+          onError={() => {
+            // Nếu ảnh lỗi → rơi về icon theo loại, cuối cùng là placeholder
+            const vt = (model.vehicleType || '').toLowerCase();
+            const key = vt === 'bicycle' ? 'bike' : vt;
+            setImgSrc(DEFAULT_ICONS[key] ?? PLACEHOLDER_SVG);
+          }}
+        />
+      </div>
+
+      <div className="px-4 pb-4 pt-2">
+        <h3 className="font-semibold text-gray-800 text-base mb-1 line-clamp-1">
+          {model.name}
+        </h3>
+        <p className="text-sm text-[#00d289] font-semibold mb-2">
+          {formatCurrency(model.pricePerDay ?? 0)} / day
+        </p>
+
+        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+          {model.motorPower && (
+            <div className="flex items-center gap-1">⚙️ {model.motorPower}W</div>
+          )}
+          {model.topSpeed && (
+            <div className="flex items-center gap-1">⚡ {model.topSpeed} km/h</div>
+          )}
+          {model.range && (
+            <div className="flex items-center gap-1">📏 {model.range} km</div>
+          )}
+          {model.maxLoad && (
+            <div className="flex items-center gap-1">🏋️ {model.maxLoad} kg</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Page ---------- */
 export default function VehicleModelsPage() {
   const [models, setModels] = useState<VehicleModel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,49 +203,11 @@ export default function VehicleModelsPage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5">
             {filteredModels.map((model) => (
-              <div
+              <ModelCard
                 key={model.id}
-                className="bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
+                model={model}
                 onClick={() => router.push(`/vehicle-models/${model.id}`)}
-              >
-                <div className="bg-white h-[180px] w-full relative flex items-center justify-center p-4">
-                  {model.imageUrl ? (
-                    <Image
-                      src={model.imageUrl}
-                      alt={model.name}
-                      width={300}
-                      height={180}
-                      className="object-contain w-full h-full transition-transform duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center text-gray-400">
-                      No Image
-                    </div>
-                  )}
-                </div>
-
-                <div className="px-4 pb-4 pt-2">
-                  <h3 className="font-semibold text-gray-800 text-base mb-1">{model.name}</h3>
-                  <p className="text-sm text-[#00d289] font-semibold mb-2">
-                    {formatCurrency(model.pricePerDay?? 0)} / day
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                    {model.motorPower && (
-                      <div className="flex items-center gap-1">⚙️ {model.motorPower}W</div>
-                    )}
-                    {model.topSpeed && (
-                      <div className="flex items-center gap-1">⚡ {model.topSpeed} km/h</div>
-                    )}
-                    {model.range && (
-                      <div className="flex items-center gap-1">📏 {model.range} km</div>
-                    )}
-                    {model.maxLoad && (
-                      <div className="flex items-center gap-1">🏋️ {model.maxLoad} kg</div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              />
             ))}
           </div>
         )}
