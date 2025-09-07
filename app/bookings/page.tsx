@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBookingData } from '@/src/hooks/useBookingData';
 import { useUser } from '@/src/context/AuthContext';
@@ -23,15 +23,16 @@ import NotificationDialog, { NotificationType } from '@/src/components/ui/Notifi
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 
-type EntityType = 'rentalCompany' | 'privateProvider';
+type EntityType = 'rentalCompany' | 'privateProvider' | 'agent';
 
 export default function BookingManagementPage() {
   const { t } = useTranslation('common', { keyPrefix: 'booking_management_page' });
 
   const { user, role, companyId, stationId } = useUser();
-  const normalizedRole = role?.toLowerCase() ?? '';
+  const normalizedRole = (role || '').toLowerCase();
+  const isAgent = normalizedRole === 'agent';
 
-  // Xác định entityType + ownerId (companyId hoặc providerId)
+  // Xác định entityType + ownerId (companyId | providerId | agent userId)
   const [entityType, setEntityType] = useState<EntityType>('rentalCompany');
   const [ownerId, setOwnerId] = useState<string>('');
   const [resolvingOwner, setResolvingOwner] = useState<boolean>(true);
@@ -41,7 +42,11 @@ export default function BookingManagementPage() {
     (async () => {
       setResolvingOwner(true);
       try {
-        if (normalizedRole === 'private_provider') {
+        if (isAgent) {
+          // 👇 Agent theo dõi booking của chính mình -> dùng user.uid
+          setEntityType('agent');
+          if (mounted) setOwnerId(user?.uid ?? '');
+        } else if (normalizedRole === 'private_provider') {
           setEntityType('privateProvider');
           if (user?.uid) {
             const snap = await getDocs(
@@ -60,10 +65,8 @@ export default function BookingManagementPage() {
         if (mounted) setResolvingOwner(false);
       }
     })();
-    return () => {
-      mounted = false;
-    };
-  }, [normalizedRole, companyId, user?.uid]);
+    return () => { mounted = false; };
+  }, [normalizedRole, companyId, user?.uid, isAgent]);
 
   // Lọc nâng cao
   const [searchText, setSearchText] = useState('');
@@ -71,7 +74,10 @@ export default function BookingManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<{ startDate?: string; endDate?: string }>({});
 
-  // Gọi hook mới (hook sẽ tự bỏ qua khi ownerId trống)
+  // ✅ Công tắc “Chỉ đơn của tôi” (mặc định bật cho Agent)
+  const [onlyMine, setOnlyMine] = useState<boolean>(isAgent);
+
+  // Hook data (đã hỗ trợ entityType='agent' trong useBookingData – xem patch bên dưới)
   const {
     bookings,
     stationNames,
@@ -93,30 +99,30 @@ export default function BookingManagementPage() {
     title: string;
     description?: string;
     onConfirm?: () => void;
-  }>({
-    open: false,
-    type: 'info',
-    title: '',
-  });
+  }>({ open: false, type: 'info', title: '' });
 
-  const filteredBookings = bookings.filter((b) => {
-    // Hook đã lọc theo ownerId, nên chỉ cần siết thêm cho station_manager
-    const matchesRole =
-      normalizedRole === 'station_manager' && stationId
-        ? b.stationId === stationId
+  // Lọc ở client (bổ sung điều kiện cho agent/onlyMine + station_manager)
+  const filteredBookings = useMemo(() => {
+    return bookings.filter((b) => {
+      const matchesAgentScope = isAgent && onlyMine ? b.userId === user?.uid || (b as any)?.agentId === user?.uid : true;
+
+      const matchesRole =
+        normalizedRole === 'station_manager' && stationId
+          ? b.stationId === stationId
+          : true;
+
+      const matchesSearch = searchText
+        ? (b.fullName || '').toLowerCase().includes(searchText.toLowerCase()) ||
+          (b.phone || '').includes(searchText) ||
+          (b.vin || '').includes(searchText)
         : true;
 
-    const matchesSearch = searchText
-      ? (b.fullName || '').toLowerCase().includes(searchText.toLowerCase()) ||
-        (b.phone || '').includes(searchText) ||
-        (b.vin || '').includes(searchText)
-      : true;
+      const matchesStatus =
+        statusFilter === 'All' || (b.bookingStatus || '').toLowerCase() === statusFilter.toLowerCase();
 
-    const matchesStatus =
-      statusFilter === 'All' || (b.bookingStatus || '').toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesRole && matchesSearch && matchesStatus;
-  });
+      return matchesAgentScope && matchesRole && matchesSearch && matchesStatus;
+    });
+  }, [bookings, isAgent, onlyMine, user?.uid, normalizedRole, stationId, searchText, statusFilter]);
 
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedBookings = filteredBookings.slice(startIndex, startIndex + pageSize);
@@ -128,20 +134,17 @@ export default function BookingManagementPage() {
     private_provider: t('badge_roles.private_provider'),
     company_admin: t('badge_roles.company_admin'),
     station_manager: t('badge_roles.station_manager'),
+    agent: t('badge_roles.agent', { defaultValue: 'Cộng tác viên' }),
   };
 
   const getBadgeColor = (r: string) => {
     switch (r) {
-      case 'admin':
-        return 'bg-red-100 text-red-800';
-      case 'company_owner':
-        return 'bg-green-100 text-green-800';
-      case 'private_provider':
-        return 'bg-blue-100 text-blue-800';
-      case 'station_manager':
-        return 'bg-purple-100 text-purple-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'admin': return 'bg-red-100 text-red-800';
+      case 'company_owner': return 'bg-green-100 text-green-800';
+      case 'private_provider': return 'bg-blue-100 text-blue-800';
+      case 'station_manager': return 'bg-purple-100 text-purple-800';
+      case 'agent': return 'bg-amber-100 text-amber-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -153,32 +156,24 @@ export default function BookingManagementPage() {
       description: t('notification.delete_confirm_description'),
       onConfirm: () => {
         deleteBooking(id);
-        setNotification({
-          open: true,
-          type: 'success',
-          title: t('notification.delete_success'),
-        });
+        setNotification({ open: true, type: 'success', title: t('notification.delete_success') });
       },
     });
   };
 
   const handleImportBookings = async (file: File) => {
     try {
-      const importedBookings = await importBookingsFromExcel(file);
-      for (const booking of importedBookings) {
-        await saveBooking(booking as Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>);
+      const imported = await importBookingsFromExcel(file);
+      for (const b of imported) {
+        await saveBooking(b as Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>);
       }
       setNotification({
         open: true,
         type: 'success',
-        title: t('notification.import_success', { count: importedBookings.length }),
+        title: t('notification.import_success', { count: imported.length }),
       });
     } catch {
-      setNotification({
-        open: true,
-        type: 'error',
-        title: t('notification.import_failed'),
-      });
+      setNotification({ open: true, type: 'error', title: t('notification.import_failed') });
     }
   };
 
@@ -188,18 +183,31 @@ export default function BookingManagementPage() {
       <UserTopMenu />
 
       <main className="flex-1 p-4 space-y-6 bg-gray-50">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <h1 className="text-2xl font-bold">
             {t('title', { defaultValue: 'Quản lý đơn thuê xe' })}
           </h1>
-          <Badge className={`text-sm px-3 py-1 rounded-full ${getBadgeColor(normalizedRole)}`}>
-            {roleDisplayName[normalizedRole] || t('badge_roles.user', { defaultValue: 'Người dùng' })}
-          </Badge>
+          <div className="flex items-center gap-3">
+            {isAgent && (
+              <label className="inline-flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="rounded border"
+                  checked={onlyMine}
+                  onChange={(e) => setOnlyMine(e.target.checked)}
+                />
+                <span>{t('only_mine', { defaultValue: 'Chỉ đơn của tôi' })}</span>
+              </label>
+            )}
+            <Badge className={`text-sm px-3 py-1 rounded-full ${getBadgeColor(normalizedRole)}`}>
+              {roleDisplayName[normalizedRole] || t('badge_roles.user', { defaultValue: 'Người dùng' })}
+            </Badge>
+          </div>
         </div>
 
-        {/* Thông báo chưa xác định owner cho private provider */}
+        {/* Thông báo nếu chưa resolve owner (provider) */}
         {resolvingOwner && <p>{t('loading')}</p>}
-        {!resolvingOwner && !ownerId && (
+        {!resolvingOwner && !ownerId && !isAgent && (
           <p className="text-red-600">
             {t('no_owner_found', { defaultValue: 'Không xác định được đơn vị quản lý cho tài khoản hiện tại.' })}
           </p>
@@ -217,19 +225,23 @@ export default function BookingManagementPage() {
           <Button onClick={() => exportBookingsToExcel(filteredBookings)}>
             {t('export_button')}
           </Button>
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            id="importBookings"
-            hidden
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleImportBookings(file);
-            }}
-          />
-          <Button onClick={() => document.getElementById('importBookings')?.click()}>
-            {t('import_button')}
-          </Button>
+          {!isAgent && (
+            <>
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                id="importBookings"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImportBookings(file);
+                }}
+              />
+              <Button onClick={() => document.getElementById('importBookings')?.click()}>
+                {t('import_button')}
+              </Button>
+            </>
+          )}
         </div>
 
         <Card>
@@ -277,7 +289,7 @@ export default function BookingManagementPage() {
                 userNames={userNames}
                 packageNames={packageNames}
                 packages={[]}
-                ebikes={[]}
+                vehicles={[]}
                 onSave={async (data) => {
                   await saveBooking(data as Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>);
                   setEditingBooking(null);

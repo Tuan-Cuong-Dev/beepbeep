@@ -1,8 +1,11 @@
 'use client'
 
 /**
- * AgentJoinedModelsShowcase (dedupe-by-model, show BASE price only) — FIXED COUNTS
- * - Chuẩn hoá vehicleType để đếm & nhóm chính xác.
+ * AgentJoinedModelsShowcase (dedupe-by-model, BASE price only) — BOOKING READY
+ * - Hiển thị theo MODEL (gom các xe từ những Program agent đã JOIN).
+ * - Giá hiển thị: baseFrom = MIN(vehicle.pricePerDay) (không áp KM).
+ * - Nút hành động: Đặt xe → /bookings/new?modelId=...&companyId=...&stationId=...&vehicleId=...
+ *   (prefill theo chiếc có giá/ngày thấp nhất tìm được).
  */
 
 import * as React from 'react'
@@ -78,13 +81,11 @@ const TYPE_ORDER: CanonType[] = ['bike', 'motorbike', 'car', 'van', 'bus', 'othe
 function normalizeVehicleType(input?: string): CanonType {
   const s = (input || '').trim().toLowerCase()
   if (!s) return 'other'
-  // aliases
   if (['bicycle', 'bike', 'ebike', 'cycle', 'xe đạp'].includes(s)) return 'bike'
   if (['motorbike', 'moto', 'motor', 'scooter', 'motorcycle', 'xe máy', 'xe tay ga'].includes(s)) return 'motorbike'
   if (['car', 'sedan', 'suv', 'hatchback', 'coupe', 'pickup', 'xe hơi', 'ô tô'].includes(s)) return 'car'
   if (['van', 'minivan', 'limo', 'limousine'].includes(s)) return 'van'
   if (['bus', 'coach'].includes(s)) return 'bus'
-  // nếu là 1 key đã hỗ trợ → dùng luôn
   if ((['bike','motorbike','car','van','bus'] as string[]).includes(s)) return s as CanonType
   return 'other'
 }
@@ -256,8 +257,10 @@ type ModelCardRow = {
   model: VehicleModel
   baseFrom: number | null
   vehicleCount: number
-  discountedBest?: number | null
-  bestProgramTitle?: string
+  // ↓ Gợi ý cho Booking: chiếc có baseFrom thấp nhất
+  preferredCompanyId?: string
+  preferredStationId?: string
+  preferredVehicleId?: string
 }
 
 interface ShowcaseProps {
@@ -318,11 +321,17 @@ export default function AgentJoinedModelsShowcase({
               model: vm,
               baseFrom: base,
               vehicleCount: 1,
+              preferredCompanyId: v.companyId,
+              preferredStationId: v.stationId,
+              preferredVehicleId: v.id,
             })
           } else {
             cur.vehicleCount += 1
             if (base != null && (cur.baseFrom == null || base < cur.baseFrom)) {
               cur.baseFrom = base
+              cur.preferredCompanyId = v.companyId
+              cur.preferredStationId = v.stationId
+              cur.preferredVehicleId = v.id
             }
           }
         })
@@ -354,20 +363,14 @@ export default function AgentJoinedModelsShowcase({
     return g
   }, [rows])
 
-  /* ==== Thống kê chính xác ==== */
-  const { totalModels, totalVehicles, perTypeModels } = React.useMemo(() => {
-    const totalModels = rows.length // số model duy nhất sau dedupe
-    let totalVehicles = 0
+  /* ==== Header đẹp + stats ==== */
+  const { totalModels, perTypeModels } = React.useMemo(() => {
+    const totalModels = rows.length
     const perTypeModels: Record<CanonType, number> = { bike:0, motorbike:0, car:0, van:0, bus:0, other:0 }
-    rows.forEach(r => {
-      const k = normalizeVehicleType(r.model?.vehicleType)
-      perTypeModels[k] += 1          // đếm THEO MODEL
-      totalVehicles += (r.vehicleCount || 0)
-    })
-    return { totalModels, totalVehicles, perTypeModels }
+    rows.forEach(r => { perTypeModels[normalizeVehicleType(r.model?.vehicleType)] += 1 })
+    return { totalModels, perTypeModels }
   }, [rows])
 
-  /* ==== Header đẹp + đếm đúng ==== */
   const StatChip = ({ emoji, label, value }: { emoji: string; label: string; value: number }) => (
     <span
       className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full border whitespace-nowrap"
@@ -383,7 +386,6 @@ export default function AgentJoinedModelsShowcase({
     const name = brand?.name || 'Agent'
     const logo = brand?.logoUrl
     const rating = brand?.rating
-    const tagline = brand?.tagline || t('agent.tagline', 'Đối tác cho thuê uy tín')
 
     const typeMeta: Record<CanonType, { label: string; emoji: string }> = {
       bike:      { label: t('vehicle.bike', 'Xe đạp'),     emoji: '🚲' },
@@ -396,20 +398,13 @@ export default function AgentJoinedModelsShowcase({
 
     return (
       <div className="font-sans w-full">
-        <div
-          className="w-full h-[120px]"
-          style={{ background: `linear-gradient(135deg, ${BRAND} 0%, #11e8a0 100%)` }}
-        />
+        <div className="w-full h-[100px]" style={{ background: `linear-gradient(135deg, ${BRAND} 0%, #11e8a0 100%)` }} />
         <div className="bg-white">
           <div className="max-w-7xl mx-auto px-4">
             <div className="-mt-10 pb-3 flex items-end gap-3">
-              <div className="relative w-16 h-16 rounded-xl ring-4 ring-white overflow-hidden bg-white border"
-                   style={{ borderColor: BRAND }}>
-                {logo ? (
-                  <Image src={logo} alt={`${name} logo`} fill className="object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center font-bold text-white"
-                       style={{ backgroundColor: BRAND }}>
+              <div className="relative w-16 h-16 rounded-xl ring-4 ring-white overflow-hidden bg-white border" style={{ borderColor: BRAND }}>
+                {logo ? <Image src={logo} alt={`${name} logo`} fill className="object-cover" /> : (
+                  <div className="w-full h-full flex items-center justify-center font-bold text-white" style={{ backgroundColor: BRAND }}>
                     {name.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -424,12 +419,10 @@ export default function AgentJoinedModelsShowcase({
                     </span>
                   )}
                 </div>
-                {tagline && <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">{tagline}</p>}
               </div>
 
               <div className="shrink-0">
-                <span className="text-xs px-2 py-1 rounded-full"
-                      style={{ background: `${BRAND}1A`, color: BRAND }}>
+                <span className="text-xs px-2 py-1 rounded-full" style={{ background: `${BRAND}1A`, color: BRAND }}>
                   {t('agent_joined_models.available_models', '{{n}} mẫu', { n: totalModels })}
                 </span>
               </div>
@@ -437,38 +430,30 @@ export default function AgentJoinedModelsShowcase({
 
             <div className="-mx-1 overflow-x-auto">
               <div className="flex gap-2 px-1 pb-2">
-                {/* ✅ Tổng MẪU (không phải tổng xe) */}
-                <StatChip
-                  emoji="📦"
-                  label={t('vehicle.total_models', 'Tổng mẫu')}
-                  value={totalModels}
-                />
-
+                <StatChip emoji="📦" label={t('vehicle.total_models', 'Tổng mẫu')} value={totalModels} />
                 {TYPE_ORDER.map((k) =>
                   (perTypeModels[k] ?? 0) > 0 ? (
-                    <StatChip
-                      key={k}
-                      emoji={typeMeta[k].emoji}
-                      label={`${typeMeta[k].label} (${t('vehicle.models', 'mẫu')})`}
-                      value={perTypeModels[k]}
-                    />
+                    <StatChip key={k} emoji={typeMeta[k].emoji} label={`${typeMeta[k].label} (${t('vehicle.models', 'mẫu')})`} value={perTypeModels[k]} />
                   ) : null
                 )}
-
-                {/*
-                // Nếu vẫn muốn hiển thị thêm tổng số XE (units), mở comment:
-                <StatChip
-                  emoji="🚘"
-                  label={t('vehicle.total_units', 'Tổng xe')}
-                  value={totalVehicles}
-                />
-                */}
               </div>
             </div>
           </div>
         </div>
       </div>
     )
+  }
+
+  /* ==== BOOK action ==== */
+  const handleBook = (r: ModelCardRow) => {
+    const params = new URLSearchParams()
+    params.set('modelId', r.model.id)
+    if (r.preferredCompanyId) params.set('companyId', r.preferredCompanyId)
+    if (r.preferredStationId) params.set('stationId', r.preferredStationId)
+    if (r.preferredVehicleId) params.set('vehicleId', r.preferredVehicleId)
+    if (r.baseFrom != null) params.set('basePricePerDay', String(r.baseFrom))
+    params.set('source', 'agent_showcase')
+    router.push(`/bookings/new?${params.toString()}`)
   }
 
   /* ==== Section ==== */
@@ -489,17 +474,15 @@ export default function AgentJoinedModelsShowcase({
               key={r.key}
               className="min-w-[78vw] max-w-[78vw] sm:min-w-[260px] sm:max-w-[260px] bg-white rounded-2xl shadow-md hover:shadow-lg transition-all"
             >
-              <div className="cursor-pointer" onClick={() => router.push(`/vehicle-models/${r.model.id}`)}>
-                <div className="bg-white rounded-t-2xl overflow-hidden">
-                  <Image
-                    src={resolveModelImage(r.model)}
-                    alt={r.model.name}
-                    width={640}
-                    height={360}
-                    className="w-full h-[44vw] max-h-[180px] object-contain bg-white"
-                    priority={false}
-                  />
-                </div>
+              <div className="bg-white rounded-t-2xl overflow-hidden">
+                <Image
+                  src={resolveModelImage(r.model)}
+                  alt={r.model.name}
+                  width={640}
+                  height={360}
+                  className="w-full h-[44vw] max-h-[180px] object-contain bg-white"
+                  priority={false}
+                />
               </div>
 
               <div className="p-4">
@@ -532,9 +515,9 @@ export default function AgentJoinedModelsShowcase({
                     variant="greenOutline"
                     className="w-full px-4 py-2 text-sm font-semibold border"
                     style={{ color: BRAND, borderColor: BRAND }}
-                    onClick={() => router.push(`/vehicle-models/${r.model.id}`)}
+                    onClick={() => handleBook(r)}
                   >
-                    {t('vehicleModelSection.view_detail', 'Xem chi tiết')}
+                    {t('booking.book_now', 'Đặt xe')}
                   </Button>
                 </div>
               </div>

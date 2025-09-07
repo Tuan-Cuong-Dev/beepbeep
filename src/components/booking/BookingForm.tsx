@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useBookingForm } from '@/src/hooks/useBookingForm';
 import { useUser } from '@/src/context/AuthContext';
-import { Ebike } from '@/src/lib/vehicles/ebikeTypes';
+import { Vehicle } from '@/src/lib/vehicles/vehicleTypes';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
@@ -20,7 +20,7 @@ interface Props {
   userNames: Record<string, string>;
   packageNames: Record<string, string>;
   packages: SubscriptionPackage[];
-  ebikes: Ebike[];
+  vehicles: Vehicle[];
   onSave: (data: Record<string, any>) => void;
   onCancel: () => void;
 }
@@ -41,7 +41,7 @@ export default function BookingForm({
   userNames,
   packageNames,
   packages,
-  ebikes,
+  vehicles,
   onSave,
   onCancel,
 }: Props) {

@@ -17,6 +17,7 @@ import {
 } from "firebase/firestore";
 
 // 🔐 Cấu hình Firebase (nên dùng biến môi trường trong production)
+// Cần chuyển đổi 2 authDomain này : "ebikerental-e1178.firebaseapp.com","auth.beepbeep.vn",
 export const firebaseConfig = {
   apiKey: "AIzaSyDZVAxSNVaAzCdZBS-5Wx1r_1aFNQgl5tE",
   authDomain: "ebikerental-e1178.firebaseapp.com",
