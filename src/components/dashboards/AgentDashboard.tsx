@@ -135,9 +135,9 @@ export default function AgentDashboard() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
             <QuickAction label={t("agent_dashboard.showcases")} href="dashboard/programs/rental-programs/AgentJoinedModelsShowcase" />
-            <QuickAction label={t("agent_dashboard.refer_customer")} href="#" />
-            <QuickAction label={t("agent_dashboard.view_commission_history")} href="/dashboard/earnings" />
-                        <QuickAction label={t("agent_dashboard.selections")} href="dashboard/programs/rental-programs/AgentJoinedModelsTable" />
+            <QuickAction label={t("agent_dashboard.refer_customer")} href="/agent/referrals/new" />
+            <QuickAction label={t("agent_dashboard.view_commission_history")} href="/agent/commissions" />
+            <QuickAction label={t("agent_dashboard.selections")} href="dashboard/programs/rental-programs/AgentJoinedModelsTable" />
             <QuickAction label={t("agent_dashboard.join_new_program")} href="dashboard/programs/rental-programs/AgentProgramTable" />
             {data.pendingCommission > 0 && (
               <QuickAction label={t("agent_dashboard.request_payment")} href="/dashboard/request-payment" />
