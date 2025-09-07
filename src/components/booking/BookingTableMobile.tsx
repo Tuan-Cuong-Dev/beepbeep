@@ -13,8 +13,11 @@ interface Props {
   companyNames: Record<string, string>;
   packageNames: Record<string, string>;
   userNames: Record<string, string>;
-  onEdit: (booking: Booking) => void;
-  onDelete: (id: string) => void;
+  /** Tuỳ chọn: truyền để hiện nút Sửa/Xoá */
+  onEdit?: (booking: Booking) => void;
+  onDelete?: (id: string) => void;
+  /** Ép hiện/ẩn khu vực thao tác; mặc định: hiện nếu có onEdit hoặc onDelete */
+  showActions?: boolean;
 }
 
 export default function BookingTableMobile({
@@ -25,19 +28,34 @@ export default function BookingTableMobile({
   userNames,
   onEdit,
   onDelete,
+  showActions,
 }: Props) {
   const { t } = useTranslation('common');
+  const actionsVisible =
+    typeof showActions === 'boolean' ? showActions : !!onEdit || !!onDelete;
 
   if (!bookings.length) {
-    return <div className="text-center text-gray-500 p-6">{t('booking_table.no_bookings')}</div>;
+    return (
+      <div className="text-center text-gray-500 p-6">
+        {t('booking_table.no_bookings')}
+      </div>
+    );
   }
+
+  const createdSecs = (b: Booking) =>
+    typeof (b as any)?.createdAt?.seconds === 'number'
+      ? (b as any).createdAt.seconds
+      : 0;
 
   return (
     <div className="flex flex-col gap-4 mt-4">
-      {bookings
-        .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
+      {[...bookings]
+        .sort((a, b) => createdSecs(b) - createdSecs(a))
         .map((b) => (
-          <div key={b.id} className="bg-white rounded-xl shadow-md p-4 text-sm space-y-2">
+          <div
+            key={b.id}
+            className="bg-white rounded-xl shadow-md p-4 text-sm space-y-2"
+          >
             {/* Customer + Status */}
             <div className="flex justify-between items-start">
               <div>
@@ -66,33 +84,51 @@ export default function BookingTableMobile({
             <div>
               <div className="font-medium">{b.vehicleModel}</div>
               <div className="text-xs text-gray-600">
-                VIN: {b.vin || 'N/A'} | {t('booking_table.plate')}: {b.licensePlate || 'N/A'}
+                VIN: {b.vin || 'N/A'} | {t('booking_table.plate')}:{' '}
+                {b.licensePlate || 'N/A'}
               </div>
             </div>
 
             {/* Pricing */}
             <div className="text-xs">
-              <div className="text-green-600 font-bold">{formatCurrency(b.totalAmount)}</div>
-              <div>{t('booking_table.package')}: {packageNames[b.package ?? ''] || 'N/A'}</div>
-              <div>{t('booking_table.deposit')}: {formatCurrency(b.deposit)}</div>
-              <div>{t('booking_table.remaining')}: {formatCurrency(b.remainingBalance)}</div>
+              <div className="text-green-600 font-bold">
+                {formatCurrency(b.totalAmount)}
+              </div>
+              <div>
+                {t('booking_table.package')}:{' '}
+                {packageNames[(b as any)?.package ?? ''] || 'N/A'}
+              </div>
+              <div>
+                {t('booking_table.deposit')}: {formatCurrency(b.deposit)}
+              </div>
+              <div>
+                {t('booking_table.remaining')}:{' '}
+                {formatCurrency(b.remainingBalance)}
+              </div>
             </div>
 
             {/* Rental Time */}
             <div className="text-xs text-gray-600">
-              {t('booking_table.rental_period')}: {safeFormatDate(b.rentalStartDate)} → {safeFormatDate(b.rentalEndDate)} ({b.rentalDays ?? 'N/A'} {t('booking_table.days')})
+              {t('booking_table.rental_period')}: {safeFormatDate(b.rentalStartDate)} →{' '}
+              {safeFormatDate(b.rentalEndDate)} ({b.rentalDays ?? 'N/A'}{' '}
+              {t('booking_table.days')})
             </div>
 
             {/* Delivery Method */}
             <div className="text-xs text-gray-700">
               <div className="flex items-center gap-1">
                 <Truck className="h-4 w-4 text-blue-600" />
-                {t(`delivery_method.${b.deliveryMethod}`, { defaultValue: b.deliveryMethod })}
+                {t(`delivery_method.${b.deliveryMethod}`, {
+                  defaultValue: b.deliveryMethod,
+                })}
               </div>
               {b.deliveryMethod === 'Deliver to Address' && b.deliveryAddress && (
-                <div className="text-xs text-gray-600 ml-6">{b.deliveryAddress}</div>
+                <div className="text-xs text-gray-600 ml-6">
+                  {b.deliveryAddress}
+                </div>
               )}
             </div>
+
             {/* Accessories */}
             <div className="text-xs text-gray-700">
               {t('booking_table.accessories')}:
@@ -101,15 +137,22 @@ export default function BookingTableMobile({
               {b.phoneHolder && <div>✔ {t('booking_table.phone_holder')}</div>}
               {b.rearRack && <div>✔ {t('booking_table.rear_rack')}</div>}
               {b.raincoat && <div>✔ {t('booking_table.raincoat')}</div>}
-              {!b.helmet && !b.charger && !b.phoneHolder && !b.rearRack && !b.raincoat && (
-                <div className="italic text-gray-400">{t('booking_table.none')}</div>
-              )}
+              {!b.helmet &&
+                !b.charger &&
+                !b.phoneHolder &&
+                !b.rearRack &&
+                !b.raincoat && (
+                  <div className="italic text-gray-400">
+                    {t('booking_table.none')}
+                  </div>
+                )}
             </div>
 
             {/* Battery Info */}
             <div className="text-xs">
               {t('booking_table.battery_info')}:
-              {[b.batteryCode1, b.batteryCode2, b.batteryCode3, b.batteryCode4].filter(Boolean).length > 0 ? (
+              {[b.batteryCode1, b.batteryCode2, b.batteryCode3, b.batteryCode4].filter(Boolean)
+                .length > 0 ? (
                 <>
                   {b.batteryCode1 && <div>🔋 {b.batteryCode1}</div>}
                   {b.batteryCode2 && <div>🔋 {b.batteryCode2}</div>}
@@ -117,45 +160,72 @@ export default function BookingTableMobile({
                   {b.batteryCode4 && <div>🔋 {b.batteryCode4}</div>}
                 </>
               ) : (
-                <div className="italic text-gray-400">{t('booking_table.no_batteries')}</div>
+                <div className="italic text-gray-400">
+                  {t('booking_table.no_batteries')}
+                </div>
               )}
             </div>
 
             {/* Notes */}
             <div className="text-xs text-gray-700">
-              {t('booking_table.notes')}: {b.note || <span className="italic text-gray-400">{t('booking_table.no_notes')}</span>}
+              {t('booking_table.notes')}: {b.note || (
+                <span className="italic text-gray-400">
+                  {t('booking_table.no_notes')}
+                </span>
+              )}
             </div>
 
-            {/* Station + Company */}
+            {/* Station + (Company optional nếu muốn) */}
             <div className="text-xs text-gray-600">
               {t('booking_table.station')}: {stationNames[b.stationId ?? ''] || 'N/A'}
+              {/* Nếu muốn hiện tên công ty ngay dưới: */}
+              {/* <div>{companyNames[b.companyId ?? ''] || 'N/A'}</div> */}
             </div>
 
             {/* Created Info */}
             <div className="text-xs text-gray-600">
-              {t('booking_table.created_by')}: {b.userId ? userNames[b.userId] || t('booking_table.unknown_user') : t('booking_table.unknown')}
+              {t('booking_table.created_by')}:{' '}
+              {b.userId
+                ? userNames[b.userId] || t('booking_table.unknown_user')
+                : t('booking_table.unknown')}
               <br />
-              {t('booking_table.booked_at')}: {safeFormatDate(b.createdAt, 'dd/MM/yyyy HH:mm')}
+              {t('booking_table.booked_at')}:{' '}
+              {safeFormatDate(b.createdAt, 'dd/MM/yyyy HH:mm')}
             </div>
 
-            {/* Comment */}
+            {/* Status comment */}
             <div className="text-xs text-gray-700">
-              {t('booking_table.status_comment')}: {b.statusComment || <span className="italic text-gray-400">{t('booking_table.no_comment')}</span>}
+              {t('booking_table.status_comment')}: {b.statusComment || (
+                <span className="italic text-gray-400">
+                  {t('booking_table.no_comment')}
+                </span>
+              )}
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-2 pt-2">
-              <Button
-                size="sm"
-                onClick={() => onEdit(b)}
-                className="bg-[#00d289] hover:bg-green-600 text-white w-full"
-              >
-                {t('booking_table.update')}
-              </Button>
-              <Button size="sm" variant="destructive" onClick={() => onDelete(b.id)} className="w-full">
-                {t('booking_table.delete')}
-              </Button>
-            </div>
+            {/* Actions (ẩn/hiện linh hoạt) */}
+            {actionsVisible && (
+              <div className="flex gap-2 pt-2">
+                {onEdit && (
+                  <Button
+                    size="sm"
+                    onClick={() => onEdit(b)}
+                    className="bg-[#00d289] hover:bg-green-600 text-white w-full"
+                  >
+                    {t('booking_table.update')}
+                  </Button>
+                )}
+                {onDelete && (
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => onDelete(b.id)}
+                    className="w-full"
+                  >
+                    {t('booking_table.delete')}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         ))}
     </div>

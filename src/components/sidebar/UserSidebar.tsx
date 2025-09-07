@@ -95,7 +95,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isOpen, onClose }) => {
       { icon: FaUser, label: t('user_sidebar.menu.profile'), path: '/profile' },
     ];
 
-    if (!['support','agent', 'technician', 'technician_assistant', 'technician_partner'].includes(normalizedRole)) {
+    if (!['support', 'technician', 'technician_assistant', 'technician_partner'].includes(normalizedRole)) {
       items.push({ icon: FaCalendarAlt, label: t('user_sidebar.menu.bookings'), path: '/bookings' });
     }
 

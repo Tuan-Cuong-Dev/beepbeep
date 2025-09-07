@@ -31,6 +31,7 @@ export default function BookingManagementPage() {
   const { user, role, companyId, stationId } = useUser();
   const normalizedRole = (role || '').toLowerCase();
   const isAgent = normalizedRole === 'agent';
+  const canManage = !isAgent; // ✅ Agent chỉ xem, không thao tác
 
   // Xác định entityType + ownerId (companyId | providerId | agent userId)
   const [entityType, setEntityType] = useState<EntityType>('rentalCompany');
@@ -43,7 +44,7 @@ export default function BookingManagementPage() {
       setResolvingOwner(true);
       try {
         if (isAgent) {
-          // 👇 Agent theo dõi booking của chính mình -> dùng user.uid
+          // Agent theo dõi booking của chính mình -> dùng user.uid
           setEntityType('agent');
           if (mounted) setOwnerId(user?.uid ?? '');
         } else if (normalizedRole === 'private_provider') {
@@ -77,7 +78,7 @@ export default function BookingManagementPage() {
   // ✅ Công tắc “Chỉ đơn của tôi” (mặc định bật cho Agent)
   const [onlyMine, setOnlyMine] = useState<boolean>(isAgent);
 
-  // Hook data (đã hỗ trợ entityType='agent' trong useBookingData – xem patch bên dưới)
+  // Hook data
   const {
     bookings,
     stationNames,
@@ -104,7 +105,8 @@ export default function BookingManagementPage() {
   // Lọc ở client (bổ sung điều kiện cho agent/onlyMine + station_manager)
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
-      const matchesAgentScope = isAgent && onlyMine ? b.userId === user?.uid || (b as any)?.agentId === user?.uid : true;
+      const matchesAgentScope =
+        isAgent && onlyMine ? b.userId === user?.uid || (b as any)?.agentId === user?.uid : true;
 
       const matchesRole =
         normalizedRole === 'station_manager' && stationId
@@ -257,8 +259,12 @@ export default function BookingManagementPage() {
                 companyNames={companyNames}
                 packageNames={packageNames}
                 userNames={userNames}
-                onEdit={(b) => setEditingBooking(b)}
-                onDelete={(id) => handleDeleteBooking(id)}
+                /* ✅ Giữ nguyên UI; chỉ thêm logic:
+                   - Agent: ẩn cột thao tác (nếu table hỗ trợ showActions),
+                   - đồng thời không truyền onEdit/onDelete để table tự ẩn nếu có điều kiện. */
+                showActions={canManage}
+                onEdit={canManage ? (b) => setEditingBooking(b) : undefined}
+                onDelete={canManage ? (id) => handleDeleteBooking(id) : undefined}
               />
             ) : (
               <p className="text-gray-500 text-center">{t('no_bookings')}</p>
@@ -273,33 +279,36 @@ export default function BookingManagementPage() {
 
       <Footer />
 
-      <Dialog open={!!editingBooking} onOpenChange={(open) => !open && setEditingBooking(null)}>
-        <DialogContent className="!p-0 w-full max-w-none h-screen overflow-y-auto rounded-none bg-white">
-          <DialogHeader className="bg-[#00d289] text-white px-6 py-4">
-            <DialogTitle className="text-lg font-semibold">
-              {editingBooking ? t('dialog.edit_title') : t('dialog.new_title')}
-            </DialogTitle>
-          </DialogHeader>
+      {/* ✅ Không mở dialog edit cho Agent */}
+      {canManage && (
+        <Dialog open={!!editingBooking} onOpenChange={(open) => !open && setEditingBooking(null)}>
+          <DialogContent className="!p-0 w-full max-w-none h-screen overflow-y-auto rounded-none bg-white">
+            <DialogHeader className="bg-[#00d289] text-white px-6 py-4">
+              <DialogTitle className="text-lg font-semibold">
+                {editingBooking ? t('dialog.edit_title') : t('dialog.new_title')}
+              </DialogTitle>
+            </DialogHeader>
 
-          {editingBooking && (
-            <div className="p-6">
-              <BookingForm
-                editingBooking={editingBooking}
-                companyNames={companyNames}
-                userNames={userNames}
-                packageNames={packageNames}
-                packages={[]}
-                vehicles={[]}
-                onSave={async (data) => {
-                  await saveBooking(data as Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>);
-                  setEditingBooking(null);
-                }}
-                onCancel={() => setEditingBooking(null)}
-              />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            {editingBooking && (
+              <div className="p-6">
+                <BookingForm
+                  editingBooking={editingBooking}
+                  companyNames={companyNames}
+                  userNames={userNames}
+                  packageNames={packageNames}
+                  packages={[]}
+                  vehicles={[]}
+                  onSave={async (data) => {
+                    await saveBooking(data as Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>);
+                    setEditingBooking(null);
+                  }}
+                  onCancel={() => setEditingBooking(null)}
+                />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
 
       <NotificationDialog
         open={notification.open}
