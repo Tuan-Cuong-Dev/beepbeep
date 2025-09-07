@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+// ❌ bỏ useSearchParams
+import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useBookingForm } from '@/src/hooks/useBookingForm';
@@ -40,23 +41,44 @@ async function resolveCompanyName(companyId: string): Promise<string> {
   return companyId;
 }
 
+type Qs = {
+  modelId: string;
+  companyId: string;
+  stationId: string;
+  vehicleId: string;
+  basePricePerDay: string | null;
+};
+
 export default function BookingNewPage() {
   const router = useRouter();
-  const search = useSearchParams();
 
-  // Safe param getter
-  const getParam = React.useCallback((k: string) => (search ? search.get(k) : null), [search]);
-
-  // Query từ Showcase
-  const modelId = getParam('modelId') ?? '';
-  const companyId = getParam('companyId') ?? '';
-  const stationIdQ = getParam('stationId') ?? '';
-  const vehicleIdQ = getParam('vehicleId') ?? '';
-  const basePricePerDayQ = getParam('basePricePerDay');
+  // 🔒 Đọc query client-side để không cản trở static export
+  const [qs, setQs] = React.useState<Qs | null>(null);
+  React.useEffect(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      setQs({
+        modelId: sp.get('modelId') ?? '',
+        companyId: sp.get('companyId') ?? '',
+        stationId: sp.get('stationId') ?? '',
+        vehicleId: sp.get('vehicleId') ?? '',
+        basePricePerDay: sp.get('basePricePerDay'),
+      });
+    } catch {
+      setQs({ modelId: '', companyId: '', stationId: '', vehicleId: '', basePricePerDay: null });
+    }
+  }, []);
 
   // Auth
   const { user } = useUser();
   const userId = user?.uid || '';
+
+  // Dùng companyId từ qs (ban đầu rỗng, hook sẽ tự cập nhật khi qs có giá trị)
+  const companyId = qs?.companyId ?? '';
+  const modelId = qs?.modelId ?? '';
+  const stationIdQ = qs?.stationId ?? '';
+  const vehicleIdQ = qs?.vehicleId ?? '';
+  const basePricePerDayQ = qs?.basePricePerDay ?? null;
 
   // Hook booking (tự tính endDate/total/remaining bên trong)
   const { formData, setFormData, stations, stationsLoading, handleSubmit } = useBookingForm(companyId, userId);
@@ -74,6 +96,7 @@ export default function BookingNewPage() {
   // 📌 Load tên công ty/nhà cung cấp từ companyId
   React.useEffect(() => {
     let active = true;
+    if (!companyId) return;
     (async () => {
       try {
         setCompanyLoading(true);
@@ -83,9 +106,7 @@ export default function BookingNewPage() {
         if (active) setCompanyLoading(false);
       }
     })();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [companyId]);
 
   // Prefill: model/vehicle meta
@@ -121,20 +142,19 @@ export default function BookingNewPage() {
         // ignore
       }
     })();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [modelId, vehicleIdQ, setFormData]);
 
   // Prefill: stationId + basePrice
   React.useEffect(() => {
+    if (!qs) return; // chờ query
     const basePrice = basePricePerDayQ ? Number(basePricePerDayQ) : undefined;
     setFormData((prev: AnyRec) => ({
       ...prev,
       stationId: stationIdQ || prev.stationId || '',
       basePrice: typeof basePrice === 'number' && !Number.isNaN(basePrice) ? basePrice : prev.basePrice ?? 0,
     }));
-  }, [stationIdQ, basePricePerDayQ, setFormData]);
+  }, [qs, stationIdQ, basePricePerDayQ, setFormData]);
 
   // Helpers
   const setF = (k: string, v: any) => setFormData((prev: AnyRec) => ({ ...prev, [k]: v }));
@@ -153,6 +173,19 @@ export default function BookingNewPage() {
       setNotice({ open: true, ok: false, msg: 'Có lỗi trong quá trình đặt xe.' });
     }
   };
+
+  // ⏳ Chờ đọc query xong rồi mới kiểm tra thiếu tham số
+  if (!qs) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-3xl mx-auto p-4">
+          <div className="rounded-lg border bg-white p-4 text-sm text-gray-600">Đang tải…</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!companyId || !modelId) {
     return (
