@@ -239,7 +239,7 @@ export default function ProgramsPage() {
                           {program.type?.replace?.(/_/g, ' ')}
                         </span>
                       </Badge>
-
+                    
                       <Badge variant="outline" size="sm">
                         {t('programs_page.models', { count: modelCount })}
                       </Badge>

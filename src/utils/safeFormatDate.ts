@@ -1,40 +1,62 @@
 // utils/safeFormatDate.ts
-import { format } from "date-fns";
+import { format as dfFormat } from 'date-fns';
 
-/**
- * Định dạng an toàn một giá trị ngày tháng (Date, Timestamp, string, number).
- * Luôn trả về string hiển thị được, tránh crash trên mobile.
- *
- * @param value - Date, Firestore Timestamp, số (ms), hoặc string
- * @param formatStr - Mặc định "yyyy-MM-dd" (thân thiện mobile)
- */
-export function safeFormatDate(value: any, formatStr = "yyyy-MM-dd"): string {
-  if (!value) return "—";
+/** Firestore Timestamp tối giản (để không phải import sdk ở layer utils) */
+type FirestoreTimestampLike = { toDate: () => Date };
 
-  let date: Date | null = null;
+/** Chuẩn hoá mọi input về Date | null */
+export function toDateSafe(value: unknown): Date | null {
+  if (!value) return null;
 
   try {
-    if (typeof value?.toDate === "function") {
-      // Firestore Timestamp
-      date = value.toDate();
-    } else if (value instanceof Date) {
-      date = value;
-    } else if (typeof value === "string" || typeof value === "number") {
-      const parsed = new Date(value);
-      if (!isNaN(parsed.getTime())) {
-        date = parsed;
-      }
+    // Firestore Timestamp
+    if (typeof (value as FirestoreTimestampLike)?.toDate === 'function') {
+      const d = (value as FirestoreTimestampLike).toDate();
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    // Date instance
+    if (value instanceof Date) {
+      return isNaN(value.getTime()) ? null : value;
+    }
+
+    // number | string
+    if (typeof value === 'number') {
+      // hỗ trợ cả giây và mili-giây
+      const ms = value < 1e12 ? value * 1000 : value;
+      const d = new Date(ms);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    if (typeof value === 'string') {
+      const raw = value.trim();
+      if (!raw) return null;
+      // Cho phép "yyyy-MM-dd", ISO, hoặc string date hợp lệ của JS
+      const d = new Date(raw);
+      return isNaN(d.getTime()) ? null : d;
     }
   } catch {
-    return "—";
+    return null;
   }
 
-  if (!date || isNaN(date.getTime())) return "—";
+  return null;
+}
+
+/**
+ * Định dạng an toàn một giá trị ngày tháng (Date, Firestore Timestamp, string, number).
+ * Luôn trả về string hiển thị được, tránh crash trên mobile / môi trường thật.
+ *
+ * @param value    Date | FirestoreTimestamp | string | number (ms/seconds)
+ * @param pattern  Mặc định "yyyy-MM-dd" (thân thiện mobile & đồng bộ input)
+ */
+export function safeFormatDate(value: unknown, pattern = 'yyyy-MM-dd'): string {
+  const date = toDateSafe(value);
+  if (!date) return '—';
 
   try {
-    return format(date, formatStr);
+    return dfFormat(date, pattern);
   } catch {
-    // fallback nếu formatStr không hợp lệ
-    return date.toISOString().split("T")[0]; // yyyy-MM-dd
+    // Fallback nếu pattern không hợp lệ
+    return date.toISOString().split('T')[0]; // yyyy-MM-dd
   }
 }

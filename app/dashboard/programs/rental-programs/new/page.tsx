@@ -489,43 +489,51 @@ export default function ProgramsFormPage() {
           </Section>
 
           <Section title={t('programs_form_page.labels.time_range') as string}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Start Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="start-date"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('programs_form_page.labels.start_date')}
                 </label>
                 <Input
-                  className="h-12"
+                  id="start-date"
                   type="date"
+                  className="h-12 w-full"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  onFocus={() => setIsDatePicking(true)}
-                  onBlur={() => setIsDatePicking(false)}
-                  onClick={(e) => openNativePicker(e.currentTarget)}
+                  aria-label="Start date"
                 />
-                <div className="mt-1 text-xs text-gray-500">
-                  ({safeFormatDate(startDate, 'dd/MM/yyyy')})
-                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  {safeFormatDate(startDate, 'dd/MM/yyyy')}
+                </p>
               </div>
+
+              {/* End Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="end-date"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   {t('programs_form_page.labels.end_date')}
                 </label>
                 <Input
-                  className="h-12"
+                  id="end-date"
                   type="date"
+                  className="h-12 w-full"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  onFocus={() => setIsDatePicking(true)}
-                  onBlur={() => setIsDatePicking(false)}
-                  onClick={(e) => openNativePicker(e.currentTarget)}
+                  aria-label="End date"
                 />
-                <div className="mt-1 text-xs text-gray-500">
-                  ({safeFormatDate(endDate, 'dd/MM/yyyy')})
-                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  {safeFormatDate(endDate, 'dd/MM/yyyy')}
+                </p>
               </div>
             </div>
           </Section>
+
 
           {(error || errors.length > 0) && (
             <Section>
