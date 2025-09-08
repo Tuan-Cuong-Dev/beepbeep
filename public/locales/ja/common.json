@@ -2278,51 +2278,75 @@
   }
 },
 
+
 "programs_page": {
-  "title": "プロモーションプログラム",
-  "subtitle": "エージェントの参加を促し、売上拡大を図ることを目的としています。",
-  "create_button": "新しいプログラムを作成",
-  "no_programs": "現在、プログラムはありません。",
+  "title": "キャンペーン一覧",
+  "subtitle": "進行中、開催予定、または終了したキャンペーンを確認・管理します。エージェントは参加でき、会社オーナーは作成・管理できます。",
+  "create_button": "キャンペーン作成",
+  "no_programs": "キャンペーンはありません。",
+  "confirm_delete": "このキャンペーンを削除しますか？",
+  "type": "種類",
+  "duration": "期間",
   "joined": "参加済み",
-  "join_button": "プログラムに参加",
-  "view_participants": "参加者を表示",
+  "join_button": "参加する",
+  "view_participants": "参加者を見る",
   "delete_button": "削除",
   "status": {
-    "inactive": "非アクティブ",
+    "active": "実施中",
     "upcoming": "開催予定",
     "ended": "終了",
-    "active": "開催中"
-  }
+    "inactive": "無効"
+  },
+  "stations": "{{count}} ステーション",
+  "models": "{{count}} 車種"
 },
 
 "programs_form_page": {
-  "title": "プログラムの作成",
+  "title": "キャンペーン作成",
   "placeholders": {
-    "title": "プログラムのタイトル",
-    "description": "プログラムの詳細を入力してください（例：新規顧客向け、モデル別割引、適用ステーションなど）",
-    "discount": "割引価格（VND）",
-    "select_company": "会社を選択"
+    "title": "キャンペーン名",
+    "description": "対象者・適用車種・適用ステーションなどの詳細を入力してください。",
+    "discount": "割引金額（VND）",
+    "select_company": "会社を選択",
+    "select_program_type": "プログラムの種類を選択"
   },
   "labels": {
+    "basic_info": "基本情報",
     "select_stations": "ステーションを選択（任意）",
-    "set_discounts": "モデルごとの割引価格を設定",
+    "set_discounts": "車種ごとの割引を設定",
+    "time_range": "適用期間",
     "start_date": "開始日",
     "end_date": "終了日"
   },
+  "discount": {
+    "fixed": "固定割引（VND）",
+    "percentage": "割合割引（％）"
+  },
+  "hints": {
+    "loading": "読み込み中…",
+    "no_models": "この組織には車種がありません。"
+  },
   "buttons": {
-    "submit": "プログラムを送信",
-    "saving": "保存中..."
+    "submit": "キャンペーンを送信",
+    "saving": "保存中…"
   },
   "messages": {
-    "success": "プログラムが正常に作成されました！",
-    "error": "プログラムの保存中にエラーが発生しました。"
+    "success": "キャンペーンを作成しました！",
+    "error": "保存中にエラーが発生しました。"
   },
   "notification": {
     "success": "成功",
     "error": "エラー"
   },
   "validation": {
-    "fill_required": "必須項目をすべて入力してください。"
+    "fill_required": "必須項目をすべて入力してください。",
+    "title_required": "キャンペーン名を入力してください。",
+    "description_required": "キャンペーンの説明を入力してください。",
+    "company_required": "レンタル用プログラムには会社の選択が必要です。",
+    "dates_required": "開始日と終了日を選択してください。",
+    "date_order": "終了日は開始日より後である必要があります。",
+    "at_least_one_discount": "少なくとも1つの車種に割引を追加してください。",
+    "percent_range": "割引率は0〜100%の範囲で指定してください。"
   }
 },
 
@@ -2337,19 +2361,17 @@
 },
 
 "program_participants_page": {
-  "title": "プログラム参加者",
-  "no_participants": "まだ参加者がいません。",
-  "name": "名前",
+  "title": "キャンペーン参加者",
+  "no_participants": "参加者はいません。",
+  "name": "氏名",
   "phone": "電話番号",
   "address": "住所",
   "role": "役割",
   "status": "ステータス",
-  "role_agent": "代理店",
-  "role_customer": "顧客",
-  "role_staff": "スタッフ",
+  "joined_at": "参加日時",
   "status_joined": "参加済み",
   "status_pending": "保留中",
-  "status_rejected": "拒否済み"
+  "status_rejected": "拒否"
 },
 
 "actual_result_popup": {

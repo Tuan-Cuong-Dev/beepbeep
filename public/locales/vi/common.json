@@ -2346,40 +2346,57 @@
   }
 },
 
-"programs_page": {
-  "title": "Chương trình khuyến mãi",
-  "subtitle": "Nhằm kích thích sự tham gia của CTV để phát triển doanh số",
-  "create_button": "Tạo chương trình mới",
-  "no_programs": "Hiện chưa có chương trình nào.",
-  "joined": "Đã tham gia",
-  "join_button": "Tham gia chương trình",
-  "view_participants": "Xem người tham gia",
-  "delete_button": "Xóa",
-  "status": {
-    "inactive": "Không hoạt động",
-    "upcoming": "Sắp diễn ra",
-    "ended": "Đã kết thúc",
-    "active": "Đang diễn ra"
-  }
-},
+ "programs_page": {
+    "title": "Chương Trình Ưu Đãi",
+    "subtitle": "Xem và quản lý các chương trình đang hoạt động, sắp diễn ra hoặc đã kết thúc. Cộng tác viên có thể tham gia chương trình; chủ công ty có thể tạo và quản trị.",
+    "create_button": "Tạo chương trình",
+    "no_programs": "Chưa có chương trình nào.",
+    "confirm_delete": "Xoá chương trình này?",
+    "type": "Loại",
+    "duration": "Thời gian",
+    "joined": "Đã tham gia",
+    "join_button": "Tham gia",
+    "view_participants": "Xem người tham gia",
+    "delete_button": "Xoá chương trình",
+    "status": {
+      "active": "Đang diễn ra",
+      "upcoming": "Sắp diễn ra",
+      "ended": "Đã kết thúc",
+      "inactive": "Ngưng kích hoạt"
+    },
+    "stations": "{{count}} trạm",
+    "models": "{{count}} mẫu xe"
+  },
+
 
 "programs_form_page": {
   "title": "Tạo Chương Trình",
   "placeholders": {
     "title": "Tiêu đề chương trình",
-    "description": "Nhập mô tả chi tiết về chương trình, ví dụ: dành cho khách mới, giảm giá theo mẫu xe, áp dụng tại trạm nào...",
+    "description": "Nhập mô tả chi tiết: đối tượng, mẫu xe áp dụng, trạm áp dụng…",
     "discount": "Giá ưu đãi (VND)",
-    "select_company": "Chọn công ty"
+    "select_company": "Chọn công ty",
+    "select_program_type": "Chọn loại chương trình"
   },
   "labels": {
+    "basic_info": "Thông tin cơ bản",
     "select_stations": "Chọn trạm (không bắt buộc)",
     "set_discounts": "Thiết lập giá ưu đãi theo mẫu xe",
+    "time_range": "Thời gian áp dụng",
     "start_date": "Ngày bắt đầu",
     "end_date": "Ngày kết thúc"
   },
+  "discount": {
+    "fixed": "Giảm cố định (VND)",
+    "percentage": "Giảm theo %"
+  },
+  "hints": {
+    "loading": "Đang tải dữ liệu…",
+    "no_models": "Chưa có mẫu xe cho đơn vị này."
+  },
   "buttons": {
     "submit": "Gửi chương trình",
-    "saving": "Đang lưu..."
+    "saving": "Đang lưu…"
   },
   "messages": {
     "success": "Tạo chương trình thành công!",
@@ -2390,9 +2407,17 @@
     "error": "Lỗi"
   },
   "validation": {
-    "fill_required": "Vui lòng điền đầy đủ các trường bắt buộc."
+    "fill_required": "Vui lòng điền đầy đủ các trường bắt buộc.",
+    "title_required": "Vui lòng nhập tiêu đề chương trình.",
+    "description_required": "Vui lòng nhập mô tả chương trình.",
+    "company_required": "Vui lòng chọn công ty cho chương trình thuê.",
+    "dates_required": "Vui lòng chọn ngày bắt đầu và ngày kết thúc.",
+    "date_order": "Ngày kết thúc phải sau ngày bắt đầu.",
+    "at_least_one_discount": "Vui lòng thêm ít nhất một ưu đãi cho mẫu xe.",
+    "percent_range": "Phần trăm giảm giá phải từ 0 đến 100%."
   }
 },
+
 
 "program_detail_page": {
   "active_until": "Hiệu lực đến {{date}}",
@@ -2407,16 +2432,14 @@
 "program_participants_page": {
   "title": "Người tham gia chương trình",
   "no_participants": "Chưa có người tham gia.",
-  "name": "Tên",
-  "phone": "Số điện thoại",
+  "name": "Họ tên",
+  "phone": "Điện thoại",
   "address": "Địa chỉ",
   "role": "Vai trò",
   "status": "Trạng thái",
-  "role_agent": "Cộng tác viên",
-  "role_customer": "Khách hàng",
-  "role_staff": "Nhân viên",
+  "joined_at": "Tham gia lúc",
   "status_joined": "Đã tham gia",
-  "status_pending": "Chờ duyệt",
+  "status_pending": "Đang chờ duyệt",
   "status_rejected": "Từ chối"
 },
 

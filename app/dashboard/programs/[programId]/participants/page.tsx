@@ -1,15 +1,30 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+  documentId,
+} from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
-import { ProgramParticipant } from '@/src/lib/programs/rental-programs/programsType';
-import { User, UserCheck, UserX } from 'lucide-react';
-import { Agent } from '@/src/lib/agents/agentTypes';
+import type { ProgramParticipant, ProgramParticipantStatus } from '@/src/lib/programs/rental-programs/programsType';
+import type { Agent } from '@/src/lib/agents/agentTypes';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '@/src/components/ui/badge';
+import { format } from 'date-fns';
+
+type Role = 'agent' | 'customer' | 'staff';
+
+const chunk = <T,>(arr: T[], size = 10) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size)
+  );
 
 export default function ProgramParticipantsPage() {
   const { t } = useTranslation('common');
@@ -17,122 +32,151 @@ export default function ProgramParticipantsPage() {
   const programId = params?.programId as string;
 
   const [participants, setParticipants] = useState<ProgramParticipant[]>([]);
-  const [agentMap, setAgentMap] = useState<Record<string, any>>({});
+  const [agentByOwnerId, setAgentByOwnerId] = useState<Record<string, Agent>>({});
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     if (!programId) return;
 
-    const fetchData = async () => {
-      const snap = await getDocs(query(collection(db, 'programParticipants'), where('programId', '==', programId)));
-      const participantsList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgramParticipant));
-      setParticipants(participantsList);
+    let mounted = true;
+    (async () => {
+      setLoading(true);
+      setErr(null);
+      try {
+        // 1) Lấy participants của program
+        const ps = await getDocs(
+          query(collection(db, 'programParticipants'), where('programId', '==', programId))
+        );
+        const list = ps.docs.map(d => ({ id: d.id, ...(d.data() as any) })) as ProgramParticipant[];
 
-      const agentIds = participantsList
-        .filter(p => p.userRole === 'agent')
-        .map(p => p.userId);
+        if (!mounted) return;
+        setParticipants(list);
 
-      if (agentIds.length > 0) {
-        const agentsSnap = await getDocs(collection(db, 'agents'));
-        const agents = agentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Agent));
-        const map = agents.reduce((acc, agent) => {
-          acc[agent.ownerId] = agent;
-          return acc;
-        }, {} as Record<string, Agent>);
-        setAgentMap(map);
+        // 2) Lấy thông tin agents liên quan (theo ownerId = userId)
+        const agentOwnerIds = Array.from(
+          new Set(list.filter(p => p.userRole === 'agent').map(p => p.userId))
+        );
+        if (agentOwnerIds.length === 0) {
+          if (mounted) setAgentByOwnerId({});
+          return;
+        }
+
+        const merged: Record<string, Agent> = {};
+        for (const ids of chunk(agentOwnerIds, 10)) {
+          const snap = await getDocs(
+            query(collection(db, 'agents'), where('ownerId', 'in', ids))
+          );
+          snap.forEach(doc => {
+            const a = { id: doc.id, ...(doc.data() as any) } as Agent;
+            merged[a.ownerId] = a; // map theo ownerId để lookup nhanh
+          });
+        }
+        if (mounted) setAgentByOwnerId(merged);
+      } catch (e: any) {
+        if (mounted) setErr(e?.message || 'Failed to load participants');
+      } finally {
+        if (mounted) setLoading(false);
       }
-    };
+    })();
 
-    fetchData();
+    return () => { mounted = false; };
   }, [programId]);
 
-  const renderStatus = (status: string) => {
+  const fmtDate = (ts?: Timestamp) =>
+    ts?.toDate ? format(ts.toDate(), 'yyyy-MM-dd HH:mm') : '—';
+
+  const RoleBadge = ({ role }: { role: Role }) => (
+    <Badge variant="outline" size="sm" className="capitalize">
+      {role}
+    </Badge>
+  );
+
+  const StatusBadge = ({ status }: { status: ProgramParticipantStatus }) => {
     switch (status) {
       case 'joined':
-        return <span className="text-green-600 font-semibold">✅ {t('program_participants_page.status_joined')}</span>;
+        return <Badge variant="brand" size="sm">{t('program_participants_page.status_joined')}</Badge>;
       case 'pending':
-        return <span className="text-yellow-500 font-semibold">⏳ {t('program_participants_page.status_pending')}</span>;
+        return <Badge variant="warning" size="sm">{t('program_participants_page.status_pending')}</Badge>;
       case 'rejected':
-        return <span className="text-red-500 font-semibold">❌ {t('program_participants_page.status_rejected')}</span>;
+        return <Badge variant="destructive" size="sm">{t('program_participants_page.status_rejected')}</Badge>;
       default:
-        return <span>{status}</span>;
+        return <Badge size="sm">{status}</Badge>;
     }
   };
 
-  const renderRole = (role: string) => {
-    switch (role) {
-      case 'agent':
-        return <span className="flex items-center gap-1"><User className="w-4 h-4" /> {t('program_participants_page.role_agent')}</span>;
-      case 'customer':
-        return <span className="flex items-center gap-1"><UserCheck className="w-4 h-4" /> {t('program_participants_page.role_customer')}</span>;
-      case 'staff':
-        return <span className="flex items-center gap-1"><UserX className="w-4 h-4" /> {t('program_participants_page.role_staff')}</span>;
-      default:
-        return <span>{role}</span>;
-    }
-  };
+  const content = useMemo(() => {
+    if (loading) return <div className="text-center py-10">Loading…</div>;
+    if (err) return <div className="text-center py-3 text-red-600">{err}</div>;
+    if (participants.length === 0)
+      return <p className="text-gray-500">{t('program_participants_page.no_participants')}</p>;
+
+    return (
+      <>
+        {/* DESKTOP TABLE */}
+        <div className="bg-white rounded-xl shadow border overflow-hidden hidden md:block">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
+              <tr>
+                <th className="p-3 text-left">{t('program_participants_page.name')}</th>
+                <th className="p-3 text-left">{t('program_participants_page.phone')}</th>
+                <th className="p-3 text-left">{t('program_participants_page.address')}</th>
+                <th className="p-3 text-left">{t('program_participants_page.role')}</th>
+                <th className="p-3 text-left">{t('program_participants_page.status')}</th>
+                <th className="p-3 text-left">{t('program_participants_page.joined_at')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {participants.map((p) => {
+                const agent = p.userRole === 'agent' ? agentByOwnerId[p.userId] : null;
+                return (
+                  <tr key={p.id} className="border-t">
+                    <td className="p-3">{agent?.name || '—'}</td>
+                    <td className="p-3">{agent?.phone || '—'}</td>
+                    <td className="p-3">{(agent as any)?.displayAddress || '—'}</td>
+                    <td className="p-3"><RoleBadge role={p.userRole as Role} /></td>
+                    <td className="p-3"><StatusBadge status={p.status} /></td>
+                    <td className="p-3">{fmtDate(p.joinedAt as any)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* MOBILE CARDS */}
+        <div className="md:hidden space-y-4">
+          {participants.map((p) => {
+            const agent = p.userRole === 'agent' ? agentByOwnerId[p.userId] : null;
+            return (
+              <div key={p.id} className="border rounded-xl p-4 bg-white shadow-sm space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold">{agent?.name || '—'}</div>
+                  <StatusBadge status={p.status} />
+                </div>
+                <div className="text-sm text-gray-600">{agent?.phone || '—'}</div>
+                <div className="text-sm text-gray-600">{(agent as any)?.displayAddress || '—'}</div>
+                <div className="text-sm"><RoleBadge role={p.userRole as Role} /></div>
+                <div className="text-xs text-gray-500">
+                  {t('program_participants_page.joined_at')}: {fmtDate(p.joinedAt as any)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </>
+    );
+  }, [loading, err, participants, agentByOwnerId, t]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-
       <main className="flex-1 px-6 py-10 space-y-8">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
           👥 {t('program_participants_page.title')}
         </h1>
-
-        {participants.length === 0 ? (
-          <p className="text-gray-500">{t('program_participants_page.no_participants')}</p>
-        ) : (
-          <>
-            {/* DESKTOP TABLE */}
-            <div className="bg-white rounded-xl shadow border overflow-hidden hidden md:block">
-              <table className="min-w-full text-sm">
-                <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
-                  <tr>
-                    <th className="p-3 text-left">{t('program_participants_page.name')}</th>
-                    <th className="p-3 text-left">{t('program_participants_page.phone')}</th>
-                    <th className="p-3 text-left">{t('program_participants_page.address')}</th>
-                    <th className="p-3 text-left">{t('program_participants_page.role')}</th>
-                    <th className="p-3 text-left">{t('program_participants_page.status')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {participants.map((p) => {
-                    const agent = p.userRole === 'agent' ? agentMap[p.userId] : null;
-
-                    return (
-                      <tr key={p.id} className="border-t">
-                        <td className="p-3">{agent?.name || '-'}</td>
-                        <td className="p-3">{agent?.phone || '-'}</td>
-                        <td className="p-3">{agent?.displayAddress || '-'}</td>
-                        <td className="p-3">{renderRole(p.userRole)}</td>
-                        <td className="p-3">{renderStatus(p.status)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* MOBILE CARDS */}
-            <div className="md:hidden space-y-4">
-              {participants.map((p) => {
-                const agent = p.userRole === 'agent' ? agentMap[p.userId] : null;
-                return (
-                  <div key={p.id} className="border rounded-xl p-4 bg-white shadow-sm space-y-2">
-                    <div><strong>{t('program_participants_page.name')}:</strong> {agent?.name || '-'}</div>
-                    <div><strong>{t('program_participants_page.phone')}:</strong> {agent?.phone || '-'}</div>
-                    <div><strong>{t('program_participants_page.address')}:</strong> {agent?.displayAddress || '-'}</div>
-                    <div><strong>{t('program_participants_page.role')}:</strong> {renderRole(p.userRole)}</div>
-                    <div><strong>{t('program_participants_page.status')}:</strong> {renderStatus(p.status)}</div>
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        )}
+        {content}
       </main>
-
       <Footer />
     </div>
   );

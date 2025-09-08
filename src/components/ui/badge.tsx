@@ -2,6 +2,7 @@
  * Badge component (rounded label), used in tables, status indicators, etc.
  *
  * ✅ Compatible with Next.js / CRA (no need for special module config)
+ * ✅ Variants + Sizes
  */
 
 import * as React from 'react'
@@ -15,11 +16,16 @@ type BadgeVariant =
   | 'warning'
   | 'secondary'
   | 'brand'
+  | 'outline'
+
+/** Sizes */
+type BadgeSize = 'sm' | 'md' | 'lg'
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode
   className?: string
   variant?: BadgeVariant
+  size?: BadgeSize
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
@@ -29,14 +35,28 @@ const variantClasses: Record<BadgeVariant, string> = {
   warning: 'bg-yellow-100 text-yellow-800',
   secondary: 'bg-gray-100 text-gray-600',
   brand: 'bg-[#00d289] text-white', // ✅ màu thương hiệu Bíp Bíp
+  outline: 'border border-gray-300 text-gray-700 bg-transparent',
 }
 
-export function Badge({ children, className = '', variant = 'default', ...props }: BadgeProps) {
+const sizeClasses: Record<BadgeSize, string> = {
+  sm: 'px-2 py-0.5 text-xs',
+  md: 'px-2.5 py-0.5 text-sm',
+  lg: 'px-3 py-1 text-base',
+}
+
+export function Badge({
+  children,
+  className = '',
+  variant = 'default',
+  size = 'sm',
+  ...props
+}: BadgeProps) {
   return (
     <span
       className={clsx(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap',
+        'inline-flex items-center rounded-full font-semibold whitespace-nowrap',
         variantClasses[variant],
+        sizeClasses[size],
         className
       )}
       {...props}

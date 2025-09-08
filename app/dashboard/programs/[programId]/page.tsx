@@ -1,56 +1,49 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useUser } from '@/src/context/AuthContext';
 import { useParams } from 'next/navigation';
 import {
   collection,
   doc,
+  documentId,
   getDoc,
   getDocs,
   query,
+  serverTimestamp,
+  Timestamp,
   where,
   addDoc,
-  serverTimestamp,
-  documentId, // 👈 dùng để query theo danh sách ID
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Button } from '@/src/components/ui/button';
+import { Badge } from '@/src/components/ui/badge';
+
 import { getDistance } from 'geolib';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 
-interface Program {
-  id: string;
-  title: string;
-  description: string;
-  companyId?: string;
-  modelDiscounts?: Record<string, string>; // modelId -> price/discount (string/number)
-  stationIds?: string[];
-  startDate: any;
-  endDate: any;
-  isActive: boolean;
-}
+import type {
+  Program,
+  ProgramModelDiscount,
+} from '@/src/lib/programs/rental-programs/programsType';
 
-// Chunk mảng cho where(documentId(), 'in', [...]) (Firestore giới hạn 10 phần tử)
-const chunk = <T,>(arr: T[], size = 10): T[][] => {
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-};
+/* -------------------- utils -------------------- */
 
-// ===== Helpers: tolerant location parsing =====
+// chunk for Firestore `in` (max 10)
+const chunk = <T,>(arr: T[], size = 10): T[][] =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size),
+  );
+
+// tolerant geo parsing (GeoPoint | plain | string "lat,lng" | nested geo)
 function toLatLng(input: any): { latitude: number; longitude: number } | null {
   if (!input) return null;
+  if (typeof input === 'object' && 'geo' in input) return toLatLng((input as any).geo);
 
-  // unwrap { geo: ... }
-  if (typeof input === 'object' && 'geo' in input) {
-    return toLatLng((input as any).geo);
-  }
-
-  // Geo-like object (GeoPoint or plain)
   if (typeof input === 'object') {
     const lat =
       typeof (input as any).latitude === 'number'
@@ -72,35 +65,68 @@ function toLatLng(input: any): { latitude: number; longitude: number } | null {
         ? (input as any).lon
         : undefined;
 
-    if (typeof lat === 'number' && typeof lng === 'number') {
-      return { latitude: lat, longitude: lng };
-    }
+    if (typeof lat === 'number' && typeof lng === 'number') return { latitude: lat, longitude: lng };
   }
 
-  // "lat,lng" string
   if (typeof input === 'string') {
     const m = input.trim().match(/(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)/);
     if (m) {
       const lat = parseFloat(m[1]);
       const lng = parseFloat(m[3]);
-      if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        return { latitude: lat, longitude: lng };
-      }
+      if (Number.isFinite(lat) && Number.isFinite(lng)) return { latitude: lat, longitude: lng };
     }
   }
-
   return null;
 }
+const getEntityLatLng = (entity: any) =>
+  toLatLng(entity?.location?.geo) ||
+  toLatLng(entity?.location) ||
+  toLatLng(entity?.geo) ||
+  toLatLng(entity);
 
-function getEntityLatLng(entity: any): { latitude: number; longitude: number } | null {
-  if (!entity) return null;
-  return (
-    toLatLng(entity.location?.geo) ||
-    toLatLng(entity.location) ||
-    toLatLng(entity.geo) ||
-    toLatLng(entity)
-  );
+/** Normalize legacy formats to ProgramModelDiscount[] */
+function normalizeModelDiscounts(raw: any): ProgramModelDiscount[] {
+  // Already an array
+  if (Array.isArray(raw)) {
+    return raw
+      .filter((x) => x && typeof x.modelId === 'string')
+      .map((x) => ({
+        modelId: x.modelId,
+        discountType: x.discountType === 'percentage' ? 'percentage' : 'fixed',
+        discountValue:
+          typeof x.discountValue === 'number'
+            ? x.discountValue
+            : Number(x.discountValue) || 0,
+      }));
+  }
+
+  // Legacy object: { [modelId]: number | { discountType, discountValue } }
+  if (raw && typeof raw === 'object') {
+    return Object.entries(raw)
+      .map(([modelId, v]: [string, any]) => {
+        if (v == null) return null;
+        if (typeof v === 'number') {
+          return { modelId, discountType: 'fixed' as const, discountValue: v };
+        }
+        if (typeof v === 'object') {
+          const discountType = v.discountType === 'percentage' ? 'percentage' : 'fixed';
+          const discountValue =
+            typeof v.discountValue === 'number'
+              ? v.discountValue
+              : Number(v.discountValue) || 0;
+          return { modelId, discountType, discountValue };
+        }
+        return null;
+      })
+      .filter(Boolean) as ProgramModelDiscount[];
+  }
+
+  return [];
 }
+
+/* -------------------- component -------------------- */
+
+type Company = { id: string; name?: string; email?: string; location?: any };
 
 export default function ProgramDetailPage() {
   const { t } = useTranslation('common');
@@ -109,98 +135,139 @@ export default function ProgramDetailPage() {
   const programId = params?.programId as string;
 
   const [program, setProgram] = useState<Program | null>(null);
-  const [company, setCompany] = useState<any>(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [stations, setStations] = useState<any[]>([]);
-  const [models, setModels] = useState<Record<string, string>>({});
+  const [modelNames, setModelNames] = useState<Record<string, string>>({});
   const [agent, setAgent] = useState<any>(null);
   const [joined, setJoined] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const nowMs = Timestamp.now().toMillis();
+
+  const statusBadge = useMemo(() => {
+    if (!program) return null;
+    if (!program.isActive) return <Badge variant="secondary" size="sm">{t('programs_page.status.inactive')}</Badge>;
+    const startMs = program.startDate?.toMillis?.();
+    const endMs = program.endDate?.toMillis?.();
+    if (startMs && startMs > nowMs) return <Badge variant="outline" size="sm">{t('programs_page.status.upcoming')}</Badge>;
+    if (endMs && endMs < nowMs) return <Badge variant="destructive" size="sm">{t('programs_page.status.ended')}</Badge>;
+    return <Badge variant="brand" size="sm">{t('programs_page.status.active')}</Badge>;
+  }, [program, nowMs, t]);
 
   const renderDistance = (station: any) => {
     const agentLoc = getEntityLatLng(agent);
     const stationLoc = getEntityLatLng(station);
     if (!agentLoc || !stationLoc) return null;
-    const distance = getDistance(agentLoc, stationLoc); // meters
+    const distance = getDistance(agentLoc, stationLoc);
     return `${(distance / 1000).toFixed(1)} km`;
   };
 
   useEffect(() => {
     if (!programId || !user) return;
 
-    const fetchData = async () => {
-      // Program
-      const programSnap = await getDoc(doc(db, 'programs', programId));
-      if (!programSnap.exists()) return;
-      const programData = { id: programSnap.id, ...programSnap.data() } as Program;
-      setProgram(programData);
+    let mounted = true;
+    (async () => {
+      try {
+        setError(null);
 
-      // Company
-      if (programData.companyId) {
-        const companySnap = await getDoc(doc(db, 'rentalCompanies', programData.companyId));
-        if (companySnap.exists()) setCompany(companySnap.data());
-      }
+        // 1) Program
+        const programSnap = await getDoc(doc(db, 'programs', programId));
+        if (!programSnap.exists()) return;
+        const raw = { id: programSnap.id, ...programSnap.data() } as any;
 
-      // ==== Vehicle models: luôn map ID -> name theo danh sách trong program.modelDiscounts
-      let modelsMap: Record<string, string> = {};
-      const discountIds = programData.modelDiscounts ? Object.keys(programData.modelDiscounts) : [];
+        // Normalize discounts to array
+        const normalizedDiscounts = normalizeModelDiscounts(raw.modelDiscounts);
+        const p = { ...raw, modelDiscounts: normalizedDiscounts } as Program;
+        if (!mounted) return;
+        setProgram(p);
 
-      if (discountIds.length > 0) {
-        const batches = chunk(discountIds, 10);
-        const results: Record<string, string> = {};
-        for (const ids of batches) {
-          const snap = await getDocs(
-            query(collection(db, 'vehicleModels'), where(documentId(), 'in', ids))
+        // 2) Company (if any)
+        if (p.companyId) {
+          const cSnap = await getDoc(doc(db, 'rentalCompanies', p.companyId));
+          if (cSnap.exists() && mounted) {
+            setCompany({ id: cSnap.id, ...(cSnap.data() as any) });
+          }
+        } else if (mounted) {
+          setCompany(null);
+        }
+
+        // 3) Model names resolution (from normalized discounts)
+        const discounts = (p.modelDiscounts ?? []) as ProgramModelDiscount[];
+        const modelIds = Array.from(new Set(discounts.map((d) => d.modelId)));
+        const names: Record<string, string> = {};
+
+        if (modelIds.length > 0) {
+          for (const ids of chunk(modelIds, 10)) {
+            const snap = await getDocs(
+              query(collection(db, 'vehicleModels'), where(documentId(), 'in', ids)),
+            );
+            snap.forEach((d) => {
+              const data = d.data() as any;
+              if (data?.name) names[d.id] = data.name;
+            });
+          }
+        } else if (p.companyId) {
+          // Fallback: load all models of company to show names if needed
+          const msnap = await getDocs(
+            query(collection(db, 'vehicleModels'), where('companyId', '==', p.companyId)),
           );
-          snap.docs.forEach((d) => {
+          msnap.forEach((d) => {
             const data = d.data() as any;
-            if (data?.name) results[d.id] = data.name;
+            if (data?.name) names[d.id] = data.name;
           });
         }
-        modelsMap = results;
-      } else if (programData.companyId) {
-        // (Fallback) nếu không có discount list thì map toàn bộ model theo company
-        const modelsSnap = await getDocs(
-          query(collection(db, 'vehicleModels'), where('companyId', '==', programData.companyId))
+        if (mounted) setModelNames(names);
+
+        // 4) Stations
+        if (p.companyId) {
+          const targets = (p.stationTargets ?? []) as { stationId: string }[];
+          if (targets.length > 0) {
+            const ids = targets.map((s) => s.stationId);
+            const loaded: any[] = [];
+            for (const group of chunk(ids, 10)) {
+              const ssnap = await getDocs(
+                query(collection(db, 'rentalStations'), where(documentId(), 'in', group)),
+              );
+              ssnap.forEach((d) => loaded.push({ id: d.id, ...(d.data() as any) }));
+            }
+            if (mounted) setStations(loaded);
+          } else {
+            const ssnap = await getDocs(
+              query(collection(db, 'rentalStations'), where('companyId', '==', p.companyId)),
+            );
+            if (mounted) setStations(ssnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
+          }
+        } else if (mounted) {
+          setStations([]);
+        }
+
+        // 5) Agent profile (for distance)
+        const aSnap = await getDocs(
+          query(collection(db, 'agents'), where('ownerId', '==', user.uid)),
         );
-        modelsMap = modelsSnap.docs.reduce((acc, d) => {
-          acc[d.id] = (d.data() as any).name;
-          return acc;
-        }, {} as Record<string, string>);
-      }
-      setModels(modelsMap);
+        if (!aSnap.empty && mounted) setAgent(aSnap.docs[0].data());
 
-      // Stations of the company
-      if (programData.companyId) {
-        const stationsSnap = await getDocs(
-          query(collection(db, 'rentalStations'), where('companyId', '==', programData.companyId))
+        // 6) Joined?
+        const jSnap = await getDocs(
+          query(
+            collection(db, 'programParticipants'),
+            where('programId', '==', programId),
+            where('userId', '==', user.uid),
+          ),
         );
-        setStations(stationsSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
-      } else {
-        setStations([]);
+        if (!jSnap.empty && mounted) setJoined(true);
+      } catch (e: any) {
+        if (mounted) setError(e?.message || 'Failed to load program');
       }
+    })();
 
-      // Agent (current user)
-      const agentSnap = await getDocs(
-        query(collection(db, 'agents'), where('ownerId', '==', user.uid))
-      );
-      if (!agentSnap.empty) setAgent(agentSnap.docs[0].data());
-
-      // Joined status
-      const joinedSnap = await getDocs(
-        query(
-          collection(db, 'programParticipants'),
-          where('programId', '==', programId),
-          where('userId', '==', user.uid)
-        )
-      );
-      if (!joinedSnap.empty) setJoined(true);
+    return () => {
+      mounted = false;
     };
-
-    fetchData();
   }, [programId, user]);
 
   const handleJoin = async () => {
     if (!user || joined) return;
-
     await addDoc(collection(db, 'programParticipants'), {
       programId,
       userId: user.uid,
@@ -208,74 +275,77 @@ export default function ProgramDetailPage() {
       status: 'joined',
       joinedAt: serverTimestamp(),
     });
-
     setJoined(true);
   };
 
   if (!program) return null;
 
+  const startStr = program.startDate?.toDate?.()?.toLocaleDateString?.() ?? '-';
+  const endStr = program.endDate?.toDate?.()?.toLocaleDateString?.() ?? '-';
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       <main className="flex-1 px-6 py-10 space-y-8 max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold">🎯 {program.title}</h1>
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="text-3xl font-bold">🎯 {program.title}</h1>
+          {statusBadge}
+        </div>
 
         <p className="text-gray-600">
-          {t('program_detail_page.active_until', {
-            date: program.endDate?.toDate?.()?.toLocaleDateString(),
-          })}
+          {t('program_detail_page.period', { start: startStr, end: endStr })}
         </p>
 
-        <div className="space-y-3 text-gray-700">
-          <p>
-            {t('program_detail_page.period', {
-              start: program.startDate?.toDate?.()?.toLocaleDateString(),
-              end: program.endDate?.toDate?.()?.toLocaleDateString(),
+        {company && (
+          <p className="text-gray-700">
+            {t('program_detail_page.company_info', {
+              name: company?.name || '—',
+              email: company?.email || 'N/A',
             })}
           </p>
+        )}
 
-          {company && (
-            <p>
-              {t('program_detail_page.company_info', {
-                name: (company as any)?.name,
-                email: (company as any)?.email || 'N/A',
+        {/* Discounts by model */}
+        {Array.isArray(program.modelDiscounts) && program.modelDiscounts.length > 0 && (
+          <div className="space-y-2">
+            <p className="font-semibold">{t('program_detail_page.discount_models')}</p>
+            <ul className="list-disc ml-6">
+              {program.modelDiscounts.map((d: ProgramModelDiscount) => {
+                const name = modelNames[d.modelId];
+                if (!name) return null; // tránh lộ ID nếu chưa có tên
+                const value =
+                  d.discountType === 'fixed'
+                    ? formatCurrency(d.discountValue)
+                    : `${d.discountValue}%`;
+                return (
+                  <li key={d.modelId}>
+                    {name}: {value}
+                  </li>
+                );
               })}
-            </p>
-          )}
+            </ul>
+          </div>
+        )}
 
-          {program.modelDiscounts && (
-            <>
-              <p>{t('program_detail_page.discount_models')}</p>
-              <ul className="list-disc ml-6">
-                {Object.entries(program.modelDiscounts).map(([modelId, price]) => {
-                  const name = models[modelId];
-                  if (!name) return null; // 👈 KHÔNG hiển thị ID khi không tìm được tên
-                  return (
-                    <li key={modelId}>
-                      {name}: {formatCurrency(price)}
-                    </li>
-                  );
-                })}
-              </ul>
-            </>
-          )}
 
-          {stations.length > 0 && (
-            <>
-              <p>{t('program_detail_page.stations_applied')}</p>
-              <ul className="list-disc ml-6">
-                {stations.map((station) => {
-                  const dist = renderDistance(station);
-                  return (
-                    <li key={station.id}>
-                      {station.name} {dist ? `(${dist})` : ''}
-                    </li>
-                  );
-                })}
-              </ul>
-            </>
-          )}
-        </div>
+        {/* Stations */}
+        {stations.length > 0 && (
+          <div className="space-y-2">
+            <p className="font-semibold">{t('program_detail_page.stations_applied')}</p>
+            <ul className="list-disc ml-6">
+              {stations.map((st) => {
+                const dist = renderDistance(st);
+                return (
+                  <li key={st.id}>
+                    {st.name} {dist ? `(${dist})` : ''}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
+        {error && <div className="text-sm text-red-600">{error}</div>}
 
         <div>
           {joined ? (

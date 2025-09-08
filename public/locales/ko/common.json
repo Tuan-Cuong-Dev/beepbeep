@@ -2300,40 +2300,57 @@
   }
 },
 
+
 "programs_page": {
-  "title": "프로모션 프로그램",
-  "subtitle": "에이전트 참여를 촉진하여 매출 성장을 도모합니다.",
-  "create_button": "새 프로그램 만들기",
-  "no_programs": "현재 프로그램이 없습니다.",
-  "joined": "참여함",
-  "join_button": "프로그램 참여",
+  "title": "프로그램/프로모션",
+  "subtitle": "진행 중, 예정 또는 종료된 프로그램을 확인하고 관리하세요. 에이전트는 프로그램에 참여할 수 있으며, 회사 소유자는 생성 및 관리할 수 있습니다.",
+  "create_button": "프로그램 생성",
+  "no_programs": "등록된 프로그램이 없습니다.",
+  "confirm_delete": "이 프로그램을 삭제하시겠습니까?",
+  "type": "유형",
+  "duration": "기간",
+  "joined": "참여됨",
+  "join_button": "참여하기",
   "view_participants": "참여자 보기",
   "delete_button": "삭제",
   "status": {
-    "inactive": "비활성",
+    "active": "진행 중",
     "upcoming": "예정",
     "ended": "종료",
-    "active": "진행 중"
-  }
+    "inactive": "비활성"
+  },
+  "stations": "{{count}} 스테이션",
+  "models": "{{count}} 모델"
 },
 
 "programs_form_page": {
   "title": "프로그램 생성",
   "placeholders": {
     "title": "프로그램 제목",
-     "description": "프로그램에 대한 자세한 설명을 입력하세요. 예: 신규 고객 대상, 모델별 할인, 적용 스테이션 등",
-    "discount": "할인 가격 (VND)",
-    "select_company": "회사 선택"
+    "description": "대상, 적용 차종, 적용 스테이션 등 상세 내용을 입력하세요.",
+    "discount": "할인 금액 (VND)",
+    "select_company": "회사 선택",
+    "select_program_type": "프로그램 유형 선택"
   },
   "labels": {
-    "select_stations": "지점 선택 (선택 사항)",
-    "set_discounts": "모델별 할인 가격 설정",
+    "basic_info": "기본 정보",
+    "select_stations": "스테이션 선택 (선택 사항)",
+    "set_discounts": "차종별 할인 설정",
+    "time_range": "적용 기간",
     "start_date": "시작일",
     "end_date": "종료일"
   },
+  "discount": {
+    "fixed": "고정 할인 (VND)",
+    "percentage": "퍼센트 할인"
+  },
+  "hints": {
+    "loading": "데이터 불러오는 중…",
+    "no_models": "해당 조직에는 등록된 차종이 없습니다."
+  },
   "buttons": {
     "submit": "프로그램 제출",
-    "saving": "저장 중..."
+    "saving": "저장 중…"
   },
   "messages": {
     "success": "프로그램이 성공적으로 생성되었습니다!",
@@ -2344,7 +2361,14 @@
     "error": "오류"
   },
   "validation": {
-    "fill_required": "필수 항목을 모두 입력해 주세요."
+    "fill_required": "필수 항목을 모두 입력해 주세요.",
+    "title_required": "프로그램 제목을 입력해 주세요.",
+    "description_required": "프로그램 설명을 입력해 주세요.",
+    "company_required": "렌털 프로그램의 경우 회사를 선택해 주세요.",
+    "dates_required": "시작일과 종료일을 모두 선택해 주세요.",
+    "date_order": "종료일은 시작일 이후여야 합니다.",
+    "at_least_one_discount": "최소 한 개의 차종에 할인을 추가해 주세요.",
+    "percent_range": "할인율은 0~100% 범위여야 합니다."
   }
 },
 
@@ -2359,17 +2383,15 @@
 },
 
 "program_participants_page": {
-  "title": "프로그램 참가자",
-  "no_participants": "아직 참가자가 없습니다.",
+  "title": "프로그램 참여자",
+  "no_participants": "아직 참여자가 없습니다.",
   "name": "이름",
   "phone": "전화번호",
   "address": "주소",
   "role": "역할",
   "status": "상태",
-  "role_agent": "에이전트",
-  "role_customer": "고객",
-  "role_staff": "직원",
-  "status_joined": "참여 완료",
+  "joined_at": "참여 시각",
+  "status_joined": "참여됨",
   "status_pending": "대기 중",
   "status_rejected": "거절됨"
 },
