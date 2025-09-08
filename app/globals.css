@@ -132,3 +132,7 @@ html, body {
 /* ============= Misc ============= */
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Đảm bảo popper của react-datepicker nổi trên mọi lớp */
+.react-datepicker-popper { z-index: 60 !important; }
+.react-datepicker { font-size: 0.95rem; }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, forwardRef } from 'react';
 import {
   addDoc, collection, serverTimestamp, getDocs, query, where, documentId,
 } from 'firebase/firestore';
@@ -29,12 +29,14 @@ import type {
   ProgramModelDiscount,
 } from '@/src/lib/programs/rental-programs/programsType';
 
-/* ---------- helpers ---------- */
+/* ---- react-datepicker (cho nút lịch) ---- */
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
+/* ---------- helpers ---------- */
 type Company = { id: string; name: string };
 type Station = { id: string; name: string };
 type Model = { id: string; name: string };
-
 type ModelDiscountUI = { type: DiscountType; value: string };
 
 const chunk = <T,>(arr: T[], size = 10) =>
@@ -44,6 +46,19 @@ const chunk = <T,>(arr: T[], size = 10) =>
 
 const asProgramType = (val: string): ProgramType =>
   val === 'agent_program' ? 'agent_program' : 'rental_program';
+
+/** parse yyyy-MM-dd -> Date|null */
+const parseYMD = (s: string): Date | null => {
+  if (!s) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.trim());
+  if (!m) return null;
+  const y = Number(m[1]), mo = Number(m[2]) - 1, d = Number(m[3]);
+  const dt = new Date(y, mo, d);
+  return (dt.getFullYear() === y && dt.getMonth() === mo && dt.getDate() === d) ? dt : null;
+};
+/** format Date -> yyyy-MM-dd */
+const fmtYMD = (d: Date | null) =>
+  d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` : '';
 
 /* ---------- small UI components (mobile-first) ---------- */
 
@@ -144,6 +159,82 @@ function ModelDiscountRow({
   );
 }
 
+/* ---------- Reusable DateField (text input + nút lịch) ---------- */
+
+type DateFieldProps = {
+  id: string;
+  label: string;
+  value: string;              // yyyy-MM-dd
+  onChange: (val: string) => void;
+  min?: string;               // yyyy-MM-dd
+  max?: string;               // yyyy-MM-dd
+  placeholder?: string;
+};
+
+function DateField({ id, label, value, onChange, min, max, placeholder = 'YYYY-MM-DD' }: DateFieldProps) {
+  // để DatePicker dùng button custom
+  const CalendarButton = forwardRef<HTMLButtonElement, React.ComponentProps<'button'>>(
+    ({ onClick }, ref) => (
+      <button
+        type="button"
+        ref={ref}
+        onClick={onClick}
+        className="h-10 px-3 rounded-lg border bg-white text-sm hover:bg-gray-50"
+        aria-label={`Open ${label} calendar`}
+      >
+        📅
+      </button>
+    )
+  );
+  CalendarButton.displayName = 'CalendarButton';
+
+  const selected = parseYMD(value);
+  const minDate = min ? parseYMD(min) ?? undefined : undefined;
+  const maxDate = max ? parseYMD(max) ?? undefined : undefined;
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+
+      <div className="flex items-center gap-2">
+        {/* Ô nhập text: tap ở giữa vẫn gõ được */}
+        <input
+          id={id}
+          type="text"
+          inputMode="numeric"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => {
+            // chỉ nhận ký tự số và dấu gạch, tự cắt tối đa 10 ký tự
+            const raw = e.target.value.replace(/[^\d-]/g, '').slice(0, 10);
+            onChange(raw);
+          }}
+          className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label={label}
+        />
+
+        {/* Nút mở lịch */}
+        <DatePicker
+          selected={selected}
+          onChange={(d) => onChange(fmtYMD(d as Date))}
+          minDate={minDate}
+          maxDate={maxDate}
+          customInput={<CalendarButton />}
+          withPortal
+        />
+      </div>
+
+      {/* Preview đẹp dd/MM/yyyy */}
+      <p className="mt-1 text-xs text-gray-500">
+        {safeFormatDate(value, 'dd/MM/yyyy')}
+      </p>
+    </div>
+  );
+}
+
 /* ---------- main page (mobile-first) ---------- */
 
 export default function ProgramsFormPage() {
@@ -159,6 +250,7 @@ export default function ProgramsFormPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  // dùng chuỗi yyyy-MM-dd để đồng bộ stringToTimestamp
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -180,14 +272,6 @@ export default function ProgramsFormPage() {
   const [notification, setNotification] =
     useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
-
-  // state & helper cho mobile date picker
-  const [isDatePicking, setIsDatePicking] = useState(false);
-  const openNativePicker = (el: HTMLInputElement | null) => {
-    try {
-      el?.showPicker?.();
-    } catch {}
-  };
 
   /* --------- 1) Resolve owner ---------- */
   useEffect(() => {
@@ -339,8 +423,15 @@ export default function ProgramsFormPage() {
       list.push(t('programs_form_page.validation.company_required') as string);
     if (!startDate || !endDate)
       list.push(t('programs_form_page.validation.dates_required') as string);
-    else if (new Date(endDate) < new Date(startDate))
-      list.push(t('programs_form_page.validation.date_order') as string);
+    else {
+      const s = parseYMD(startDate);
+      const e = parseYMD(endDate);
+      if (!s || !e) {
+        list.push(t('programs_form_page.validation.dates_required') as string);
+      } else if (e.getTime() < s.getTime()) {
+        list.push(t('programs_form_page.validation.date_order') as string);
+      }
+    }
     const discounts = buildModelDiscountsPayload();
     if (discounts.length === 0)
       list.push(t('programs_form_page.validation.at_least_one_discount') as string);
@@ -488,52 +579,32 @@ export default function ProgramsFormPage() {
             )}
           </Section>
 
+          {/* Time range: DateField cho mobile/desktop */}
           <Section title={t('programs_form_page.labels.time_range') as string}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Start Date */}
-              <div>
-                <label
-                  htmlFor="start-date"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  {t('programs_form_page.labels.start_date')}
-                </label>
-                <Input
-                  id="start-date"
-                  type="date"
-                  className="h-12 w-full"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  aria-label="Start date"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  {safeFormatDate(startDate, 'dd/MM/yyyy')}
-                </p>
-              </div>
-
-              {/* End Date */}
-              <div>
-                <label
-                  htmlFor="end-date"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  {t('programs_form_page.labels.end_date')}
-                </label>
-                <Input
-                  id="end-date"
-                  type="date"
-                  className="h-12 w-full"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  aria-label="End date"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  {safeFormatDate(endDate, 'dd/MM/yyyy')}
-                </p>
-              </div>
+              <DateField
+                id="start-date"
+                label={t('programs_form_page.labels.start_date') as string}
+                value={startDate}
+                onChange={(v) => {
+                  setStartDate(v);
+                  // nếu end < start thì reset end
+                  const s = parseYMD(v);
+                  const e = parseYMD(endDate);
+                  if (s && e && e.getTime() < s.getTime()) {
+                    setEndDate('');
+                  }
+                }}
+              />
+              <DateField
+                id="end-date"
+                label={t('programs_form_page.labels.end_date') as string}
+                value={endDate}
+                onChange={setEndDate}
+                min={startDate || undefined}
+              />
             </div>
           </Section>
-
 
           {(error || errors.length > 0) && (
             <Section>
@@ -545,21 +616,19 @@ export default function ProgramsFormPage() {
         </div>
       </main>
 
-      {/* Sticky action bar (mobile-first) */}
-      {!isDatePicking && (
-        <div className="sticky bottom-0 inset-x-0 z-20 border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75">
-          <div className="max-w-2xl mx-auto px-3 py-3 sm:px-6 sm:py-4">
-            <Button
-              onClick={handleSubmit}
-              disabled={saving || !canSubmit}
-              className="h-12 w-full rounded-xl"
-            >
-              {saving ? t('programs_form_page.buttons.saving') : t('programs_form_page.buttons.submit')}
-            </Button>
-            <div className="h-[max(env(safe-area-inset-bottom),0px)]" />
-          </div>
+      {/* Sticky action bar */}
+      <div className="sticky bottom-0 inset-x-0 z-20 border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+        <div className="max-w-2xl mx-auto px-3 py-3 sm:px-6 sm:py-4">
+          <Button
+            onClick={handleSubmit}
+            disabled={saving || !canSubmit}
+            className="h-12 w-full rounded-xl"
+          >
+            {saving ? t('programs_form_page.buttons.saving') : t('programs_form_page.buttons.submit')}
+          </Button>
+          <div className="h-[max(env(safe-area-inset-bottom),0px)]" />
         </div>
-      )}
+      </div>
 
       <Footer />
 

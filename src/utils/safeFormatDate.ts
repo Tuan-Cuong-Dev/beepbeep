@@ -1,4 +1,8 @@
 // utils/safeFormatDate.ts
+// Bỏ dần vì nó ko cho phép chọn ngay trên input
+// làm người dùng khó hiểu - sẽ cho thay bằng dateYMD.ts từ 08/09/2025
+// Gọi DateField trong UI
+
 import { format as dfFormat } from 'date-fns';
 
 /** Firestore Timestamp tối giản (để không phải import sdk ở layer utils) */
