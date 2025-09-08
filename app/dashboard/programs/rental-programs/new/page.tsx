@@ -21,17 +21,13 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { stringToTimestamp } from '@/src/utils/date';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
+import { safeFormatDate } from '@/src/utils/safeFormatDate';
 
 import type {
   ProgramType,
   DiscountType,
   ProgramModelDiscount,
 } from '@/src/lib/programs/rental-programs/programsType';
-
-/* ---------- NEW: react-datepicker ---------- */
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
 
 /* ---------- helpers ---------- */
 
@@ -161,26 +157,18 @@ export default function ProgramsFormPage() {
   const isCompanyOwner = normalizedRole === 'company_owner';
   const isCompanyRole = isPrivateProvider || isCompanyOwner;
 
-  // form states
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  // 🔁 đổi sang Date | null cho react-datepicker
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
-  // owner + options
   const [selectedOwnerId, setSelectedOwnerId] = useState<string | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
-
-  // data by owner
   const [stations, setStations] = useState<Station[]>([]);
   const [models, setModels] = useState<Model[]>([]);
-
-  // picks
   const [selectedStationIds, setSelectedStationIds] = useState<string[]>([]);
   const [modelDiscountsUI, setModelDiscountsUI] = useState<Record<string, ModelDiscountUI>>({});
 
-  // meta
   const [adminProgramType, setAdminProgramType] = useState<ProgramType>('rental_program');
   const programType: ProgramType = useMemo(
     () => (isAdmin ? adminProgramType : isCompanyRole ? 'rental_program' : 'agent_program'),
@@ -193,17 +181,21 @@ export default function ProgramsFormPage() {
     useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Ẩn sticky khi đang mở calendar (tránh che)
-  const [calendarOpen, setCalendarOpen] = useState(false);
+  // state & helper cho mobile date picker
+  const [isDatePicking, setIsDatePicking] = useState(false);
+  const openNativePicker = (el: HTMLInputElement | null) => {
+    try {
+      el?.showPicker?.();
+    } catch {}
+  };
 
-  /* --------- 1) Resolve owner (company/provider) by role ---------- */
+  /* --------- 1) Resolve owner ---------- */
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
         setError(null);
-
         if (isAdmin) {
           const snap = await getDocs(collection(db, 'rentalCompanies'));
           if (!mounted) return;
@@ -212,7 +204,6 @@ export default function ProgramsFormPage() {
           if (!selectedOwnerId && list.length) setSelectedOwnerId(list[0].id);
           return;
         }
-
         if (isPrivateProvider) {
           if (!user?.uid) return;
           const snap = await getDocs(
@@ -222,14 +213,11 @@ export default function ProgramsFormPage() {
           setSelectedOwnerId(snap.docs[0]?.id ?? null);
           return;
         }
-
         if (isCompanyOwner) {
           if (!mounted) return;
           setSelectedOwnerId(companyId ?? null);
           return;
         }
-
-        // agent / unknown roles -> still allow create agent_program without owner
         setSelectedOwnerId(null);
       } catch (e: any) {
         if (mounted) setError(e?.message || 'Failed to resolve owner');
@@ -242,10 +230,9 @@ export default function ProgramsFormPage() {
     };
   }, [isAdmin, isPrivateProvider, isCompanyOwner, companyId, user?.uid, selectedOwnerId]);
 
-  /* --------- 2) Load stations + models by owner ---------- */
+  /* --------- 2) Load stations + models ---------- */
   useEffect(() => {
     let mounted = true;
-
     const loadStations = async (ownerId: string) => {
       if (isPrivateProvider) {
         setStations([]);
@@ -257,9 +244,7 @@ export default function ProgramsFormPage() {
       if (!mounted) return;
       setStations(snap.docs.map((d) => ({ id: d.id, name: (d.data() as any).name })));
     };
-
     const loadModels = async (ownerId: string) => {
-      // gather vehicles by companyId OR providerId
       const [v1, v2] = await Promise.all([
         getDocs(query(collection(db, 'vehicles'), where('companyId', '==', ownerId))),
         getDocs(query(collection(db, 'vehicles'), where('providerId', '==', ownerId))),
@@ -275,7 +260,6 @@ export default function ProgramsFormPage() {
         if (mounted) setModels([]);
         return;
       }
-
       const map = new Map<string, Model>();
       for (const group of chunk(modelIds, 10)) {
         const msnap = await getDocs(
@@ -291,8 +275,6 @@ export default function ProgramsFormPage() {
         (a.name ?? '').localeCompare(b.name ?? '', 'vi', { sensitivity: 'base' })
       );
       setModels(sorted);
-
-      // init discount UI
       setModelDiscountsUI((prev) => {
         const copy = { ...prev };
         sorted.forEach((m) => {
@@ -301,14 +283,12 @@ export default function ProgramsFormPage() {
         return copy;
       });
     };
-
     (async () => {
       if (!selectedOwnerId) {
         setStations([]);
         setModels([]);
         return;
       }
-
       try {
         setLoading(true);
         setError(null);
@@ -319,14 +299,12 @@ export default function ProgramsFormPage() {
         if (mounted) setLoading(false);
       }
     })();
-
     return () => {
       mounted = false;
     };
   }, [selectedOwnerId, isPrivateProvider]);
 
   /* --------- handlers ---------- */
-
   const toggleStation = useCallback((id: string) => {
     setSelectedStationIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -345,14 +323,12 @@ export default function ProgramsFormPage() {
       if (Number.isNaN(val)) continue;
       if (ui.type === 'percentage' && (val < 0 || val > 100)) continue;
       if (ui.type === 'fixed' && val < 0) continue;
-
       items.push({ modelId, discountType: ui.type, discountValue: val });
     }
     return items;
   };
 
   /* --------- validation ---------- */
-
   const errors = useMemo(() => {
     const list: string[] = [];
     if (!title.trim())
@@ -363,20 +339,17 @@ export default function ProgramsFormPage() {
       list.push(t('programs_form_page.validation.company_required') as string);
     if (!startDate || !endDate)
       list.push(t('programs_form_page.validation.dates_required') as string);
-    else if (endDate.getTime() < startDate.getTime())
+    else if (new Date(endDate) < new Date(startDate))
       list.push(t('programs_form_page.validation.date_order') as string);
-
     const discounts = buildModelDiscountsPayload();
     if (discounts.length === 0)
       list.push(t('programs_form_page.validation.at_least_one_discount') as string);
-
     return list;
   }, [title, description, selectedOwnerId, startDate, endDate, modelDiscountsUI, programType, t]);
 
   const canSubmit = errors.length === 0;
 
   /* --------- submit ---------- */
-
   const handleSubmit = async () => {
     if (!canSubmit) {
       setNotification({
@@ -388,11 +361,6 @@ export default function ProgramsFormPage() {
     setSaving(true);
     try {
       const modelDiscounts = buildModelDiscountsPayload();
-
-      // chuẩn hoá 'yyyy-MM-dd' trước khi stringToTimestamp
-      const startStr = startDate ? format(startDate, 'yyyy-MM-dd') : '';
-      const endStr = endDate ? format(endDate, 'yyyy-MM-dd') : '';
-
       await addDoc(collection(db, 'programs'), {
         title,
         description,
@@ -403,15 +371,14 @@ export default function ProgramsFormPage() {
             ? []
             : selectedStationIds.map((id) => ({ stationId: id })),
         modelDiscounts,
-        startDate: stringToTimestamp(startStr),
-        endDate: stringToTimestamp(endStr),
+        startDate: stringToTimestamp(startDate),
+        endDate: stringToTimestamp(endDate),
         createdByUserId: user?.uid ?? null,
         createdByRole: isAdmin ? 'Admin' : isPrivateProvider ? 'private_provider' : 'company_owner',
         isActive: true,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-
       setNotification({ type: 'success', message: t('programs_form_page.messages.success') });
       setTimeout(() => router.push('/dashboard/programs'), 700);
     } catch (e) {
@@ -423,12 +390,10 @@ export default function ProgramsFormPage() {
   };
 
   /* --------- render ---------- */
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
-      {/* main: mobile-first spacing */}
       <main className="flex-1 px-3 sm:px-6 pt-4 pb-[6.5rem] sm:pb-10 space-y-4 sm:space-y-8">
         <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
           <Section>
@@ -437,7 +402,6 @@ export default function ProgramsFormPage() {
             </h1>
           </Section>
 
-          {/* Owner/type selection for Admin */}
           {isAdmin && (
             <Section>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -480,7 +444,6 @@ export default function ProgramsFormPage() {
             </div>
           </Section>
 
-          {/* Stations (only for rental_program & non-provider) */}
           {!isPrivateProvider && programType === 'rental_program' && (
             <StationPicker
               stations={stations}
@@ -491,7 +454,6 @@ export default function ProgramsFormPage() {
             />
           )}
 
-          {/* Models + discounts */}
           <Section title={t('programs_form_page.labels.set_discounts') as string}>
             {loading ? (
               <p className="text-sm text-gray-500">
@@ -502,7 +464,6 @@ export default function ProgramsFormPage() {
                 {t('programs_form_page.hints.no_models', { defaultValue: 'Chưa có mẫu xe cho đơn vị này.' })}
               </p>
             ) : (
-              // 1 cột mobile, 2 cột >= md
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {models.map((m) => {
                   const ui = modelDiscountsUI[m.id] || { type: 'fixed', value: '' };
@@ -527,44 +488,45 @@ export default function ProgramsFormPage() {
             )}
           </Section>
 
-          {/* Dates */}
           <Section title={t('programs_form_page.labels.time_range') as string}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('programs_form_page.labels.start_date')}
                 </label>
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date as Date)}
-                  dateFormat="yyyy-MM-dd"
-                  placeholderText="YYYY-MM-DD"
-                  className="h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  withPortal
-                  onCalendarOpen={() => setCalendarOpen(true)}
-                  onCalendarClose={() => setCalendarOpen(false)}
+                <Input
+                  className="h-12"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  onFocus={() => setIsDatePicking(true)}
+                  onBlur={() => setIsDatePicking(false)}
+                  onClick={(e) => openNativePicker(e.currentTarget)}
                 />
+                <div className="mt-1 text-xs text-gray-500">
+                  ({safeFormatDate(startDate, 'dd/MM/yyyy')})
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('programs_form_page.labels.end_date')}
                 </label>
-                <DatePicker
-                  selected={endDate}
-                  onChange={(date) => setEndDate(date as Date)}
-                  dateFormat="yyyy-MM-dd"
-                  placeholderText="YYYY-MM-DD"
-                  className="h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  withPortal
-                  onCalendarOpen={() => setCalendarOpen(true)}
-                  onCalendarClose={() => setCalendarOpen(false)}
-                  minDate={startDate ?? undefined}
+                <Input
+                  className="h-12"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  onFocus={() => setIsDatePicking(true)}
+                  onBlur={() => setIsDatePicking(false)}
+                  onClick={(e) => openNativePicker(e.currentTarget)}
                 />
+                <div className="mt-1 text-xs text-gray-500">
+                  ({safeFormatDate(endDate, 'dd/MM/yyyy')})
+                </div>
               </div>
             </div>
           </Section>
 
-          {/* Errors */}
           {(error || errors.length > 0) && (
             <Section>
               <div className="text-sm text-red-600">
@@ -576,7 +538,7 @@ export default function ProgramsFormPage() {
       </main>
 
       {/* Sticky action bar (mobile-first) */}
-      {!calendarOpen && (
+      {!isDatePicking && (
         <div className="sticky bottom-0 inset-x-0 z-20 border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75">
           <div className="max-w-2xl mx-auto px-3 py-3 sm:px-6 sm:py-4">
             <Button
@@ -586,7 +548,6 @@ export default function ProgramsFormPage() {
             >
               {saving ? t('programs_form_page.buttons.saving') : t('programs_form_page.buttons.submit')}
             </Button>
-            {/* safe area cho iOS */}
             <div className="h-[max(env(safe-area-inset-bottom),0px)]" />
           </div>
         </div>

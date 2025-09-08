@@ -1,20 +1,40 @@
 // utils/safeFormatDate.ts
 import { format } from "date-fns";
 
-export function safeFormatDate(value: any, formatStr = "dd/MM/yyyy") {
-  if (!value) return "N/A";
+/**
+ * Định dạng an toàn một giá trị ngày tháng (Date, Timestamp, string, number).
+ * Luôn trả về string hiển thị được, tránh crash trên mobile.
+ *
+ * @param value - Date, Firestore Timestamp, số (ms), hoặc string
+ * @param formatStr - Mặc định "yyyy-MM-dd" (thân thiện mobile)
+ */
+export function safeFormatDate(value: any, formatStr = "yyyy-MM-dd"): string {
+  if (!value) return "—";
 
   let date: Date | null = null;
 
-  if (typeof value?.toDate === "function") {
-    date = value.toDate();
-  } else if (value instanceof Date) {
-    date = value;
-  } else if (typeof value === "string" || typeof value === "number") {
-    date = new Date(value);
+  try {
+    if (typeof value?.toDate === "function") {
+      // Firestore Timestamp
+      date = value.toDate();
+    } else if (value instanceof Date) {
+      date = value;
+    } else if (typeof value === "string" || typeof value === "number") {
+      const parsed = new Date(value);
+      if (!isNaN(parsed.getTime())) {
+        date = parsed;
+      }
+    }
+  } catch {
+    return "—";
   }
 
-  if (!date || isNaN(date.getTime())) return "N/A";
+  if (!date || isNaN(date.getTime())) return "—";
 
-  return format(date, formatStr);
+  try {
+    return format(date, formatStr);
+  } catch {
+    // fallback nếu formatStr không hợp lệ
+    return date.toISOString().split("T")[0]; // yyyy-MM-dd
+  }
 }
