@@ -21,6 +21,9 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { stringToTimestamp } from '@/src/utils/date';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
+// thêm ngay dưới các import utils khác
+import { safeFormatDate } from '@/src/utils/safeFormatDate';
+
 
 import type {
   ProgramType,
@@ -521,6 +524,7 @@ export default function ProgramsFormPage() {
           </Section>
 
           {/* Dates */}
+          {/* Dates */}
           <Section title={t('programs_form_page.labels.time_range') as string}>
             {/* xếp dọc mobile, 2 cột từ md */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -534,7 +538,11 @@ export default function ProgramsFormPage() {
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
+                <div className="mt-1 text-xs text-gray-500">
+                  ({safeFormatDate(startDate, 'dd/MM/yyyy')})
+                </div>
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('programs_form_page.labels.end_date')}
@@ -545,9 +553,13 @@ export default function ProgramsFormPage() {
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
+                <div className="mt-1 text-xs text-gray-500">
+                  ({safeFormatDate(endDate, 'dd/MM/yyyy')})
+                </div>
               </div>
             </div>
           </Section>
+
 
           {/* Errors */}
           {(error || errors.length > 0) && (
