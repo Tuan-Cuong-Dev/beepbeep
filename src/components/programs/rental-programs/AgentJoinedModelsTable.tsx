@@ -338,19 +338,51 @@ async function loadProvidersByIds(providerIds: string[], coll = 'privateProvider
   return map
 }
 
+/* ===== Helpers đọc stationId & giá/ngày từ nhiều schema ===== */
+const getVehicleStationId = (v: AnyRec): string | null => {
+  if (typeof v.stationId === 'string') return v.stationId
+  if (isRecord(v.stationRef) && typeof (v.stationRef as AnyRec).id === 'string') return (v.stationRef as AnyRec).id as string
+  if (isRecord(v.station) && typeof (v.station as AnyRec).id === 'string') return (v.station as AnyRec).id as string
+  if (isRecord(v.location) && typeof (v.location as AnyRec).stationId === 'string') return (v.location as AnyRec).stationId as string
+  return null
+}
+
+const getVehicleDayPrice = (v: AnyRec): number | null => {
+  const cands = [
+    v.pricePerDay,
+    isRecord(v.pricing) ? (v.pricing as AnyRec).perDay : undefined,
+    isRecord(v.prices) ? (v.prices as AnyRec).day : undefined,
+    isRecord(v.rental) ? (v.rental as AnyRec).dayPrice : undefined,
+  ]
+  for (const x of cands) if (typeof x === 'number') return x
+  return null
+}
+
 /** Load vehicles theo (companyId, modelId) để lấy min price */
 async function loadVehiclesFor(
   companyIds: string[],
   modelIds: string[],
   coll = 'vehicles',
-  statusFilter?: VehicleStatus
+  statusFilter?: VehicleStatus | string | string[]
 ): Promise<Vehicle[]> {
   const out: Vehicle[] = []
   if (!companyIds.length || !modelIds.length) return out
+
+  // chuẩn hoá status → mảng cho where('in', ...)
+  let statusList: string[] | null = null
+  if (Array.isArray(statusFilter)) {
+    statusList = [...new Set(statusFilter as string[])]
+  } else if (typeof statusFilter === 'string') {
+    statusList = [...new Set([statusFilter, statusFilter.toLowerCase(), statusFilter.toUpperCase()])]
+  }
+
   for (const companyId of companyIds) {
     for (const part of chunk(modelIds, 10)) {
       const conds: any[] = [where('companyId', '==', companyId), where('modelId', 'in', part)]
-      if (statusFilter) conds.push(where('status', '==', statusFilter))
+      if (statusList && statusList.length) {
+        // Firestore: 'in' tối đa 10 phần tử
+        conds.push(where('status', 'in', statusList.slice(0, 10)))
+      }
       const q = query(collection(db, coll), ...conds)
       const snap = await getDocs(q)
       snap.docs.forEach((d) => out.push({ id: d.id, ...(d.data() as AnyRec) } as Vehicle))
@@ -492,7 +524,7 @@ export default function AgentJoinedModelsTable({
         const getMinPriceDay = (vlist: Vehicle[]): number | null => {
           let min: number | null = null
           vlist.forEach((v) => {
-            const p = typeof v.pricePerDay === 'number' ? v.pricePerDay : null
+            const p = getVehicleDayPrice(v as unknown as AnyRec)
             if (p != null) min = min == null ? p : Math.min(min, p)
           })
           return min
@@ -526,11 +558,27 @@ export default function AgentJoinedModelsTable({
               p.stationTargets.forEach((st: StationTargetLite) => {
                 const stMeta = st.stationId ? stationMapById.get(st.stationId) : undefined
                 const stationName = stMeta?.name || st.stationId || t('all_stations', 'Tất cả trạm')
-                const baseDayPrice = getMinPriceDay(vlist.filter((v) => v.stationId === st.stationId))
+
+                // Ưu tiên min theo TRẠM; nếu không có → min theo COMPANY+MODEL; nếu vẫn không → model.pricePerDay
+                const byStation = vlist.filter((v) => getVehicleStationId(v as unknown as AnyRec) === st.stationId)
+                const baseDayPrice =
+                  getMinPriceDay(byStation)
+                  ?? getMinPriceDay(vlist)
+                  ?? (typeof vm?.pricePerDay === 'number' ? vm.pricePerDay : null)
+
                 const distanceKm = (agentPos && stMeta?.ll) ? haversineKm(agentPos, stMeta.ll) : null
 
+                if (LOG) log('row-debug', {
+                  programId: (p as unknown as AnyRec).id, modelId: md.modelId, stationId: st.stationId,
+                  totalVehicles: vlist.length,
+                  matchStation: byStation.length,
+                  minByStation: getMinPriceDay(byStation),
+                  minCompanyModel: getMinPriceDay(vlist),
+                  vmPrice: vm?.pricePerDay,
+                })
+
                 acc.push({
-                  key: `${p.id}:${md.modelId}:${st.stationId}`,
+                  key: `${(p as unknown as AnyRec).id}:${md.modelId}:${st.stationId}`,
                   companyId: p.companyId,
                   companyName,
                   stationName,
@@ -551,10 +599,12 @@ export default function AgentJoinedModelsTable({
                 ...(providerAsStation ? [{ name: providerAsStation.name, ll: providerAsStation.ll }] : []),
               ]
               const nearest = pickNearest(agentPos, cand)
-              const baseDayPrice = getMinPriceDay(vlist)
+              const baseDayPrice =
+                getMinPriceDay(vlist)
+                ?? (typeof vm?.pricePerDay === 'number' ? vm.pricePerDay : null)
 
               acc.push({
-                key: `${p.id}:${md.modelId}:ALL`,
+                key: `${(p as unknown as AnyRec).id}:${md.modelId}:ALL`,
                 companyId: p.companyId,
                 companyName,
                 stationName: cand.length ? nearest.name : t('agent_joined_models.all_stations', 'Tất cả trạm'),
