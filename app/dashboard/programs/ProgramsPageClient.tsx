@@ -112,7 +112,7 @@ function ProgramActions({ programId, role, joinedPrograms, onJoin, onDelete, t }
   return null;
 }
 
-export default function ProgramsPage() {
+export default function ProgramsPageClient() {
   const { t } = useTranslation('common');
   const { user, role, companyId: ctxCompanyId } = useUser() as any;
 

@@ -1,13 +1,10 @@
-// app/dashboard/programs/page.tsx  (KHÔNG 'use client')
+// app/dashboard/programs/page.tsx
 export const revalidate = 0;
-export const dynamic = 'force-dynamic';     // OK nếu không export static
 
-import NextDynamic from 'next/dynamic';     // ⬅ alias, tránh trùng tên
+// ❗ Nếu dự án của bạn KHÔNG dùng `output: 'export'`, bạn có thể bật dòng sau.
+// export const dynamic = 'force-dynamic'; // <- BỎ dòng này nếu dùng static export
 
-const ProgramsPageClient = NextDynamic(
-  () => import('./ProgramsPageClient'),     // file client
-  { ssr: false }                            // tắt SSR cho component này
-);
+import ProgramsPageClient from './ProgramsPageClient';
 
 export default function Page() {
   return <ProgramsPageClient />;
