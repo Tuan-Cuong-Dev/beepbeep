@@ -1,6 +1,5 @@
 // lib/agents/agentTypes.ts
 // Update 04/09/2025
-// lib/agents/agentTypes.ts
 
 import { Timestamp, FieldValue, GeoPoint } from "firebase/firestore";
 import type { LocationCore } from "@/src/lib/locations/locationTypes";
