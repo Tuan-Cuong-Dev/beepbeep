@@ -29,7 +29,6 @@ import type {
   ProgramModelDiscount,
 } from '@/src/lib/programs/rental-programs/programsType';
 
-/* ---- react-datepicker (cho nút lịch) ---- */
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -60,8 +59,7 @@ const parseYMD = (s: string): Date | null => {
 const fmtYMD = (d: Date | null) =>
   d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` : '';
 
-/* ---------- small UI components (mobile-first) ---------- */
-
+/* ---------- small UI components ---------- */
 function Section({ title, children }: { title?: string; children: React.ReactNode }) {
   return (
     <section className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
@@ -159,8 +157,7 @@ function ModelDiscountRow({
   );
 }
 
-/* ---------- Reusable DateField (text input + nút lịch) ---------- */
-
+/* ---------- Reusable DateField ---------- */
 type DateFieldProps = {
   id: string;
   label: string;
@@ -172,7 +169,6 @@ type DateFieldProps = {
 };
 
 function DateField({ id, label, value, onChange, min, max, placeholder = 'YYYY-MM-DD' }: DateFieldProps) {
-  // để DatePicker dùng button custom
   const CalendarButton = forwardRef<HTMLButtonElement, React.ComponentProps<'button'>>(
     ({ onClick }, ref) => (
       <button
@@ -199,7 +195,6 @@ function DateField({ id, label, value, onChange, min, max, placeholder = 'YYYY-M
       </label>
 
       <div className="flex items-center gap-2">
-        {/* Ô nhập text: tap ở giữa vẫn gõ được */}
         <input
           id={id}
           type="text"
@@ -207,7 +202,6 @@ function DateField({ id, label, value, onChange, min, max, placeholder = 'YYYY-M
           placeholder={placeholder}
           value={value}
           onChange={(e) => {
-            // chỉ nhận ký tự số và dấu gạch, tự cắt tối đa 10 ký tự
             const raw = e.target.value.replace(/[^\d-]/g, '').slice(0, 10);
             onChange(raw);
           }}
@@ -215,8 +209,6 @@ function DateField({ id, label, value, onChange, min, max, placeholder = 'YYYY-M
                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label={label}
         />
-
-        {/* Nút mở lịch */}
         <DatePicker
           selected={selected}
           onChange={(d) => onChange(fmtYMD(d as Date))}
@@ -227,7 +219,6 @@ function DateField({ id, label, value, onChange, min, max, placeholder = 'YYYY-M
         />
       </div>
 
-      {/* Preview đẹp dd/MM/yyyy */}
       <p className="mt-1 text-xs text-gray-500">
         {safeFormatDate(value, 'dd/MM/yyyy')}
       </p>
@@ -235,8 +226,7 @@ function DateField({ id, label, value, onChange, min, max, placeholder = 'YYYY-M
   );
 }
 
-/* ---------- main page (mobile-first) ---------- */
-
+/* ---------- main page ---------- */
 export default function ProgramsFormPage() {
   const { t } = useTranslation('common');
   const router = useRouter();
@@ -250,7 +240,7 @@ export default function ProgramsFormPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  // dùng chuỗi yyyy-MM-dd để đồng bộ stringToTimestamp
+  // yyyy-MM-dd để đồng bộ stringToTimestamp
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -261,10 +251,13 @@ export default function ProgramsFormPage() {
   const [selectedStationIds, setSelectedStationIds] = useState<string[]>([]);
   const [modelDiscountsUI, setModelDiscountsUI] = useState<Record<string, ModelDiscountUI>>({});
 
+  // NEW: cho phép company role chọn loại chương trình
   const [adminProgramType, setAdminProgramType] = useState<ProgramType>('rental_program');
+  const [companyProgramType, setCompanyProgramType] = useState<ProgramType>('rental_program');
+
   const programType: ProgramType = useMemo(
-    () => (isAdmin ? adminProgramType : isCompanyRole ? 'rental_program' : 'agent_program'),
-    [isAdmin, adminProgramType, isCompanyRole]
+    () => (isAdmin ? adminProgramType : isCompanyRole ? companyProgramType : 'agent_program'),
+    [isAdmin, adminProgramType, isCompanyRole, companyProgramType]
   );
 
   const [loading, setLoading] = useState(false);
@@ -416,25 +409,32 @@ export default function ProgramsFormPage() {
   const errors = useMemo(() => {
     const list: string[] = [];
     if (!title.trim())
-      list.push(t('programs_form_page.validation.title_required') as string);
+      list.push(t('programs_form_page.validation.title_required', { defaultValue: 'Vui lòng nhập tiêu đề.' }) as string);
     if (!description.trim())
-      list.push(t('programs_form_page.validation.description_required') as string);
+      list.push(t('programs_form_page.validation.description_required', { defaultValue: 'Vui lòng nhập mô tả.' }) as string);
+
     if (programType === 'rental_program' && !selectedOwnerId)
-      list.push(t('programs_form_page.validation.company_required') as string);
+      list.push(t('programs_form_page.validation.company_required', { defaultValue: 'Vui lòng chọn đơn vị áp dụng.' }) as string);
+
     if (!startDate || !endDate)
-      list.push(t('programs_form_page.validation.dates_required') as string);
+      list.push(t('programs_form_page.validation.dates_required', { defaultValue: 'Vui lòng chọn thời gian áp dụng.' }) as string);
     else {
       const s = parseYMD(startDate);
       const e = parseYMD(endDate);
       if (!s || !e) {
-        list.push(t('programs_form_page.validation.dates_required') as string);
+        list.push(t('programs_form_page.validation.dates_required', { defaultValue: 'Vui lòng chọn thời gian áp dụng.' }) as string);
       } else if (e.getTime() < s.getTime()) {
-        list.push(t('programs_form_page.validation.date_order') as string);
+        list.push(t('programs_form_page.validation.date_order', { defaultValue: 'Ngày kết thúc phải sau ngày bắt đầu.' }) as string);
       }
     }
-    const discounts = buildModelDiscountsPayload();
-    if (discounts.length === 0)
-      list.push(t('programs_form_page.validation.at_least_one_discount') as string);
+
+    // 🔴 Quan trọng: chỉ rental_program mới yêu cầu discount
+    if (programType === 'rental_program') {
+      const discounts = buildModelDiscountsPayload();
+      if (discounts.length === 0)
+        list.push(t('programs_form_page.validation.at_least_one_discount', { defaultValue: 'Cần ít nhất 1 cấu hình giảm giá.' }) as string);
+    }
+
     return list;
   }, [title, description, selectedOwnerId, startDate, endDate, modelDiscountsUI, programType, t]);
 
@@ -445,22 +445,24 @@ export default function ProgramsFormPage() {
     if (!canSubmit) {
       setNotification({
         type: 'error',
-        message: errors[0] ?? t('programs_form_page.validation.fill_required'),
+        message: errors[0] ?? (t('programs_form_page.validation.fill_required', { defaultValue: 'Vui lòng điền đầy đủ thông tin bắt buộc.' }) as string),
       });
       return;
     }
     setSaving(true);
     try {
-      const modelDiscounts = buildModelDiscountsPayload();
+      const modelDiscounts = programType === 'rental_program' ? buildModelDiscountsPayload() : [];
+
       await addDoc(collection(db, 'programs'), {
         title,
         description,
         type: programType,
         companyId: programType === 'rental_program' ? selectedOwnerId : null,
+        // Stations & discounts CHỈ áp dụng cho rental_program
         stationTargets:
-          isPrivateProvider || programType === 'agent_program'
-            ? []
-            : selectedStationIds.map((id) => ({ stationId: id })),
+          programType === 'rental_program' && !isPrivateProvider
+            ? selectedStationIds.map((id) => ({ stationId: id }))
+            : [],
         modelDiscounts,
         startDate: stringToTimestamp(startDate),
         endDate: stringToTimestamp(endDate),
@@ -470,11 +472,12 @@ export default function ProgramsFormPage() {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-      setNotification({ type: 'success', message: t('programs_form_page.messages.success') });
+
+      setNotification({ type: 'success', message: t('programs_form_page.messages.success', { defaultValue: 'Tạo chương trình thành công.' }) });
       setTimeout(() => router.push('/dashboard/programs'), 700);
     } catch (e) {
       console.error('❌ Add program failed:', e);
-      setNotification({ type: 'error', message: t('programs_form_page.messages.error') });
+      setNotification({ type: 'error', message: t('programs_form_page.messages.error', { defaultValue: 'Tạo chương trình thất bại.' }) });
     } finally {
       setSaving(false);
     }
@@ -489,106 +492,134 @@ export default function ProgramsFormPage() {
         <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
           <Section>
             <h1 className="text-xl sm:text-2xl font-bold">
-              {t('programs_form_page.title')}
+              {t('programs_form_page.title', { defaultValue: 'Tạo chương trình' })}
             </h1>
           </Section>
 
-          {isAdmin && (
+          {/* Program type selector + explain */}
+          {(isAdmin || isCompanyRole) && (
             <Section>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <SimpleSelect
                   className="h-12"
                   options={[
-                    { value: 'rental_program', label: 'Rental program' },
-                    { value: 'agent_program', label: 'Agent program' },
+                    { value: 'rental_program', label: t('programs_form_page.labels.rental_program', { defaultValue: 'Rental program' }) as string },
+                    { value: 'agent_program', label: t('programs_form_page.labels.agent_program', { defaultValue: 'Agent program' }) as string },
                   ]}
-                  value={adminProgramType}
-                  onChange={(v) => setAdminProgramType(asProgramType(v))}
-                  placeholder={t('programs_form_page.placeholders.select_program_type')}
+                  value={isAdmin ? adminProgramType : companyProgramType}
+                  onChange={(v) => (isAdmin ? setAdminProgramType(asProgramType(v)) : setCompanyProgramType(asProgramType(v)))}
+                  placeholder={t('programs_form_page.placeholders.select_program_type', { defaultValue: 'Chọn loại chương trình' })}
                 />
-                <SimpleSelect
-                  className="h-12"
-                  options={companies.map((c) => ({ value: c.id, label: c.name }))}
-                  value={selectedOwnerId ?? ''}
-                  onChange={(val) => setSelectedOwnerId(val || null)}
-                  disabled={adminProgramType === 'agent_program'}
-                  placeholder={t('programs_form_page.placeholders.select_company')}
-                />
+
+                {isAdmin && (
+                  <SimpleSelect
+                    className="h-12"
+                    options={companies.map((c) => ({ value: c.id, label: c.name }))}
+                    value={selectedOwnerId ?? ''}
+                    onChange={(val) => setSelectedOwnerId(val || null)}
+                    disabled={(isAdmin ? adminProgramType : companyProgramType) === 'agent_program'}
+                    placeholder={t('programs_form_page.placeholders.select_company', { defaultValue: 'Chọn công ty áp dụng' })}
+                  />
+                )}
+              </div>
+
+              {/* Subtitle giải thích từng loại — NHẤN MẠNH LOGIC CTV */}
+              <div className="mt-3 grid grid-cols-1 gap-3">
+                {programType === 'rental_program' ? (
+                  <div className="rounded-lg border bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                    {t('programs_form_page.explain.rental', {
+                      defaultValue:
+                        'Rental program: áp dụng giảm giá theo mẫu xe / trạm / thời gian cho khách thuê. CTV sẽ nhận hoa hồng dựa trên CHÍNH phần giảm giá này khi phát sinh booking.',
+                    })}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border bg-blue-50 px-3 py-2 text-sm text-blue-700">
+                    {t('programs_form_page.explain.agent', {
+                      defaultValue:
+                        'Agent program: chương trình để CTV/đại lý tham gia & theo dõi. KHÔNG cấu hình giảm giá ở đây; hoa hồng CTV được tính theo mức giảm giá của các rental program áp vào booking.',
+                    })}
+                  </div>
+                )}
               </div>
             </Section>
           )}
 
-          <Section title={t('programs_form_page.labels.basic_info') as string}>
+          <Section title={t('programs_form_page.labels.basic_info', { defaultValue: 'Thông tin cơ bản' }) as string}>
             <div className="space-y-3">
               <Input
                 className="h-12"
-                placeholder={t('programs_form_page.placeholders.title')}
+                placeholder={t('programs_form_page.placeholders.title', { defaultValue: 'Tiêu đề chương trình' })}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+            </div>
+            <div className="mt-3">
               <Textarea
                 className="min-h-28"
-                placeholder={t('programs_form_page.placeholders.description')}
+                placeholder={t('programs_form_page.placeholders.description', { defaultValue: 'Mô tả ngắn về chương trình' })}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
           </Section>
 
+          {/* Stations: chỉ rental_program & không phải private provider */}
           {!isPrivateProvider && programType === 'rental_program' && (
             <StationPicker
               stations={stations}
               selected={selectedStationIds}
               onToggle={toggleStation}
               disabled={loading}
-              label={t('programs_form_page.labels.select_stations') as string}
+              label={t('programs_form_page.labels.select_stations', { defaultValue: 'Chọn trạm áp dụng (tuỳ chọn)' }) as string}
             />
           )}
 
-          <Section title={t('programs_form_page.labels.set_discounts') as string}>
-            {loading ? (
-              <p className="text-sm text-gray-500">
-                {t('programs_form_page.hints.loading')}
-              </p>
-            ) : models.length === 0 ? (
-              <p className="text-sm text-gray-500">
-                {t('programs_form_page.hints.no_models', { defaultValue: 'Chưa có mẫu xe cho đơn vị này.' })}
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {models.map((m) => {
-                  const ui = modelDiscountsUI[m.id] || { type: 'fixed', value: '' };
-                  return (
-                    <ModelDiscountRow
-                      key={m.id}
-                      model={m}
-                      ui={ui}
-                      onChangeType={(type) =>
-                        setModelDiscountsUI((prev) => ({ ...prev, [m.id]: { ...ui, type } }))
-                      }
-                      onChangeValue={(value) =>
-                        setModelDiscountsUI((prev) => ({ ...prev, [m.id]: { ...ui, value } }))
-                      }
-                      labelFixed={t('programs_form_page.discount.fixed') as string}
-                      labelPercent={t('programs_form_page.discount.percentage') as string}
-                      warnPercentRange={t('programs_form_page.validation.percent_range') as string}
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </Section>
+          {/* Discounts: chỉ rental_program — vì CTV ăn theo discount này */}
+          {programType === 'rental_program' && (
+            <Section title={t('programs_form_page.labels.set_discounts', { defaultValue: 'Thiết lập giảm giá theo mẫu xe' }) as string}>
+              {loading ? (
+                <p className="text-sm text-gray-500">
+                  {t('programs_form_page.hints.loading', { defaultValue: 'Đang tải dữ liệu…' })}
+                </p>
+              ) : models.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  {t('programs_form_page.hints.no_models', { defaultValue: 'Chưa có mẫu xe cho đơn vị này.' })}
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {models.map((m) => {
+                    const ui = modelDiscountsUI[m.id] || { type: 'fixed', value: '' };
+                    return (
+                      <ModelDiscountRow
+                        key={m.id}
+                        model={m}
+                        ui={ui}
+                        onChangeType={(type) =>
+                          setModelDiscountsUI((prev) => ({ ...prev, [m.id]: { ...ui, type } }))
+                        }
+                        onChangeValue={(value) =>
+                          setModelDiscountsUI((prev) => ({ ...prev, [m.id]: { ...ui, value } }))
+                        }
+                        labelFixed={t('programs_form_page.discount.fixed', { defaultValue: 'Giảm cố định (VND/ngày)' }) as string}
+                        labelPercent={t('programs_form_page.discount.percentage', { defaultValue: 'Giảm theo %' }) as string}
+                        warnPercentRange={t('programs_form_page.validation.percent_range', { defaultValue: 'Phần trăm phải từ 0 đến 100.' }) as string}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </Section>
+          )}
 
-          {/* Time range: DateField cho mobile/desktop */}
-          <Section title={t('programs_form_page.labels.time_range') as string}>
+          {/* Time range */}
+          <Section title={t('programs_form_page.labels.time_range', { defaultValue: 'Thời gian áp dụng' }) as string}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <DateField
                 id="start-date"
-                label={t('programs_form_page.labels.start_date') as string}
+                label={t('programs_form_page.labels.start_date', { defaultValue: 'Ngày bắt đầu' }) as string}
                 value={startDate}
                 onChange={(v) => {
                   setStartDate(v);
-                  // nếu end < start thì reset end
                   const s = parseYMD(v);
                   const e = parseYMD(endDate);
                   if (s && e && e.getTime() < s.getTime()) {
@@ -598,7 +629,7 @@ export default function ProgramsFormPage() {
               />
               <DateField
                 id="end-date"
-                label={t('programs_form_page.labels.end_date') as string}
+                label={t('programs_form_page.labels.end_date', { defaultValue: 'Ngày kết thúc' }) as string}
                 value={endDate}
                 onChange={setEndDate}
                 min={startDate || undefined}
@@ -624,7 +655,7 @@ export default function ProgramsFormPage() {
             disabled={saving || !canSubmit}
             className="h-12 w-full rounded-xl"
           >
-            {saving ? t('programs_form_page.buttons.saving') : t('programs_form_page.buttons.submit')}
+            {saving ? t('programs_form_page.buttons.saving', { defaultValue: 'Đang lưu…' }) : t('programs_form_page.buttons.submit', { defaultValue: 'Tạo chương trình' })}
           </Button>
           <div className="h-[max(env(safe-area-inset-bottom),0px)]" />
         </div>
@@ -636,7 +667,7 @@ export default function ProgramsFormPage() {
         <NotificationDialog
           open
           type={notification.type}
-          title={t(`programs_form_page.notification.${notification.type}`)}
+          title={t(`programs_form_page.notification.${notification.type}`, { defaultValue: notification.type === 'success' ? 'Thành công' : 'Lỗi' })}
           description={notification.message}
           onClose={() => setNotification(null)}
         />

@@ -1,3 +1,6 @@
+// Lấy và xữ lý dữ liệu bookings
+// 10/09/2025
+
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
