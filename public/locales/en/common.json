@@ -2321,25 +2321,45 @@
 
 
 "programs_page": {
-  "title": "Promotions & Programs",
-  "subtitle": "View and manage programs that are active, upcoming, or ended. Agents can join programs; company owners can create and manage them.",
-  "create_button": "Create program",
+  "title": "Promotional Programs",
+  "subtitle": "View and manage programs that are active, upcoming, or completed. Agents can join programs; company owners can create and manage them.",
+  "create_button": "Create Program",
   "no_programs": "No programs available.",
-  "confirm_delete": "Delete this program?",
   "type": "Type",
   "duration": "Duration",
+
   "joined": "Joined",
   "join_button": "Join",
-  "view_participants": "View participants",
-  "delete_button": "Delete program",
+  "view_participants": "View Participants",
+  "participants": "{{count}} participants",
+
+  "delete_button": "Delete Program",
+  "confirm_delete": "Delete this program?",
+  "delete_desc": "This action cannot be undone.",
+  "delete_blocked_title": "Cannot Delete",
+  "delete_blocked_has_participants": "This program already has participants. Please end or archive it instead.",
+
+  "end_button": "End",
+  "ended": "Ended",
+  "confirm_end_title": "End this program?",
+  "confirm_end_desc": "After ending, the program will no longer be valid for new orders.",
+
+  "archive_button": "Archive",
+  "archived": "Archived",
+  "confirm_archive_title": "Archive this program?",
+  "confirm_archive_desc": "The program will be moved to archived status (hidden from users).",
+
   "status": {
     "active": "Active",
     "upcoming": "Upcoming",
     "ended": "Ended",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "archived": "Archived",
+    "canceled": "Canceled"
   },
-  "stations": "{{count}} station",
-  "models": "{{count}} model"
+
+  "stations": "{{count}} stations",
+  "models": "{{count}} models"
 },
 
 "programs_form_page": {

@@ -1,93 +1,74 @@
 import { Timestamp } from 'firebase/firestore';
 
-/**
- * Loại chương trình (Program Type)
- */
+/** Loại chương trình */
 export type ProgramType = 'agent_program' | 'rental_program';
 
-/**
- * Hình thức giảm giá áp dụng cho model
- */
+/** Hình thức giảm giá */
 export type DiscountType = 'fixed' | 'percentage';
 
-/**
- * Trạng thái của người tham gia chương trình
- */
+/** Trạng thái người tham gia */
 export type ProgramParticipantStatus = 'joined' | 'pending' | 'rejected';
 
-/**
- * Đối tượng áp dụng giảm giá theo từng model
- */
+/** Trạng thái chương trình (đồng bộ với server-actions) */
+export type ProgramStatus =
+  | 'scheduled' // chưa tới startDate
+  | 'active'    // đang chạy
+  | 'ended'     // đã kết thúc theo thời gian hoặc force end
+  | 'paused'    // tạm dừng (isActive = false nhưng chưa archive/cancel/ended)
+  | 'archived'  // lưu trữ mềm
+  | 'canceled'; // huỷ trước khi chạy
+
 export interface ProgramModelDiscount {
   modelId: string;
-  discountType: DiscountType;   // fixed (giá cố định) hoặc percentage (%)
-  discountValue: number;        // số tiền giảm hoặc %
+  discountType: DiscountType;
+  discountValue: number;
 }
 
-/**
- * Đối tượng áp dụng theo trạm
- */
 export interface ProgramStationTarget {
   stationId: string;
 }
 
-/**
- * Chương trình ưu đãi / khuyến mãi
- */
 export interface Program {
   id: string;
 
-  // Tiêu đề chương trình
   title: string;
-
-  // Mô tả chương trình
   description: string;
-
-  // Loại chương trình (agent_program hoặc rental_program)
   type: ProgramType;
 
-  // Người tạo chương trình
   createdByUserId: string;
   createdByRole: 'Admin' | 'company_owner' | 'private_provider';
 
-  // Công ty áp dụng (chỉ có khi là rental_program)
   companyId?: string | null;
-
-  // Danh sách trạm áp dụng (nếu có)
   stationTargets?: ProgramStationTarget[];
-
-  // Danh sách model và giá giảm
   modelDiscounts?: ProgramModelDiscount[];
 
-  // Thời gian áp dụng chương trình
-  startDate?: Timestamp;
-  endDate?: Timestamp;
+  /** Cho phép null để tránh lỗi toMillis */
+  startDate?: Timestamp | null;
+  endDate?: Timestamp | null;
 
-  // Trạng thái chương trình
+  /** Cờ tương thích cũ */
   isActive: boolean;
 
-  // Thời gian tạo và cập nhật
+  /** Trạng thái hiển thị đã chuẩn hoá */
+  status: ProgramStatus;
+
+  /** Counters/extra (optional) */
+  participantsCount?: number;
+  ordersCount?: number;
+
+  /** Dấu mốc vòng đời */
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  endedAt?: Timestamp | null;
+  archivedAt?: Timestamp | null;
+  canceledAt?: Timestamp | null;
 }
-
-/**
- * Người tham gia chương trình
- */
 
 export interface ProgramParticipant {
   id: string;
-
-  // Chương trình liên quan
   programId: string;
-
-  // Người tham gia
   userId: string;
   userRole: 'agent' | 'customer' | 'staff';
-
-  // Trạng thái tham gia
   status: ProgramParticipantStatus;
-
-  // Ngày tham gia
   joinedAt: Timestamp;
 }

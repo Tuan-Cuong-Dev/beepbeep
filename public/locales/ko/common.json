@@ -2302,25 +2302,45 @@
 
 
 "programs_page": {
-  "title": "프로그램/프로모션",
-  "subtitle": "진행 중, 예정 또는 종료된 프로그램을 확인하고 관리하세요. 에이전트는 프로그램에 참여할 수 있으며, 회사 소유자는 생성 및 관리할 수 있습니다.",
+  "title": "프로모션 프로그램",
+  "subtitle": "진행 중, 예정, 또는 종료된 프로그램을 확인하고 관리하세요. 에이전트는 프로그램에 참여할 수 있고, 회사 소유자는 생성 및 관리할 수 있습니다.",
   "create_button": "프로그램 생성",
   "no_programs": "등록된 프로그램이 없습니다.",
-  "confirm_delete": "이 프로그램을 삭제하시겠습니까?",
   "type": "유형",
   "duration": "기간",
-  "joined": "참여됨",
+
+  "joined": "참여 완료",
   "join_button": "참여하기",
   "view_participants": "참여자 보기",
-  "delete_button": "삭제",
+  "participants": "참여자 {{count}}명",
+
+  "delete_button": "프로그램 삭제",
+  "confirm_delete": "이 프로그램을 삭제하시겠습니까?",
+  "delete_desc": "이 작업은 되돌릴 수 없습니다.",
+  "delete_blocked_title": "삭제 불가",
+  "delete_blocked_has_participants": "이미 참여자가 있는 프로그램입니다. 종료하거나 아카이브 해주세요.",
+
+  "end_button": "종료",
+  "ended": "종료됨",
+  "confirm_end_title": "프로그램을 종료하시겠습니까?",
+  "confirm_end_desc": "종료 후, 새로운 주문에는 더 이상 적용되지 않습니다.",
+
+  "archive_button": "아카이브",
+  "archived": "아카이브됨",
+  "confirm_archive_title": "프로그램을 아카이브하시겠습니까?",
+  "confirm_archive_desc": "해당 프로그램은 아카이브 상태로 전환되며 사용자에게 표시되지 않습니다.",
+
   "status": {
     "active": "진행 중",
     "upcoming": "예정",
-    "ended": "종료",
-    "inactive": "비활성"
+    "ended": "종료됨",
+    "inactive": "비활성화됨",
+    "archived": "아카이브됨",
+    "canceled": "취소됨"
   },
-  "stations": "{{count}} 스테이션",
-  "models": "{{count}} 모델"
+
+  "stations": "스테이션 {{count}}개",
+  "models": "모델 {{count}}개"
 },
 
 "programs_form_page": {

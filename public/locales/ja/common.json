@@ -2280,25 +2280,45 @@
 
 
 "programs_page": {
-  "title": "キャンペーン一覧",
-  "subtitle": "進行中、開催予定、または終了したキャンペーンを確認・管理します。エージェントは参加でき、会社オーナーは作成・管理できます。",
-  "create_button": "キャンペーン作成",
-  "no_programs": "キャンペーンはありません。",
-  "confirm_delete": "このキャンペーンを削除しますか？",
+  "title": "プロモーションプログラム",
+  "subtitle": "進行中、開催予定、または終了したプログラムを表示・管理します。エージェントはプログラムに参加でき、会社オーナーは作成・管理できます。",
+  "create_button": "プログラムを作成",
+  "no_programs": "プログラムがありません。",
   "type": "種類",
   "duration": "期間",
+
   "joined": "参加済み",
   "join_button": "参加する",
   "view_participants": "参加者を見る",
-  "delete_button": "削除",
+  "participants": "{{count}} 人の参加者",
+
+  "delete_button": "プログラムを削除",
+  "confirm_delete": "このプログラムを削除しますか？",
+  "delete_desc": "この操作は元に戻せません。",
+  "delete_blocked_title": "削除できません",
+  "delete_blocked_has_participants": "このプログラムにはすでに参加者がいます。終了またはアーカイブしてください。",
+
+  "end_button": "終了",
+  "ended": "終了済み",
+  "confirm_end_title": "プログラムを終了しますか？",
+  "confirm_end_desc": "終了後、このプログラムは新規注文には無効になります。",
+
+  "archive_button": "アーカイブ",
+  "archived": "アーカイブ済み",
+  "confirm_archive_title": "プログラムをアーカイブしますか？",
+  "confirm_archive_desc": "プログラムはアーカイブ状態に移行され、ユーザーには表示されません。",
+
   "status": {
-    "active": "実施中",
+    "active": "進行中",
     "upcoming": "開催予定",
-    "ended": "終了",
-    "inactive": "無効"
+    "ended": "終了済み",
+    "inactive": "停止中",
+    "archived": "アーカイブ済み",
+    "canceled": "キャンセル済み"
   },
+
   "stations": "{{count}} ステーション",
-  "models": "{{count}} 車種"
+  "models": "{{count}} モデル"
 },
 
 "programs_form_page": {

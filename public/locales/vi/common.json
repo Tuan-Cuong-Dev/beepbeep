@@ -2346,27 +2346,47 @@
   }
 },
 
- "programs_page": {
-    "title": "Chương Trình Ưu Đãi",
-    "subtitle": "Xem và quản lý các chương trình đang hoạt động, sắp diễn ra hoặc đã kết thúc. Cộng tác viên có thể tham gia chương trình; chủ công ty có thể tạo và quản trị.",
-    "create_button": "Tạo chương trình",
-    "no_programs": "Chưa có chương trình nào.",
-    "confirm_delete": "Xoá chương trình này?",
-    "type": "Loại",
-    "duration": "Thời gian",
-    "joined": "Đã tham gia",
-    "join_button": "Tham gia",
-    "view_participants": "Xem người tham gia",
-    "delete_button": "Xoá chương trình",
-    "status": {
-      "active": "Đang diễn ra",
-      "upcoming": "Sắp diễn ra",
-      "ended": "Đã kết thúc",
-      "inactive": "Ngưng kích hoạt"
-    },
-    "stations": "{{count}} trạm",
-    "models": "{{count}} mẫu xe"
+"programs_page": {
+  "title": "Chương Trình Ưu Đãi",
+  "subtitle": "Xem và quản lý các chương trình đang hoạt động, sắp diễn ra hoặc đã kết thúc. Cộng tác viên có thể tham gia chương trình; chủ công ty có thể tạo và quản trị.",
+  "create_button": "Tạo chương trình",
+  "no_programs": "Chưa có chương trình nào.",
+  "type": "Loại",
+  "duration": "Thời gian",
+
+  "joined": "Đã tham gia",
+  "join_button": "Tham gia",
+  "view_participants": "Xem người tham gia",
+  "participants": "{{count}} người tham gia",
+
+  "delete_button": "Xoá chương trình",
+  "confirm_delete": "Xoá chương trình này?",
+  "delete_desc": "Hành động không thể hoàn tác.",
+  "delete_blocked_title": "Không thể xoá",
+  "delete_blocked_has_participants": "Chương trình đã có người tham gia. Hãy kết thúc hoặc lưu trữ để đảm bảo công bằng.",
+
+  "end_button": "Kết thúc",
+  "ended": "Đã kết thúc",
+  "confirm_end_title": "Kết thúc chương trình?",
+  "confirm_end_desc": "Sau khi kết thúc, chương trình không còn hiệu lực cho đơn mới.",
+
+  "archive_button": "Lưu trữ",
+  "archived": "Đã lưu trữ",
+  "confirm_archive_title": "Lưu trữ chương trình?",
+  "confirm_archive_desc": "Chương trình sẽ chuyển sang trạng thái lưu trữ (ẩn với người dùng).",
+
+  "status": {
+    "active": "Đang diễn ra",
+    "upcoming": "Sắp diễn ra",
+    "ended": "Đã kết thúc",
+    "inactive": "Ngưng kích hoạt",
+    "archived": "Đã lưu trữ",
+    "canceled": "Đã huỷ"
   },
+
+  "stations": "{{count}} trạm",
+  "models": "{{count}} mẫu xe"
+},
 
 
 "programs_form_page": {
