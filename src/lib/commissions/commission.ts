@@ -1,7 +1,7 @@
 // Xữ lý hoa hồng cho CTV 
 // Date : 07/09/2025
-
 // src/lib/commissions/commission.ts
+
 
 export type CommissionPolicy =
   | { mode: 'percent'; rate: number; min?: number; max?: number }

@@ -15,6 +15,7 @@ import { safeFormatDate } from '@/src/utils/safeFormatDate';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 
 import { PiggyBank, CheckCircle2, Clock3, RefreshCw } from 'lucide-react';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
 const DEFAULT_TOTALS = { pending: 0, approved: 0, paid: 0 } as const;
 
@@ -27,24 +28,51 @@ export default function AgentCommissionPage() {
   const [items, setItems] = React.useState<CommissionEntry[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<unknown>(null);
+  const [cursor, setCursor] = React.useState<QueryDocumentSnapshot<DocumentData> | undefined>(undefined);
+  const [hasMore, setHasMore] = React.useState<boolean>(false);
+
+  const PAGE_SIZE = 100;
 
   const reload = React.useCallback(async () => {
     if (!agentId) {
       setItems([]);
+      setCursor(undefined);
+      setHasMore(false);
       setLoading(false);
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const rows = await listCommissionByAgent(agentId, 100);
+      const { items: rows, lastDoc, hasMore } = await listCommissionByAgent(agentId, { take: PAGE_SIZE });
       setItems(rows);
+      setCursor(lastDoc);
+      setHasMore(hasMore);
     } catch (e) {
       setError(e);
     } finally {
       setLoading(false);
     }
   }, [agentId, listCommissionByAgent]);
+
+  const loadMore = React.useCallback(async () => {
+    if (!agentId || !cursor) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const { items: rows, lastDoc, hasMore } = await listCommissionByAgent(agentId, {
+        take: PAGE_SIZE,
+        after: cursor,
+      });
+      setItems((prev) => [...prev, ...rows]);
+      setCursor(lastDoc);
+      setHasMore(hasMore);
+    } catch (e) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [agentId, cursor, listCommissionByAgent]);
 
   React.useEffect(() => {
     void reload();
@@ -112,7 +140,7 @@ export default function AgentCommissionPage() {
 
           {/* Content */}
           <div className="mt-6">
-            {(!agentId) && (
+            {!agentId && (
               <div className="rounded-xl bg-white border p-6 text-gray-700">
                 Vui lòng đăng nhập để xem hoa hồng cộng tác viên.
               </div>
@@ -120,7 +148,7 @@ export default function AgentCommissionPage() {
 
             {agentId && (
               <>
-                {loading && (
+                {loading && items.length === 0 && (
                   <div className="rounded-xl bg-white border p-6 text-gray-700">
                     Đang tải…
                   </div>
@@ -133,15 +161,25 @@ export default function AgentCommissionPage() {
                 )}
 
                 {!loading && !error && (
-                  <div className="space-y-3">
-                    {items.length === 0 ? (
-                      <div className="rounded-xl bg-white border p-10 text-center text-gray-500">
-                        Chưa có hoa hồng nào.
+                  <>
+                    <div className="space-y-3">
+                      {items.length === 0 ? (
+                        <div className="rounded-xl bg-white border p-10 text-center text-gray-500">
+                          Chưa có hoa hồng nào.
+                        </div>
+                      ) : (
+                        items.map((it) => <EntryCard key={it.id} entry={it} />)
+                      )}
+                    </div>
+
+                    {hasMore && (
+                      <div className="flex justify-center mt-4">
+                        <Button onClick={loadMore} disabled={loading} variant="outline" className="min-w-[160px]">
+                          {loading ? 'Đang tải…' : 'Tải thêm'}
+                        </Button>
                       </div>
-                    ) : (
-                      items.map((it) => <EntryCard key={it.id} entry={it} />)
                     )}
-                  </div>
+                  </>
                 )}
               </>
             )}

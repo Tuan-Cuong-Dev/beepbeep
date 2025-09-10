@@ -1,3 +1,4 @@
+// Agent - Giới thiệu khách hàng và lịch sử hoa hồng
 'use client';
 
 import * as React from 'react';
@@ -11,7 +12,6 @@ import {
   where,
   writeBatch,
   serverTimestamp,
-  documentId,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { Booking, SubmitResult } from '@/src/lib/booking/BookingTypes';
@@ -21,7 +21,10 @@ import { useUser } from '@/src/context/AuthContext';
 import type { User } from '@/src/lib/users/userTypes';
 import type { AddressCore } from '@/src/lib/locations/addressTypes';
 import type { Program } from '@/src/lib/programs/rental-programs/programsType';
-import { useCommissionHistory, CommissionPolicy as SerializedCommissionPolicy } from '@/src/hooks/useCommissionHistory';
+import {
+  useCommissionHistory,
+  type CommissionPolicy as SerializedCommissionPolicy,
+} from '@/src/hooks/useCommissionHistory';
 
 /* ================= Helpers: Address / User ================= */
 
@@ -70,19 +73,25 @@ function computeCommission(total: number, policy: LocalCommissionPolicy): number
   switch (policy.mode) {
     case 'percent': {
       const { rate, min, max } = policy;
-      const raw = Math.max(0, total * rate);
+      const raw = Math.max(0, total * Math.max(0, Math.min(rate, 1)));
       const withMin = min != null ? Math.max(raw, min) : raw;
       const bounded = max != null ? Math.min(withMin, max) : withMin;
-      return Math.max(0, Math.floor(bounded));
+      // VND → làm tròn tới đồng
+      return Math.max(0, Math.round(bounded));
     }
     case 'flat':
-      return Math.max(0, Math.floor(policy.amount || 0));
+      return Math.max(0, Math.round(policy.amount || 0));
   }
 }
 
 function serializeCommissionPolicy(policy: LocalCommissionPolicy): SerializedCommissionPolicy {
   return policy.mode === 'percent'
-    ? { mode: 'percent', rate: policy.rate, ...(policy.min != null ? { min: policy.min } : {}), ...(policy.max != null ? { max: policy.max } : {}) }
+    ? {
+        mode: 'percent',
+        rate: policy.rate,
+        ...(policy.min != null ? { min: policy.min } : {}),
+        ...(policy.max != null ? { max: policy.max } : {}),
+      }
     : { mode: 'flat', amount: policy.amount };
 }
 
@@ -108,7 +117,7 @@ async function loadActiveRentalPrograms(companyId: string) {
       where('isActive', '==', true)
     )
   );
-  return snap.docs.map(d => ({ id: d.id, ...(d.data() as any) })).filter(isProgramActiveNow);
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })).filter(isProgramActiveNow);
 }
 
 function getFixedDiscountFromProgram(p: any, modelId: string): number {
@@ -124,8 +133,10 @@ function getFixedDiscountFromProgram(p: any, modelId: string): number {
 
 function pickFixedDiscount(programs: any[], modelId: string, stationId?: string) {
   const prioritized = [
-    ...programs.filter(p => Array.isArray(p.stationIds) && stationId && p.stationIds.includes(stationId)),
-    ...programs.filter(p => !Array.isArray(p.stationIds) || p.stationIds.length === 0),
+    ...programs.filter(
+      (p) => Array.isArray(p.stationIds) && stationId && p.stationIds.includes(stationId)
+    ),
+    ...programs.filter((p) => !Array.isArray(p.stationIds) || p.stationIds.length === 0),
   ];
   for (const p of prioritized) {
     const v = getFixedDiscountFromProgram(p, modelId);
@@ -146,7 +157,9 @@ export function useBookingForm(companyId: string, userId: string) {
 
   // Discount state
   const [discountPerDay, setDiscountPerDay] = React.useState(0);
-  const [discountSourceProgramId, setDiscountSourceProgramId] = React.useState<string | undefined>(undefined);
+  const [discountSourceProgramId, setDiscountSourceProgramId] = React.useState<string | undefined>(
+    undefined
+  );
 
   // Prefill user info
   React.useEffect(() => {
@@ -177,7 +190,8 @@ export function useBookingForm(companyId: string, userId: string) {
   }, [formData?.rentalStartDate, formData?.rentalStartHour, formData?.rentalDays, setFormData]);
 
   // Load rental_program discount
-  const modelId: string = (formData as any)?.modelId || (formData as any)?.vehicleModelId || '';
+  const modelId: string =
+    (formData as any)?.modelId || (formData as any)?.vehicleModelId || '';
   React.useEffect(() => {
     let alive = true;
     (async () => {
@@ -185,12 +199,18 @@ export function useBookingForm(companyId: string, userId: string) {
       setDiscountSourceProgramId(undefined);
       if (!companyId || !modelId) return;
       const programs = await loadActiveRentalPrograms(companyId);
-      const { programId, discountPerDay } = pickFixedDiscount(programs, modelId, formData?.stationId || undefined);
+      const { programId, discountPerDay } = pickFixedDiscount(
+        programs,
+        modelId,
+        formData?.stationId || undefined
+      );
       if (!alive) return;
       setDiscountPerDay(Math.max(0, money(discountPerDay)));
       setDiscountSourceProgramId(programId);
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [companyId, modelId, formData?.stationId]);
 
   // Auto compute totals with discount
@@ -204,7 +224,11 @@ export function useBookingForm(companyId: string, userId: string) {
     const total = Math.max(0, effectiveBase * days + batteryFee);
     const remaining = Math.max(0, total - deposit);
 
-    if (formData?.totalAmount !== total || formData?.remainingBalance !== remaining || (formData as any)?.discountedBasePrice !== effectiveBase) {
+    if (
+      formData?.totalAmount !== total ||
+      formData?.remainingBalance !== remaining ||
+      (formData as any)?.discountedBasePrice !== effectiveBase
+    ) {
       setFormData((prev: any) => ({
         ...prev,
         discountedBasePrice: effectiveBase,
@@ -212,7 +236,14 @@ export function useBookingForm(companyId: string, userId: string) {
         remainingBalance: remaining,
       }));
     }
-  }, [formData?.basePrice, formData?.rentalDays, formData?.batteryFee, formData?.deposit, discountPerDay, setFormData]);
+  }, [
+    formData?.basePrice,
+    formData?.rentalDays,
+    formData?.batteryFee,
+    formData?.deposit,
+    discountPerDay,
+    setFormData,
+  ]);
 
   /* ================= Submit ================= */
 
@@ -255,13 +286,14 @@ export function useBookingForm(companyId: string, userId: string) {
         vehicleColor: '',
         vin: '',
         deliveryMethod: 'Pickup at Shop',
-        bookingStatus: 'draft'
+        bookingStatus: 'draft',
       };
 
       const batch = writeBatch(db);
       const bookingDoc = doc(collection(db, 'bookings'));
       const bookingId = bookingDoc.id;
 
+      // Lưu booking kèm snapshot promotion + commission (để UI đọc nhanh)
       batch.set(bookingDoc, {
         ...bookingData,
         promotion: {
@@ -282,9 +314,13 @@ export function useBookingForm(companyId: string, userId: string) {
 
       await batch.commit();
 
+      // Ghi lịch sử hoa hồng (idempotent qua dedupeKey)
       await addCommissionEntry({
         bookingId,
         agentId: userId,
+        agentProgramId: null, // nếu có agent_program riêng, truyền ID tương ứng
+        // amount có thể bỏ qua để hook tự compute từ snapshot + policy;
+        // giữ lại để đồng bộ với bookingData vừa lưu:
         amount: commissionAmount,
         currency: 'VND',
         status: 'pending',
@@ -295,8 +331,10 @@ export function useBookingForm(companyId: string, userId: string) {
           rentalDays: Number(formData.rentalDays) || 0,
           batteryFee: money(formData.batteryFee),
           deposit: money(formData.deposit),
+          // có thể truyền thêm baseForCommission nếu bạn muốn cố định base:
+          // baseForCommission: total, // ví dụ
         },
-        dedupeKey: `${bookingId}|confirmed`,
+        dedupeKey: `${bookingId}|draft_created`,
       });
 
       return { status: 'success', booking: { id: bookingId, ...bookingData } as Booking };
