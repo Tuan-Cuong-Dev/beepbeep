@@ -14,11 +14,42 @@ import { Button } from '@/src/components/ui/button';
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
 import { formatCurrency } from '@/src/utils/formatCurrency';
 
-import { PiggyBank, CheckCircle2, Clock3, RefreshCw } from 'lucide-react';
-import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import {
+  PiggyBank,
+  CheckCircle2,
+  Clock3,
+  RefreshCw,
+  BadgeInfo,
+} from 'lucide-react';
 
+import type {
+  QueryDocumentSnapshot,
+  DocumentData,
+} from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  documentId,
+} from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
+
+/* =========================================================
+   Utilities
+========================================================= */
 const DEFAULT_TOTALS = { pending: 0, approved: 0, paid: 0 } as const;
+const PAGE_SIZE = 100;
 
+function chunk<T>(arr: T[], size: number): T[][] {
+  const res: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) res.push(arr.slice(i, i + size));
+  return res;
+}
+
+/* =========================================================
+   Component
+========================================================= */
 export default function AgentCommissionPage() {
   const { user } = useUser();
   const agentId = user?.uid ?? '';
@@ -28,10 +59,14 @@ export default function AgentCommissionPage() {
   const [items, setItems] = React.useState<CommissionEntry[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<unknown>(null);
-  const [cursor, setCursor] = React.useState<QueryDocumentSnapshot<DocumentData> | undefined>(undefined);
+  const [cursor, setCursor] = React.useState<
+    QueryDocumentSnapshot<DocumentData> | undefined
+  >(undefined);
   const [hasMore, setHasMore] = React.useState<boolean>(false);
 
-  const PAGE_SIZE = 100;
+  // id -> program name
+  const [programNames, setProgramNames] = React.useState<Record<string, string>>({});
+  const [progLoading, setProgLoading] = React.useState(false);
 
   const reload = React.useCallback(async () => {
     if (!agentId) {
@@ -44,7 +79,9 @@ export default function AgentCommissionPage() {
     setLoading(true);
     setError(null);
     try {
-      const { items: rows, lastDoc, hasMore } = await listCommissionByAgent(agentId, { take: PAGE_SIZE });
+      const { items: rows, lastDoc, hasMore } = await listCommissionByAgent(agentId, {
+        take: PAGE_SIZE,
+      });
       setItems(rows);
       setCursor(lastDoc);
       setHasMore(hasMore);
@@ -74,10 +111,12 @@ export default function AgentCommissionPage() {
     }
   }, [agentId, cursor, listCommissionByAgent]);
 
+  // initial load
   React.useEffect(() => {
     void reload();
   }, [reload]);
 
+  // derive totals
   const totals = React.useMemo(() => {
     const acc = { ...DEFAULT_TOTALS };
     for (const it of items) {
@@ -89,12 +128,63 @@ export default function AgentCommissionPage() {
     return acc;
   }, [items]);
 
+  // Load program names for visible entries (batch by 10 for documentId "in")
+  React.useEffect(() => {
+    const ids = Array.from(
+      new Set(
+        items
+          .map((it) => it.agentProgramId)
+          .filter((v): v is string => Boolean(v))
+      )
+    );
+    if (ids.length === 0) return;
+
+    // Only fetch missing ids
+    const missing = ids.filter((id) => !(id in programNames));
+    if (missing.length === 0) return;
+
+    setProgLoading(true);
+
+    const fetchNames = async () => {
+      const newMap: Record<string, string> = {};
+
+      const pull = async (colPath: string, wanted: string[]) => {
+        for (const group of chunk(wanted, 10)) {
+          const qRef = query(
+            collection(db, colPath),
+            where(documentId(), 'in', group)
+          );
+          const snap = await getDocs(qRef);
+          snap.forEach((doc) => {
+            const data = doc.data() as any;
+            const name =
+              data?.name || data?.title || data?.programName || doc.id;
+            newMap[doc.id] = name;
+          });
+        }
+      };
+
+      const wanted = [...missing];
+      await pull('agentPrograms', wanted);
+
+      const stillMissing = wanted.filter((id) => !(id in newMap));
+      if (stillMissing.length) {
+        await pull('programs', stillMissing);
+      }
+
+      setProgramNames((prev) => ({ ...prev, ...newMap }));
+      setProgLoading(false);
+    };
+
+    void fetchNames();
+  }, [items, programNames]);
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-emerald-50/60 to-white">
       <Header />
 
       <main className="flex-1">
-        <section className="max-w-5xl mx-auto px-4 pt-6 pb-2">
+        <section className="max-w-6xl mx-auto px-4 pt-6 pb-2">
           {/* Hero */}
           <div className="rounded-2xl bg-white shadow-sm border p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -107,14 +197,13 @@ export default function AgentCommissionPage() {
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={reload} className="gap-2">
-                <RefreshCw className="h-4 w-4" />
-                Tải lại
+                <RefreshCw className="h-4 w-4" /> Tải lại
               </Button>
             </div>
           </div>
 
           {/* Stat cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-3">
             <StatCard
               title="Đang chờ"
               value={totals.pending}
@@ -168,13 +257,29 @@ export default function AgentCommissionPage() {
                           Chưa có hoa hồng nào.
                         </div>
                       ) : (
-                        items.map((it) => <EntryCard key={it.id} entry={it} />)
+                        items.map((it) => (
+                          <EntryCard
+                            key={it.id}
+                            entry={it}
+                            programName={
+                              it.agentProgramId
+                                ? programNames[it.agentProgramId]
+                                : undefined
+                            }
+                            progLoading={progLoading}
+                          />
+                        ))
                       )}
                     </div>
 
                     {hasMore && (
                       <div className="flex justify-center mt-4">
-                        <Button onClick={loadMore} disabled={loading} variant="outline" className="min-w-[160px]">
+                        <Button
+                          onClick={loadMore}
+                          disabled={loading}
+                          variant="outline"
+                          className="min-w-[160px]"
+                        >
                           {loading ? 'Đang tải…' : 'Tải thêm'}
                         </Button>
                       </div>
@@ -192,8 +297,9 @@ export default function AgentCommissionPage() {
   );
 }
 
-/* ============= UI pieces ============= */
-
+/* =========================================================
+   UI Subcomponents
+========================================================= */
 function StatCard({
   title,
   value,
@@ -208,19 +314,35 @@ function StatCard({
   tone?: 'emerald' | 'blue' | 'amber';
 }) {
   const toneMap = {
-    emerald: { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
-    blue: { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
-    amber: { bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-500' },
+    emerald: {
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-700',
+      dot: 'bg-emerald-500',
+    },
+    blue: {
+      bg: 'bg-blue-50',
+      text: 'text-blue-700',
+      dot: 'bg-blue-500',
+    },
+    amber: {
+      bg: 'bg-amber-50',
+      text: 'text-amber-700',
+      dot: 'bg-amber-500',
+    },
   }[tone];
 
   return (
     <div className="rounded-2xl border bg-white shadow-sm p-5">
       <div className="flex items-center justify-between">
-        <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs ${toneMap.bg} ${toneMap.text}`}>
+        <div
+          className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs ${toneMap.bg} ${toneMap.text}`}
+        >
           <span className={`inline-block h-2 w-2 rounded-full ${toneMap.dot}`} />
           {title}
         </div>
-        <div className={`rounded-full p-2 ${toneMap.bg} ${toneMap.text}`}>{icon}</div>
+        <div className={`rounded-full p-2 ${toneMap.bg} ${toneMap.text}`}>
+          {icon}
+        </div>
       </div>
       <div className="mt-3 text-2xl font-semibold">
         {formatCurrency(value ?? 0)}
@@ -230,54 +352,93 @@ function StatCard({
   );
 }
 
-function EntryCard({ entry }: { entry: CommissionEntry }) {
+function EntryCard({
+  entry,
+  programName,
+  progLoading,
+}: {
+  entry: CommissionEntry;
+  programName?: string;
+  progLoading?: boolean;
+}) {
   return (
     <div className="rounded-2xl bg-white border shadow-sm p-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         {/* Left */}
         <div className="space-y-1 text-sm">
-          <div>
-            <span className="text-gray-500">Booking:</span>{' '}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-gray-500">Booking:</span>
             <span className="font-medium">{entry.bookingId}</span>
-          </div>
-          <div className="text-gray-600">
-            Chương trình: {entry.agentProgramId ?? '—'}
+            <ProgramBadge
+              name={programName}
+              isLoading={
+                progLoading && !!entry.agentProgramId && !programName
+              }
+            />
           </div>
           <div className="text-gray-600">
             Tính lúc: {safeFormatDate(entry.computedAt, 'dd/MM/yyyy HH:mm')}
           </div>
+          {entry.snapshot && (
+            <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs text-gray-600">
+              {'totalAmount' in entry.snapshot && (
+                <Info
+                  kv="Tổng đơn"
+                  val={formatCurrency(entry.snapshot.totalAmount ?? 0)}
+                />
+              )}
+              {'basePrice' in entry.snapshot && (
+                <Info
+                  kv="Giá/ngày"
+                  val={formatCurrency(entry.snapshot.basePrice ?? 0)}
+                />
+              )}
+              {'rentalDays' in entry.snapshot && (
+                <Info
+                  kv="Số ngày"
+                  val={String(entry.snapshot.rentalDays ?? 0)}
+                />
+              )}
+              {'batteryFee' in entry.snapshot && (
+                <Info
+                  kv="Phí pin"
+                  val={formatCurrency(entry.snapshot.batteryFee ?? 0)}
+                />
+              )}
+              {'deposit' in entry.snapshot && (
+                <Info
+                  kv="Đặt cọc"
+                  val={formatCurrency(entry.snapshot.deposit ?? 0)}
+                />
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right */}
-        <div className="text-right">
+        <div className="text-right min-w-[180px]">
           <div className="text-lg font-semibold text-emerald-600">
             {formatCurrency(entry.amount ?? 0)}
           </div>
           <StatusBadge status={entry.status} />
         </div>
       </div>
-
-      {/* Snapshot */}
-      {entry.snapshot && (
-        <div className="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs text-gray-600">
-          {'totalAmount' in entry.snapshot && (
-            <Info kv="Tổng đơn" val={formatCurrency(entry.snapshot.totalAmount ?? 0)} />
-          )}
-          {'basePrice' in entry.snapshot && (
-            <Info kv="Giá/ngày" val={formatCurrency(entry.snapshot.basePrice ?? 0)} />
-          )}
-          {'rentalDays' in entry.snapshot && (
-            <Info kv="Số ngày" val={String(entry.snapshot.rentalDays ?? 0)} />
-          )}
-          {'batteryFee' in entry.snapshot && (
-            <Info kv="Phí pin" val={formatCurrency(entry.snapshot.batteryFee ?? 0)} />
-          )}
-          {'deposit' in entry.snapshot && (
-            <Info kv="Đặt cọc" val={formatCurrency(entry.snapshot.deposit ?? 0)} />
-          )}
-        </div>
-      )}
     </div>
+  );
+}
+
+function ProgramBadge({
+  name,
+  isLoading,
+}: {
+  name?: string;
+  isLoading?: boolean;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 text-xs">
+      <BadgeInfo className="h-3.5 w-3.5" />
+      {isLoading ? 'Đang tải chương trình…' : name || 'Không có chương trình'}
+    </span>
   );
 }
 
@@ -298,9 +459,15 @@ function StatusBadge({ status }: { status: CommissionStatus }) {
       ? 'bg-blue-100 text-blue-700'
       : 'bg-amber-100 text-amber-700';
   const text =
-    status === 'paid' ? 'Đã trả' : status === 'approved' ? 'Đã duyệt' : 'Đang chờ';
+    status === 'paid'
+      ? 'Đã trả'
+      : status === 'approved'
+      ? 'Đã duyệt'
+      : 'Đang chờ';
   return (
-    <span className={`inline-block mt-1 px-2 py-1 rounded-full text-xs ${color}`}>
+    <span
+      className={`inline-block mt-1 px-2 py-1 rounded-full text-xs ${color}`}
+    >
       {text}
     </span>
   );

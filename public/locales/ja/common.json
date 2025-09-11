@@ -4197,15 +4197,16 @@
   },
 
 "agent_dashboard": {
-  "title": "エージェント／代理店ダッシュボード",
+  "title": "エージェントダッシュボード",
   "referrals": "紹介顧客",
   "total_commission": "総コミッション",
   "paid_commission": "支払済みコミッション",
   "pending_commission": "保留中のコミッション",
-  "join_new_program": "新しいプログラムに参加",
-  "selections": "選択済みステーションと車両",
-  "showcases": "ショーケース",
-  "available": "利用可",
+  "join_new_program": "新しいプログラムを見る",
+  "selections": "選択したステーションと車両",
+  "approved_commission": "承認済みコミッション",
+  "showcases": "レンタルショーケース",
+  "available": "利用可能",
   "payment_requests": "支払いリクエスト",
   "times": "回",
   "recent_activity": "最近のアクティビティ",
@@ -4213,8 +4214,8 @@
   "commission": "コミッション",
   "no_activity": "まだアクティビティがありません。",
   "quick_actions": "クイックアクション",
-  "refer_customer": "顧客を紹介",
-  "view_commission_history": "コミッション履歴を表示",
+  "refer_customer": "顧客を紹介する",
+  "view_commission_history": "コミッション履歴を見る",
   "request_payment": "支払いをリクエスト"
 },
 

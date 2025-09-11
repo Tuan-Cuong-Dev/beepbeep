@@ -1,24 +1,39 @@
 'use client';
 
-import { JSX, useEffect, useState } from 'react';
+import { JSX, useEffect, useMemo, useState } from 'react';
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { useUser } from '@/src/context/AuthContext';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/src/firebaseConfig';
 import Link from 'next/link';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+  orderBy,
+  limit as qLimit,
+} from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
+import { useTranslation } from 'react-i18next';
 import {
   Handshake,
   Users,
   DollarSign,
   FileText,
   BarChart2,
+  Clock3,
+  CheckCircle2,
+  PiggyBank,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/src/utils/formatCurrency';
 
+/* ================= Types ================= */
 interface ActivityLog {
   bookingId: string;
   commission: number;
+  computedAt?: Timestamp;
+  status?: 'pending' | 'approved' | 'paid' | 'rejected';
 }
 
 interface DashboardData {
@@ -26,124 +41,188 @@ interface DashboardData {
   totalCommission: number;
   paidCommission: number;
   pendingCommission: number;
+  approvedCommission: number;
   activity: ActivityLog[];
   paymentRequests: number;
 }
 
+/* ================= Component ================= */
 export default function AgentDashboard() {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
   const { user } = useUser();
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DashboardData>({
     referrals: 0,
     totalCommission: 0,
     paidCommission: 0,
     pendingCommission: 0,
+    approvedCommission: 0,
     activity: [],
     paymentRequests: 0,
   });
 
   useEffect(() => {
-    if (!user) return;
+    if (!user?.uid) return;
 
-    const fetchData = async () => {
-      const bookingsQuery = query(collection(db, 'bookings'), where('agentId', '==', user.uid));
-      const bookingsSnap = await getDocs(bookingsQuery);
+    const run = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const uid = user.uid;
 
-      let total = 0, paid = 0, pending = 0;
-      const logs: ActivityLog[] = [];
+        // Referrals = số booking có agentId = uid
+        const bookingsQ = query(
+          collection(db, 'bookings'),
+          where('agentId', '==', uid)
+        );
+        const bookingsSnap = await getDocs(bookingsQ);
+        const referrals = bookingsSnap.size;
 
-      bookingsSnap.forEach((doc) => {
-        const booking = doc.data();
-        const amount = booking.agentCommission || 0;
-        total += amount;
-        if (booking.agentCommissionPaid) paid += amount;
-        else pending += amount;
+        // Commission stats từ collection commissionHistory
+        const chQ = query(
+          collection(db, 'commissionHistory'),
+          where('agentId', '==', uid),
+          orderBy('createdAt', 'desc'),
+          qLimit(200) // hiển thị nhanh 200 bản ghi gần nhất cho dashboard
+        );
+        const chSnap = await getDocs(chQ);
 
-        logs.push({
-          bookingId: doc.id,
-          commission: amount,
+        let total = 0,
+          paid = 0,
+          pending = 0,
+          approved = 0;
+        const activities: ActivityLog[] = [];
+
+        chSnap.forEach((d) => {
+          const row: any = d.data();
+          const amt = Number(row?.amount || 0);
+          total += amt;
+          if (row.status === 'paid') paid += amt;
+          else if (row.status === 'approved') approved += amt;
+          else if (row.status === 'pending') pending += amt;
+
+          if (activities.length < 5) {
+            activities.push({
+              bookingId: row?.bookingId || d.id,
+              commission: amt,
+              computedAt: row?.computedAt,
+              status: row?.status,
+            });
+          }
         });
-      });
 
-      const requestQuery = query(collection(db, 'paymentRequests'), where('agentId', '==', user.uid));
-      const requestSnap = await getDocs(requestQuery);
+        // Payment requests count
+        const reqQ = query(
+          collection(db, 'paymentRequests'),
+          where('agentId', '==', uid)
+        );
+        const reqSnap = await getDocs(reqQ);
 
-      setData({
-        referrals: bookingsSnap.size,
-        totalCommission: total,
-        paidCommission: paid,
-        pendingCommission: pending,
-        activity: logs.slice(0, 5),
-        paymentRequests: requestSnap.size,
-      });
+        setData({
+          referrals,
+          totalCommission: total,
+          paidCommission: paid,
+          pendingCommission: pending,
+          approvedCommission: approved,
+          activity: activities,
+          paymentRequests: reqSnap.size,
+        });
+      } catch (e: any) {
+        setError(e?.message || String(e));
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchData();
-  }, [user]);
+    void run();
+  }, [user?.uid]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-emerald-50/60 to-white">
       <Header />
 
-      <main className="flex-1 px-6 py-10 space-y-10">
-        <h1 className="text-3xl font-bold text-center text-gray-800">
-          🤝 {t("agent_dashboard.title")}
+      <main className="flex-1 px-4 md:px-6 py-8 md:py-10 space-y-8 md:space-y-10 max-w-7xl mx-auto w-full">
+        <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-800">
+          🤝 {t('agent_dashboard.title')}
         </h1>
 
+        {/* KPI Cards */}
         <DashboardGrid>
           <DashboardCard
-            title={t("agent_dashboard.referrals")}
+            title={t('agent_dashboard.referrals')}
             value={data.referrals.toString()}
             href="#"
             icon={<Users className="w-6 h-6" />}
           />
           <DashboardCard
-            title={t("agent_dashboard.total_commission")}
-            value={`$${data.totalCommission.toLocaleString()}`}
-            href="#"
+            title={t('agent_dashboard.total_commission')}
+            value={formatCurrency(data.totalCommission)}
+            href="/agent/commissions"
             icon={<DollarSign className="w-6 h-6" />}
           />
           <DashboardCard
-            title={t("agent_dashboard.paid_commission")}
-            value={`$${data.paidCommission.toLocaleString()}`}
-            href="#"
-            icon={<DollarSign className="w-6 h-6" />}
+            title={t('agent_dashboard.paid_commission')}
+            value={formatCurrency(data.paidCommission)}
+            href="/agent/commissions?status=paid"
+            icon={<PiggyBank className="w-6 h-6" />}
           />
           <DashboardCard
-            title={t("agent_dashboard.pending_commission")}
-            value={`$${data.pendingCommission.toLocaleString()}`}
-            href="#"
-            icon={<DollarSign className="w-6 h-6" />}
+            title={t('agent_dashboard.pending_commission')}
+            value={formatCurrency(data.pendingCommission)}
+            href="/agent/commissions?status=pending"
+            icon={<Clock3 className="w-6 h-6" />}
           />
           <DashboardCard
-            title={t("agent_dashboard.join_new_program")}
-            value={t("agent_dashboard.available")}
-            href="dashboard/programs/rental-programs/AgentProgramTable"
-            icon={<Handshake className="w-6 h-6" />}
+            title={t('agent_dashboard.approved_commission') || 'Đã duyệt'}
+            value={formatCurrency(data.approvedCommission)}
+            href="/agent/commissions?status=approved"
+            icon={<CheckCircle2 className="w-6 h-6" />}
           />
           <DashboardCard
-            title={t("agent_dashboard.payment_requests")}
-            value={`${data.paymentRequests} ${t("agent_dashboard.times")}`}
-            href="/dashboard/earnings"
+            title={t('agent_dashboard.payment_requests')}
+            value={`${data.paymentRequests} ${t('agent_dashboard.times')}`}
+            href="/dashboard/request-payment"
             icon={<BarChart2 className="w-6 h-6" />}
           />
         </DashboardGrid>
 
+        {/* Quick actions */}
         <section className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            ⚡ {t("agent_dashboard.quick_actions")}
+          <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4">
+            ⚡ {t('agent_dashboard.quick_actions')}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            <QuickAction label={t("agent_dashboard.showcases")} href="dashboard/programs/rental-programs/AgentJoinedModelsShowcase" />
-            <QuickAction label={t("agent_dashboard.refer_customer")} href="/agent/referrals/new" />
-            <QuickAction label={t("agent_dashboard.view_commission_history")} href="/agent/commissions" />
-            <QuickAction label={t("agent_dashboard.selections")} href="dashboard/programs/rental-programs/AgentJoinedModelsTable" />
-            <QuickAction label={t("agent_dashboard.join_new_program")} href="dashboard/programs/rental-programs/AgentProgramTable" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
+            <QuickAction
+              label={t('agent_dashboard.showcases')}
+              href="/dashboard/programs/rental-programs/AgentJoinedModelsShowcase"
+            />
+            <QuickAction
+              label={t('agent_dashboard.refer_customer')}
+              href="/agent/referrals/new"
+            />
+            <QuickAction
+              label={t('agent_dashboard.view_commission_history') || 'Xem lịch sử hoa hồng'}
+              href="/agent/commissions"
+            />
+            <QuickAction
+              label={t('agent_dashboard.selections') || 'Lựa chọn của tôi'}
+              href="/dashboard/programs/rental-programs/AgentJoinedModelsTable"
+            />
+            <QuickAction
+              label={t('agent_dashboard.join_new_program')}
+              href="/dashboard/programs/rental-programs/AgentProgramTable"
+            />
             {data.pendingCommission > 0 && (
-              <QuickAction label={t("agent_dashboard.request_payment")} href="/dashboard/request-payment" />
+              <QuickAction
+                label={t('agent_dashboard.request_payment') || 'Yêu cầu thanh toán'}
+                href="/dashboard/request-payment"
+              />
             )}
           </div>
         </section>
+
       </main>
 
       <Footer />
@@ -151,8 +230,14 @@ export default function AgentDashboard() {
   );
 }
 
+/* ================= UI bits ================= */
 function DashboardGrid({ children }: { children: React.ReactNode }) {
-  return <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6">{children}</section>;
+  // 2 cột mobile, 3 cột md, 6 cột xl → luôn căng đều đẹp
+  return (
+    <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
+      {children}
+    </section>
+  );
 }
 
 function DashboardCard({
@@ -169,14 +254,14 @@ function DashboardCard({
   return (
     <Link
       href={href}
-      className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition border border-gray-200 flex items-center gap-4"
+      className="bg-white p-4 rounded-2xl shadow hover:shadow-lg transition border border-gray-200 flex items-center gap-3 md:gap-4"
     >
       <div className="text-[#00d289] bg-[#e6fff5] rounded-full p-3 flex items-center justify-center w-10 h-10">
         {icon}
       </div>
       <div>
-        <p className="text-sm text-gray-500">{title}</p>
-        <h3 className="text-lg font-bold text-gray-800">{value}</h3>
+        <p className="text-xs md:text-sm text-gray-500">{title}</p>
+        <h3 className="text-sm md:text-lg font-bold text-gray-800">{value}</h3>
       </div>
     </Link>
   );
@@ -186,7 +271,7 @@ function QuickAction({ label, href }: { label: string; href: string }) {
   return (
     <Link
       href={href}
-      className="block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-4 py-3 rounded-xl transition"
+      className="block bg-[#00d289] hover:bg-[#00b67a] text-white text-center font-medium px-3 md:px-4 py-2.5 md:py-3 rounded-xl transition"
     >
       {label}
     </Link>
