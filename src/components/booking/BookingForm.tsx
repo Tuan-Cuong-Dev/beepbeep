@@ -1,3 +1,7 @@
+// Cập nhật trạng thái xe khi thay đổi trạng thái
+// Cập nhật trạng thái của hoa hồng cho CTV khi thay đổi trạng thái
+// Việc công ty thay đổi trạng thái của xe thuê sẽ quyết định nhiều yếu tố về hoa hồng, về số xe sẵn sàng cho thuê
+
 'use client';
 
 import { useEffect } from 'react';
@@ -14,9 +18,12 @@ import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
 import { sanitizeFirestoreData } from '@/src/utils/sanitizeFirestoreData';
 import { useTranslation } from 'react-i18next';
 
-// 👇 NEW: Firestore & db
-import { collection, getDocs, query, where, updateDoc } from 'firebase/firestore'; // 👈 NEW
-import { db } from '@/src/firebaseConfig'; // 👈 NEW
+// Firestore
+import {
+  collection, getDocs, query, where, updateDoc,
+  writeBatch, doc
+} from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
 
 interface Props {
   editingBooking: Record<string, any> | null;
@@ -25,7 +32,7 @@ interface Props {
   packageNames: Record<string, string>;
   packages: SubscriptionPackage[];
   vehicles: Vehicle[];
-  onSave: (data: Record<string, any>) => Promise<void> | void; // 👈 NEW: cho phép await
+  onSave: (data: Record<string, any>) => Promise<void> | void;
   onCancel: () => void;
 }
 
@@ -39,26 +46,69 @@ const formatDateInput = (date: any) => {
   return format(realDate, 'yyyy-MM-dd');
 };
 
-// 👇 NEW: helper cập nhật xe về Available khi completed/cancelled
+/* ===================== Helpers ===================== */
+
+// Cập nhật xe về Available khi booking completed/cancelled
 async function updateVehicleStatusIfDone(bookingData: Record<string, any>) {
   const done =
     bookingData?.bookingStatus === 'completed' ||
     bookingData?.bookingStatus === 'cancelled';
-
-  if (!done) return;
-  if (!bookingData?.vin) return;
+  if (!done || !bookingData?.vin) return;
 
   const vehicleSnap = await getDocs(
     query(collection(db, 'vehicles'), where('vehicleID', '==', bookingData.vin))
   );
-
   if (!vehicleSnap.empty) {
     await updateDoc(vehicleSnap.docs[0].ref, {
-      status: 'Available',       // chuẩn hóa giá trị DB
-      currentBookingId: null,    // nếu có field liên kết thì gỡ luôn
+      status: 'Available',
+      currentBookingId: null,
     });
   }
 }
+
+// 👇 NEW: Cập nhật CommissionStatus tối giản theo bookingStatus
+async function updateCommissionStatusForBooking(
+  bookingData: Record<string, any>,
+  bookingId?: string | null
+) {
+  if (!bookingId) return;
+  const bs = bookingData?.bookingStatus as
+    | 'draft' | 'confirmed' | 'returned' | 'completed' | 'cancelled' | undefined;
+  if (!bs) return;
+
+  const snap = await getDocs(
+    query(collection(db, 'commissionHistory'), where('bookingId', '==', bookingId))
+  );
+  if (snap.empty) return;
+
+  const batch = writeBatch(db);
+  snap.forEach((d) => {
+    const data = d.data() as { status?: string; type?: string };
+    const curr = (data.status || 'pending') as 'pending'|'approved'|'paid'|'rejected';
+
+    // Không đụng vào các txn đã "paid"
+    if (curr === 'paid') return;
+
+    let next: 'pending'|'approved'|'rejected'|null = null;
+
+    if (bs === 'cancelled') {
+      // Hủy đơn → reject tất cả commission còn pending/approved
+      if (curr === 'pending' || curr === 'approved') next = 'rejected';
+    } else if (bs === 'completed' || bs === 'confirmed') {
+      // Xác nhận / Hoàn tất → approve các commission còn pending
+      if (curr === 'pending') next = 'approved';
+    }
+    // draft/returned: không làm gì
+
+    if (next) {
+      batch.update(doc(db, 'commissionHistory', d.id), { status: next });
+    }
+  });
+
+  await batch.commit();
+}
+
+/* ===================== Component ===================== */
 
 export default function BookingForm({
   editingBooking,
@@ -94,7 +144,7 @@ export default function BookingForm({
     }
   }, [editingBooking]);
 
-  // 👇 NEW: async + gọi cập nhật xe sau khi lưu
+  // SAVE → update booking, rồi update vehicle + commission
   const handleSubmit = async () => {
     if (!form.fullName || !form.phone || !form.vehicleModel) {
       alert(t('booking_form.validation_required'));
@@ -105,12 +155,15 @@ export default function BookingForm({
     // 1) Lưu booking
     await onSave(bookingData);
 
-    // 2) Nếu completed/cancelled → cập nhật xe về Available
+    // 2) Vehicle: completed/cancelled → Available
+    try { await updateVehicleStatusIfDone(bookingData); }
+    catch (e) { console.error('update vehicle failed:', e); }
+
+    // 3) CommissionStatus: giản lược theo bookingStatus
     try {
-      await updateVehicleStatusIfDone(bookingData); // 👈 NEW
+      await updateCommissionStatusForBooking(bookingData, editingBooking?.id ?? form.id);
     } catch (e) {
-      // Không chặn luồng, nhưng nên log/notify (tùy hệ thống toast của bạn)
-      console.error('Failed to update vehicle status:', e);
+      console.error('update commission status failed:', e);
     }
   };
 
@@ -174,15 +227,6 @@ export default function BookingForm({
         ]}</GridCols>
       </Section>
 
-      <Section title={t('booking_form.section_battery')}>
-        <GridCols>{[
-          <Input key="b1" placeholder="Battery Code 1" value={form.batteryCode1 || ''} onChange={(e) => handleChange('batteryCode1', e.target.value)} />,
-          <Input key="b2" placeholder="Battery Code 2" value={form.batteryCode2 || ''} onChange={(e) => handleChange('batteryCode2', e.target.value)} />,
-          <Input key="b3" placeholder="Battery Code 3" value={form.batteryCode3 || ''} onChange={(e) => handleChange('batteryCode3', e.target.value)} />,
-          <Input key="b4" placeholder="Battery Code 4" value={form.batteryCode4 || ''} onChange={(e) => handleChange('batteryCode4', e.target.value)} />,
-        ]}</GridCols>
-      </Section>
-
       <Section title={t('booking_form.section_method')}>
         <GridCols>{[
           <select key="method" className="border p-2 rounded w-full" value={form.deliveryMethod || ''} onChange={(e) => handleChange('deliveryMethod', e.target.value)}>
@@ -241,7 +285,7 @@ export default function BookingForm({
   );
 }
 
-// Shared Layout Components
+/* ========= Shared Layout ========= */
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

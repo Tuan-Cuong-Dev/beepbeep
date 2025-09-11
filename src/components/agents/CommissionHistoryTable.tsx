@@ -4,7 +4,7 @@
 
 import { formatCurrency } from '@/src/utils/formatCurrency';
 import { safeFormatDate } from '@/src/utils/safeFormatDate';
-import type { CommissionTxn } from '@/src/lib/agents/commissionTypes';
+import type { CommissionTxn } from '@/src/lib/commision/commissionTypes';
 
 export default function CommissionHistoryTable({ txns }: { txns: CommissionTxn[] }) {
   if (!txns.length) return <div className="text-center text-gray-500 py-6">Chưa có giao dịch hoa hồng.</div>;

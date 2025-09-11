@@ -180,12 +180,6 @@ export default function AgentDashboard() {
             href="/agent/commissions?status=approved"
             icon={<CheckCircle2 className="w-6 h-6" />}
           />
-          <DashboardCard
-            title={t('agent_dashboard.payment_requests')}
-            value={`${data.paymentRequests} ${t('agent_dashboard.times')}`}
-            href="/dashboard/request-payment"
-            icon={<BarChart2 className="w-6 h-6" />}
-          />
         </DashboardGrid>
 
         {/* Quick actions */}
@@ -193,7 +187,7 @@ export default function AgentDashboard() {
           <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4">
             ⚡ {t('agent_dashboard.quick_actions')}
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
             <QuickAction
               label={t('agent_dashboard.showcases')}
               href="/dashboard/programs/rental-programs/AgentJoinedModelsShowcase"
@@ -214,12 +208,6 @@ export default function AgentDashboard() {
               label={t('agent_dashboard.join_new_program')}
               href="/dashboard/programs/rental-programs/AgentProgramTable"
             />
-            {data.pendingCommission > 0 && (
-              <QuickAction
-                label={t('agent_dashboard.request_payment') || 'Yêu cầu thanh toán'}
-                href="/dashboard/request-payment"
-              />
-            )}
           </div>
         </section>
 
@@ -234,7 +222,7 @@ export default function AgentDashboard() {
 function DashboardGrid({ children }: { children: React.ReactNode }) {
   // 2 cột mobile, 3 cột md, 6 cột xl → luôn căng đều đẹp
   return (
-    <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
+    <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
       {children}
     </section>
   );
