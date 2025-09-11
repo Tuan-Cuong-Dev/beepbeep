@@ -6,7 +6,6 @@ import i18n from '@/src/i18n';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
 import { auth } from '@/src/firebaseConfig';
-import { format } from 'date-fns';
 
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
@@ -25,16 +24,43 @@ import type { User as AppUser } from '@/src/lib/users/userTypes';
 import type { AddressCore } from '@/src/lib/locations/addressTypes';
 import { useCurrentLocation } from '@/src/hooks/useCurrentLocation';
 import { composeFromAddressCore } from '@/src/utils/address';
+import { DateField } from '@/src/components/ui/DateField';
 
-// ===== Helpers =====
+/* =============== Helpers (không ảnh hưởng dữ liệu) =============== */
+
+// Chuẩn hoá mọi kiểu (string | Timestamp | Date | undefined) -> 'yyyy-MM-dd' hoặc ''
+// type guard để check Timestamp
+  const isFirestoreTimestamp = (v: any): v is Timestamp =>
+    v && typeof v.toDate === 'function';
+
+  // Chuẩn hoá mọi kiểu -> 'yyyy-MM-dd'
+  const toYMD = (v?: unknown): string => {
+    if (!v) return '';
+
+    // Firestore Timestamp
+    if (isFirestoreTimestamp(v)) {
+      const d = v.toDate();
+      return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+    }
+
+    // Date object
+    if (v instanceof Date) return v.toISOString().slice(0, 10);
+
+    // string date
+    if (typeof v === 'string') {
+      const d = new Date(v);
+      return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+    }
+
+    return '';
+  };
+
+
+// hôm nay dạng yyyy-MM-dd để set max
+const todayYMD = new Date().toISOString().slice(0, 10);
+
 const sanitizeReferral = (idNumber?: string) =>
   idNumber ? idNumber.trim().replace(/\s+/g, '').toUpperCase() : undefined;
-
-const toISODateOrEmpty = (value?: string) => {
-  if (!value) return '';
-  const d = new Date(value);
-  return isNaN(d.getTime()) ? '' : format(d, 'yyyy-MM-dd');
-};
 
 // Trạng thái địa điểm cho UI (tránh dùng GeoPoint trong input)
 type EditableUserLocation = {
@@ -57,7 +83,7 @@ export default function AccountPage() {
   const [localUser, setLocalUser] = useState<Partial<AppUser> | null>(null);
   const [localPrefs, setLocalPrefs] = useState(preferences);
   const [localLoc, setLocalLoc] = useState<EditableUserLocation | null>(null);
-  const [formattedDateOfBirth, setFormattedDateOfBirth] = useState('');
+  const [dobYMD, setDobYMD] = useState('');
 
   // Notifications
   const [notifyOpen, setNotifyOpen] = useState(false);
@@ -68,7 +94,7 @@ export default function AccountPage() {
   // Refresh state
   const [manualRefreshing, setManualRefreshing] = useState(false);
 
-  // ===== Sync remote → local =====
+  /* ===== Sync remote → local ===== */
   useEffect(() => {
     setLocalUser(user ?? null);
   }, [user]);
@@ -107,9 +133,9 @@ export default function AccountPage() {
     }
   }, [currentLoc]);
 
-  // Seed DOB input
+  // Seed DOB input từ dữ liệu (không xoá trường nào)
   useEffect(() => {
-    setFormattedDateOfBirth(toISODateOrEmpty(localUser?.dateOfBirth));
+    setDobYMD(toYMD(localUser?.dateOfBirth));
   }, [localUser?.dateOfBirth]);
 
   // Auto-fill profileAddress.formatted từ tọa độ nếu trống
@@ -136,7 +162,7 @@ export default function AccountPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localLoc?.lat, localLoc?.lng, i18n.language]);
 
-  // ===== Derived UI states =====
+  /* ===== Derived UI states ===== */
   const isBusy = loading || !user || !localUser;
   const isSavingDisabled = !localUser || !user?.uid;
 
@@ -147,10 +173,10 @@ export default function AccountPage() {
 
   const lngText = useMemo(() => {
     if (locLoading || manualRefreshing) return t('account.fetching_location');
-    return typeof localLoc?.lng === 'number' ? String(localLoc.lng) : '';
+    return typeof localLoc?.lng === 'number' ? String(localLoc?.lng) : '';
   }, [locLoading, manualRefreshing, localLoc?.lng, t]);
 
-  // ===== Helpers =====
+  /* ===== Helpers ===== */
   const showNotification = (type: NotificationType, title: string, description?: string) => {
     setNotifyType(type);
     setNotifyTitle(title);
@@ -170,7 +196,7 @@ export default function AccountPage() {
     });
   };
 
-  // ===== Actions =====
+  /* ===== Actions ===== */
   const handleResetPassword = async () => {
     if (!user?.email) return;
     try {
@@ -194,7 +220,7 @@ export default function AccountPage() {
         ? { ...pa, formatted: (pa.formatted && pa.formatted.trim()) || composeFromAddressCore(pa) }
         : undefined;
 
-      // strip các field legacy nếu còn
+      // strip các field legacy nếu còn (chỉ loại khỏi payload gửi lên, KHÔNG xoá dữ liệu đang hiển thị)
       const {
         address: _legacy1,
         address2: _legacy2,
@@ -206,12 +232,13 @@ export default function AccountPage() {
       } = localUser as any;
 
       const cleanedUserData: Partial<AppUser> = {
-        ...rest,
+        ...rest,                                   // giữ nguyên tất cả field bạn đang dùng
+        ...(dobYMD ? { dateOfBirth: dobYMD } : {}),// lưu DOB chuẩn yyyy-MM-dd nếu có
         referralCode,
         ...(finalizedPA ? { profileAddress: finalizedPA } : {}),
       };
 
-      // lọc undefined/null
+      // lọc undefined/null trước khi update
       const payload = Object.fromEntries(
         Object.entries(cleanedUserData).filter(([, v]) => v !== undefined && v !== null)
       );
@@ -263,6 +290,7 @@ export default function AccountPage() {
     return <div className="p-6">{t('landing.loading')}</div>;
   }
 
+  /* ===================== Render ===================== */
   return (
     <>
       <Header />
@@ -323,13 +351,19 @@ export default function AccountPage() {
             {/* Date of Birth */}
             <div>
               <Label>{t('account.date_of_birth')}</Label>
-              <Input
-                type="date"
-                value={formattedDateOfBirth}
-                onChange={e => {
-                  setFormattedDateOfBirth(e.target.value);
-                  handleFieldChange('dateOfBirth', e.target.value);
+              <DateField
+                id="dateOfBirth"
+                label={undefined}
+                value={dobYMD}
+                onChange={(val) => {
+                  setDobYMD(val);
+                  // đồng bộ vào localUser để giữ nguyên luồng save
+                  handleFieldChange('dateOfBirth', val as any);
                 }}
+                min="1900-01-01"
+                max={todayYMD}
+                placeholder="YYYY-MM-DD"
+                size="md"
               />
             </div>
 
