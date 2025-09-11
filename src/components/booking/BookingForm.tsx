@@ -14,6 +14,10 @@ import { parseCurrencyString } from '@/src/utils/parseCurrencyString';
 import { sanitizeFirestoreData } from '@/src/utils/sanitizeFirestoreData';
 import { useTranslation } from 'react-i18next';
 
+// 👇 NEW: Firestore & db
+import { collection, getDocs, query, where, updateDoc } from 'firebase/firestore'; // 👈 NEW
+import { db } from '@/src/firebaseConfig'; // 👈 NEW
+
 interface Props {
   editingBooking: Record<string, any> | null;
   companyNames: Record<string, string>;
@@ -21,7 +25,7 @@ interface Props {
   packageNames: Record<string, string>;
   packages: SubscriptionPackage[];
   vehicles: Vehicle[];
-  onSave: (data: Record<string, any>) => void;
+  onSave: (data: Record<string, any>) => Promise<void> | void; // 👈 NEW: cho phép await
   onCancel: () => void;
 }
 
@@ -34,6 +38,27 @@ const formatDateInput = (date: any) => {
   if (!realDate || isNaN(realDate.getTime())) return '';
   return format(realDate, 'yyyy-MM-dd');
 };
+
+// 👇 NEW: helper cập nhật xe về Available khi completed/cancelled
+async function updateVehicleStatusIfDone(bookingData: Record<string, any>) {
+  const done =
+    bookingData?.bookingStatus === 'completed' ||
+    bookingData?.bookingStatus === 'cancelled';
+
+  if (!done) return;
+  if (!bookingData?.vin) return;
+
+  const vehicleSnap = await getDocs(
+    query(collection(db, 'vehicles'), where('vehicleID', '==', bookingData.vin))
+  );
+
+  if (!vehicleSnap.empty) {
+    await updateDoc(vehicleSnap.docs[0].ref, {
+      status: 'Available',       // chuẩn hóa giá trị DB
+      currentBookingId: null,    // nếu có field liên kết thì gỡ luôn
+    });
+  }
+}
 
 export default function BookingForm({
   editingBooking,
@@ -69,12 +94,24 @@ export default function BookingForm({
     }
   }, [editingBooking]);
 
-  const handleSubmit = () => {
+  // 👇 NEW: async + gọi cập nhật xe sau khi lưu
+  const handleSubmit = async () => {
     if (!form.fullName || !form.phone || !form.vehicleModel) {
       alert(t('booking_form.validation_required'));
       return;
     }
-    onSave(sanitizeFirestoreData(form));
+    const bookingData = sanitizeFirestoreData(form);
+
+    // 1) Lưu booking
+    await onSave(bookingData);
+
+    // 2) Nếu completed/cancelled → cập nhật xe về Available
+    try {
+      await updateVehicleStatusIfDone(bookingData); // 👈 NEW
+    } catch (e) {
+      // Không chặn luồng, nhưng nên log/notify (tùy hệ thống toast của bạn)
+      console.error('Failed to update vehicle status:', e);
+    }
   };
 
   const handleCurrencyChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {

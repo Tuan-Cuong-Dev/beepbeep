@@ -1,5 +1,6 @@
 // Cấu hình linh hoạt theo % hoặc theo số tiền, áp dụng cho 2 đối tượng: CTV (agent) và Đại lý (dealer).
 //  Phần giảm giá cho khách hàng cuối bỏ qua (không liên quan đến commission).
+//  Types: mở rộng Program cho commission theo model
 
 import { Timestamp } from 'firebase/firestore';
 

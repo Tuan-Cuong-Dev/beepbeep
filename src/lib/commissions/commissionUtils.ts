@@ -1,4 +1,3 @@
-// Chuẩn hóa việc tính hoa hồng
 // Helpers: chuẩn hoá & tính commission
 
 import type {
