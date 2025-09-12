@@ -2389,54 +2389,60 @@
 },
 
 
-"programs_form_page": {
-  "title": "Tạo Chương Trình",
-  "placeholders": {
-    "title": "Tiêu đề chương trình",
-    "description": "Nhập mô tả chi tiết: đối tượng, mẫu xe áp dụng, trạm áp dụng…",
-    "discount": "Giá ưu đãi (VND)",
-    "select_company": "Chọn công ty",
-    "select_program_type": "Chọn loại chương trình"
+  "programs_form_page": {
+    "title": "Tạo chương trình",
+    "labels": {
+      "rental_program": "Chương trình thuê (Rental program)",
+      "agent_program": "Chương trình CTV/Đại lý (Agent program)",
+      "basic_info": "Thông tin cơ bản",
+      "select_stations": "Chọn trạm áp dụng (tuỳ chọn)",
+      "set_discounts": "Thiết lập giảm giá theo mẫu xe",
+      "time_range": "Thời gian áp dụng",
+      "start_date": "Ngày bắt đầu",
+      "end_date": "Ngày kết thúc"
+    },
+    "placeholders": {
+      "select_program_type": "Chọn loại chương trình",
+      "select_company": "Chọn công ty áp dụng",
+      "title": "Tiêu đề chương trình",
+      "description": "Mô tả ngắn về chương trình"
+    },
+    "discount": {
+      "fixed": "Giảm cố định (VND/ngày)",
+      "percentage": "Giảm theo %"
+    },
+    "hints": {
+      "loading": "Đang tải dữ liệu…",
+      "no_models": "Chưa có mẫu xe cho đơn vị này.",
+      "agent_hidden": "Agent program tạm ẩn — hiện chỉ hỗ trợ tạo Rental program."
+    },
+    "explain": {
+      "rental": "Rental program: áp dụng giảm giá theo mẫu xe / trạm / thời gian cho CTV . CTV sẽ nhận hoa hồng dựa trên CHÍNH phần giảm giá này khi phát sinh booking.",
+      "agent": "Agent program: chương trình để CTV/đại lý tham gia & theo dõi. KHÔNG cấu hình giảm giá ở đây; hoa hồng CTV được tính theo mức giảm giá của các rental program áp vào booking."
+    },
+    "validation": {
+      "title_required": "Vui lòng nhập tiêu đề.",
+      "description_required": "Vui lòng nhập mô tả.",
+      "company_required": "Vui lòng chọn đơn vị áp dụng.",
+      "dates_required": "Vui lòng chọn thời gian áp dụng.",
+      "date_order": "Ngày kết thúc phải sau ngày bắt đầu.",
+      "at_least_one_discount": "Cần ít nhất 1 cấu hình giảm giá.",
+      "fill_required": "Vui lòng điền đầy đủ thông tin bắt buộc.",
+      "percent_range": "Phần trăm phải từ 0 đến 100."
+    },
+    "buttons": {
+      "saving": "Đang lưu…",
+      "submit": "Tạo chương trình"
+    },
+    "messages": {
+      "success": "Tạo chương trình thành công.",
+      "error": "Tạo chương trình thất bại."
+    },
+    "notification": {
+      "success": "Thành công",
+      "error": "Lỗi"
+    }
   },
-  "labels": {
-    "basic_info": "Thông tin cơ bản",
-    "select_stations": "Chọn trạm (không bắt buộc)",
-    "set_discounts": "Thiết lập giá ưu đãi theo mẫu xe",
-    "time_range": "Thời gian áp dụng",
-    "start_date": "Ngày bắt đầu",
-    "end_date": "Ngày kết thúc"
-  },
-  "discount": {
-    "fixed": "Giảm cố định (VND)",
-    "percentage": "Giảm theo %"
-  },
-  "hints": {
-    "loading": "Đang tải dữ liệu…",
-    "no_models": "Chưa có mẫu xe cho đơn vị này."
-  },
-  "buttons": {
-    "submit": "Gửi chương trình",
-    "saving": "Đang lưu…"
-  },
-  "messages": {
-    "success": "Tạo chương trình thành công!",
-    "error": "Có lỗi khi lưu chương trình."
-  },
-  "notification": {
-    "success": "Thành công",
-    "error": "Lỗi"
-  },
-  "validation": {
-    "fill_required": "Vui lòng điền đầy đủ các trường bắt buộc.",
-    "title_required": "Vui lòng nhập tiêu đề chương trình.",
-    "description_required": "Vui lòng nhập mô tả chương trình.",
-    "company_required": "Vui lòng chọn công ty cho chương trình thuê.",
-    "dates_required": "Vui lòng chọn ngày bắt đầu và ngày kết thúc.",
-    "date_order": "Ngày kết thúc phải sau ngày bắt đầu.",
-    "at_least_one_discount": "Vui lòng thêm ít nhất một ưu đãi cho mẫu xe.",
-    "percent_range": "Phần trăm giảm giá phải từ 0 đến 100%."
-  }
-},
 
 
 "program_detail_page": {

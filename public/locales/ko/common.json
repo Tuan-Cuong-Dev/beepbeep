@@ -2343,54 +2343,60 @@
   "models": "모델 {{count}}개"
 },
 
-"programs_form_page": {
-  "title": "프로그램 생성",
-  "placeholders": {
-    "title": "프로그램 제목",
-    "description": "대상, 적용 차종, 적용 스테이션 등 상세 내용을 입력하세요.",
-    "discount": "할인 금액 (VND)",
-    "select_company": "회사 선택",
-    "select_program_type": "프로그램 유형 선택"
+ "programs_form_page": {
+    "title": "프로그램 만들기",
+    "labels": {
+      "rental_program": "렌탈 프로그램",
+      "agent_program": "에이전트 프로그램",
+      "basic_info": "기본 정보",
+      "select_stations": "적용 지점 선택 (선택 사항)",
+      "set_discounts": "차종별 할인 설정",
+      "time_range": "적용 기간",
+      "start_date": "시작일",
+      "end_date": "종료일"
+    },
+    "placeholders": {
+      "select_program_type": "프로그램 유형 선택",
+      "select_company": "적용 회사 선택",
+      "title": "프로그램 제목",
+      "description": "간단한 설명"
+    },
+    "discount": {
+      "fixed": "고정 할인 (VND/일)",
+      "percentage": "비율 할인 (%)"
+    },
+    "hints": {
+      "loading": "불러오는 중…",
+      "no_models": "해당 회사에는 차종이 없습니다.",
+      "agent_hidden": "에이전트 프로그램은 임시로 숨겨져 있습니다. 현재는 렌탈 프로그램만 지원됩니다."
+    },
+    "explain": {
+      "rental": "렌탈 프로그램: 차종/지점/기간별로 할인을 적용합니다. 예약이 발생하면 에이전트는 이 할인에 기반해 수수료를 받습니다.",
+      "agent": "에이전트 프로그램: 에이전트 참여 및 관리용입니다. 여기에서는 할인을 설정하지 않으며, 수수료는 예약에 적용된 렌탈 프로그램의 할인에서 산출됩니다."
+    },
+    "validation": {
+      "title_required": "제목을 입력하세요.",
+      "description_required": "설명을 입력하세요.",
+      "company_required": "회사를 선택하세요.",
+      "dates_required": "적용 기간을 선택하세요.",
+      "date_order": "종료일은 시작일 이후여야 합니다.",
+      "at_least_one_discount": "최소 1개의 할인 구성이 필요합니다.",
+      "fill_required": "필수 항목을 모두 입력하세요.",
+      "percent_range": "비율은 0에서 100 사이여야 합니다."
+    },
+    "buttons": {
+      "saving": "저장 중…",
+      "submit": "프로그램 생성"
+    },
+    "messages": {
+      "success": "프로그램이 성공적으로 생성되었습니다.",
+      "error": "프로그램 생성에 실패했습니다."
+    },
+    "notification": {
+      "success": "성공",
+      "error": "오류"
+    }
   },
-  "labels": {
-    "basic_info": "기본 정보",
-    "select_stations": "스테이션 선택 (선택 사항)",
-    "set_discounts": "차종별 할인 설정",
-    "time_range": "적용 기간",
-    "start_date": "시작일",
-    "end_date": "종료일"
-  },
-  "discount": {
-    "fixed": "고정 할인 (VND)",
-    "percentage": "퍼센트 할인"
-  },
-  "hints": {
-    "loading": "데이터 불러오는 중…",
-    "no_models": "해당 조직에는 등록된 차종이 없습니다."
-  },
-  "buttons": {
-    "submit": "프로그램 제출",
-    "saving": "저장 중…"
-  },
-  "messages": {
-    "success": "프로그램이 성공적으로 생성되었습니다!",
-    "error": "프로그램 저장 중 오류가 발생했습니다."
-  },
-  "notification": {
-    "success": "성공",
-    "error": "오류"
-  },
-  "validation": {
-    "fill_required": "필수 항목을 모두 입력해 주세요.",
-    "title_required": "프로그램 제목을 입력해 주세요.",
-    "description_required": "프로그램 설명을 입력해 주세요.",
-    "company_required": "렌털 프로그램의 경우 회사를 선택해 주세요.",
-    "dates_required": "시작일과 종료일을 모두 선택해 주세요.",
-    "date_order": "종료일은 시작일 이후여야 합니다.",
-    "at_least_one_discount": "최소 한 개의 차종에 할인을 추가해 주세요.",
-    "percent_range": "할인율은 0~100% 범위여야 합니다."
-  }
-},
 
 "program_detail_page": {
   "active_until": "{{date}}까지 유효",

@@ -2362,54 +2362,60 @@
   "models": "{{count}} models"
 },
 
-"programs_form_page": {
-  "title": "Create Program",
-  "placeholders": {
-    "title": "Program title",
-    "description": "Enter details: audience, applicable models, applicable stations…",
-    "discount": "Discount price (VND)",
-    "select_company": "Select company",
-    "select_program_type": "Select program type"
+  "programs_form_page": {
+    "title": "Create program",
+    "labels": {
+      "rental_program": "Rental program",
+      "agent_program": "Agent program",
+      "basic_info": "Basic information",
+      "select_stations": "Select applicable stations (optional)",
+      "set_discounts": "Set discounts by model",
+      "time_range": "Validity period",
+      "start_date": "Start date",
+      "end_date": "End date"
+    },
+    "placeholders": {
+      "select_program_type": "Select program type",
+      "select_company": "Select company",
+      "title": "Program title",
+      "description": "Short description"
+    },
+    "discount": {
+      "fixed": "Fixed discount (VND/day)",
+      "percentage": "Percentage discount"
+    },
+    "hints": {
+      "loading": "Loading…",
+      "no_models": "No models for this company.",
+      "agent_hidden": "Agent program is temporarily hidden — only Rental program is supported."
+    },
+    "explain": {
+      "rental": "Rental program: apply discounts by model/station/time for customers. Agents will earn commission based on THESE discounts when a booking occurs.",
+      "agent": "Agent program: for agents to join and track. No discounts are configured here; agent commissions are calculated from the discounts of rental programs applied to bookings."
+    },
+    "validation": {
+      "title_required": "Please enter a title.",
+      "description_required": "Please enter a description.",
+      "company_required": "Please select a company.",
+      "dates_required": "Please select the validity period.",
+      "date_order": "End date must be after start date.",
+      "at_least_one_discount": "At least one discount configuration is required.",
+      "fill_required": "Please fill in all required fields.",
+      "percent_range": "Percentage must be between 0 and 100."
+    },
+    "buttons": {
+      "saving": "Saving…",
+      "submit": "Create program"
+    },
+    "messages": {
+      "success": "Program created successfully.",
+      "error": "Failed to create program."
+    },
+    "notification": {
+      "success": "Success",
+      "error": "Error"
+    }
   },
-  "labels": {
-    "basic_info": "Basic information",
-    "select_stations": "Select stations (optional)",
-    "set_discounts": "Set discounts by vehicle model",
-    "time_range": "Effective period",
-    "start_date": "Start date",
-    "end_date": "End date"
-  },
-  "discount": {
-    "fixed": "Fixed discount (VND)",
-    "percentage": "Percentage discount"
-  },
-  "hints": {
-    "loading": "Loading data…",
-    "no_models": "No vehicle models for this organization."
-  },
-  "buttons": {
-    "submit": "Submit program",
-    "saving": "Saving…"
-  },
-  "messages": {
-    "success": "Program created successfully!",
-    "error": "An error occurred while saving the program."
-  },
-  "notification": {
-    "success": "Success",
-    "error": "Error"
-  },
-  "validation": {
-    "fill_required": "Please fill in all required fields.",
-    "title_required": "Please enter a program title.",
-    "description_required": "Please enter a program description.",
-    "company_required": "Please select a company for rental programs.",
-    "dates_required": "Please select both start and end dates.",
-    "date_order": "End date must be after start date.",
-    "at_least_one_discount": "Please add at least one discount for a model.",
-    "percent_range": "Percentage must be between 0 and 100%."
-  }
-},
 
 "program_detail_page": {
   "active_until": "Active until {{date}}",

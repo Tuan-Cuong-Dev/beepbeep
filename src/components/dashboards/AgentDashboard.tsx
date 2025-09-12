@@ -153,7 +153,7 @@ export default function AgentDashboard() {
           <DashboardCard
             title={t('agent_dashboard.referrals')}
             value={data.referrals.toString()}
-            href="#"
+            href="/agent/referrals"
             icon={<Users className="w-6 h-6" />}
           />
           <DashboardCard

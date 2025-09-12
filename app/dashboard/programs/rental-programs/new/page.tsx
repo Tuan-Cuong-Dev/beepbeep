@@ -1,3 +1,4 @@
+// Chỉ cho chạy rental-program // Giữ nguyên helper (dù hiện tại không cho chọn agent_program )
 'use client';
 
 import { useEffect, useMemo, useState, useCallback, forwardRef } from 'react';
@@ -9,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 
 import { db } from '@/src/firebaseConfig';
 import { useUser } from '@/src/context/AuthContext';
-
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Button } from '@/src/components/ui/button';
@@ -43,6 +43,7 @@ const chunk = <T,>(arr: T[], size = 10) =>
     arr.slice(i * size, i * size + size)
   );
 
+// Giữ nguyên helper (dù hiện tại không cho chọn agent_program)
 const asProgramType = (val: string): ProgramType =>
   val === 'agent_program' ? 'agent_program' : 'rental_program';
 
@@ -251,14 +252,12 @@ export default function ProgramsFormPage() {
   const [selectedStationIds, setSelectedStationIds] = useState<string[]>([]);
   const [modelDiscountsUI, setModelDiscountsUI] = useState<Record<string, ModelDiscountUI>>({});
 
-  // NEW: cho phép company role chọn loại chương trình
-  const [adminProgramType, setAdminProgramType] = useState<ProgramType>('rental_program');
-  const [companyProgramType, setCompanyProgramType] = useState<ProgramType>('rental_program');
+  // Giữ state nhưng khóa UI về rental_program (agent_program tạm ẩn)
+  const [adminProgramType] = useState<ProgramType>('rental_program');
+  const [companyProgramType] = useState<ProgramType>('rental_program');
 
-  const programType: ProgramType = useMemo(
-    () => (isAdmin ? adminProgramType : isCompanyRole ? companyProgramType : 'agent_program'),
-    [isAdmin, adminProgramType, isCompanyRole, companyProgramType]
-  );
+  // 🔒 Khóa loại chương trình: luôn là 'rental_program'
+  const programType: ProgramType = 'rental_program';
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -428,7 +427,7 @@ export default function ProgramsFormPage() {
       }
     }
 
-    // 🔴 Quan trọng: chỉ rental_program mới yêu cầu discount
+    // rental_program yêu cầu ít nhất 1 discount
     if (programType === 'rental_program') {
       const discounts = buildModelDiscountsPayload();
       if (discounts.length === 0)
@@ -496,53 +495,33 @@ export default function ProgramsFormPage() {
             </h1>
           </Section>
 
-          {/* Program type selector + explain */}
-          {(isAdmin || isCompanyRole) && (
-            <Section>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          {/* 🔒 Program type locked to rental_program (UI-only info) */}
+          <Section>
+            <div className="flex flex-col gap-3">
+              <div className="rounded-lg border bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                {t('programs_form_page.explain.rental', {
+                  defaultValue:
+                    'Rental program: áp dụng giảm giá theo mẫu xe / trạm / thời gian cho CTV. Và CTV sẽ nhận hoa hồng dựa trên CHÍNH phần giảm giá này khi phát sinh booking.',
+                })}
+              </div>
+
+              {/* Admin vẫn cần chọn công ty áp dụng */}
+              {isAdmin && (
                 <SimpleSelect
                   className="h-12"
-                  options={[
-                    { value: 'rental_program', label: t('programs_form_page.labels.rental_program', { defaultValue: 'Rental program' }) as string },
-                    { value: 'agent_program', label: t('programs_form_page.labels.agent_program', { defaultValue: 'Agent program' }) as string },
-                  ]}
-                  value={isAdmin ? adminProgramType : companyProgramType}
-                  onChange={(v) => (isAdmin ? setAdminProgramType(asProgramType(v)) : setCompanyProgramType(asProgramType(v)))}
-                  placeholder={t('programs_form_page.placeholders.select_program_type', { defaultValue: 'Chọn loại chương trình' })}
+                  options={companies.map((c) => ({ value: c.id, label: c.name }))}
+                  value={selectedOwnerId ?? ''}
+                  onChange={(val) => setSelectedOwnerId(val || null)}
+                  placeholder={t('programs_form_page.placeholders.select_company', { defaultValue: 'Chọn công ty áp dụng' })}
                 />
+              )}
 
-                {isAdmin && (
-                  <SimpleSelect
-                    className="h-12"
-                    options={companies.map((c) => ({ value: c.id, label: c.name }))}
-                    value={selectedOwnerId ?? ''}
-                    onChange={(val) => setSelectedOwnerId(val || null)}
-                    disabled={(isAdmin ? adminProgramType : companyProgramType) === 'agent_program'}
-                    placeholder={t('programs_form_page.placeholders.select_company', { defaultValue: 'Chọn công ty áp dụng' })}
-                  />
-                )}
+              {/* Badge trạng thái: agent_program đang ẩn */}
+              <div className="text-xs text-gray-500">
+                {t('programs_form_page.hints.agent_hidden', { defaultValue: 'Agent program tạm ẩn — hiện chỉ hỗ trợ tạo Rental program.' })}
               </div>
-
-              {/* Subtitle giải thích từng loại — NHẤN MẠNH LOGIC CTV */}
-              <div className="mt-3 grid grid-cols-1 gap-3">
-                {programType === 'rental_program' ? (
-                  <div className="rounded-lg border bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-                    {t('programs_form_page.explain.rental', {
-                      defaultValue:
-                        'Rental program: áp dụng giảm giá theo mẫu xe / trạm / thời gian cho khách thuê. CTV sẽ nhận hoa hồng dựa trên CHÍNH phần giảm giá này khi phát sinh booking.',
-                    })}
-                  </div>
-                ) : (
-                  <div className="rounded-lg border bg-blue-50 px-3 py-2 text-sm text-blue-700">
-                    {t('programs_form_page.explain.agent', {
-                      defaultValue:
-                        'Agent program: chương trình để CTV/đại lý tham gia & theo dõi. KHÔNG cấu hình giảm giá ở đây; hoa hồng CTV được tính theo mức giảm giá của các rental program áp vào booking.',
-                    })}
-                  </div>
-                )}
-              </div>
-            </Section>
-          )}
+            </div>
+          </Section>
 
           <Section title={t('programs_form_page.labels.basic_info', { defaultValue: 'Thông tin cơ bản' }) as string}>
             <div className="space-y-3">
@@ -574,7 +553,7 @@ export default function ProgramsFormPage() {
             />
           )}
 
-          {/* Discounts: chỉ rental_program — vì CTV ăn theo discount này */}
+          {/* Discounts: rental_program */}
           {programType === 'rental_program' && (
             <Section title={t('programs_form_page.labels.set_discounts', { defaultValue: 'Thiết lập giảm giá theo mẫu xe' }) as string}>
               {loading ? (

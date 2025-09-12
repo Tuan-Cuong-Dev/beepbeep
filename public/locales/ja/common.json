@@ -2321,54 +2321,60 @@
   "models": "{{count}} モデル"
 },
 
-"programs_form_page": {
-  "title": "キャンペーン作成",
-  "placeholders": {
-    "title": "キャンペーン名",
-    "description": "対象者・適用車種・適用ステーションなどの詳細を入力してください。",
-    "discount": "割引金額（VND）",
-    "select_company": "会社を選択",
-    "select_program_type": "プログラムの種類を選択"
+ "programs_form_page": {
+    "title": "プログラムを作成",
+    "labels": {
+      "rental_program": "レンタルプログラム",
+      "agent_program": "エージェントプログラム",
+      "basic_info": "基本情報",
+      "select_stations": "適用ステーションを選択（任意）",
+      "set_discounts": "車種ごとの割引を設定",
+      "time_range": "適用期間",
+      "start_date": "開始日",
+      "end_date": "終了日"
+    },
+    "placeholders": {
+      "select_program_type": "プログラムの種類を選択",
+      "select_company": "会社を選択",
+      "title": "プログラム名",
+      "description": "簡単な説明"
+    },
+    "discount": {
+      "fixed": "固定割引（VND/日）",
+      "percentage": "割合割引（%）"
+    },
+    "hints": {
+      "loading": "読み込み中…",
+      "no_models": "この会社には車種がありません。",
+      "agent_hidden": "エージェントプログラムは一時的に非表示です。現在はレンタルプログラムのみ対応しています。"
+    },
+    "explain": {
+      "rental": "レンタルプログラム：車種・ステーション・期間ごとに割引を適用。予約が発生した際、エージェントの手数料はこの割引に基づいて計算されます。",
+      "agent": "エージェントプログラム：エージェントが参加・管理するためのもの。ここでは割引を設定せず、手数料は予約に適用されたレンタルプログラムの割引から算出されます。"
+    },
+    "validation": {
+      "title_required": "タイトルを入力してください。",
+      "description_required": "説明を入力してください。",
+      "company_required": "会社を選択してください。",
+      "dates_required": "適用期間を選択してください。",
+      "date_order": "終了日は開始日より後である必要があります。",
+      "at_least_one_discount": "少なくとも1つの割引設定が必要です。",
+      "fill_required": "必須項目をすべて入力してください。",
+      "percent_range": "割合は0〜100の範囲で入力してください。"
+    },
+    "buttons": {
+      "saving": "保存中…",
+      "submit": "作成する"
+    },
+    "messages": {
+      "success": "プログラムを作成しました。",
+      "error": "プログラムの作成に失敗しました。"
+    },
+    "notification": {
+      "success": "成功",
+      "error": "エラー"
+    }
   },
-  "labels": {
-    "basic_info": "基本情報",
-    "select_stations": "ステーションを選択（任意）",
-    "set_discounts": "車種ごとの割引を設定",
-    "time_range": "適用期間",
-    "start_date": "開始日",
-    "end_date": "終了日"
-  },
-  "discount": {
-    "fixed": "固定割引（VND）",
-    "percentage": "割合割引（％）"
-  },
-  "hints": {
-    "loading": "読み込み中…",
-    "no_models": "この組織には車種がありません。"
-  },
-  "buttons": {
-    "submit": "キャンペーンを送信",
-    "saving": "保存中…"
-  },
-  "messages": {
-    "success": "キャンペーンを作成しました！",
-    "error": "保存中にエラーが発生しました。"
-  },
-  "notification": {
-    "success": "成功",
-    "error": "エラー"
-  },
-  "validation": {
-    "fill_required": "必須項目をすべて入力してください。",
-    "title_required": "キャンペーン名を入力してください。",
-    "description_required": "キャンペーンの説明を入力してください。",
-    "company_required": "レンタル用プログラムには会社の選択が必要です。",
-    "dates_required": "開始日と終了日を選択してください。",
-    "date_order": "終了日は開始日より後である必要があります。",
-    "at_least_one_discount": "少なくとも1つの車種に割引を追加してください。",
-    "percent_range": "割引率は0〜100%の範囲で指定してください。"
-  }
-},
 
 "program_detail_page": {
   "active_until": "{{date}} まで有効",

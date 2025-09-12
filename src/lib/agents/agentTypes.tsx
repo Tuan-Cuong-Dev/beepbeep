@@ -1,4 +1,5 @@
 // lib/agents/agentTypes.ts
+// Agent - Giới thiệu khách hàng để nhận hoa hồng theo chiết khấu Chương trình.
 // Update 04/09/2025
 
 import { Timestamp, FieldValue, GeoPoint } from "firebase/firestore";
