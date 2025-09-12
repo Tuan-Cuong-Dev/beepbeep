@@ -121,15 +121,16 @@ export default function ReferralForm({ agentId, initial, submitting, onSubmit }:
 
       {/* Time / Vehicle */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
+        <div className="md:space-x-4">
           <label className="text-sm text-gray-600">Ngày dự kiến thuê</label>
           <DatePicker
             selected={form.expectedStart ?? null}
             onChange={(d) => setF('expectedStart', d)}
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="w-full rounded border px-3 py-2"
             placeholderText="Chọn ngày"
           />
         </div>
+
         <div>
           <label className="text-sm text-gray-600">Loại phương tiện</label>
           <SimpleSelect

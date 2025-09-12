@@ -182,7 +182,7 @@ export default function AgentReferralNewPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
+                <div className="md:space-x-2">
                   <label className="text-sm text-gray-600">Ngày dự kiến thuê</label>
                   <DatePicker
                     selected={form.expectedStart}

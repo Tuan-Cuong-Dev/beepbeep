@@ -24,7 +24,7 @@ import { db } from '@/src/firebaseConfig';
 
 import type { AgentReferral } from '@/src/lib/agents/referralTypes';
 
-/* ============== Utils ============== */
+/* ================= Utils ================= */
 function tsToMillis(t?: Timestamp | null) {
   if (!t) return 0;
   try { return t.toMillis?.() ?? 0; } catch { return 0; }
@@ -42,49 +42,90 @@ const shallowEqual = (a: Record<string, string>, b: Record<string, string>) => {
   return true;
 };
 
-/* ============== Page ============== */
+/* ================= Station name cache (memory + localStorage) ================= */
+const STATION_CACHE_KEY = 'stationNameCache:v1';
+const stationNameCache = new Map<string, string>();
+
+function hydrateStationCache() {
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(STATION_CACHE_KEY) : null;
+    if (!raw) return;
+    const obj = JSON.parse(raw) as Record<string, string>;
+    Object.entries(obj).forEach(([k, v]) => stationNameCache.set(k, v));
+  } catch {}
+}
+function persistStationCache() {
+  try {
+    if (typeof window === 'undefined') return;
+    const obj = Object.fromEntries(stationNameCache.entries());
+    localStorage.setItem(STATION_CACHE_KEY, JSON.stringify(obj));
+  } catch {}
+}
+
+/* ================= Page ================= */
 export default function ReferralManagementPage() {
   const { t } = useTranslation('common');
   const { user } = useUser();
   const agentId = user?.uid || '';
 
-  // Date | null -> Firestore Timestamp (or null)
+  // Date | null -> Firestore Timestamp (hoặc null)
   const toFsTime = (d?: Date | null) => (d ? Timestamp.fromDate(d) : null);
 
-  const {
-    items, loading, create, updateReferral, remove,
-  } = useAgentReferrals(agentId);
-
-  const { companyOptions, getStationOptionsForCompany } = useAgentOptions({ agentId });
+  const { items, loading, create, updateReferral, remove } = useAgentReferrals(agentId);
+  const { companyOptions } = useAgentOptions({ agentId });
 
   // Maps: id -> name
   const [companyNameMap, setCompanyNameMap] = useState<Record<string, string>>({});
   const [stationNameMap, setStationNameMap] = useState<Record<string, string>>({});
   const [programNameMap, setProgramNameMap] = useState<Record<string, string>>({});
 
+  // Company map từ options
   useEffect(() => {
     const next = Object.fromEntries(companyOptions.map((o) => [o.value, o.label]));
     setCompanyNameMap((prev) => (shallowEqual(prev, next) ? prev : next));
   }, [companyOptions]);
 
-  const getStationsRef = useRef(getStationOptionsForCompany);
-  useEffect(() => { getStationsRef.current = getStationOptionsForCompany; }, [getStationOptionsForCompany]);
+  // --- Station name: hydrate cache 1 lần + seed state để hiển thị tên ngay
+  useEffect(() => {
+    hydrateStationCache();
+    setStationNameMap((prev) => ({ ...Object.fromEntries(stationNameCache), ...prev }));
+  }, []);
+
+  // Gom tất cả stationId đang có trong items (có thể đổi thành pageRows nếu muốn lazy)
+  const stationIdsInItems = useMemo(
+    () => Array.from(new Set(items.map((r) => r.stationId).filter(Boolean) as string[])),
+    [items]
+  );
+
+  // Fetch những stationId chưa có trong cache (chunk 10)
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const companyIds = Array.from(new Set(items.map((r) => r.companyId).filter(Boolean) as string[]));
-      const merged: Record<string, string> = {};
-      for (const cid of companyIds) {
-        const opts = getStationsRef.current(cid);
-        for (const o of opts) merged[o.value] = o.label;
+      const missing = stationIdsInItems.filter((id) => !stationNameCache.has(id));
+      if (missing.length === 0) return;
+
+      const newEntries: [string, string][] = [];
+      for (const part of chunk(missing, 10)) {
+        const snap = await getDocs(
+          query(collection(db, 'rentalStations'), where(documentId(), 'in', part))
+        );
+        snap.docs.forEach((d) => {
+          const data = d.data() as any;
+          const name = (data?.name as string) || d.id;
+          stationNameCache.set(d.id, name);
+          newEntries.push([d.id, name]);
+        });
       }
-      if (!cancelled) {
-        setStationNameMap((prev) => (shallowEqual(prev, merged) ? prev : merged));
+      if (cancelled) return;
+      if (newEntries.length) {
+        setStationNameMap((prev) => ({ ...prev, ...Object.fromEntries(newEntries) }));
+        persistStationCache();
       }
     })();
     return () => { cancelled = true; };
-  }, [items]);
+  }, [stationIdsInItems]);
 
+  // Program map theo ids từ items
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -156,17 +197,14 @@ export default function ReferralManagementPage() {
   const [editing, setEditing] = useState<AgentReferral | null>(null);
   const isUpdateMode = !!editing;
 
-  // Ref tới khối form để scroll/focus khi bấm "Sửa"
+  // Scroll tới form khi bấm "Sửa"
   const formRef = useRef<HTMLDivElement>(null);
-
   const handleEdit = (r: AgentReferral) => {
     setEditing(r);
-    // Scroll tới form
     requestAnimationFrame(() => {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Thử focus ô nhập đầu tiên (nếu ReferralForm có input với data-ref="first")
       const input = formRef.current?.querySelector<HTMLInputElement>('input, textarea, select');
-      if (input) input.focus();
+      input?.focus();
     });
   };
 
@@ -200,11 +238,13 @@ export default function ReferralManagementPage() {
           {t('referrals.title', { defaultValue: 'Quản lý giới thiệu khách hàng' })}
         </h1>
 
+        {/* Search / Filters (đơn giản) */}
         <ReferralSearch
           initial={filters}
           onChange={(f) => setFilters(f)}
         />
 
+        {/* Table */}
         <div className="mt-4">
           <ReferralTable
             rows={pageRows}
@@ -232,7 +272,7 @@ export default function ReferralManagementPage() {
           )}
         </div>
 
-        {/* Form block */}
+        {/* Form */}
         <div ref={formRef} className="mt-6 bg-white rounded-2xl border p-4">
           <h2 className="text-lg font-semibold mb-3">
             {isUpdateMode
@@ -241,7 +281,7 @@ export default function ReferralManagementPage() {
           </h2>
 
           <ReferralForm
-            key={editing?.id ?? 'create'}  // <- bắt buộc để remount khi chuyển sang edit
+            key={editing?.id ?? 'create'}  // remount khi chuyển edit/create
             agentId={agentId}
             initial={isUpdateMode ? {
               fullName: editing?.fullName,
