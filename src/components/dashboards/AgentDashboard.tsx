@@ -17,13 +17,10 @@ import {
 import { db } from '@/src/firebaseConfig';
 import { useTranslation } from 'react-i18next';
 import {
-  Handshake,
   Users,
   DollarSign,
-  FileText,
-  BarChart2,
-  Clock3,
   CheckCircle2,
+  Clock3,
   PiggyBank,
 } from 'lucide-react';
 import { formatCurrency } from '@/src/utils/formatCurrency';
@@ -37,7 +34,7 @@ interface ActivityLog {
 }
 
 interface DashboardData {
-  referrals: number;
+  referrals: number;               // Số KH giới thiệu (unique theo phone) từ agentReferrals
   totalCommission: number;
   paidCommission: number;
   pendingCommission: number;
@@ -45,6 +42,15 @@ interface DashboardData {
   activity: ActivityLog[];
   paymentRequests: number;
 }
+
+/* Helpers */
+const normalizePhone = (p: unknown) => {
+  const d = String(p || '').replace(/[^\d]/g, '');
+  if (!d) return '';
+  // chuẩn hoá đầu số Việt Nam đơn giản: 84xxxx -> 0xxxx
+  if (d.startsWith('84') && d.length >= 9) return '0' + d.slice(2);
+  return d;
+};
 
 /* ================= Component ================= */
 export default function AgentDashboard() {
@@ -72,20 +78,27 @@ export default function AgentDashboard() {
       try {
         const uid = user.uid;
 
-        // Referrals = số booking có agentId = uid
-        const bookingsQ = query(
-          collection(db, 'bookings'),
+        // ===== ĐẾM KHÁCH GIỚI THIỆU (UNIQUE PHONE) TỪ agentReferrals =====
+        const leadsQ = query(
+          collection(db, 'agentReferrals'),
           where('agentId', '==', uid)
         );
-        const bookingsSnap = await getDocs(bookingsQ);
-        const referrals = bookingsSnap.size;
+        const leadsSnap = await getDocs(leadsQ);
 
-        // Commission stats từ collection commissionHistory
+        const uniquePhones = new Set<string>();
+        leadsSnap.forEach((d) => {
+          const row: any = d.data();
+          const phone = normalizePhone(row?.phone);
+          if (phone) uniquePhones.add(phone);
+        });
+        const referrals = uniquePhones.size;
+
+        // ===== HOA HỒNG: lấy từ commissionHistory =====
         const chQ = query(
           collection(db, 'commissionHistory'),
           where('agentId', '==', uid),
           orderBy('createdAt', 'desc'),
-          qLimit(200) // hiển thị nhanh 200 bản ghi gần nhất cho dashboard
+          qLimit(200) // lấy nhanh 200 bản ghi gần nhất cho dashboard
         );
         const chSnap = await getDocs(chQ);
 
@@ -113,7 +126,7 @@ export default function AgentDashboard() {
           }
         });
 
-        // Payment requests count
+        // ===== YÊU CẦU THANH TOÁN =====
         const reqQ = query(
           collection(db, 'paymentRequests'),
           where('agentId', '==', uid)
@@ -194,7 +207,7 @@ export default function AgentDashboard() {
             />
             <QuickAction
               label={t('agent_dashboard.refer_customer')}
-              href="/agent/referrals/new"
+              href="/agent/referrals/quick"   
             />
             <QuickAction
               label={t('agent_dashboard.view_commission_history') || 'Xem lịch sử hoa hồng'}
@@ -220,7 +233,6 @@ export default function AgentDashboard() {
 
 /* ================= UI bits ================= */
 function DashboardGrid({ children }: { children: React.ReactNode }) {
-  // 2 cột mobile, 3 cột md, 6 cột xl → luôn căng đều đẹp
   return (
     <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
       {children}

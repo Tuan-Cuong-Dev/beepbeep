@@ -36,18 +36,30 @@ export default function ReferralSearch({ onChange, initial }: Props) {
     to: initial?.to ?? null,
   });
 
-  // debounce emit
+  // Auto-swap if from > to (tránh khoảng thời gian ngược)
+  useEffect(() => {
+    if (f.from && f.to && f.from.getTime() > f.to.getTime()) {
+      setF((p) => ({ ...p, from: f.to, to: f.from }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [f.from, f.to]);
+
+  // Debounce emit
   useEffect(() => {
     const t = setTimeout(() => onChange(f), 300);
     return () => clearTimeout(t);
   }, [f, onChange]);
 
+  const resetFilters = () =>
+    setF({ q: '', status: 'all', from: null, to: null });
+
   return (
     <div className="bg-white rounded-2xl border p-3 md:p-4 space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div>
+        <div className="min-w-0">
           <label className="text-sm text-gray-600">Tìm kiếm</label>
           <Input
+            className="h-10"
             placeholder="Tên hoặc SĐT…"
             value={f.q || ''}
             onChange={(e) => setF((p) => ({ ...p, q: e.target.value }))}
@@ -72,8 +84,11 @@ export default function ReferralSearch({ onChange, initial }: Props) {
             <DatePicker
               selected={f.from ?? null}
               onChange={(d) => setF((p) => ({ ...p, from: d }))}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full rounded border px-3 py-2 h-10"
+              wrapperClassName="w-full"
+              isClearable
               placeholderText="Chọn ngày"
+              dateFormat="dd/MM/yyyy"
             />
           </div>
           <div>
@@ -81,11 +96,24 @@ export default function ReferralSearch({ onChange, initial }: Props) {
             <DatePicker
               selected={f.to ?? null}
               onChange={(d) => setF((p) => ({ ...p, to: d }))}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full rounded border px-3 py-2 h-10"
+              wrapperClassName="w-full"
+              isClearable
               placeholderText="Chọn ngày"
+              dateFormat="dd/MM/yyyy"
             />
           </div>
         </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className="text-sm text-gray-600 underline"
+          onClick={resetFilters}
+        >
+          Xóa lọc
+        </button>
       </div>
     </div>
   );

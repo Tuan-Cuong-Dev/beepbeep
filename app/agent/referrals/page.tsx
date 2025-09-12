@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  collection, getDocs, query, where, documentId, Timestamp
+  collection, getDocs, query, where, documentId, Timestamp,
 } from 'firebase/firestore';
 import { useTranslation } from 'react-i18next';
 
@@ -48,7 +48,8 @@ const stationNameCache = new Map<string, string>();
 
 function hydrateStationCache() {
   try {
-    const raw = typeof window !== 'undefined' ? localStorage.getItem(STATION_CACHE_KEY) : null;
+    if (typeof window === 'undefined') return;
+    const raw = localStorage.getItem(STATION_CACHE_KEY);
     if (!raw) return;
     const obj = JSON.parse(raw) as Record<string, string>;
     Object.entries(obj).forEach(([k, v]) => stationNameCache.set(k, v));
@@ -72,77 +73,7 @@ export default function ReferralManagementPage() {
   const toFsTime = (d?: Date | null) => (d ? Timestamp.fromDate(d) : null);
 
   const { items, loading, create, updateReferral, remove } = useAgentReferrals(agentId);
-  const { companyOptions } = useAgentOptions({ agentId });
-
-  // Maps: id -> name
-  const [companyNameMap, setCompanyNameMap] = useState<Record<string, string>>({});
-  const [stationNameMap, setStationNameMap] = useState<Record<string, string>>({});
-  const [programNameMap, setProgramNameMap] = useState<Record<string, string>>({});
-
-  // Company map từ options
-  useEffect(() => {
-    const next = Object.fromEntries(companyOptions.map((o) => [o.value, o.label]));
-    setCompanyNameMap((prev) => (shallowEqual(prev, next) ? prev : next));
-  }, [companyOptions]);
-
-  // --- Station name: hydrate cache 1 lần + seed state để hiển thị tên ngay
-  useEffect(() => {
-    hydrateStationCache();
-    setStationNameMap((prev) => ({ ...Object.fromEntries(stationNameCache), ...prev }));
-  }, []);
-
-  // Gom tất cả stationId đang có trong items (có thể đổi thành pageRows nếu muốn lazy)
-  const stationIdsInItems = useMemo(
-    () => Array.from(new Set(items.map((r) => r.stationId).filter(Boolean) as string[])),
-    [items]
-  );
-
-  // Fetch những stationId chưa có trong cache (chunk 10)
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const missing = stationIdsInItems.filter((id) => !stationNameCache.has(id));
-      if (missing.length === 0) return;
-
-      const newEntries: [string, string][] = [];
-      for (const part of chunk(missing, 10)) {
-        const snap = await getDocs(
-          query(collection(db, 'rentalStations'), where(documentId(), 'in', part))
-        );
-        snap.docs.forEach((d) => {
-          const data = d.data() as any;
-          const name = (data?.name as string) || d.id;
-          stationNameCache.set(d.id, name);
-          newEntries.push([d.id, name]);
-        });
-      }
-      if (cancelled) return;
-      if (newEntries.length) {
-        setStationNameMap((prev) => ({ ...prev, ...Object.fromEntries(newEntries) }));
-        persistStationCache();
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [stationIdsInItems]);
-
-  // Program map theo ids từ items
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const ids = Array.from(new Set(items.map((r) => r.programId).filter(Boolean) as string[]));
-      if (ids.length === 0) { if (!cancelled) setProgramNameMap({}); return; }
-      const map: Record<string, string> = {};
-      for (const part of chunk(ids, 10)) {
-        const snap = await getDocs(query(collection(db, 'programs'), where(documentId(), 'in', part)));
-        snap.docs.forEach((d) => {
-          const data = d.data() as any;
-          map[d.id] = (data.title as string) || d.id;
-        });
-      }
-      if (!cancelled) setProgramNameMap(map);
-    })();
-    return () => { cancelled = true; };
-  }, [items]);
+  const { companyOptions } = useAgentOptions({ agentId }); // vẫn dùng để map tên công ty trong bảng
 
   /* ---------- Filters + pagination ---------- */
   const [filters, setFilters] = useState<ReferralFilters>({
@@ -180,6 +111,76 @@ export default function ReferralManagementPage() {
     [filtered, currentPage]
   );
 
+  /* ---------- Name maps: id -> name ---------- */
+  const [companyNameMap, setCompanyNameMap] = useState<Record<string, string>>({});
+  const [stationNameMap, setStationNameMap] = useState<Record<string, string>>({});
+  const [programNameMap, setProgramNameMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const next = Object.fromEntries(companyOptions.map((o) => [o.value, o.label]));
+    setCompanyNameMap((prev) => (shallowEqual(prev, next) ? prev : next));
+  }, [companyOptions]);
+
+  useEffect(() => {
+    hydrateStationCache();
+    setStationNameMap((prev) => ({ ...Object.fromEntries(stationNameCache), ...prev }));
+  }, []);
+
+  // chỉ tải tên trạm cho các stationId trong TRANG hiện tại
+  const stationIdsOnPage = useMemo(
+    () => Array.from(new Set(pageRows.map((r) => r.stationId).filter(Boolean) as string[])),
+    [pageRows]
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const missing = stationIdsOnPage.filter((id) => id && !stationNameCache.has(id));
+      if (missing.length === 0) return;
+
+      const newEntries: [string, string][] = [];
+      for (const part of chunk(missing, 10)) {
+        const snap = await getDocs(
+          query(collection(db, 'rentalStations'), where(documentId(), 'in', part))
+        );
+        snap.docs.forEach((d) => {
+          const data = d.data() as any;
+          const name = (data?.name as string) || d.id;
+          stationNameCache.set(d.id, name);
+          newEntries.push([d.id, name]);
+        });
+      }
+      if (cancelled) return;
+      if (newEntries.length) {
+        setStationNameMap((prev) => ({ ...prev, ...Object.fromEntries(newEntries) }));
+        persistStationCache();
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [stationIdsOnPage]);
+
+  // Program map (nếu cần hiển thị tên CT)
+  const programIdsOnPage = useMemo(
+    () => Array.from(new Set(pageRows.map((r) => r.programId).filter(Boolean) as string[])),
+    [pageRows]
+  );
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (programIdsOnPage.length === 0) { if (!cancelled) setProgramNameMap({}); return; }
+      const map: Record<string, string> = {};
+      for (const part of chunk(programIdsOnPage, 10)) {
+        const snap = await getDocs(query(collection(db, 'programs'), where(documentId(), 'in', part)));
+        snap.docs.forEach((d) => {
+          const data = d.data() as any;
+          map[d.id] = (data.title as string) || d.id;
+        });
+      }
+      if (!cancelled) setProgramNameMap(map);
+    })();
+    return () => { cancelled = true; };
+  }, [programIdsOnPage]);
+
   /* ---------- Dialog & Edit mode ---------- */
   const [dialog, setDialog] = useState({
     open: false,
@@ -203,8 +204,12 @@ export default function ReferralManagementPage() {
     setEditing(r);
     requestAnimationFrame(() => {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      const input = formRef.current?.querySelector<HTMLInputElement>('input, textarea, select');
-      input?.focus();
+      const el = formRef.current?.querySelector('input, textarea, select') as
+        | HTMLInputElement
+        | HTMLTextAreaElement
+        | HTMLSelectElement
+        | null;
+      el?.focus();
     });
   };
 
@@ -284,21 +289,26 @@ export default function ReferralManagementPage() {
             key={editing?.id ?? 'create'}  // remount khi chuyển edit/create
             agentId={agentId}
             initial={isUpdateMode ? {
-              fullName: editing?.fullName,
-              phone: editing?.phone,
-              note: editing?.note,
-              companyId: editing?.companyId,
-              stationId: editing?.stationId,
+              fullName: editing?.fullName || '',
+              phone: editing?.phone || '',
+              // quick fields
               expectedStart: editing?.expectedStart
                 ? new Date(tsToMillis(editing.expectedStart))
-                : undefined,
-              vehicleType: editing?.vehicleType,
-              modelHint: editing?.modelHint,
+                : null,
+              quantity: editing?.quantity ?? 1,
+              rentalDays: editing?.rentalDays ?? 1,
+              // optional quick
+              stationId: editing?.stationId ?? '',
               contactChannel: editing?.contactChannel,
               preferredLanguage: editing?.preferredLanguage,
-              programId: editing?.programId ?? null,
-              sourceTag: editing?.sourceTag,
-              consentContact: editing?.consentContact ?? true,
+              // teammate: chỉ cần tên
+              teammate: editing?.teammate?.name || '',
+              splitPreset: editing?.splitPreset || '50_50',
+              splitSelfPct: editing?.splitSelfPct ?? undefined,
+              // misc
+              attributionLocked: editing?.attributionLocked ?? true,
+              note: editing?.note || '',
+              sourceTag: editing?.sourceTag || 'HotelLobby',
             } : undefined}
             submitting={false}
             onSubmit={async (val) => {
@@ -308,16 +318,22 @@ export default function ReferralManagementPage() {
                     fullName: val.fullName,
                     phone: val.phone,
                     note: val.note,
-                    companyId: val.companyId,
-                    stationId: val.stationId,
+                    // quick
                     expectedStart: toFsTime(val.expectedStart),
-                    vehicleType: val.vehicleType,
-                    modelHint: val.modelHint,
+                    rentalDays: val.rentalDays,
+                    quantity: val.quantity,
+                    vehicleType: 'motorbike',
+                    // optional quick
+                    stationId: val.stationId,
                     contactChannel: val.contactChannel,
                     preferredLanguage: val.preferredLanguage,
-                    programId: val.programId ?? null,
+                    // teammate object
+                    teammate: val.teammate ? { name: val.teammate } : undefined,
+                    splitPreset: val.splitPreset,
+                    splitSelfPct: val.splitPreset === 'custom' ? (val.splitSelfPct ?? 50) : undefined,
+                    // misc
                     sourceTag: val.sourceTag,
-                    consentContact: val.consentContact,
+                    attributionLocked: !!val.attributionLocked,
                   });
                   setEditing(null);
                   showDialog('success', t('referrals.update_success', { defaultValue: 'Đã cập nhật lead.' }));
@@ -326,18 +342,24 @@ export default function ReferralManagementPage() {
                     fullName: val.fullName,
                     phone: val.phone,
                     note: val.note,
-                    companyId: val.companyId,
-                    stationId: val.stationId,
+                    // quick
                     expectedStart: toFsTime(val.expectedStart),
-                    vehicleType: val.vehicleType,
-                    modelHint: val.modelHint,
+                    rentalDays: val.rentalDays,
+                    quantity: val.quantity,
+                    vehicleType: 'motorbike',
+                    // optional quick
+                    stationId: val.stationId,
                     contactChannel: val.contactChannel,
                     preferredLanguage: val.preferredLanguage,
-                    programId: val.programId ?? null,
+                    teammate: val.teammate ? { name: val.teammate } : undefined,
+                    splitPreset: val.splitPreset,
+                    splitSelfPct: val.splitPreset === 'custom' ? (val.splitSelfPct ?? 50) : undefined,
+                    // misc
                     sourceTag: val.sourceTag,
-                    consentContact: val.consentContact,
+                    attributionLocked: !!val.attributionLocked,
                     source: 'agent_form',
                     meta: { byAgentId: agentId, preferredLanguage: val.preferredLanguage, sourceTag: val.sourceTag },
+                    agentId: ''
                   });
                   if (id) {
                     showDialog('success', t('referrals.create_success', { defaultValue: 'Đã tạo giới thiệu.' }));
