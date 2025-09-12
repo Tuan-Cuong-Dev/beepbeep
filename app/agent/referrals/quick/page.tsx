@@ -25,7 +25,10 @@ const vnPhoneNormalize = (s: string) => {
   return d;
 };
 
-/** One row with label (left) + control (right) aligned, 4px gaps */
+/** Field responsive:
+ * - Mobile: label trên, input dưới (full width)
+ * - Desktop (md+): 2 cột label | control như cũ
+ */
 function FieldRow({
   label,
   children,
@@ -36,8 +39,8 @@ function FieldRow({
   required?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-[140px_1fr] items-center gap-x-1 gap-y-1">
-      <label className="text-sm text-gray-600">
+    <div className="grid grid-cols-1 gap-1 md:grid-cols-[160px_1fr] md:items-center md:gap-x-2">
+      <label className="text-sm text-gray-600 md:text-right">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div className="min-w-0">{children}</div>
@@ -212,9 +215,7 @@ export default function HotelQuickReferralPage() {
               <select
                 className="w-full rounded border px-3 py-2 h-10"
                 value={vehicleType}
-                onChange={(e) =>
-                  setVehicleType(e.target.value as typeof vehicleType)
-                }
+                onChange={(e) => setVehicleType(e.target.value as typeof vehicleType)}
               >
                 <option value="motorbike">Xe máy</option>
                 <option value="bike">Xe đạp</option>
@@ -268,7 +269,7 @@ export default function HotelQuickReferralPage() {
                 </FieldRow>
 
                 <FieldRow label="Tỷ lệ chia">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                     <select
                       className="rounded border px-3 py-2 h-10"
                       value={splitPreset}
@@ -294,15 +295,11 @@ export default function HotelQuickReferralPage() {
                         max={100}
                         value={splitSelfPct}
                         onChange={(e) =>
-                          setSplitSelfPct(
-                            Math.min(100, Math.max(0, Number(e.target.value) || 0))
-                          )
+                          setSplitSelfPct(Math.min(100, Math.max(0, Number(e.target.value) || 0)))
                         }
                       />
                     )}
-                    <span className="text-sm text-gray-600">
-                      (phần trăm của bạn)
-                    </span>
+                    <span className="text-sm text-gray-600">(phần trăm của bạn)</span>
                   </div>
                 </FieldRow>
               </div>
