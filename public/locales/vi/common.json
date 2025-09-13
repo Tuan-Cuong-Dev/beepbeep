@@ -2466,7 +2466,13 @@
   "joined_at": "Tham gia lúc",
   "status_joined": "Đã tham gia",
   "status_pending": "Đang chờ duyệt",
-  "status_rejected": "Từ chối"
+  "status_rejected": "Từ chối",
+  "actions": "Hành động",
+  "approve": "Duyệt",
+  "reject": "Từ chối",
+  "revert_pending": "Chuyển về chờ duyệt",
+  "updated_success": "Cập nhật trạng thái thành công.",
+  "update_failed": "Cập nhật trạng thái thất bại."
 },
 
 "actual_result_popup":{

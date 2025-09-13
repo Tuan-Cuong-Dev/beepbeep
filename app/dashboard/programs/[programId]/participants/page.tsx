@@ -11,13 +11,18 @@ import {
   where,
   Timestamp,
   documentId,
+  updateDoc,
+  doc,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import type { ProgramParticipant, ProgramParticipantStatus } from '@/src/lib/programs/rental-programs/programsType';
 import type { Agent } from '@/src/lib/agents/agentTypes';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/src/components/ui/badge';
+import { Button } from '@/src/components/ui/button';
 import { format } from 'date-fns';
+import { useUser } from '@/src/context/AuthContext';
 
 type Role = 'agent' | 'customer' | 'staff';
 
@@ -30,11 +35,13 @@ export default function ProgramParticipantsPage() {
   const { t } = useTranslation('common');
   const params = useParams();
   const programId = params?.programId as string;
+  const { user } = useUser();
 
   const [participants, setParticipants] = useState<ProgramParticipant[]>([]);
   const [agentByOwnerId, setAgentByOwnerId] = useState<Record<string, Agent>>({});
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!programId) return;
@@ -67,8 +74,8 @@ export default function ProgramParticipantsPage() {
           const snap = await getDocs(
             query(collection(db, 'agents'), where('ownerId', 'in', ids))
           );
-          snap.forEach(doc => {
-            const a = { id: doc.id, ...(doc.data() as any) } as Agent;
+          snap.forEach(docu => {
+            const a = { id: docu.id, ...(docu.data() as any) } as Agent;
             merged[a.ownerId] = a; // map theo ownerId để lookup nhanh
           });
         }
@@ -105,6 +112,70 @@ export default function ProgramParticipantsPage() {
     }
   };
 
+  // ====== NEW: Cập nhật trạng thái duyệt/từ chối ======
+  const handleSetStatus = async (p: ProgramParticipant, newStatus: ProgramParticipantStatus) => {
+    if (!p?.id) return;
+    if (p.status === newStatus) return;
+
+    setUpdatingId(p.id);
+    setErr(null);
+    try {
+      await updateDoc(doc(db, 'programParticipants', p.id), {
+        status: newStatus,
+        reviewedAt: serverTimestamp(),
+        reviewedBy: user?.uid || null,
+      });
+
+      // Optimistic update
+      setParticipants(prev =>
+        prev.map(x => (x.id === p.id ? { ...x, status: newStatus } : x))
+      );
+    } catch (e: any) {
+      setErr(e?.message || t('program_participants_page.update_failed'));
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const ActionButtons = ({ p }: { p: ProgramParticipant }) => {
+    const disabled = updatingId === p.id;
+
+    if (p.status === 'pending') {
+      return (
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="success"
+            disabled={disabled}
+            onClick={() => handleSetStatus(p, 'joined')}
+          >
+            {t('program_participants_page.approve')}
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            disabled={disabled}
+            onClick={() => handleSetStatus(p, 'rejected')}
+          >
+            {t('program_participants_page.reject')}
+          </Button>
+        </div>
+      );
+    }
+
+    // Cho phép “Revert to pending” nếu đã joined hoặc rejected
+    return (
+      <Button
+        size="sm"
+        variant="secondary"
+        disabled={disabled}
+        onClick={() => handleSetStatus(p, 'pending')}
+      >
+        {t('program_participants_page.revert_pending')}
+      </Button>
+    );
+  };
+
   const content = useMemo(() => {
     if (loading) return <div className="text-center py-10">Loading…</div>;
     if (err) return <div className="text-center py-3 text-red-600">{err}</div>;
@@ -124,6 +195,7 @@ export default function ProgramParticipantsPage() {
                 <th className="p-3 text-left">{t('program_participants_page.role')}</th>
                 <th className="p-3 text-left">{t('program_participants_page.status')}</th>
                 <th className="p-3 text-left">{t('program_participants_page.joined_at')}</th>
+                <th className="p-3 text-left">{t('program_participants_page.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -137,6 +209,9 @@ export default function ProgramParticipantsPage() {
                     <td className="p-3"><RoleBadge role={p.userRole as Role} /></td>
                     <td className="p-3"><StatusBadge status={p.status} /></td>
                     <td className="p-3">{fmtDate(p.joinedAt as any)}</td>
+                    <td className="p-3">
+                      <ActionButtons p={p} />
+                    </td>
                   </tr>
                 );
               })}
@@ -160,13 +235,16 @@ export default function ProgramParticipantsPage() {
                 <div className="text-xs text-gray-500">
                   {t('program_participants_page.joined_at')}: {fmtDate(p.joinedAt as any)}
                 </div>
+                <div className="pt-2">
+                  <ActionButtons p={p} />
+                </div>
               </div>
             );
           })}
         </div>
       </>
     );
-  }, [loading, err, participants, agentByOwnerId, t]);
+  }, [loading, err, participants, agentByOwnerId, t, updatingId]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

@@ -2427,19 +2427,25 @@
   "join_button": "Join program"
 },
 
-"program_participants_page": {
-  "title": "Program Participants",
-  "no_participants": "No participants yet.",
-  "name": "Name",
-  "phone": "Phone",
-  "address": "Address",
-  "role": "Role",
-  "status": "Status",
-  "joined_at": "Joined at",
-  "status_joined": "Joined",
-  "status_pending": "Pending",
-  "status_rejected": "Rejected"
-},
+ "program_participants_page": {
+    "title": "Program Participants",
+    "no_participants": "No participants yet.",
+    "name": "Name",
+    "phone": "Phone",
+    "address": "Address",
+    "role": "Role",
+    "status": "Status",
+    "joined_at": "Joined at",
+    "status_joined": "Joined",
+    "status_pending": "Pending approval",
+    "status_rejected": "Rejected",
+    "actions": "Actions",
+    "approve": "Approve",
+    "reject": "Reject",
+    "revert_pending": "Revert to pending",
+    "updated_success": "Status updated successfully.",
+    "update_failed": "Failed to update status."
+  },
 
 "actual_result_popup": {
   "title": "Submit Actual Result",

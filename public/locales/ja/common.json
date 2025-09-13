@@ -2387,18 +2387,24 @@
 },
 
 "program_participants_page": {
-  "title": "キャンペーン参加者",
-  "no_participants": "参加者はいません。",
-  "name": "氏名",
-  "phone": "電話番号",
-  "address": "住所",
-  "role": "役割",
-  "status": "ステータス",
-  "joined_at": "参加日時",
-  "status_joined": "参加済み",
-  "status_pending": "保留中",
-  "status_rejected": "拒否"
-},
+    "title": "プログラム参加者",
+    "no_participants": "参加者はまだいません。",
+    "name": "氏名",
+    "phone": "電話番号",
+    "address": "住所",
+    "role": "役割",
+    "status": "ステータス",
+    "joined_at": "参加日時",
+    "status_joined": "参加済み",
+    "status_pending": "承認待ち",
+    "status_rejected": "却下",
+    "actions": "操作",
+    "approve": "承認",
+    "reject": "却下",
+    "revert_pending": "承認待ちに戻す",
+    "updated_success": "ステータスを更新しました。",
+    "update_failed": "ステータスの更新に失敗しました。"
+  },
 
 "actual_result_popup": {
   "title": "実際の結果を送信",

@@ -2408,19 +2408,25 @@
   "join_button": "프로그램 참여"
 },
 
-"program_participants_page": {
-  "title": "프로그램 참여자",
-  "no_participants": "아직 참여자가 없습니다.",
-  "name": "이름",
-  "phone": "전화번호",
-  "address": "주소",
-  "role": "역할",
-  "status": "상태",
-  "joined_at": "참여 시각",
-  "status_joined": "참여됨",
-  "status_pending": "대기 중",
-  "status_rejected": "거절됨"
-},
+ "program_participants_page": {
+    "title": "프로그램 참가자",
+    "no_participants": "아직 참가자가 없습니다.",
+    "name": "이름",
+    "phone": "전화번호",
+    "address": "주소",
+    "role": "역할",
+    "status": "상태",
+    "joined_at": "참여 일시",
+    "status_joined": "참여 완료",
+    "status_pending": "승인 대기",
+    "status_rejected": "거절됨",
+    "actions": "작업",
+    "approve": "승인",
+    "reject": "거절",
+    "revert_pending": "대기로 되돌리기",
+    "updated_success": "상태가 성공적으로 업데이트되었습니다.",
+    "update_failed": "상태 업데이트에 실패했습니다."
+  },
 
 "actual_result_popup": {
   "title": "실제 결과 제출",
