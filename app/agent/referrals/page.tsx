@@ -239,9 +239,18 @@ export default function ReferralManagementPage() {
       <UserTopMenu />
 
       <div className="p-6 mt-1">
-        <h1 className="text-2xl font-semibold mb-4 border-b-2 pb-2">
+      <div className="mb-4 border-b-2 pb-2">
+        <h1 className="text-2xl font-semibold">
           {t('referrals.title', { defaultValue: 'Quản lý giới thiệu khách hàng' })}
         </h1>
+        <p className="mt-1 text-sm text-gray-600">
+          {t('referrals.subtitle', {
+            defaultValue:
+              'Phần này để lưu nội bộ, hệ thống sẽ nhường phần xử lý lại cho khách hàng. Tất cả việc tính hoa hồng bạn cần thực hiện đặt hàng ở "Gian hàng cho thuê".',
+          })}
+        </p>
+      </div>
+
 
         {/* Search / Filters (đơn giản) */}
         <ReferralSearch

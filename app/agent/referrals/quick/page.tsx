@@ -14,6 +14,7 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 
 import { useUser } from '@/src/context/AuthContext';
 import { useAgentReferrals } from '@/src/hooks/useAgentReferrals';
+import { useTranslation } from 'react-i18next';
 
 /* ---------- helpers ---------- */
 const toFsTime = (d?: Date | null) => (d ? Timestamp.fromDate(d) : null);
@@ -50,6 +51,7 @@ function FieldRow({
 
 /* ---------- page ---------- */
 export default function HotelQuickReferralPage() {
+  const { t } = useTranslation('common', { useSuspense: false });
   const { user } = useUser();
   const agentId = user?.uid;
   const { create } = useAgentReferrals(agentId);
@@ -86,7 +88,7 @@ export default function HotelQuickReferralPage() {
 
   const onSubmit = async () => {
     if (!canSubmit) {
-      setNotif({ open: true, ok: false, msg: 'Vui lòng nhập Họ tên & SĐT hợp lệ.' });
+      setNotif({ open: true, ok: false, msg: t('hotel_quick_referral_page.notif.invalid_input') });
       return;
     }
     try {
@@ -124,7 +126,9 @@ export default function HotelQuickReferralPage() {
       setNotif({
         open: true,
         ok: !!id,
-        msg: id ? 'Đã lưu giới thiệu nhanh. Bạn có thể đặt xe cho khách sau.' : 'Không thể lưu giới thiệu.',
+        msg: id
+          ? t('hotel_quick_referral_page.notif.saved_ok')
+          : t('hotel_quick_referral_page.notif.save_fail'),
       });
 
       if (id) {
@@ -141,7 +145,7 @@ export default function HotelQuickReferralPage() {
       }
     } catch (e) {
       console.error(e);
-      setNotif({ open: true, ok: false, msg: 'Lưu thất bại. Vui lòng thử lại.' });
+      setNotif({ open: true, ok: false, msg: t('hotel_quick_referral_page.notif.error_retry') });
     } finally {
       setSubmitting(false);
     }
@@ -152,40 +156,42 @@ export default function HotelQuickReferralPage() {
       <Header />
       <main className="flex-1 px-4 py-6">
         <div className="max-w-2xl mx-auto bg-white border rounded-2xl p-4 sm:p-6 shadow-sm">
-          <h1 className="text-xl sm:text-2xl font-bold mb-4">Giới thiệu khách (Nhanh)</h1>
+          <h1 className="text-xl sm:text-2xl font-bold mb-4">
+            {t('hotel_quick_referral_page.title')}
+          </h1>
 
           {/* Basic */}
           <div className="space-y-3">
-            <FieldRow label="Họ tên" required>
+            <FieldRow label={t('hotel_quick_referral_page.fields.full_name_label')} required>
               <Input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Nguyễn Văn A"
+                placeholder={t('hotel_quick_referral_page.placeholders.full_name_ph')}
                 className="h-10"
               />
             </FieldRow>
 
-            <FieldRow label="Số điện thoại" required>
+            <FieldRow label={t('hotel_quick_referral_page.fields.phone_label')} required>
               <Input
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 inputMode="tel"
-                placeholder="0xxxxxxxxx"
+                placeholder={t('hotel_quick_referral_page.placeholders.phone_ph')}
                 className="h-10"
               />
             </FieldRow>
 
-            <FieldRow label="Ngày dự kiến thuê">
+            <FieldRow label={t('hotel_quick_referral_page.fields.expected_start_label')}>
               <DatePicker
                 selected={expectedStart ?? null}
                 onChange={(d) => setExpectedStart(d)}
                 className="w-full rounded border px-3 py-2 h-10"
-                placeholderText="Chọn ngày"
+                placeholderText={t('hotel_quick_referral_page.placeholders.date_ph')}
               />
             </FieldRow>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <FieldRow label="Số ngày">
+              <FieldRow label={t('hotel_quick_referral_page.fields.days_label')}>
                 <select
                   className="w-full rounded border px-3 py-2 h-10"
                   value={days}
@@ -199,7 +205,7 @@ export default function HotelQuickReferralPage() {
                 </select>
               </FieldRow>
 
-              <FieldRow label="Số lượng xe">
+              <FieldRow label={t('hotel_quick_referral_page.fields.quantity_label')}>
                 <Input
                   type="number"
                   className="h-10"
@@ -211,27 +217,27 @@ export default function HotelQuickReferralPage() {
               </FieldRow>
             </div>
 
-            <FieldRow label="Loại xe (mặc định)">
+            <FieldRow label={t('hotel_quick_referral_page.fields.vehicle_type_default_label')}>
               <select
                 className="w-full rounded border px-3 py-2 h-10"
                 value={vehicleType}
                 onChange={(e) => setVehicleType(e.target.value as typeof vehicleType)}
               >
-                <option value="motorbike">Xe máy</option>
-                <option value="bike">Xe đạp</option>
-                <option value="car">Ô tô</option>
-                <option value="van">Xe van</option>
-                <option value="bus">Xe buýt</option>
-                <option value="other">Khác</option>
+                <option value="motorbike">{t('hotel_quick_referral_page.vehicle_type_options.motorbike')}</option>
+                <option value="bike">{t('hotel_quick_referral_page.vehicle_type_options.bike')}</option>
+                <option value="car">{t('hotel_quick_referral_page.vehicle_type_options.car')}</option>
+                <option value="van">{t('hotel_quick_referral_page.vehicle_type_options.van')}</option>
+                <option value="bus">{t('hotel_quick_referral_page.vehicle_type_options.bus')}</option>
+                <option value="other">{t('hotel_quick_referral_page.vehicle_type_options.other')}</option>
               </select>
             </FieldRow>
 
-            <FieldRow label="Ghi chú">
+            <FieldRow label={t('hotel_quick_referral_page.fields.note_label')}>
               <Textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={3}
-                placeholder="Yêu cầu đặc biệt của khách…"
+                placeholder={t('hotel_quick_referral_page.placeholders.note_ph')}
               />
             </FieldRow>
           </div>
@@ -244,31 +250,31 @@ export default function HotelQuickReferralPage() {
                 checked={hasMate}
                 onChange={(e) => setHasMate(e.target.checked)}
               />
-              Có đồng đội cùng giới thiệu?
+              {t('hotel_quick_referral_page.teammate.has_mate_label')}
             </label>
 
             {hasMate && (
               <div className="mt-3 space-y-3">
-                <FieldRow label="Tên đồng đội" required>
+                <FieldRow label={t('hotel_quick_referral_page.teammate.mate_name_label')} required>
                   <Input
                     value={mateName}
                     onChange={(e) => setMateName(e.target.value)}
-                    placeholder="Anh Tuấn bảo vệ"
+                    placeholder={t('hotel_quick_referral_page.placeholders.mate_name_ph')}
                     className="h-10"
                   />
                 </FieldRow>
 
-                <FieldRow label="SĐT đồng đội">
+                <FieldRow label={t('hotel_quick_referral_page.teammate.mate_phone_label')}>
                   <Input
                     value={matePhone}
                     onChange={(e) => setMatePhone(e.target.value)}
                     inputMode="tel"
-                    placeholder="0xxxxxxxxx (tuỳ chọn)"
+                    placeholder={t('hotel_quick_referral_page.placeholders.mate_phone_ph')}
                     className="h-10"
                   />
                 </FieldRow>
 
-                <FieldRow label="Tỷ lệ chia">
+                <FieldRow label={t('hotel_quick_referral_page.teammate.split_ratio_label')}>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                     <select
                       className="rounded border px-3 py-2 h-10"
@@ -281,10 +287,10 @@ export default function HotelQuickReferralPage() {
                         if (v === '100_0') setSplitSelfPct(100);
                       }}
                     >
-                      <option value="50_50">50% tôi • 50% đồng đội</option>
-                      <option value="70_30">70% tôi • 30% đồng đội</option>
-                      <option value="100_0">100% tôi</option>
-                      <option value="custom">Tuỳ chỉnh</option>
+                      <option value="50_50">{t('hotel_quick_referral_page.teammate.split_presets.50_50')}</option>
+                      <option value="70_30">{t('hotel_quick_referral_page.teammate.split_presets.70_30')}</option>
+                      <option value="100_0">{t('hotel_quick_referral_page.teammate.split_presets.100_0')}</option>
+                      <option value="custom">{t('hotel_quick_referral_page.teammate.split_presets.custom')}</option>
                     </select>
 
                     {splitPreset === 'custom' && (
@@ -299,7 +305,9 @@ export default function HotelQuickReferralPage() {
                         }
                       />
                     )}
-                    <span className="text-sm text-gray-600">(phần trăm của bạn)</span>
+                    <span className="text-sm text-gray-600">
+                      {t('hotel_quick_referral_page.teammate.percent_hint')}
+                    </span>
                   </div>
                 </FieldRow>
               </div>
@@ -313,7 +321,9 @@ export default function HotelQuickReferralPage() {
               onClick={onSubmit}
               disabled={submitting || !canSubmit}
             >
-              {submitting ? 'Đang lưu…' : 'Tạo giới thiệu'}
+              {submitting
+                ? t('hotel_quick_referral_page.buttons.saving')
+                : t('hotel_quick_referral_page.buttons.submit')}
             </Button>
           </div>
         </div>
@@ -324,7 +334,11 @@ export default function HotelQuickReferralPage() {
         open={notif.open}
         onClose={() => setNotif((p) => ({ ...p, open: false }))}
         type={notif.ok ? 'success' : 'error'}
-        title={notif.ok ? 'Thành công' : 'Lỗi'}
+        title={
+          notif.ok
+            ? t('hotel_quick_referral_page.notif.success_title')
+            : t('hotel_quick_referral_page.notif.error_title')
+        }
         description={notif.msg}
       />
     </div>

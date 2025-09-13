@@ -2768,54 +2768,55 @@
 },
 
 "booking_form": {
-  "section_customer": "CUSTOMER INFORMATION",
-  "section_vehicle": "VEHICLE INFORMATION",
-  "section_rental_period": "RENTAL PERIOD",
-  "section_pricing": "PRICING & DEPOSIT",
-  "section_accessories": "ACCESSORIES",
-  "section_battery": "BATTERY",
-  "section_method": "DELIVERY METHOD",
-  "section_station": "RENTAL STATION",
-  "section_notes": "NOTES",
-  "section_status": "STATUS",
-  "full_name": "Full Name",
-  "phone": "Phone Number",
-  "id_number": "ID/Passport Number",
-  "address": "Address",
-  "vehicle_model": "Vehicle Model",
-  "vehicle_color": "Color",
-  "vin": "VIN",
-  "license_plate": "License Plate",
-  "rental_start_hour": "Start Hour",
-  "rental_days": "Rental Days",
-  "base_price": "Base Price (₫/day)",
-  "battery_fee": "Battery Fee (₫)",
-  "total_amount": "Total Amount",
-  "deposit": "Deposit (₫)",
-  "remaining_balance": "Remaining Balance (₫)",
-  "package": "Rental Package",
-  "helmet": "Helmet",
-  "charger": "Charger",
-  "rear_rack": "Rear Rack",
-  "phone_holder": "Phone Holder",
-  "raincoat": "Raincoat",
-  "select_method": "-- Select method --",
-  "pickup_shop": "Pickup at Store",
-  "deliver_address": "Deliver to Address",
-  "delivery_address": "Delivery Address",
-  "select_station": "Select Station",
-  "loading_station": "Loading stations...",
-  "additional_notes": "Additional Notes",
-  "status": "Booking Status",
-  "status_comment": "Status Note",
-  "status_draft": "Draft",
-  "status_confirmed": "Confirmed",
-  "status_completed": "Completed",
-  "status_cancelled": "Cancelled",
-  "save": "Save",
-  "cancel": "Cancel",
-  "validation_required": "Please enter Full Name, Phone and Vehicle Model"
-},
+    "section_customer": "CUSTOMER INFORMATION",
+    "section_vehicle": "VEHICLE INFORMATION",
+    "section_rental_period": "RENTAL PERIOD",
+    "section_pricing": "PRICING & DEPOSIT",
+    "section_accessories": "ACCESSORIES",
+    "section_battery": "BATTERY",
+    "section_method": "PICKUP / DELIVERY METHOD",
+    "section_station": "HANDOVER STATION",
+    "section_notes": "NOTES",
+    "section_status": "STATUS",
+    "status_subtitle": "Before changing the status to \"Completed\", please make sure you have fully paid commissions to affiliates (CTV) and dealers (if any) to avoid complaints.",
+    "full_name": "Full name",
+    "phone": "Phone number",
+    "id_number": "ID number (CMND/CCCD/Passport)",
+    "address": "Address",
+    "vehicle_model": "Vehicle model",
+    "vehicle_color": "Vehicle color",
+    "vin": "Frame number (VIN)",
+    "license_plate": "License plate",
+    "rental_start_hour": "Start time",
+    "rental_days": "Rental days",
+    "base_price": "Base rental price (₫/day)",
+    "battery_fee": "Battery rental fee (₫)",
+    "total_amount": "Total amount",
+    "deposit": "Deposit (₫)",
+    "remaining_balance": "Remaining balance (₫)",
+    "package": "Rental package",
+    "helmet": "Helmet",
+    "charger": "Charger",
+    "rear_rack": "Rear rack",
+    "phone_holder": "Phone holder",
+    "raincoat": "Raincoat",
+    "select_method": "-- Select a method --",
+    "pickup_shop": "Pick up at store",
+    "deliver_address": "Deliver to address",
+    "delivery_address": "Delivery address",
+    "select_station": "Select handover station",
+    "loading_station": "Loading station list...",
+    "additional_notes": "Additional notes",
+    "status": "Order status",
+    "status_comment": "Status note",
+    "status_draft": "Draft",
+    "status_confirmed": "Confirmed",
+    "status_completed": "Completed",
+    "status_cancelled": "Cancelled",
+    "save": "Save",
+    "cancel": "Cancel",
+    "validation_required": "Please enter full name, phone number, and vehicle model"
+  },
 
 
 "admin_dashboard": {
@@ -4269,6 +4270,191 @@
 
  "my_business": {
     "no_business": "No business found."
+  },
+
+  "agent_joined_models_page": {
+    "title": "Models you’ve joined",
+    "loading": "Loading information…",
+    "login_required": "Please sign in to view the list.",
+    "distance_hint": "Tip: Allow location permission in your browser for more accurate distance. If blocked, a default location will be used so the distance can still be estimated."
+  },
+  "error": "Error",
+  "company_name": "Company",
+  "station_name": "Station",
+  "model_name": "Model",
+  "image": "Vehicle image",
+  "price_day": "Daily price",
+  "agent_discount": "Agent discount",
+  "distance": "Distance",
+  "unknown_company": "Unknown",
+  "per_day_suffix": "/day",
+  "km_format": "{{value}} km",
+  "image_alt_model": "Image of {{model}}",
+
+  "agent_joined_models": {
+    "empty": "You haven’t joined any programs with models yet.",
+    "all_stations": "All stations"
+  },
+
+  "agent_commission": {
+    "title": "Agent commissions",
+    "greeting_named": "Hello, {{name}}! Here's an overview of commissions calculated per booking.",
+    "greeting_generic": "Hello! Here's an overview of commissions calculated per booking.",
+    "reload": "Reload",
+    "stats": {
+      "pending": { "title": "Pending", "hint": "Commission awaiting approval" },
+      "approved": { "title": "Approved", "hint": "Will be paid in the cycle" },
+      "paid": { "title": "Paid", "hint": "Already paid" }
+    },
+    "login_required": "Please sign in to view your agent commissions.",
+    "empty": "No commissions yet.",
+    "load_more": "Load more",
+    "booking_label": "Booking:",
+    "computed_at_label": "Computed at:",
+    "program_loading": "Loading program…",
+    "no_program": "No program",
+    "snapshot": {
+      "total_amount": "Order total",
+      "base_price": "Price/day",
+      "rental_days": "Days",
+      "battery_fee": "Battery fee",
+      "deposit": "Deposit"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "paid": "Paid"
+    }
+  },
+
+    "hotel_quick_referral_page": {
+    "title": "Quick customer referral",
+    "fields": {
+      "full_name_label": "Full name",
+      "phone_label": "Phone number",
+      "expected_start_label": "Planned rental date",
+      "days_label": "Number of days",
+      "quantity_label": "Vehicle quantity",
+      "vehicle_type_default_label": "Vehicle type (default)",
+      "note_label": "Note"
+    },
+    "placeholders": {
+      "full_name_ph": "Nguyen Van A",
+      "phone_ph": "0xxxxxxxxx",
+      "date_ph": "Select a date",
+      "note_ph": "Customer special requests…",
+      "mate_name_ph": "Teammate name",
+      "mate_phone_ph": "0xxxxxxxxx (optional)"
+    },
+    "vehicle_type_options": {
+      "motorbike": "Motorbike",
+      "bike": "Bicycle",
+      "car": "Car",
+      "van": "Van",
+      "bus": "Bus",
+      "other": "Other"
+    },
+    "teammate": {
+      "has_mate_label": "Add a teammate as co-referrer?",
+      "mate_name_label": "Teammate name",
+      "mate_phone_label": "Teammate phone",
+      "split_ratio_label": "Split ratio",
+      "split_presets": {
+        "50_50": "50% me • 50% teammate",
+        "70_30": "70% me • 30% teammate",
+        "100_0": "100% me",
+        "custom": "Custom"
+      },
+      "percent_hint": "(your share, %)"
+    },
+    "buttons": {
+      "submit": "Create referral",
+      "saving": "Saving…"
+    },
+    "notif": {
+      "success_title": "Success",
+      "error_title": "Error",
+      "invalid_input": "Please enter a valid full name and phone number.",
+      "saved_ok": "Quick referral saved. You can place a booking for the guest later.",
+      "save_fail": "Could not save the referral.",
+      "error_retry": "Save failed. Please try again."
+    }
+  },
+
+   "agent_joined_models_showcase_page": {
+    "title": "Joined models in programs",
+    "loading": "Loading information…",
+    "login_required": "Please sign in to view the list."
+  },
+
+   "booking": { "book_now": "Book now" },
+  "vehicle": {
+    "bike": "Bicycle",
+    "motorbike": "Motorbike",
+    "car": "Car",
+    "van": "Van / Limo",
+    "bus": "Bus",
+    "other": "Other"
+  },
+  "agent_joined_models_showcase": {
+    "agent_fallback": "Agent",
+    "available_models": "{{n}} models",
+    "total_models": "Total models",
+    "models_unit": "models",
+    "per_day": "/day",
+    "available_count": "{{n}} vehicles available",
+    "empty": "No suitable models found in your joined programs.",
+    "notification": {
+      "title": "Notice",
+      "description": "This feature is under development."
+    }
+  },
+
+  "booking_new_page": {
+    "title": "Book a vehicle",
+    "company_label": "Company:",
+    "loading": "Loading…",
+    "missing_params": "Missing parameters: companyId or modelId. Please go back to the list and click “Book now”.",
+    "model_card": {
+      "vin": "VIN",
+      "plate": "License plate",
+      "color": "Color",
+      "base_price_per_day": "Base/day"
+    },
+    "customer_info": "Renter information",
+    "name": "Full name",
+    "phone": "Phone",
+    "id_card": "ID/Passport",
+    "address": "Address",
+    "rental_info": "Rental information",
+    "start_date": "Start date",
+    "start_time": "Start time",
+    "rental_days": "Rental days",
+    "end_date_auto": "Return date (auto)",
+    "pickup_station": "Pick-up station",
+    "delivery_method": "Handoff method",
+    "pickup_at_shop": "Pickup at shop",
+    "deliver_to_address": "Deliver to address",
+    "delivery_address": "Delivery address",
+    "pricing_and_deposit": "Pricing & deposit",
+    "base_price": "Base/day",
+    "battery_fee": "Battery fee",
+    "total": "Total",
+    "deposit": "Deposit",
+    "remaining": "Remaining",
+    "accessories": "Accessories",
+    "helmet": "Helmet",
+    "charger": "Charger",
+    "phone_holder": "Phone holder",
+    "rear_rack": "Rear rack",
+    "raincoat": "Raincoat",
+    "note": "Note",
+    "status": "Status",
+    "create_booking": "Create booking",
+    "creating": "Creating…",
+    "notice_success": "Booking created successfully!",
+    "notice_validation_error": "Missing data: start date/time and rental days.",
+    "notice_error": "An error occurred while creating the booking."
   }
 
 

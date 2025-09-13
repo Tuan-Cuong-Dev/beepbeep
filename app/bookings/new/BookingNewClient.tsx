@@ -12,6 +12,7 @@ import Footer from '@/src/components/landingpage/Footer';
 import { Button } from '@/src/components/ui/button';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { formatCurrency } from '@/src/utils/formatCurrency';
+import { t } from 'i18next';
 
 
 type AnyRec = Record<string, any>;
@@ -205,202 +206,365 @@ export default function BookingNewPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
 
-      <main className="flex-1">
-        <div className="max-w-5xl mx-auto p-4">
-          {/* Header page */}
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">Đặt xe</h1>
-            <p className="text-sm text-gray-500">
-              Công ty:{' '}
-              <span className="font-medium">
-                {companyLoading ? 'Đang tải…' : companyName || companyId}
+        <main className="flex-1">
+    <div className="max-w-5xl mx-auto p-4">
+      {/* Header page */}
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold text-gray-900">
+          {t('booking_new_page.title', 'Đặt xe')}
+        </h1>
+        <p className="text-sm text-gray-500">
+          {t('booking_new_page.company_label', 'Công ty:')}{' '}
+          <span className="font-medium">
+            {companyLoading ? t('loading', 'Đang tải…') : companyName || companyId}
+          </span>
+        </p>
+      </div>
+
+      {/* Top: Model card */}
+      <div className="bg-white rounded-2xl shadow overflow-hidden md:flex">
+        <div className="relative w-full md:w-1/2 h-[240px] md:h-[320px] border-b md:border-b-0 md:border-r">
+          <Image
+            src={imgSrc}
+            alt={modelMeta?.name || modelId}
+            fill
+            className="object-contain p-4 bg-white"
+          />
+        </div>
+        <div className="p-4 md:w-1/2">
+          <h2 className="text-xl font-semibold">{modelMeta?.name || '—'}</h2>
+          <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-gray-700">
+            <div>
+              <span className="text-gray-500">{t('booking_form.vin', 'Số khung (VIN)')}:</span>{' '}
+              {vehicleMeta?.vehicleID || '—'}
+            </div>
+            <div>
+              <span className="text-gray-500">{t('booking_form.license_plate', 'Biển số')}:</span>{' '}
+              {vehicleMeta?.licensePlate || '—'}
+            </div>
+            <div>
+              <span className="text-gray-500">{t('booking_form.vehicle_color', 'Màu xe')}:</span>{' '}
+              {vehicleMeta?.color || '—'}
+            </div>
+            <div>
+              <span className="text-gray-500">{t('booking_new_page.base_price_label', 'Giá gốc/ngày')}:</span>{' '}
+              <span className="font-semibold text-emerald-600">
+                {formatCurrency(formData?.basePrice || 0)}
               </span>
-            </p>
-          </div>
-
-          {/* Top: Model card */}
-          <div className="bg-white rounded-2xl shadow overflow-hidden md:flex">
-            <div className="relative w-full md:w-1/2 h-[240px] md:h-[320px] border-b md:border-b-0 md:border-r">
-              <Image src={imgSrc} alt={modelMeta?.name || modelId} fill className="object-contain p-4 bg-white" />
-            </div>
-            <div className="p-4 md:w-1/2">
-              <h2 className="text-xl font-semibold">{modelMeta?.name || '—'}</h2>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-gray-700">
-                <div><span className="text-gray-500">VIN:</span> {vehicleMeta?.vehicleID || '—'}</div>
-                <div><span className="text-gray-500">Biển số:</span> {vehicleMeta?.licensePlate || '—'}</div>
-                <div><span className="text-gray-500">Màu:</span> {vehicleMeta?.color || '—'}</div>
-                <div>
-                  <span className="text-gray-500">Giá gốc/ngày:</span>{' '}
-                  <span className="font-semibold text-emerald-600">
-                    {formatCurrency(formData?.basePrice || 0)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Form */}
-          <div className="mt-4 bg-white rounded-2xl shadow p-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Thông tin KH */}
-              <section>
-                <h3 className="font-semibold mb-2">Thông tin khách thuê</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm text-gray-600">Họ tên</label>
-                    <input className="mt-1 w-full rounded border px-3 py-2" value={formData?.fullName || ''} onChange={(e) => setF('fullName', e.target.value)} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-sm text-gray-600">SĐT</label>
-                      <input className="mt-1 w-full rounded border px-3 py-2" value={formData?.phone || ''} onChange={(e) => setF('phone', e.target.value)} />
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-600">CCCD/CMND</label>
-                      <input className="mt-1 w-full rounded border px-3 py-2" value={formData?.idNumber || ''} onChange={(e) => setF('idNumber', e.target.value)} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-600">Địa chỉ</label>
-                    <input className="mt-1 w-full rounded border px-3 py-2" value={formData?.address || ''} onChange={(e) => setF('address', e.target.value)} />
-                  </div>
-                </div>
-              </section>
-
-              {/* Thông tin thuê */}
-              <section>
-                <h3 className="font-semibold mb-2">Thông tin thuê</h3>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-sm text-gray-600">Ngày bắt đầu</label>
-                      <input type="date" className="mt-1 w-full rounded border px-3 py-2" value={formData?.rentalStartDate || ''} onChange={(e) => setF('rentalStartDate', e.target.value)} />
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-600">Giờ bắt đầu</label>
-                      <input type="time" className="mt-1 w-full rounded border px-3 py-2" value={formData?.rentalStartHour || ''} onChange={(e) => setF('rentalStartHour', e.target.value)} />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-sm text-gray-600">Số ngày thuê</label>
-                      <input type="number" min={1} className="mt-1 w-full rounded border px-3 py-2" value={formData?.rentalDays ?? 1} onChange={(e) => setF('rentalDays', Number(e.target.value || 0))} />
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-600">Ngày trả (tự tính)</label>
-                      <input readOnly className="mt-1 w-full rounded border px-3 py-2 bg-gray-50" value={formData?.rentalEndDate ? new Date(formData.rentalEndDate).toLocaleString() : ''} />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-sm text-gray-600">Trạm nhận xe</label>
-                      <select className="mt-1 w-full rounded border px-3 py-2" disabled={stationsLoading} value={formData?.stationId || ''} onChange={(e) => setF('stationId', e.target.value)}>
-                        <option value="">{stationsLoading ? 'Đang tải…' : '— Chọn trạm —'}</option>
-                        {stations?.map((s: any) => (
-                          <option key={s.id} value={s.id}>{s.name || s.id}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-600">Hình thức giao nhận</label>
-                      <select className="mt-1 w-full rounded border px-3 py-2" value={formData?.deliveryMethod || 'Pickup at Shop'} onChange={(e) => setF('deliveryMethod', e.target.value)}>
-                        <option value="Pickup at Shop">Nhận tại cửa hàng</option>
-                        <option value="Deliver to Address">Giao đến địa chỉ</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {formData?.deliveryMethod === 'Deliver to Address' && (
-                    <div>
-                      <label className="text-sm text-gray-600">Địa chỉ giao</label>
-                      <input className="mt-1 w-full rounded border px-3 py-2" value={formData?.deliveryAddress || ''} onChange={(e) => setF('deliveryAddress', e.target.value)} />
-                    </div>
-                  )}
-                </div>
-              </section>
-            </div>
-
-            {/* Giá & phụ phí */}
-            <div className="mt-4 grid md:grid-cols-2 gap-4">
-              <section>
-                <h3 className="font-semibold mb-2">Giá & cọc</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-sm text-gray-600">Giá/ngày (gốc)</label>
-                    <input type="number" className="mt-1 w-full rounded border px-3 py-2" value={formData?.basePrice ?? 0} onChange={(e) => setF('basePrice', Number(e.target.value || 0))} />
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-600">Phí pin</label>
-                    <input type="number" className="mt-1 w-full rounded border px-3 py-2" value={formData?.batteryFee ?? 0} onChange={(e) => setF('batteryFee', Number(e.target.value || 0))} />
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-600">Tổng tiền</label>
-                    <input readOnly className="mt-1 w-full rounded border px-3 py-2 bg-gray-50" value={formData?.totalAmount ?? 0} />
-                    <div className="text-xs text-gray-500 mt-1">{formatCurrency(formData?.totalAmount ?? 0)}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-600">Đặt cọc</label>
-                    <input type="number" className="mt-1 w-full rounded border px-3 py-2" value={formData?.deposit ?? 0} onChange={(e) => setF('deposit', Number(e.target.value || 0))} />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="text-sm text-gray-600">Còn lại</label>
-                    <input readOnly className="mt-1 w-full rounded border px-3 py-2 bg-gray-50" value={formData?.remainingBalance ?? 0} />
-                    <div className="text-xs text-gray-500 mt-1">{formatCurrency(formData?.remainingBalance ?? 0)}</div>
-                  </div>
-                </div>
-              </section>
-
-              <section>
-                <h3 className="font-semibold mb-2">Phụ kiện</h3>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  {(['helmet','charger','phoneHolder','rearRack','raincoat'] as const).map((k) => (
-                    <label key={k} className="inline-flex items-center gap-2">
-                      <input type="checkbox" className="rounded border" checked={!!(formData as any)?.[k]} onChange={(e) => setF(k, e.target.checked)} />
-                      <span>
-                        {k === 'helmet' ? 'Nón bảo hiểm'
-                          : k === 'charger' ? 'Sạc'
-                          : k === 'phoneHolder' ? 'Giá đỡ điện thoại'
-                          : k === 'rearRack' ? 'Baga sau'
-                          : 'Áo mưa'}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-                <div className="mt-3">
-                  <label className="text-sm text-gray-600">Ghi chú</label>
-                  <textarea className="mt-1 w-full rounded border px-3 py-2" rows={3} value={formData?.note || ''} onChange={(e) => setF('note', e.target.value)} />
-                </div>
-              </section>
-            </div>
-
-            {/* Actions */}
-            <div className="mt-5 flex items-center justify-between">
-              <div className="text-sm text-gray-500">
-                Trạng thái: <span className="font-medium">{formData?.bookingStatus || 'draft'}</span>
-              </div>
-              <Button
-                onClick={onSubmit}
-                disabled={submitting || !formData?.rentalStartDate || !formData?.rentalStartHour || !formData?.rentalDays}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                {submitting ? 'Đang tạo…' : 'Tạo booking'}
-              </Button>
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
-      <Footer />
+      {/* Form */}
+      <div className="mt-4 bg-white rounded-2xl shadow p-4">
+        <div className="grid md:grid-cols-2 gap-4">
+          {/* Thông tin KH */}
+          <section>
+            <h3 className="font-semibold mb-2">
+              {t('booking_form.section_customer', 'THÔNG TIN KHÁCH HÀNG')}
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm text-gray-600">
+                  {t('booking_form.full_name', 'Họ tên')}
+                </label>
+                <input
+                  className="mt-1 w-full rounded border px-3 py-2"
+                  value={formData?.fullName || ''}
+                  onChange={(e) => setF('fullName', e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_form.phone', 'Số điện thoại')}
+                  </label>
+                  <input
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    value={formData?.phone || ''}
+                    onChange={(e) => setF('phone', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_form.id_number', 'CMND/CCCD/Hộ chiếu')}
+                  </label>
+                  <input
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    value={formData?.idNumber || ''}
+                    onChange={(e) => setF('idNumber', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">
+                  {t('booking_form.address', 'Địa chỉ')}
+                </label>
+                <input
+                  className="mt-1 w-full rounded border px-3 py-2"
+                  value={formData?.address || ''}
+                  onChange={(e) => setF('address', e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
 
-      <NotificationDialog
-        open={notice.open}
-        onClose={() => setNotice({ open: false })}
-        type={notice.ok ? 'success' : 'error'}
-        title={notice.ok ? 'Thành công' : 'Lỗi'}
-        description={notice.msg || ''}
-      />
+          {/* Thông tin thuê */}
+          <section>
+            <h3 className="font-semibold mb-2">
+              {t('booking_form.section_rental_period', 'THỜI GIAN THUÊ')}
+            </h3>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_new_page.start_date', 'Ngày bắt đầu')}
+                  </label>
+                  <input
+                    type="date"
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    value={formData?.rentalStartDate || ''}
+                    onChange={(e) => setF('rentalStartDate', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_form.rental_start_hour', 'Giờ bắt đầu')}
+                  </label>
+                  <input
+                    type="time"
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    value={formData?.rentalStartHour || ''}
+                    onChange={(e) => setF('rentalStartHour', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_form.rental_days', 'Số ngày thuê')}
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    value={formData?.rentalDays ?? 1}
+                    onChange={(e) => setF('rentalDays', Number(e.target.value || 0))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_new_page.end_date_auto', 'Ngày trả (tự tính)')}
+                  </label>
+                  <input
+                    readOnly
+                    className="mt-1 w-full rounded border px-3 py-2 bg-gray-50"
+                    value={formData?.rentalEndDate ? new Date(formData.rentalEndDate).toLocaleString() : ''}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_form.select_station', 'Chọn trạm giao xe')}
+                  </label>
+                  <select
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    disabled={stationsLoading}
+                    value={formData?.stationId || ''}
+                    onChange={(e) => setF('stationId', e.target.value)}
+                  >
+                    <option value="">
+                      {stationsLoading
+                        ? t('booking_form.loading_station', 'Đang tải danh sách trạm...')
+                        : `— ${t('booking_form.select_station', 'Chọn trạm giao xe')} —`}
+                    </option>
+                    {stations?.map((s: any) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name || s.id}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_form.section_method', 'HÌNH THỨC NHẬN XE')}
+                  </label>
+                  <select
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    value={formData?.deliveryMethod || 'Pickup at Shop'}
+                    onChange={(e) => setF('deliveryMethod', e.target.value)}
+                  >
+                    <option value="Pickup at Shop">
+                      {t('booking_form.pickup_shop', 'Đến cửa hàng nhận xe')}
+                    </option>
+                    <option value="Deliver to Address">
+                      {t('booking_form.deliver_address', 'Giao tận nơi')}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {formData?.deliveryMethod === 'Deliver to Address' && (
+                <div>
+                  <label className="text-sm text-gray-600">
+                    {t('booking_form.delivery_address', 'Địa chỉ giao xe')}
+                  </label>
+                  <input
+                    className="mt-1 w-full rounded border px-3 py-2"
+                    value={formData?.deliveryAddress || ''}
+                    onChange={(e) => setF('deliveryAddress', e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* Giá & phụ phí */}
+        <div className="mt-4 grid md:grid-cols-2 gap-4">
+          <section>
+            <h3 className="font-semibold mb-2">
+              {t('booking_form.section_pricing', 'GIÁ THUÊ & CỌC')}
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm text-gray-600">
+                  {t('booking_form.base_price', 'Giá thuê cơ bản (₫/ngày)')}
+                </label>
+                <input
+                  type="number"
+                  className="mt-1 w-full rounded border px-3 py-2"
+                  value={formData?.basePrice ?? 0}
+                  onChange={(e) => setF('basePrice', Number(e.target.value || 0))}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">
+                  {t('booking_form.battery_fee', 'Phí thuê pin (₫)')}
+                </label>
+                <input
+                  type="number"
+                  className="mt-1 w-full rounded border px-3 py-2"
+                  value={formData?.batteryFee ?? 0}
+                  onChange={(e) => setF('batteryFee', Number(e.target.value || 0))}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">
+                  {t('booking_form.total_amount', 'Tổng tiền')}
+                </label>
+                <input
+                  readOnly
+                  className="mt-1 w-full rounded border px-3 py-2 bg-gray-50"
+                  value={formData?.totalAmount ?? 0}
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  {formatCurrency(formData?.totalAmount ?? 0)}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm text-gray-600">
+                  {t('booking_form.deposit', 'Tiền cọc (₫)')}
+                </label>
+                <input
+                  type="number"
+                  className="mt-1 w-full rounded border px-3 py-2"
+                  value={formData?.deposit ?? 0}
+                  onChange={(e) => setF('deposit', Number(e.target.value || 0))}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="text-sm text-gray-600">
+                  {t('booking_form.remaining_balance', 'Số tiền còn lại (₫)')}
+                </label>
+                <input
+                  readOnly
+                  className="mt-1 w-full rounded border px-3 py-2 bg-gray-50"
+                  value={formData?.remainingBalance ?? 0}
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  {formatCurrency(formData?.remainingBalance ?? 0)}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="font-semibold mb-2">
+              {t('booking_form.section_accessories', 'PHỤ KIỆN')}
+            </h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {(['helmet', 'charger', 'phoneHolder', 'rearRack', 'raincoat'] as const).map((k) => (
+                <label key={k} className="inline-flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="rounded border"
+                    checked={!!(formData as any)?.[k]}
+                    onChange={(e) => setF(k, e.target.checked)}
+                  />
+                  <span>
+                    {k === 'helmet'
+                      ? t('booking_form.helmet', 'Nón bảo hiểm')
+                      : k === 'charger'
+                      ? t('booking_form.charger', 'Bộ sạc')
+                      : k === 'phoneHolder'
+                      ? t('booking_form.phone_holder', 'Giá đỡ điện thoại')
+                      : k === 'rearRack'
+                      ? t('booking_form.rear_rack', 'Gác baga')
+                      : t('booking_form.raincoat', 'Áo mưa')}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-3">
+              <label className="text-sm text-gray-600">
+                {t('booking_form.section_notes', 'GHI CHÚ')}
+              </label>
+              <textarea
+                className="mt-1 w-full rounded border px-3 py-2"
+                rows={3}
+                value={formData?.note || ''}
+                onChange={(e) => setF('note', e.target.value)}
+              />
+            </div>
+          </section>
+        </div>
+
+        {/* Actions */}
+        <div className="mt-5 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            {t('booking_form.status', 'Trạng thái đơn')}: <span className="font-medium">{formData?.bookingStatus || 'draft'}</span>
+          </div>
+          <Button
+            onClick={onSubmit}
+            disabled={
+              submitting ||
+              !formData?.rentalStartDate ||
+              !formData?.rentalStartHour ||
+              !formData?.rentalDays
+            }
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          >
+            {submitting ? t('booking_new_page.creating', 'Đang tạo…') : t('booking_new_page.create_booking', 'Tạo booking')}
+          </Button>
+        </div>
+      </div>
     </div>
-  );
+  </main>
+
+  <Footer />
+
+  <NotificationDialog
+    open={notice.open}
+    onClose={() => setNotice({ open: false })}
+    type={notice.ok ? 'success' : 'error'}
+    title={notice.ok ? t('success', 'Thành công') : t('error', 'Lỗi')}
+    description={notice.msg || ''}
+  />
+</div>
+)
 }

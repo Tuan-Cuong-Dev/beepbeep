@@ -85,7 +85,7 @@ export interface AgentReferral {
 
 /** Payload khi tạo mới từ client (khớp HotelQuickReferralPage) */
 export interface AgentReferralCreateInput {
-  agentId: string;                    // có thể set ở server, để rõ ràng
+  agentId: string;                   
   fullName: string;
   phone: string;
 

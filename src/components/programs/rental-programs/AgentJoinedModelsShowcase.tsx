@@ -224,7 +224,11 @@ async function loadVehiclesFor(
 
 /* ===== Agent brand info ===== */
 type AgentBrandInfo = { name: string; logoUrl?: string; rating?: number; tagline?: string }
-function resolveBrandUrl(url?: string) { return getDirectDriveImageUrl(url) || url }
+
+function resolveBrandUrl(url?: string) {
+  return getDirectDriveImageUrl(url) || url
+}
+
 async function loadAgentBrandInfo(agentId: string): Promise<AgentBrandInfo> {
   const agentRef = doc(db, 'agents', agentId)
   const agentSnap = await getDoc(agentRef)
@@ -237,6 +241,7 @@ async function loadAgentBrandInfo(agentId: string): Promise<AgentBrandInfo> {
       tagline: d.tagline || d.slogan || undefined,
     }
   }
+
   const userRef = doc(db, 'users', agentId)
   const userSnap = await getDoc(userRef)
   if (userSnap.exists()) {
@@ -248,8 +253,11 @@ async function loadAgentBrandInfo(agentId: string): Promise<AgentBrandInfo> {
       tagline: d.tagline || d.slogan || undefined,
     }
   }
+
+  // ⬇️ Fallback luôn có name để thỏa kiểu AgentBrandInfo
   return { name: 'Agent' }
 }
+
 
 /* ===== View types ===== */
 type ModelCardRow = {
@@ -257,7 +265,6 @@ type ModelCardRow = {
   model: VehicleModel
   baseFrom: number | null
   vehicleCount: number
-  // ↓ Gợi ý cho Booking: chiếc có baseFrom thấp nhất
   preferredCompanyId?: string
   preferredStationId?: string
   preferredVehicleId?: string
@@ -322,7 +329,7 @@ export default function AgentJoinedModelsShowcase({
               baseFrom: base,
               vehicleCount: 1,
               preferredCompanyId: v.companyId,
-              preferredStationId: v.stationId,
+              preferredStationId: (v as any).stationId,
               preferredVehicleId: v.id,
             })
           } else {
@@ -330,7 +337,7 @@ export default function AgentJoinedModelsShowcase({
             if (base != null && (cur.baseFrom == null || base < cur.baseFrom)) {
               cur.baseFrom = base
               cur.preferredCompanyId = v.companyId
-              cur.preferredStationId = v.stationId
+              cur.preferredStationId = (v as any).stationId
               cur.preferredVehicleId = v.id
             }
           }
@@ -353,7 +360,7 @@ export default function AgentJoinedModelsShowcase({
     return () => { mounted = false }
   }, [agentId, vehicleModelCollectionName, vehiclesCollectionName, onlyAvailable, limitPerRow])
 
-  /* ==== Group theo type (đÃ CHUẨN HOÁ) ==== */
+  /* ==== Group theo type ==== */
   const grouped = React.useMemo(() => {
     const g: Record<CanonType, ModelCardRow[]> = { bike:[], motorbike:[], car:[], van:[], bus:[], other:[] }
     rows.forEach(r => {
@@ -363,7 +370,7 @@ export default function AgentJoinedModelsShowcase({
     return g
   }, [rows])
 
-  /* ==== Header đẹp + stats ==== */
+  /* ==== Header + stats ==== */
   const { totalModels, perTypeModels } = React.useMemo(() => {
     const totalModels = rows.length
     const perTypeModels: Record<CanonType, number> = { bike:0, motorbike:0, car:0, van:0, bus:0, other:0 }
@@ -383,17 +390,17 @@ export default function AgentJoinedModelsShowcase({
   )
 
   const EnhancedBrandHeader = () => {
-    const name = brand?.name || 'Agent'
+    const name = brand?.name || t('agent_joined_models_showcase.agent_fallback')
     const logo = brand?.logoUrl
     const rating = brand?.rating
 
     const typeMeta: Record<CanonType, { label: string; emoji: string }> = {
-      bike:      { label: t('vehicle.bike', 'Xe đạp'),     emoji: '🚲' },
-      motorbike: { label: t('vehicle.motorbike', 'Xe máy'), emoji: '🛵' },
-      car:       { label: t('vehicle.car', 'Ô tô'),         emoji: '🚗' },
-      van:       { label: t('vehicle.van', 'Van'),          emoji: '🚐' },
-      bus:       { label: t('vehicle.bus', 'Xe bus'),       emoji: '🚌' },
-      other:     { label: t('vehicle.other', 'Khác'),       emoji: '🚘' },
+      bike:      { label: t('vehicle.bike'),      emoji: '🚲' },
+      motorbike: { label: t('vehicle.motorbike'), emoji: '🛵' },
+      car:       { label: t('vehicle.car'),       emoji: '🚗' },
+      van:       { label: t('vehicle.van'),       emoji: '🚐' },
+      bus:       { label: t('vehicle.bus'),       emoji: '🚌' },
+      other:     { label: t('vehicle.other'),     emoji: '🚘' },
     }
 
     return (
@@ -423,17 +430,22 @@ export default function AgentJoinedModelsShowcase({
 
               <div className="shrink-0">
                 <span className="text-xs px-2 py-1 rounded-full" style={{ background: `${BRAND}1A`, color: BRAND }}>
-                  {t('agent_joined_models.available_models', '{{n}} mẫu', { n: totalModels })}
+                  {t('agent_joined_models_showcase.available_models', { n: totalModels })}
                 </span>
               </div>
             </div>
 
             <div className="-mx-1 overflow-x-auto">
               <div className="flex gap-2 px-1 pb-2">
-                <StatChip emoji="📦" label={t('vehicle.total_models', 'Tổng mẫu')} value={totalModels} />
+                <StatChip emoji="📦" label={t('agent_joined_models_showcase.total_models')} value={totalModels} />
                 {TYPE_ORDER.map((k) =>
                   (perTypeModels[k] ?? 0) > 0 ? (
-                    <StatChip key={k} emoji={typeMeta[k].emoji} label={`${typeMeta[k].label} (${t('vehicle.models', 'mẫu')})`} value={perTypeModels[k]} />
+                    <StatChip
+                      key={k}
+                      emoji={typeMeta[k].emoji}
+                      label={`${typeMeta[k].label} (${t('agent_joined_models_showcase.models_unit')})`}
+                      value={perTypeModels[k]}
+                    />
                   ) : null
                 )}
               </div>
@@ -492,7 +504,7 @@ export default function AgentJoinedModelsShowcase({
 
                 <div className="mt-1">
                   <span className="text-sm font-semibold" style={{ color: BRAND }}>
-                    {formatVND(r.baseFrom)}{r.baseFrom != null ? '/ngày' : ''}
+                    {formatVND(r.baseFrom)}{r.baseFrom != null ? ` ${t('agent_joined_models_showcase.per_day')}` : ''}
                   </span>
                 </div>
 
@@ -502,11 +514,11 @@ export default function AgentJoinedModelsShowcase({
                   {typeof r.model.topSpeed === 'number' && <div>🚀 {r.model.topSpeed} km/h</div>}
                   {typeof r.model.range === 'number' && <div>📏 {r.model.range} km</div>}
                   {typeof r.model.maxLoad === 'number' && <div>🏋️ {r.model.maxLoad} kg</div>}
-                  {typeof r.model.capacity === 'number' && <div>🪑 {r.model.capacity} chỗ</div>}
+                  {typeof r.model.capacity === 'number' && <div>🪑 {r.model.capacity}</div>}
                 </div>
 
                 <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                  <span>{t('vehicle.available_count', '{{n}} xe khả dụng', { n: r.vehicleCount })}</span>
+                  <span>{t('agent_joined_models_showcase.available_count', { n: r.vehicleCount })}</span>
                 </div>
 
                 <div className="mt-4">
@@ -517,7 +529,7 @@ export default function AgentJoinedModelsShowcase({
                     style={{ color: BRAND, borderColor: BRAND }}
                     onClick={() => handleBook(r)}
                   >
-                    {t('booking.book_now', 'Đặt xe')}
+                    {t('booking.book_now')}
                   </Button>
                 </div>
               </div>
@@ -544,12 +556,12 @@ export default function AgentJoinedModelsShowcase({
         <div className="max-w-7xl mx-auto">
           {TYPE_ORDER.map((key) => {
             const labelMap: Record<CanonType, string> = {
-              bike: t('vehicle.bike', 'Xe đạp'),
-              motorbike: t('vehicle.motorbike', 'Xe máy'),
-              car: t('vehicle.car', 'Ô tô'),
-              van: t('vehicle.van', 'Van / Limo'),
-              bus: t('vehicle.bus', 'Xe bus'),
-              other: t('vehicle.other', 'Khác'),
+              bike: t('vehicle.bike'),
+              motorbike: t('vehicle.motorbike'),
+              car: t('vehicle.car'),
+              van: t('vehicle.van'),
+              bus: t('vehicle.bus'),
+              other: t('vehicle.other'),
             }
             const data = grouped[key] || []
             return data.length > 0 ? (
@@ -560,7 +572,7 @@ export default function AgentJoinedModelsShowcase({
           {TYPE_ORDER.every((k) => (grouped[k]?.length || 0) === 0) && (
             <div className="px-4 mt-6">
               <div className="rounded-2xl bg-white border p-6 text-sm text-gray-600">
-                {t('agent_joined_models.empty', 'Không có mẫu phù hợp trong các chương trình bạn đã tham gia.')}
+                {t('agent_joined_models_showcase.empty')}
               </div>
             </div>
           )}
@@ -571,8 +583,8 @@ export default function AgentJoinedModelsShowcase({
         open={noticeOpen}
         onClose={() => setNoticeOpen(false)}
         type="info"
-        title={t('vehicleModelSection.notification_title', 'Thông báo')}
-        description={t('vehicleModelSection.notification_description', 'Tính năng đang phát triển.')}
+        title={t('agent_joined_models_showcase.notification.title')}
+        description={t('agent_joined_models_showcase.notification.description')}
       />
     </section>
   )

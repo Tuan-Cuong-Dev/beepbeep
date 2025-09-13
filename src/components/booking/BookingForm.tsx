@@ -254,27 +254,41 @@ export default function BookingForm({
 
       <Section title={t('booking_form.section_status')}>
         <GridCols>{[
-          <Dropdown
-            key="status"
-            label={t('booking_form.status')}
-            value={form.bookingStatus || 'draft'}
-            onChange={(e) => handleChange('bookingStatus', e.target.value)}
-            options={{
-              draft: t('booking_form.status_draft'),
-              confirmed: t('booking_form.status_confirmed'),
-              completed: t('booking_form.status_completed'),
-              cancelled: t('booking_form.status_cancelled'),
-            }}
-          />,
-          <div key="statusNote" className="col-span-full">
-            <label className="block text-sm font-medium mb-1 text-gray-700">{t('booking_form.status_comment')}</label>
-            <Textarea
-              placeholder={t('booking_form.status_comment')}
-              value={form.statusComment || ''}
-              onChange={(e) => handleChange('statusComment', e.target.value)}
-            />
-          </div>,
-        ]}</GridCols>
+        <Dropdown
+          key="status"
+          label={t('booking_form.status')}
+          value={form.bookingStatus || 'draft'}
+          onChange={(e) => handleChange('bookingStatus', e.target.value)}
+          options={{
+            draft: t('booking_form.status_draft'),
+            confirmed: t('booking_form.status_confirmed'),
+            completed: t('booking_form.status_completed'),
+            cancelled: t('booking_form.status_cancelled'),
+          }}
+        />,
+
+        // ⬇️ Subtitle cảnh báo dưới Trạng thái
+        <p
+          key="statusSubtitle"
+          className="col-span-full mt-1 text-xs md:text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2"
+        >
+          {t('booking_form.status_subtitle', {
+            defaultValue:
+              'Trước khi thay đổi trạng thái "Hoàn tất", hãy đảm bảo bạn đã thanh toán đủ hoa hồng cho CTV và đại lý (nếu có) để tránh khiếu nại.',
+          })}
+        </p>,
+
+        <div key="statusNote" className="col-span-full">
+          <label className="block text-sm font-medium mb-1 text-gray-700">
+            {t('booking_form.status_comment')}
+          </label>
+          <Textarea
+            placeholder={t('booking_form.status_comment')}
+            value={form.statusComment || ''}
+            onChange={(e) => handleChange('statusComment', e.target.value)}
+          />
+        </div>,
+      ]}</GridCols>
       </Section>
 
       <div className="flex justify-end gap-4 pt-6 sticky bottom-0 bg-white z-10">

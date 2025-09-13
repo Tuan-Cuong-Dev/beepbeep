@@ -12,7 +12,6 @@ type Props = {
   rows: AgentReferral[];
   pageSize?: number;
 
-  /** Map id -> name để hiển thị “tên” thay vì id */
   companyNameMap?: NameMap;
   stationNameMap?: NameMap;
   programNameMap?: NameMap;
@@ -27,6 +26,13 @@ function maskPhone(p?: string | null) {
   const d = p.replace(/[^\d]/g, '');
   if (d.length <= 6) return d || '—';
   return d.slice(0, 3) + '***' + d.slice(-3);
+}
+
+function clip(s?: string | null, n = 80) {
+  if (!s) return '—';
+  const t = String(s).trim();
+  if (!t) return '—';
+  return t.length > n ? t.slice(0, n) + '…' : t;
 }
 
 function StatusBadge({ s }: { s: AgentReferral['status'] }) {
@@ -54,10 +60,8 @@ const VEHICLE_LABEL: Record<NonNullable<AgentReferral['vehicleType']>, string> =
   other: 'Khác',
 };
 
-/** Lấy tên từ map; fallback id hoặc '—' */
 const nameOf = (id?: string | null, m?: NameMap) => (id ? (m?.[id] || id) : '—');
 
-/** Các trường mở rộng/tương thích ngược (teammate có thể là string hoặc object {name, phone}) */
 function ext(r: AgentReferral) {
   const a = r as any;
 
@@ -85,7 +89,6 @@ function ext(r: AgentReferral) {
   };
 }
 
-/** Suy ra % của Agent từ preset + splitSelfPct */
 function getSplitSelfPct(r: AgentReferral) {
   const { splitPreset, splitSelfPct } = ext(r);
   if (typeof splitSelfPct === 'number') return splitSelfPct;
@@ -93,7 +96,7 @@ function getSplitSelfPct(r: AgentReferral) {
     case '70_30': return 70;
     case '100_0': return 100;
     case '50_50': return 50;
-    default: return undefined; // custom nhưng chưa có số → '—'
+    default: return undefined;
   }
 }
 
@@ -179,6 +182,9 @@ export default function ReferralTable({
             <TableHead className="min-w-[90px]">SL xe</TableHead>
             <TableHead className="min-w-[100px]">Số ngày</TableHead>
 
+            {/* NEW: Note */}
+            <TableHead className="min-w-[240px]">Ghi chú</TableHead>
+
             <TableHead className="min-w-[200px]">Đồng đội</TableHead>
             <TableHead className="min-w-[110px]">Chia % (Bạn/Đội)</TableHead>
             <TableHead className="min-w-[80px]">Khoá</TableHead>
@@ -210,6 +216,11 @@ export default function ReferralTable({
 
                 <TableCell className="text-sm">{e.quantity ?? '—'}</TableCell>
                 <TableCell className="text-sm">{e.rentalDays ?? '—'}</TableCell>
+
+                {/* NEW: Note cell (truncated with tooltip) */}
+                <TableCell className="text-sm max-w-[360px] truncate" title={r.note || ''}>
+                  {clip(r.note, 100)}
+                </TableCell>
 
                 <TableCell className="text-sm">
                   {e.teammateName ? (
@@ -250,7 +261,6 @@ export default function ReferralTable({
         </TableBody>
       </Table>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="text-sm text-gray-600">
           Trang {page}/{totalPages} • Tổng {rows.length}
@@ -290,6 +300,9 @@ export default function ReferralTable({
                   </b>
                 </div>
                 <div>💰 Chia: <b>{splitPair}</b></div>
+
+                {/* NEW: Note full row on mobile */}
+                <div className="col-span-2">📝 {clip(r.note, 120)}</div>
               </div>
 
               <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -317,7 +330,6 @@ export default function ReferralTable({
         );
       })}
 
-      {/* Pagination */}
       <div className="flex items-center justify-between px-1 py-2">
         <div className="text-xs text-gray-600">
           Trang {page}/{totalPages} • Tổng {rows.length}

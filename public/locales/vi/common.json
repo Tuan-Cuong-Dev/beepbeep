@@ -2806,6 +2806,7 @@
   "section_station": "TRẠM GIAO XE",
   "section_notes": "GHI CHÚ",
   "section_status": "TRẠNG THÁI",
+  "status_subtitle": "Trước khi thay đổi trạng thái \"Hoàn tất\", hãy đảm bảo bạn đã thanh toán đủ hoa hồng cho CTV và đại lý (nếu có) để tránh khiếu nại.",
   "full_name": "Họ tên",
   "phone": "Số điện thoại",
   "id_number": "CMND/CCCD/Hộ chiếu",
@@ -4352,6 +4353,198 @@
 
 "my_business": {
     "no_business": "Chưa có doanh nghiệp nào."
+  },
+
+"agent_joined_models_page": {
+    "title": "Mẫu xe đã tham gia chương trình",
+    "loading": "Đang tải thông tin…",
+    "login_required": "Vui lòng đăng nhập để xem danh sách.",
+    "distance_hint": "Mẹo: Hãy cho phép quyền vị trí trong trình duyệt để khoảng cách hiển thị chính xác hơn. Nếu bị chặn, hệ thống dùng vị trí mặc định để vẫn ước lượng được khoảng cách."
+  },
+  "error": "Lỗi",
+  "company_name": "Tên công ty",
+  "station_name": "Tên trạm",
+  "model_name": "Tên model",
+  "image": "Ảnh xe",
+  "price_day": "Giá thuê ngày",
+  "agent_discount": "Chiết khấu CTV",
+  "distance": "Khoảng cách",
+  "unknown_company": "Không rõ",
+  "per_day_suffix": "/ngày",
+  "km_format": "{{value}} km",
+  "image_alt_model": "Ảnh {{model}}",
+
+  "agent_joined_models": {
+    "empty": "Bạn chưa tham gia chương trình nào có mẫu xe.",
+    "all_stations": "Tất cả trạm"
+  },
+
+
+  "agent_commission": {
+    "title": "Hoa hồng cộng tác viên",
+    "greeting_named": "Xin chào, {{name}}! Dưới đây là tổng quan hoa hồng được tính theo từng đơn.",
+    "greeting_generic": "Xin chào! Dưới đây là tổng quan hoa hồng được tính theo từng đơn.",
+    "reload": "Tải lại",
+
+    "stats": {
+      "pending": { "title": "Đang chờ", "hint": "Hoa hồng chờ duyệt" },
+      "approved": { "title": "Đã duyệt", "hint": "Sẽ được trả trong kỳ" },
+      "paid": { "title": "Đã trả", "hint": "Đã thanh toán" }
+    },
+
+    "login_required": "Vui lòng đăng nhập để xem hoa hồng cộng tác viên.",
+    "empty": "Chưa có hoa hồng nào.",
+    "load_more": "Tải thêm",
+
+    "booking_label": "Booking:",
+    "computed_at_label": "Tính lúc:",
+
+    "program_loading": "Đang tải chương trình…",
+    "no_program": "Không có chương trình",
+
+    "snapshot": {
+      "total_amount": "Tổng đơn",
+      "base_price": "Giá/ngày",
+      "rental_days": "Số ngày",
+      "battery_fee": "Phí pin",
+      "deposit": "Đặt cọc"
+    },
+
+    "status": {
+      "pending": "Đang chờ",
+      "approved": "Đã duyệt",
+      "paid": "Đã trả"
+    }
+  },
+
+   "hotel_quick_referral_page": {
+    "title": "Giới thiệu khách (Nhanh)",
+    "fields": {
+      "full_name_label": "Họ tên",
+      "phone_label": "Số điện thoại",
+      "expected_start_label": "Ngày dự kiến thuê",
+      "days_label": "Số ngày",
+      "quantity_label": "Số lượng xe",
+      "vehicle_type_default_label": "Loại xe (mặc định)",
+      "note_label": "Ghi chú"
+    },
+    "placeholders": {
+      "full_name_ph": "Nguyễn Văn A",
+      "phone_ph": "0xxxxxxxxx",
+      "date_ph": "Chọn ngày",
+      "note_ph": "Yêu cầu đặc biệt của khách…",
+      "mate_name_ph": "Tên đồng đội",
+      "mate_phone_ph": "0xxxxxxxxx (tuỳ chọn)"
+    },
+    "vehicle_type_options": {
+      "motorbike": "Xe máy",
+      "bike": "Xe đạp",
+      "car": "Ô tô",
+      "van": "Xe van",
+      "bus": "Xe buýt",
+      "other": "Khác"
+    },
+    "teammate": {
+      "has_mate_label": "Có đồng đội cùng giới thiệu?",
+      "mate_name_label": "Tên đồng đội",
+      "mate_phone_label": "SĐT đồng đội",
+      "split_ratio_label": "Tỷ lệ chia",
+      "split_presets": {
+        "50_50": "50% tôi • 50% đồng đội",
+        "70_30": "70% tôi • 30% đồng đội",
+        "100_0": "100% tôi",
+        "custom": "Tuỳ chỉnh"
+      },
+      "percent_hint": "(phần trăm của bạn)"
+    },
+    "buttons": {
+      "submit": "Tạo giới thiệu",
+      "saving": "Đang lưu…"
+    },
+    "notif": {
+      "success_title": "Thành công",
+      "error_title": "Lỗi",
+      "invalid_input": "Vui lòng nhập Họ tên & SĐT hợp lệ.",
+      "saved_ok": "Đã lưu giới thiệu nhanh. Bạn có thể đặt xe cho khách sau.",
+      "save_fail": "Không thể lưu giới thiệu.",
+      "error_retry": "Lưu thất bại. Vui lòng thử lại."
+    }
+  },
+
+  "agent_joined_models_showcase_page": {
+    "title": "Mẫu xe đã tham gia chương trình",
+    "loading": "Đang tải thông tin…",
+    "login_required": "Vui lòng đăng nhập để xem danh sách."
+  },
+
+ "booking": { "book_now": "Đặt xe" },
+  "vehicle": {
+    "bike": "Xe đạp",
+    "motorbike": "Xe máy",
+    "car": "Ô tô",
+    "van": "Van / Limo",
+    "bus": "Xe buýt",
+    "other": "Khác"
+  },
+  "agent_joined_models_showcase": {
+    "agent_fallback": "Agent",
+    "available_models": "{{n}} mẫu",
+    "total_models": "Tổng mẫu",
+    "models_unit": "mẫu",
+    "per_day": "/ngày",
+    "available_count": "{{n}} xe khả dụng",
+    "empty": "Không có mẫu phù hợp trong các chương trình bạn đã tham gia.",
+    "notification": {
+      "title": "Thông báo",
+      "description": "Tính năng đang phát triển."
+    }
+  },
+
+  "booking_new_page": {
+    "title": "Đặt xe",
+    "company_label": "Công ty:",
+    "loading": "Đang tải…",
+    "missing_params": "Thiếu tham số: companyId hoặc modelId. Hãy quay lại danh sách và bấm “Đặt xe”.",
+    "model_card": {
+      "vin": "VIN",
+      "plate": "Biển số",
+      "color": "Màu",
+      "base_price_per_day": "Giá gốc/ngày"
+    },
+    "customer_info": "Thông tin khách thuê",
+    "name": "Họ tên",
+    "phone": "SĐT",
+    "id_card": "CCCD/CMND",
+    "address": "Địa chỉ",
+    "rental_info": "Thông tin thuê",
+    "start_date": "Ngày bắt đầu",
+    "start_time": "Giờ bắt đầu",
+    "rental_days": "Số ngày thuê",
+    "end_date_auto": "Ngày trả (tự tính)",
+    "pickup_station": "Trạm nhận xe",
+    "delivery_method": "Hình thức giao nhận",
+    "pickup_at_shop": "Nhận tại cửa hàng",
+    "deliver_to_address": "Giao đến địa chỉ",
+    "delivery_address": "Địa chỉ giao",
+    "pricing_and_deposit": "Giá & cọc",
+    "base_price": "Giá/ngày (gốc)",
+    "battery_fee": "Phí pin",
+    "total": "Tổng tiền",
+    "deposit": "Đặt cọc",
+    "remaining": "Còn lại",
+    "accessories": "Phụ kiện",
+    "helmet": "Nón bảo hiểm",
+    "charger": "Sạc",
+    "phone_holder": "Giá đỡ điện thoại",
+    "rear_rack": "Baga sau",
+    "raincoat": "Áo mưa",
+    "note": "Ghi chú",
+    "status": "Trạng thái",
+    "create_booking": "Tạo booking",
+    "creating": "Đang tạo…",
+    "notice_success": "Đặt xe thành công!",
+    "notice_validation_error": "Thiếu dữ liệu: Ngày/giờ bắt đầu và số ngày thuê.",
+    "notice_error": "Có lỗi trong quá trình đặt xe."
   }
 
 

@@ -34,6 +34,7 @@ import {
   documentId,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
+import { useTranslation } from 'react-i18next';
 
 /* =========================================================
    Utilities
@@ -51,6 +52,7 @@ function chunk<T>(arr: T[], size: number): T[][] {
    Component
 ========================================================= */
 export default function AgentCommissionPage() {
+  const { t } = useTranslation('common');
   const { user } = useUser();
   const agentId = user?.uid ?? '';
 
@@ -179,6 +181,10 @@ export default function AgentCommissionPage() {
     void fetchNames();
   }, [items, programNames]);
 
+  const greeting = user?.name
+    ? t('agent_commission.greeting_named', { name: user.name })
+    : t('agent_commission.greeting_generic');
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-emerald-50/60 to-white">
       <Header />
@@ -189,15 +195,15 @@ export default function AgentCommissionPage() {
           <div className="rounded-2xl bg-white shadow-sm border p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Hoa hồng cộng tác viên
+                {t('agent_commission.title')}
               </h1>
               <p className="text-gray-600 mt-1">
-                Xin chào{user?.name ? `, ${user.name}` : ''}! Dưới đây là tổng quan hoa hồng được tính theo từng đơn.
+                {greeting}
               </p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={reload} className="gap-2">
-                <RefreshCw className="h-4 w-4" /> Tải lại
+                <RefreshCw className="h-4 w-4" /> {t('agent_commission.reload')}
               </Button>
             </div>
           </div>
@@ -205,24 +211,24 @@ export default function AgentCommissionPage() {
           {/* Stat cards */}
           <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-3">
             <StatCard
-              title="Đang chờ"
+              title={t('agent_commission.stats.pending.title')}
               value={totals.pending}
               icon={<Clock3 className="h-5 w-5" />}
-              hint="Hoa hồng chờ duyệt"
+              hint={t('agent_commission.stats.pending.hint')}
               tone="amber"
             />
             <StatCard
-              title="Đã duyệt"
+              title={t('agent_commission.stats.approved.title')}
               value={totals.approved}
               icon={<CheckCircle2 className="h-5 w-5" />}
-              hint="Sẽ được trả trong kỳ"
+              hint={t('agent_commission.stats.approved.hint')}
               tone="blue"
             />
             <StatCard
-              title="Đã trả"
+              title={t('agent_commission.stats.paid.title')}
               value={totals.paid}
               icon={<PiggyBank className="h-5 w-5" />}
-              hint="Đã thanh toán"
+              hint={t('agent_commission.stats.paid.hint')}
               tone="emerald"
             />
           </div>
@@ -231,7 +237,7 @@ export default function AgentCommissionPage() {
           <div className="mt-6">
             {!agentId && (
               <div className="rounded-xl bg-white border p-6 text-gray-700">
-                Vui lòng đăng nhập để xem hoa hồng cộng tác viên.
+                {t('agent_commission.login_required')}
               </div>
             )}
 
@@ -239,13 +245,13 @@ export default function AgentCommissionPage() {
               <>
                 {loading && items.length === 0 && (
                   <div className="rounded-xl bg-white border p-6 text-gray-700">
-                    Đang tải…
+                    {t('loading')}
                   </div>
                 )}
 
                 {!loading && error && (
                   <div className="rounded-xl bg-white border p-6 text-red-600">
-                    Lỗi: {String(error)}
+                    {t('error')}: {String(error)}
                   </div>
                 )}
 
@@ -254,7 +260,7 @@ export default function AgentCommissionPage() {
                     <div className="space-y-3">
                       {items.length === 0 ? (
                         <div className="rounded-xl bg-white border p-10 text-center text-gray-500">
-                          Chưa có hoa hồng nào.
+                          {t('agent_commission.empty')}
                         </div>
                       ) : (
                         items.map((it) => (
@@ -280,7 +286,7 @@ export default function AgentCommissionPage() {
                           variant="outline"
                           className="min-w-[160px]"
                         >
-                          {loading ? 'Đang tải…' : 'Tải thêm'}
+                          {loading ? t('loading') : t('agent_commission.load_more')}
                         </Button>
                       </div>
                     )}
@@ -361,53 +367,55 @@ function EntryCard({
   programName?: string;
   progLoading?: boolean;
 }) {
+  const { t } = useTranslation('common');
   return (
     <div className="rounded-2xl bg-white border shadow-sm p-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         {/* Left */}
         <div className="space-y-1 text-sm">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-gray-500">Booking:</span>
+            <span className="text-gray-500">{t('agent_commission.booking_label')}</span>
             <span className="font-medium">{entry.bookingId}</span>
             <ProgramBadge
               name={programName}
               isLoading={
-                progLoading && !!entry.agentProgramId && !programName
+                !!(progLoading && entry.agentProgramId && !programName)
               }
             />
           </div>
           <div className="text-gray-600">
-            Tính lúc: {safeFormatDate(entry.computedAt, 'dd/MM/yyyy HH:mm')}
+            {t('agent_commission.computed_at_label')}{' '}
+            {safeFormatDate(entry.computedAt, 'dd/MM/yyyy HH:mm')}
           </div>
           {entry.snapshot && (
             <div className="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs text-gray-600">
               {'totalAmount' in entry.snapshot && (
                 <Info
-                  kv="Tổng đơn"
+                  kv={t('agent_commission.snapshot.total_amount')}
                   val={formatCurrency(entry.snapshot.totalAmount ?? 0)}
                 />
               )}
               {'basePrice' in entry.snapshot && (
                 <Info
-                  kv="Giá/ngày"
+                  kv={t('agent_commission.snapshot.base_price')}
                   val={formatCurrency(entry.snapshot.basePrice ?? 0)}
                 />
               )}
               {'rentalDays' in entry.snapshot && (
                 <Info
-                  kv="Số ngày"
+                  kv={t('agent_commission.snapshot.rental_days')}
                   val={String(entry.snapshot.rentalDays ?? 0)}
                 />
               )}
               {'batteryFee' in entry.snapshot && (
                 <Info
-                  kv="Phí pin"
+                  kv={t('agent_commission.snapshot.battery_fee')}
                   val={formatCurrency(entry.snapshot.batteryFee ?? 0)}
                 />
               )}
               {'deposit' in entry.snapshot && (
                 <Info
-                  kv="Đặt cọc"
+                  kv={t('agent_commission.snapshot.deposit')}
                   val={formatCurrency(entry.snapshot.deposit ?? 0)}
                 />
               )}
@@ -434,10 +442,11 @@ function ProgramBadge({
   name?: string;
   isLoading?: boolean;
 }) {
+  const { t } = useTranslation('common');
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 text-xs">
       <BadgeInfo className="h-3.5 w-3.5" />
-      {isLoading ? 'Đang tải chương trình…' : name || 'Không có chương trình'}
+      {isLoading ? t('agent_commission.program_loading') : (name || t('agent_commission.no_program'))}
     </span>
   );
 }
@@ -452,18 +461,21 @@ function Info({ kv, val }: { kv: string; val: string }) {
 }
 
 function StatusBadge({ status }: { status: CommissionStatus }) {
+  const { t } = useTranslation('common');
   const color =
     status === 'paid'
       ? 'bg-green-100 text-green-700'
       : status === 'approved'
       ? 'bg-blue-100 text-blue-700'
       : 'bg-amber-100 text-amber-700';
+
   const text =
     status === 'paid'
-      ? 'Đã trả'
+      ? t('agent_commission.status.paid')
       : status === 'approved'
-      ? 'Đã duyệt'
-      : 'Đang chờ';
+      ? t('agent_commission.status.approved')
+      : t('agent_commission.status.pending');
+
   return (
     <span
       className={`inline-block mt-1 px-2 py-1 rounded-full text-xs ${color}`}

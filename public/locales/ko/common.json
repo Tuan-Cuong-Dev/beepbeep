@@ -2748,55 +2748,56 @@
   "confirm": "확인"
 },
 
-"booking_form": {
-  "section_customer": "고객 정보",
-  "section_vehicle": "차량 정보",
-  "section_rental_period": "대여 기간",
-  "section_pricing": "요금 및 보증금",
-  "section_accessories": "액세서리",
-  "section_battery": "배터리",
-  "section_method": "수령 방식",
-  "section_station": "대여 지점",
-  "section_notes": "비고",
-  "section_status": "상태",
-  "full_name": "이름",
-  "phone": "전화번호",
-  "id_number": "신분증/여권 번호",
-  "address": "주소",
-  "vehicle_model": "차량 모델",
-  "vehicle_color": "색상",
-  "vin": "차대 번호 (VIN)",
-  "license_plate": "차량 번호",
-  "rental_start_hour": "시작 시간",
-  "rental_days": "대여 일수",
-  "base_price": "기본 요금 (₫/일)",
-  "battery_fee": "배터리 요금 (₫)",
-  "total_amount": "총액",
-  "deposit": "보증금 (₫)",
-  "remaining_balance": "잔액 (₫)",
-  "package": "대여 패키지",
-  "helmet": "헬멧",
-  "charger": "충전기",
-  "rear_rack": "짐받이",
-  "phone_holder": "휴대폰 거치대",
-  "raincoat": "우비",
-  "select_method": "-- 방식 선택 --",
-  "pickup_shop": "매장에서 수령",
-  "deliver_address": "주소로 배달",
-  "delivery_address": "배달 주소",
-  "select_station": "지점 선택",
-  "loading_station": "지점 목록 불러오는 중...",
-  "additional_notes": "추가 메모",
-  "status": "예약 상태",
-  "status_comment": "상태 메모",
-  "status_draft": "초안",
-  "status_confirmed": "확정됨",
-  "status_completed": "완료됨",
-  "status_cancelled": "취소됨",
-  "save": "저장",
-  "cancel": "취소",
-  "validation_required": "이름, 전화번호, 차량 모델을 입력하세요"
-},
+ "booking_form": {
+    "section_customer": "お客様情報",
+    "section_vehicle": "車両情報",
+    "section_rental_period": "レンタル期間",
+    "section_pricing": "料金とデポジット",
+    "section_accessories": "アクセサリー",
+    "section_battery": "バッテリー",
+    "section_method": "受け取り方法",
+    "section_station": "受け渡しステーション",
+    "section_notes": "備考",
+    "section_status": "ステータス",
+    "status_subtitle": "ステータスを「完了」に変更する前に、（該当する場合）CTV（アフィリエイト）や代理店へのコミッション支払いが完了していることを必ずご確認ください。クレーム防止のためです。",
+    "full_name": "氏名",
+    "phone": "電話番号",
+    "id_number": "身分証番号（CMND/CCCD/パスポート）",
+    "address": "住所",
+    "vehicle_model": "車種 / モデル",
+    "vehicle_color": "車体色",
+    "vin": "フレーム番号（VIN）",
+    "license_plate": "ナンバープレート",
+    "rental_start_hour": "レンタル開始時刻",
+    "rental_days": "レンタル日数",
+    "base_price": "基本料金（₫/日）",
+    "battery_fee": "バッテリーレンタル料（₫）",
+    "total_amount": "合計金額",
+    "deposit": "デポジット（₫）",
+    "remaining_balance": "残金（₫）",
+    "package": "レンタルプラン",
+    "helmet": "ヘルメット",
+    "charger": "充電器",
+    "rear_rack": "リアキャリア",
+    "phone_holder": "スマホホルダー",
+    "raincoat": "レインコート",
+    "select_method": "-- 受け取り方法を選択 --",
+    "pickup_shop": "店舗で受け取り",
+    "deliver_address": "指定住所へ配送",
+    "delivery_address": "配送先住所",
+    "select_station": "受け渡しステーションを選択",
+    "loading_station": "ステーション一覧を読み込み中…",
+    "additional_notes": "追記事項",
+    "status": "注文ステータス",
+    "status_comment": "ステータス備考",
+    "status_draft": "下書き",
+    "status_confirmed": "確定",
+    "status_completed": "完了",
+    "status_cancelled": "キャンセル",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "validation_required": "氏名・電話番号・車種を入力してください"
+  },
 
 "admin_dashboard": {
     "labels": {
@@ -4333,8 +4334,193 @@
 
  "my_business": {
     "no_business": "등록된 사업이 없습니다."
-  }
+  },
 
+"agent_joined_models_page": {
+    "title": "参加中の車両モデル",
+    "loading": "情報を読み込み中…",
+    "login_required": "一覧を表示するにはログインしてください。",
+    "distance_hint": "ヒント：ブラウザで位置情報の許可をオンにすると、距離がより正確に表示されます。拒否されている場合でも既定の位置を用いて距離を概算します."
+  },
+
+  "error": "エラー",
+  "company_name": "会社名",
+  "station_name": "ステーション名",
+  "model_name": "モデル名",
+  "image": "車両画像",
+  "price_day": "日額料金",
+  "agent_discount": "エージェント割引",
+  "distance": "距離",
+  "unknown_company": "不明",
+  "per_day_suffix": "/日",
+  "km_format": "{{value}} km",
+  "image_alt_model": "{{model}} の画像",
+
+  "agent_joined_models": {
+    "empty": "参加中のモデルはまだありません。",
+    "all_stations": "すべてのステーション"
+  },
+
+   "agent_commission": {
+    "title": "에이전트 커미션",
+    "greeting_named": "안녕하세요, {{name}}님! 아래는 예약별로 계산된 커미션 요약입니다.",
+    "greeting_generic": "안녕하세요! 아래는 예약별로 계산된 커미션 요약입니다.",
+    "reload": "새로고침",
+    "stats": {
+      "pending": { "title": "대기", "hint": "승인 대기 중 커미션" },
+      "approved": { "title": "승인됨", "hint": "정산 주기에 지급 예정" },
+      "paid": { "title": "지급완료", "hint": "지급 완료" }
+    },
+    "login_required": "에이전트 커미션을 보려면 로그인하세요.",
+    "empty": "아직 커미션이 없습니다.",
+    "load_more": "더 보기",
+    "booking_label": "예약:",
+    "computed_at_label": "계산 시각:",
+    "program_loading": "프로그램 불러오는 중…",
+    "no_program": "프로그램 없음",
+    "snapshot": {
+      "total_amount": "주문 총액",
+      "base_price": "일일 가격",
+      "rental_days": "일수",
+      "battery_fee": "배터리 요금",
+      "deposit": "보증금"
+    },
+    "status": {
+      "pending": "대기",
+      "approved": "승인됨",
+      "paid": "지급완료"
+    }
+  },
+
+   "hotel_quick_referral_page": {
+    "title": "빠른 고객 추천",
+    "fields": {
+      "full_name_label": "성명",
+      "phone_label": "전화번호",
+      "expected_start_label": "예상 대여 시작일",
+      "days_label": "일수",
+      "quantity_label": "차량 수량",
+      "vehicle_type_default_label": "기본 차량 유형",
+      "note_label": "메모"
+    },
+    "placeholders": {
+      "full_name_ph": "홍길동",
+      "phone_ph": "0xxxxxxxxx",
+      "date_ph": "날짜 선택",
+      "note_ph": "고객의 특별 요청…",
+      "mate_name_ph": "동료 이름",
+      "mate_phone_ph": "0xxxxxxxxx (선택)"
+    },
+    "vehicle_type_options": {
+      "motorbike": "오토바이",
+      "bike": "자전거",
+      "car": "자동차",
+      "van": "밴",
+      "bus": "버스",
+      "other": "기타"
+    },
+    "teammate": {
+      "has_mate_label": "동료 추가(공동 소개)?",
+      "mate_name_label": "동료 이름",
+      "mate_phone_label": "동료 연락처",
+      "split_ratio_label": "배분 비율",
+      "split_presets": {
+        "50_50": "50% 나 • 50% 동료",
+        "70_30": "70% 나 • 30% 동료",
+        "100_0": "100% 나",
+        "custom": "사용자 지정"
+      },
+      "percent_hint": "(본인 비율, %)"
+    },
+    "buttons": {
+      "submit": "소개 생성",
+      "saving": "저장 중…"
+    },
+    "notif": {
+      "success_title": "성공",
+      "error_title": "오류",
+      "invalid_input": "성명과 유효한 전화번호를 입력하세요.",
+      "saved_ok": "빠른 소개가 저장되었습니다. 나중에 고객 예약을 진행할 수 있습니다.",
+      "save_fail": "소개를 저장할 수 없습니다.",
+      "error_retry": "저장에 실패했습니다. 다시 시도해 주세요."
+    }
+  },
+
+   "agent_joined_models_showcase_page": {
+    "title": "프로그램 참여 차량 모델",
+    "loading": "정보 불러오는 중…",
+    "login_required": "목록을 보려면 로그인하세요."
+  },
+
+   "booking": { "book_now": "지금 예약" },
+  "vehicle": {
+    "bike": "자전거",
+    "motorbike": "오토바이",
+    "car": "자동차",
+    "van": "밴 / 리무진",
+    "bus": "버스",
+    "other": "기타"
+  },
+  "agent_joined_models_showcase": {
+    "agent_fallback": "에이전트",
+    "available_models": "모델 {{n}}개",
+    "total_models": "총 모델",
+    "models_unit": "모델",
+    "per_day": "/일",
+    "available_count": "이용 가능 차량 {{n}}대",
+    "empty": "참여한 프로그램에서 해당되는 모델이 없습니다.",
+    "notification": {
+      "title": "알림",
+      "description": "해당 기능은 개발 중입니다."
+    }
+  },
+
+  "booking_new_page": {
+    "title": "車両予約",
+    "company_label": "会社:",
+    "loading": "読み込み中…",
+    "missing_params": "パラメータ不足：companyId または modelId。リストに戻って「今すぐ予約」を押してください。",
+    "model_card": {
+      "vin": "VIN",
+      "plate": "ナンバー",
+      "color": "カラー",
+      "base_price_per_day": "基本/日"
+    },
+    "customer_info": "借主情報",
+    "name": "氏名",
+    "phone": "電話番号",
+    "id_card": "身分証/パスポート",
+    "address": "住所",
+    "rental_info": "レンタル情報",
+    "start_date": "開始日",
+    "start_time": "開始時刻",
+    "rental_days": "日数",
+    "end_date_auto": "返却日時（自動）",
+    "pickup_station": "受け取りステーション",
+    "delivery_method": "受け渡し方法",
+    "pickup_at_shop": "店舗受け取り",
+    "deliver_to_address": "住所へ配送",
+    "delivery_address": "配送先住所",
+    "pricing_and_deposit": "料金・デポジット",
+    "base_price": "基本/日",
+    "battery_fee": "バッテリー料金",
+    "total": "合計",
+    "deposit": "デポジット",
+    "remaining": "残額",
+    "accessories": "アクセサリー",
+    "helmet": "ヘルメット",
+    "charger": "充電器",
+    "phone_holder": "スマホホルダー",
+    "rear_rack": "リアラック",
+    "raincoat": "レインコート",
+    "note": "メモ",
+    "status": "ステータス",
+    "create_booking": "予約を作成",
+    "creating": "作成中…",
+    "notice_success": "予約を作成しました！",
+    "notice_validation_error": "不足データ：開始日時と日数。",
+    "notice_error": "予約作成中にエラーが発生しました。"
+  }
 
 
 
