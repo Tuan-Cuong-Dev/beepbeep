@@ -4545,8 +4545,116 @@
     "notice_success": "Đặt xe thành công!",
     "notice_validation_error": "Thiếu dữ liệu: Ngày/giờ bắt đầu và số ngày thuê.",
     "notice_error": "Có lỗi trong quá trình đặt xe."
-  }
+  },
 
+  "referral_management": {
+    "title": "Quản lý giới thiệu khách hàng",
+    "subtitle": "Phần này để lưu nội bộ, hệ thống sẽ nhường phần xử lý lại cho khách hàng. Tất cả việc tính hoa hồng bạn cần thực hiện đặt hàng ở \"Gian hàng cho thuê\".",
+    "loading_list": "Đang tải danh sách…",
+    "delete_title": "Xoá lead?",
+    "delete_confirm": "Bạn chắc chắn muốn xoá lead này?",
+    "delete_success": "Đã xoá lead.",
+    "delete_failed": "Không thể xoá lead.",
+    "edit_title": "Cập nhật giới thiệu",
+    "create_title": "Tạo giới thiệu",
+    "update_success": "Đã cập nhật lead.",
+    "create_success": "Đã tạo giới thiệu.",
+    "mutate_failed": "Thao tác không thành công.",
+    "cancel_edit": "Huỷ chỉnh sửa"
+  },
+
+   "referrals": {
+    "status": {
+      "new": "Mới",
+      "contacted": "Đã liên hệ",
+      "converted": "Đã chuyển đổi",
+      "rejected": "Từ chối"
+    },
+    "table": {
+      "created_at": "Ngày tạo",
+      "customer": "Khách hàng",
+      "phone_short": "SĐT",
+      "company_station": "Công ty / Trạm",
+      "channel": "Kênh",
+      "vehicle_type": "Loại xe",
+      "qty": "SL xe",
+      "days": "Số ngày",
+      "note": "Ghi chú",
+      "teammate": "Đồng đội",
+      "split_pair": "Chia % (Bạn/Đội)",
+      "locked": "Khoá",
+      "status": "Trạng thái",
+      "expected_start": "Dự kiến thuê",
+      "commission": "Hoa hồng",
+      "actions": "Thao tác",
+      "qty_short": "SL",
+      "days_short": "Ngày",
+      "split_pair_short": "Chia",
+      "expected_short": "Dự kiến"
+    },
+    "form": {
+      "customer_info": "Thông tin khách",
+      "required_hint": "* bắt buộc",
+      "full_name": "Họ tên",
+      "placeholder_full_name": "Nguyễn Văn A",
+      "phone": "Số điện thoại",
+      "placeholder_phone": "090x xxx xxx",
+
+      "rental_details": "Chi tiết thuê",
+      "expected_date": "Ngày dự kiến",
+      "vehicle_type": "Loại phương tiện",
+      "quantity": "Số lượng xe",
+      "rental_days": "Số ngày thuê",
+
+      "station_optional": "Trạm (tùy chọn)",
+      "station_placeholder": "Nhập trạm gần nhất (nếu biết)",
+
+      "contact_channel": "Kênh liên lạc",
+      "preferred_language": "Ngôn ngữ",
+
+      "teammate_and_share": "Đồng đội & chia hoa hồng",
+      "share_you_teammate": "Bạn {{self}}% • Đồng đội {{mate}}%",
+      "teammate_optional": "Đồng đội (tùy chọn)",
+      "teammate_placeholder": "Tên người hỗ trợ (bảo vệ, buồng phòng…)",
+      "split_commission": "Chia hoa hồng",
+      "split": {
+        "50_50": "50% - 50%",
+        "70_30": "70% - 30%",
+        "100_0": "100% - 0%",
+        "custom": "Tùy chỉnh"
+      },
+      "your_share": "Tỷ lệ của bạn {{unit}}",
+
+      "notes_and_options": "Ghi chú & tuỳ chọn",
+      "note": "Ghi chú",
+      "note_placeholder": "Thông tin khách cần, khung giờ nhận xe, màu xe, vị trí giao nhận…",
+      "source_tag": "Nguồn (tag)",
+      "source_placeholder": "HotelLobby / Showroom / Event / ...",
+      "lock_attribution": "Khóa ghi nhận hoa hồng (giữ lead cho bạn)"
+    }
+  },
+  
+  "referrals_search": {
+    "table": {
+      "all": "Tất cả",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "new": "Mới",
+      "contacted": "Đã liên hệ",
+      "converted": "Đã chuyển đổi",
+      "rejected": "Từ chối"
+    },
+    "search": {
+      "label": "Tìm kiếm",
+      "placeholder": "Tên hoặc SĐT…",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "select_date": "Chọn ngày",
+      "clear": "Xóa lọc"
+    }
+  }
+  
 
 
 

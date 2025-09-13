@@ -4520,6 +4520,114 @@
     "notice_success": "予約を作成しました！",
     "notice_validation_error": "不足データ：開始日時と日数。",
     "notice_error": "予約作成中にエラーが発生しました。"
+  },
+
+   "referral_management": {
+    "title": "紹介管理",
+    "subtitle": "このセクションは社内記録用です。以降の対応はお客様側で行います。コミッション計算は「レンタルストア」で注文を作成してください。",
+    "loading_list": "リストを読み込み中…",
+    "delete_title": "リードを削除しますか？",
+    "delete_confirm": "このリードを本当に削除しますか？",
+    "delete_success": "リードを削除しました。",
+    "delete_failed": "リードを削除できません。",
+    "edit_title": "紹介を更新",
+    "create_title": "紹介を作成",
+    "update_success": "紹介を更新しました。",
+    "create_success": "紹介を作成しました。",
+    "mutate_failed": "操作に失敗しました。",
+    "cancel_edit": "編集をキャンセル"
+  },
+
+  "referrals": {
+    "status": {
+      "new": "신규",
+      "contacted": "연락 완료",
+      "converted": "전환 완료",
+      "rejected": "거절됨"
+    },
+    "table": {
+      "created_at": "생성일",
+      "customer": "고객",
+      "phone_short": "전화",
+      "company_station": "업체 / 지점",
+      "channel": "채널",
+      "vehicle_type": "차종",
+      "qty": "대수",
+      "days": "일수",
+      "note": "메모",
+      "teammate": "동료",
+      "split_pair": "배분 % (나/동료)",
+      "locked": "잠금",
+      "status": "상태",
+      "expected_start": "예상 대여일",
+      "commission": "커미션",
+      "actions": "작업",
+      "qty_short": "대수",
+      "days_short": "일수",
+      "split_pair_short": "배분",
+      "expected_short": "예상"
+    },
+        "form": {
+      "customer_info": "고객 정보",
+      "required_hint": "* 필수",
+      "full_name": "성함",
+      "placeholder_full_name": "홍길동",
+      "phone": "전화번호",
+      "placeholder_phone": "010-xxxx-xxxx",
+
+      "rental_details": "대여 상세",
+      "expected_date": "예정일",
+      "vehicle_type": "차량 종류",
+      "quantity": "수량",
+      "rental_days": "대여 일수",
+
+      "station_optional": "지점(선택)",
+      "station_placeholder": "가장 가까운 지점 입력(가능한 경우)",
+
+      "contact_channel": "연락 채널",
+      "preferred_language": "언어",
+
+      "teammate_and_share": "팀원 & 수수료 배분",
+      "share_you_teammate": "당신 {{self}}% • 팀원 {{mate}}%",
+      "teammate_optional": "팀원(선택)",
+      "teammate_placeholder": "도움 준 분 성함(경비, 하우스키핑 등)",
+      "split_commission": "수수료 배분",
+      "split": {
+        "50_50": "50% - 50%",
+        "70_30": "70% - 30%",
+        "100_0": "100% - 0%",
+        "custom": "사용자 지정"
+      },
+      "your_share": "당신의 비율 {{unit}}",
+
+      "notes_and_options": "메모 & 옵션",
+      "note": "메모",
+      "note_placeholder": "고객 요청, 픽업 시간, 색상, 인도 위치 등",
+      "source_tag": "소스(태그)",
+      "source_placeholder": "HotelLobby / Showroom / Event / ...",
+      "lock_attribution": "커미션 귀속 잠금(리드를 귀하에게 유지)"
+    }
+  },
+
+  "referrals_search": {
+    "table": {
+      "all": "전체",
+      "status": "상태"
+    },
+    "status": {
+      "new": "신규",
+      "contacted": "연락 완료",
+      "converted": "전환됨",
+      "rejected": "거절됨"
+    },
+    "search": {
+      "label": "검색",
+      "placeholder": "이름 또는 전화번호…",
+      "from": "시작일",
+      "to": "종료일",
+      "select_date": "날짜 선택",
+      "clear": "필터 지우기"
+    }
   }
 
 

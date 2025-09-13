@@ -65,7 +65,7 @@ function persistStationCache() {
 
 /* ================= Page ================= */
 export default function ReferralManagementPage() {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('common', { useSuspense: false });
   const { user } = useUser();
   const agentId = user?.uid || '';
 
@@ -217,16 +217,16 @@ export default function ReferralManagementPage() {
     setDialog({
       open: true,
       type: 'confirm',
-      title: t('referrals.delete_title', { defaultValue: 'Xoá lead?' }),
-      description: t('referrals.delete_confirm', { defaultValue: 'Bạn chắc chắn muốn xoá lead này?' }),
+      title: t('referral_management.delete_title'),
+      description: t('referral_management.delete_confirm'),
       onConfirm: async () => {
         try {
           await remove(id);
           setDialog((prev) => ({ ...prev, open: false }));
-          showDialog('success', t('referrals.delete_success', { defaultValue: 'Đã xoá lead.' }));
+          showDialog('success', t('referral_management.delete_success'));
         } catch (e) {
           console.error(e);
-          showDialog('error', t('referrals.delete_failed', { defaultValue: 'Không thể xoá lead.' }));
+          showDialog('error', t('referral_management.delete_failed'));
         }
       },
     });
@@ -239,20 +239,16 @@ export default function ReferralManagementPage() {
       <UserTopMenu />
 
       <div className="p-6 mt-1">
-      <div className="mb-4 border-b-2 pb-2">
-        <h1 className="text-2xl font-semibold">
-          {t('referrals.title', { defaultValue: 'Quản lý giới thiệu khách hàng' })}
-        </h1>
-        <p className="mt-1 text-sm text-gray-600">
-          {t('referrals.subtitle', {
-            defaultValue:
-              'Phần này để lưu nội bộ, hệ thống sẽ nhường phần xử lý lại cho khách hàng. Tất cả việc tính hoa hồng bạn cần thực hiện đặt hàng ở "Gian hàng cho thuê".',
-          })}
-        </p>
-      </div>
+        <div className="mb-4 border-b-2 pb-2">
+          <h1 className="text-2xl font-semibold">
+            {t('referral_management.title')}
+          </h1>
+          <p className="mt-1 text-sm text-gray-600">
+            {t('referral_management.subtitle')}
+          </p>
+        </div>
 
-
-        {/* Search / Filters (đơn giản) */}
+        {/* Search / Filters */}
         <ReferralSearch
           initial={filters}
           onChange={(f) => setFilters(f)}
@@ -271,7 +267,7 @@ export default function ReferralManagementPage() {
 
           {loading && (
             <div className="mt-2 text-sm text-gray-500">
-              {t('loading', { defaultValue: 'Đang tải danh sách…' })}
+              {t('referral_management.loading_list')}
             </div>
           )}
 
@@ -290,8 +286,8 @@ export default function ReferralManagementPage() {
         <div ref={formRef} className="mt-6 bg-white rounded-2xl border p-4">
           <h2 className="text-lg font-semibold mb-3">
             {isUpdateMode
-              ? t('referrals.edit_title', { defaultValue: 'Cập nhật giới thiệu' })
-              : t('referrals.create_title', { defaultValue: 'Tạo giới thiệu' })}
+              ? t('referral_management.edit_title')
+              : t('referral_management.create_title')}
           </h2>
 
           <ReferralForm
@@ -345,7 +341,7 @@ export default function ReferralManagementPage() {
                     attributionLocked: !!val.attributionLocked,
                   });
                   setEditing(null);
-                  showDialog('success', t('referrals.update_success', { defaultValue: 'Đã cập nhật lead.' }));
+                  showDialog('success', t('referral_management.update_success'));
                 } else {
                   const id = await create({
                     fullName: val.fullName,
@@ -371,12 +367,12 @@ export default function ReferralManagementPage() {
                     agentId: ''
                   });
                   if (id) {
-                    showDialog('success', t('referrals.create_success', { defaultValue: 'Đã tạo giới thiệu.' }));
+                    showDialog('success', t('referral_management.create_success'));
                   }
                 }
               } catch (e) {
                 console.error(e);
-                showDialog('error', t('referrals.mutate_failed', { defaultValue: 'Thao tác không thành công.' }));
+                showDialog('error', t('referral_management.mutate_failed'));
               }
             }}
           />
@@ -387,7 +383,7 @@ export default function ReferralManagementPage() {
                 className="text-sm text-gray-600 underline"
                 onClick={() => setEditing(null)}
               >
-                {t('referrals.cancel_edit', { defaultValue: 'Huỷ chỉnh sửa' })}
+                {t('referral_management.cancel_edit')}
               </button>
             </div>
           )}

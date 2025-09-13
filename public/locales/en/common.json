@@ -4455,8 +4455,115 @@
     "notice_success": "Booking created successfully!",
     "notice_validation_error": "Missing data: start date/time and rental days.",
     "notice_error": "An error occurred while creating the booking."
-  }
+  },
 
+  "referral_management": {
+    "title": "Referral management",
+    "subtitle": "This section stores internal referrals; customers will handle the journey themselves. To calculate commissions, please place orders in the “Rental storefront”.",
+    "loading_list": "Loading list…",
+    "delete_title": "Delete lead?",
+    "delete_confirm": "Are you sure you want to delete this lead?",
+    "delete_success": "Lead deleted.",
+    "delete_failed": "Unable to delete lead.",
+    "edit_title": "Update referral",
+    "create_title": "Create referral",
+    "update_success": "Referral updated.",
+    "create_success": "Referral created.",
+    "mutate_failed": "Action failed.",
+    "cancel_edit": "Cancel editing"
+  },
+
+  "referrals": {
+    "status": {
+      "new": "New",
+      "contacted": "Contacted",
+      "converted": "Converted",
+      "rejected": "Rejected"
+    },
+    "table": {
+      "created_at": "Created at",
+      "customer": "Customer",
+      "phone_short": "Phone",
+      "company_station": "Company / Station",
+      "channel": "Channel",
+      "vehicle_type": "Vehicle type",
+      "qty": "Quantity",
+      "days": "Days",
+      "note": "Note",
+      "teammate": "Teammate",
+      "split_pair": "Split % (You/Teammate)",
+      "locked": "Locked",
+      "status": "Status",
+      "expected_start": "Expected start",
+      "commission": "Commission",
+      "actions": "Actions",
+      "qty_short": "Qty",
+      "days_short": "Days",
+      "split_pair_short": "Split",
+      "expected_short": "Expected"
+    },
+      "form": {
+      "customer_info": "Customer info",
+      "required_hint": "* required",
+      "full_name": "Full name",
+      "placeholder_full_name": "John Doe",
+      "phone": "Phone number",
+      "placeholder_phone": "090x xxx xxx",
+
+      "rental_details": "Rental details",
+      "expected_date": "Expected date",
+      "vehicle_type": "Vehicle type",
+      "quantity": "Quantity",
+      "rental_days": "Rental days",
+
+      "station_optional": "Station (optional)",
+      "station_placeholder": "Enter nearest station (if known)",
+
+      "contact_channel": "Contact channel",
+      "preferred_language": "Language",
+
+      "teammate_and_share": "Teammate & commission split",
+      "share_you_teammate": "You {{self}}% • Teammate {{mate}}%",
+      "teammate_optional": "Teammate (optional)",
+      "teammate_placeholder": "Helper’s name (security, housekeeping…)",
+      "split_commission": "Commission split",
+      "split": {
+        "50_50": "50% - 50%",
+        "70_30": "70% - 30%",
+        "100_0": "100% - 0%",
+        "custom": "Custom"
+      },
+      "your_share": "Your share {{unit}}",
+
+      "notes_and_options": "Notes & options",
+      "note": "Note",
+      "note_placeholder": "Customer needs, pickup time, color, handover location…",
+      "source_tag": "Source (tag)",
+      "source_placeholder": "HotelLobby / Showroom / Event / ...",
+      "lock_attribution": "Lock commission attribution (keep this lead for you)"
+    }
+  },
+
+  "referrals_search": {
+    "table": {
+      "all": "All",
+      "status": "Status"
+    },
+    "status": {
+      "new": "New",
+      "contacted": "Contacted",
+      "converted": "Converted",
+      "rejected": "Rejected"
+    },
+    "search": {
+      "label": "Search",
+      "placeholder": "Name or phone…",
+      "from": "From date",
+      "to": "To date",
+      "select_date": "Select a date",
+      "clear": "Clear filters"
+    }
+  }
 
 
 

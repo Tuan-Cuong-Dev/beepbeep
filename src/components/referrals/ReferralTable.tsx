@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/src/components/ui/table';
 import { Button } from '@/src/components/ui/button';
 import type { AgentReferral } from '@/src/lib/agents/referralTypes';
@@ -36,6 +37,7 @@ function clip(s?: string | null, n = 80) {
 }
 
 function StatusBadge({ s }: { s: AgentReferral['status'] }) {
+  const { t } = useTranslation('common', { useSuspense: false });
   const map: Record<AgentReferral['status'], string> = {
     new: 'bg-blue-50 text-blue-700',
     contacted: 'bg-amber-50 text-amber-700',
@@ -43,22 +45,13 @@ function StatusBadge({ s }: { s: AgentReferral['status'] }) {
     rejected: 'bg-red-50 text-red-700',
   };
   const label: Record<AgentReferral['status'], string> = {
-    new: 'Mới',
-    contacted: 'Đã liên hệ',
-    converted: 'Đã chuyển đổi',
-    rejected: 'Từ chối',
+    new: t('referrals.status.new', { defaultValue: 'Mới' }),
+    contacted: t('referrals.status.contacted', { defaultValue: 'Đã liên hệ' }),
+    converted: t('referrals.status.converted', { defaultValue: 'Đã chuyển đổi' }),
+    rejected: t('referrals.status.rejected', { defaultValue: 'Từ chối' }),
   };
   return <span className={`px-2 py-0.5 rounded-full text-xs ${map[s]}`}>{label[s]}</span>;
 }
-
-const VEHICLE_LABEL: Record<NonNullable<AgentReferral['vehicleType']>, string> = {
-  bike: 'Xe đạp',
-  motorbike: 'Xe máy',
-  car: 'Ô tô',
-  van: 'Xe van',
-  bus: 'Xe buýt',
-  other: 'Khác',
-};
 
 const nameOf = (id?: string | null, m?: NameMap) => (id ? (m?.[id] || id) : '—');
 
@@ -107,7 +100,7 @@ function fmtSplitPair(r: AgentReferral) {
   return `${self}% / ${mate}%`;
 }
 
-export default function ReferralTable({
+const ReferralTable = ({
   rows,
   pageSize = 10,
   companyNameMap,
@@ -116,7 +109,18 @@ export default function ReferralTable({
   onView,
   onEdit,
   onDelete,
-}: Props) {
+}: Props) => {
+  const { t } = useTranslation('common', { useSuspense: false });
+
+  const VEHICLE_LABEL: Record<NonNullable<AgentReferral['vehicleType']>, string> = {
+    bike: t('vehicle.bike', { defaultValue: 'Xe đạp' }),
+    motorbike: t('vehicle.motorbike', { defaultValue: 'Xe máy' }),
+    car: t('vehicle.car', { defaultValue: 'Ô tô' }),
+    van: t('vehicle.van', { defaultValue: 'Xe van' }),
+    bus: t('vehicle.bus', { defaultValue: 'Xe buýt' }),
+    other: t('vehicle.other', { defaultValue: 'Khác' }),
+  };
+
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<
     'createdAt' | 'status' | 'fullName' | 'companyName' | 'programName'
@@ -168,31 +172,60 @@ export default function ReferralTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="min-w-[140px] cursor-pointer" onClick={() => toggleSort('createdAt')}>Ngày tạo</TableHead>
-            <TableHead className="min-w-[160px] cursor-pointer" onClick={() => toggleSort('fullName')}>Khách hàng</TableHead>
-            <TableHead className="min-w-[120px]">SĐT</TableHead>
-
-            <TableHead className="min-w-[200px] cursor-pointer" onClick={() => toggleSort('companyName')}>
-              Công ty / Trạm
+            <TableHead className="min-w-[140px] cursor-pointer" onClick={() => toggleSort('createdAt')}>
+              {t('referrals.table.created_at', { defaultValue: 'Ngày tạo' })}
+            </TableHead>
+            <TableHead className="min-w-[160px] cursor-pointer" onClick={() => toggleSort('fullName')}>
+              {t('referrals.table.customer', { defaultValue: 'Khách hàng' })}
+            </TableHead>
+            <TableHead className="min-w-[120px]">
+              {t('referrals.table.phone_short', { defaultValue: 'SĐT' })}
             </TableHead>
 
-            <TableHead className="min-w-[120px]">Kênh</TableHead>
-            <TableHead className="min-w-[120px]">Loại xe</TableHead>
+            <TableHead className="min-w-[200px] cursor-pointer" onClick={() => toggleSort('companyName')}>
+              {t('referrals.table.company_station', { defaultValue: 'Công ty / Trạm' })}
+            </TableHead>
 
-            <TableHead className="min-w-[90px]">SL xe</TableHead>
-            <TableHead className="min-w-[100px]">Số ngày</TableHead>
+            <TableHead className="min-w-[120px]">
+              {t('referrals.table.channel', { defaultValue: 'Kênh' })}
+            </TableHead>
+            <TableHead className="min-w-[120px]">
+              {t('referrals.table.vehicle_type', { defaultValue: 'Loại xe' })}
+            </TableHead>
 
-            {/* NEW: Note */}
-            <TableHead className="min-w-[240px]">Ghi chú</TableHead>
+            <TableHead className="min-w-[90px]">
+              {t('referrals.table.qty', { defaultValue: 'SL xe' })}
+            </TableHead>
+            <TableHead className="min-w-[100px]">
+              {t('referrals.table.days', { defaultValue: 'Số ngày' })}
+            </TableHead>
 
-            <TableHead className="min-w-[200px]">Đồng đội</TableHead>
-            <TableHead className="min-w-[110px]">Chia % (Bạn/Đội)</TableHead>
-            <TableHead className="min-w-[80px]">Khoá</TableHead>
+            <TableHead className="min-w-[240px]">
+              {t('referrals.table.note', { defaultValue: 'Ghi chú' })}
+            </TableHead>
 
-            <TableHead className="min-w-[120px] cursor-pointer" onClick={() => toggleSort('status')}>Trạng thái</TableHead>
-            <TableHead className="min-w-[130px]">Dự kiến thuê</TableHead>
-            <TableHead className="min-w-[130px]">Hoa hồng</TableHead>
-            <TableHead className="min-w-[160px]" style={{ textAlign: 'right' }}>Thao tác</TableHead>
+            <TableHead className="min-w-[200px]">
+              {t('referrals.table.teammate', { defaultValue: 'Đồng đội' })}
+            </TableHead>
+            <TableHead className="min-w-[110px]">
+              {t('referrals.table.split_pair', { defaultValue: 'Chia % (Bạn/Đội)' })}
+            </TableHead>
+            <TableHead className="min-w-[80px]">
+              {t('referrals.table.locked', { defaultValue: 'Khoá' })}
+            </TableHead>
+
+            <TableHead className="min-w-[120px] cursor-pointer" onClick={() => toggleSort('status')}>
+              {t('referrals.table.status', { defaultValue: 'Trạng thái' })}
+            </TableHead>
+            <TableHead className="min-w-[130px]">
+              {t('referrals.table.expected_start', { defaultValue: 'Dự kiến thuê' })}
+            </TableHead>
+            <TableHead className="min-w-[130px]">
+              {t('referrals.table.commission', { defaultValue: 'Hoa hồng' })}
+            </TableHead>
+            <TableHead className="min-w-[160px]" style={{ textAlign: 'right' }}>
+              {t('referrals.table.actions', { defaultValue: 'Thao tác' })}
+            </TableHead>
           </TableRow>
         </TableHeader>
 
@@ -212,12 +245,13 @@ export default function ReferralTable({
                 </TableCell>
 
                 <TableCell className="text-sm">{r.contactChannel || '—'}</TableCell>
-                <TableCell className="text-sm">{r.vehicleType ? VEHICLE_LABEL[r.vehicleType] : '—'}</TableCell>
+                <TableCell className="text-sm">
+                  {r.vehicleType ? VEHICLE_LABEL[r.vehicleType] : '—'}
+                </TableCell>
 
                 <TableCell className="text-sm">{e.quantity ?? '—'}</TableCell>
                 <TableCell className="text-sm">{e.rentalDays ?? '—'}</TableCell>
 
-                {/* NEW: Note cell (truncated with tooltip) */}
                 <TableCell className="text-sm max-w-[360px] truncate" title={r.note || ''}>
                   {clip(r.note, 100)}
                 </TableCell>
@@ -250,9 +284,21 @@ export default function ReferralTable({
 
                 <TableCell style={{ textAlign: 'right' }}>
                   <div className="flex justify-end gap-2">
-                    {onView && <Button variant="outline" size="sm" onClick={() => onView(r)}>Xem</Button>}
-                    {onEdit && <Button variant="outline" size="sm" onClick={() => onEdit(r)}>Sửa</Button>}
-                    {onDelete && <Button variant="destructive" size="sm" onClick={() => onDelete(r)}>Xoá</Button>}
+                    {onView && (
+                      <Button variant="outline" size="sm" onClick={() => onView(r)}>
+                        {t('actions.view', { defaultValue: 'Xem' })}
+                      </Button>
+                    )}
+                    {onEdit && (
+                      <Button variant="outline" size="sm" onClick={() => onEdit(r)}>
+                        {t('actions.edit', { defaultValue: 'Sửa' })}
+                      </Button>
+                    )}
+                    {onDelete && (
+                      <Button variant="destructive" size="sm" onClick={() => onDelete(r)}>
+                        {t('actions.delete', { defaultValue: 'Xoá' })}
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -263,11 +309,28 @@ export default function ReferralTable({
 
       <div className="flex items-center justify-between px-4 py-3">
         <div className="text-sm text-gray-600">
-          Trang {page}/{totalPages} • Tổng {rows.length}
+          {t('pagination.page_status', {
+            defaultValue: 'Trang {{page}}/{{total}} • Tổng {{count}}',
+            page,
+            total: totalPages,
+            count: rows.length,
+          })}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Trước</Button>
-          <Button variant="outline" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Sau</Button>
+          <Button
+            variant="outline"
+            disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            {t('pagination.prev', { defaultValue: 'Trước' })}
+          </Button>
+          <Button
+            variant="outline"
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          >
+            {t('pagination.next', { defaultValue: 'Sau' })}
+          </Button>
         </div>
       </div>
     </div>
@@ -281,7 +344,9 @@ export default function ReferralTable({
         return (
           <div key={r.id} className="bg-white rounded-2xl border shadow-sm overflow-hidden">
             <div className="p-3">
-              <div className="text-xs text-gray-500">{safeFormatDate(r.createdAt as any, 'dd/MM/yyyy HH:mm')}</div>
+              <div className="text-xs text-gray-500">
+                {safeFormatDate(r.createdAt as any, 'dd/MM/yyyy HH:mm')}
+              </div>
               <div className="text-base font-semibold">{r.fullName}</div>
               <div className="text-sm text-gray-700">{maskPhone(r.phone)}</div>
 
@@ -290,27 +355,38 @@ export default function ReferralTable({
                 <div>🚏 {nameOf(r.stationId, stationNameMap)}</div>
                 <div>📞 {r.contactChannel || '—'}</div>
                 <div>🚘 {r.vehicleType ? VEHICLE_LABEL[r.vehicleType] : '—'}</div>
-                <div>🛵 SL: <b>{e.quantity ?? '—'}</b></div>
-                <div>🗓️ Ngày: <b>{e.rentalDays ?? '—'}</b></div>
                 <div>
-                  👥 Đồng đội:{' '}
+                  🛵 {t('referrals.table.qty_short', { defaultValue: 'SL' })}:{' '}
+                  <b>{e.quantity ?? '—'}</b>
+                </div>
+                <div>
+                  🗓️ {t('referrals.table.days_short', { defaultValue: 'Ngày' })}:{' '}
+                  <b>{e.rentalDays ?? '—'}</b>
+                </div>
+                <div>
+                  👥 {t('referrals.table.teammate', { defaultValue: 'Đồng đội' })}:{' '}
                   <b>
                     {e.teammateName || '—'}
                     {e.teammatePhone ? ` (${maskPhone(e.teammatePhone)})` : ''}
                   </b>
                 </div>
-                <div>💰 Chia: <b>{splitPair}</b></div>
+                <div>
+                  💰 {t('referrals.table.split_pair_short', { defaultValue: 'Chia' })}:{' '}
+                  <b>{splitPair}</b>
+                </div>
 
-                {/* NEW: Note full row on mobile */}
                 <div className="col-span-2">📝 {clip(r.note, 120)}</div>
               </div>
 
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <StatusBadge s={r.status} />
                 <span className="text-xs text-gray-600">
-                  Dự kiến: <b>{r.expectedStart ? safeFormatDate(r.expectedStart as any, 'dd/MM/yyyy') : '—'}</b>
+                  {t('referrals.table.expected_short', { defaultValue: 'Dự kiến' })}:{' '}
+                  <b>{r.expectedStart ? safeFormatDate(r.expectedStart as any, 'dd/MM/yyyy') : '—'}</b>
                 </span>
-                <span className="text-xs">{e.attributionLocked ? '🔒 Khoá' : ''}</span>
+                <span className="text-xs">
+                  {ext(r).attributionLocked ? `🔒 ${t('referrals.table.locked', { defaultValue: 'Khoá' })}` : ''}
+                </span>
                 <span className="text-xs text-emerald-700 font-semibold">
                   {typeof r.commissionAmount === 'number'
                     ? r.commissionAmount.toLocaleString('vi-VN') + '₫'
@@ -320,9 +396,21 @@ export default function ReferralTable({
 
               {(onView || onEdit || onDelete) && (
                 <div className="mt-3 flex justify-end gap-2">
-                  {onView && <Button variant="outline" size="sm" onClick={() => onView(r)}>Xem</Button>}
-                  {onEdit && <Button variant="outline" size="sm" onClick={() => onEdit(r)}>Sửa</Button>}
-                  {onDelete && <Button variant="destructive" size="sm" onClick={() => onDelete(r)}>Xoá</Button>}
+                  {onView && (
+                    <Button variant="outline" size="sm" onClick={() => onView(r)}>
+                      {t('actions.view', { defaultValue: 'Xem' })}
+                    </Button>
+                  )}
+                  {onEdit && (
+                    <Button variant="outline" size="sm" onClick={() => onEdit(r)}>
+                      {t('actions.edit', { defaultValue: 'Sửa' })}
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button variant="destructive" size="sm" onClick={() => onDelete(r)}>
+                      {t('actions.delete', { defaultValue: 'Xoá' })}
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
@@ -332,11 +420,30 @@ export default function ReferralTable({
 
       <div className="flex items-center justify-between px-1 py-2">
         <div className="text-xs text-gray-600">
-          Trang {page}/{totalPages} • Tổng {rows.length}
+          {t('pagination.page_status', {
+            defaultValue: 'Trang {{page}}/{{total}} • Tổng {{count}}',
+            page,
+            total: totalPages,
+            count: rows.length,
+          })}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Trước</Button>
-          <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Sau</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            {t('pagination.prev', { defaultValue: 'Trước' })}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          >
+            {t('pagination.next', { defaultValue: 'Sau' })}
+          </Button>
         </div>
       </div>
     </div>
@@ -348,4 +455,6 @@ export default function ReferralTable({
       <Desktop />
     </div>
   );
-}
+};
+
+export default ReferralTable;

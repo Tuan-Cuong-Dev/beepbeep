@@ -4499,6 +4499,113 @@
     "notice_success": "예약이 성공적으로 생성되었습니다!",
     "notice_validation_error": "필수 데이터 누락: 시작 일시 및 대여 일수.",
     "notice_error": "예약 생성 중 오류가 발생했습니다."
+  },
+
+  "referral_management": {
+    "title": "추천 관리",
+    "subtitle": "이 섹션은 내부 보관용입니다. 고객은 이후 절차를 스스로 진행합니다. 커미션 정산은 ‘대여 스토어’에서 주문을 생성해 주세요.",
+    "loading_list": "목록을 불러오는 중…",
+    "delete_title": "리드를 삭제할까요?",
+    "delete_confirm": "이 리드를 정말 삭제하시겠습니까?",
+    "delete_success": "리드를 삭제했습니다.",
+    "delete_failed": "리드를 삭제할 수 없습니다.",
+    "edit_title": "추천 수정",
+    "create_title": "추천 생성",
+    "update_success": "추천을 업데이트했습니다.",
+    "create_success": "추천을 생성했습니다.",
+    "mutate_failed": "작업에 실패했습니다.",
+    "cancel_edit": "수정 취소"
+  },
+  "referrals": {
+    "status": {
+      "new": "新規",
+      "contacted": "連絡済み",
+      "converted": "成約済み",
+      "rejected": "却下"
+    },
+    "table": {
+      "created_at": "作成日",
+      "customer": "顧客",
+      "phone_short": "電話",
+      "company_station": "会社 / ステーション",
+      "channel": "チャネル",
+      "vehicle_type": "車種",
+      "qty": "台数",
+      "days": "日数",
+      "note": "メモ",
+      "teammate": "チームメイト",
+      "split_pair": "分配 %（あなた/相手）",
+      "locked": "ロック",
+      "status": "ステータス",
+      "expected_start": "予定レンタル日",
+      "commission": "コミッション",
+      "actions": "操作",
+      "qty_short": "台数",
+      "days_short": "日数",
+      "split_pair_short": "分配",
+      "expected_short": "予定"
+    },
+       "form": {
+      "customer_info": "顧客情報",
+      "required_hint": "※必須",
+      "full_name": "氏名",
+      "placeholder_full_name": "山田 太郎",
+      "phone": "電話番号",
+      "placeholder_phone": "090x xxx xxx",
+
+      "rental_details": "レンタル詳細",
+      "expected_date": "予定日",
+      "vehicle_type": "車両タイプ",
+      "quantity": "台数",
+      "rental_days": "日数",
+
+      "station_optional": "ステーション（任意）",
+      "station_placeholder": "最寄りステーション（分かれば）を入力",
+
+      "contact_channel": "連絡手段",
+      "preferred_language": "言語",
+
+      "teammate_and_share": "チームメイトとコミッション配分",
+      "share_you_teammate": "あなた {{self}}%・チームメイト {{mate}}%",
+      "teammate_optional": "チームメイト（任意）",
+      "teammate_placeholder": "協力者名（警備、清掃 など）",
+      "split_commission": "コミッション配分",
+      "split": {
+        "50_50": "50% - 50%",
+        "70_30": "70% - 30%",
+        "100_0": "100% - 0%",
+        "custom": "カスタム"
+      },
+      "your_share": "あなたの割合 {{unit}}",
+
+      "notes_and_options": "メモ・オプション",
+      "note": "メモ",
+      "note_placeholder": "顧客の要望、受け取り時間、色、引渡し場所など",
+      "source_tag": "ソース（タグ）",
+      "source_placeholder": "HotelLobby / Showroom / Event / ...",
+      "lock_attribution": "コミッションの帰属をロック（このリードをあなたに紐付ける）"
+    }
+  },
+
+ "referrals_search": {
+    "table": {
+      "all": "すべて",
+      "status": "ステータス"
+    },
+    "status": {
+      "new": "新規",
+      "contacted": "連絡済み",
+      "converted": "成約",
+      "rejected": "却下"
+    },
+    "search": {
+      "label": "検索",
+      "placeholder": "氏名または電話番号…",
+      "from": "開始日",
+      "to": "終了日",
+      "select_date": "日付を選択",
+      "clear": "フィルターをクリア"
+    }
   }
 
 
