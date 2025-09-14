@@ -239,9 +239,7 @@ export default function VehicleTable({
 
                   <div className="text-gray-500">{t('vehicle_location')}</div>
                   <div className="text-right font-medium line-clamp-1">
-                    <td className="px-3 py-2 border">
-                      {t(`vehicle_table.${vehicle.currentLocation || 'Unknown'}`)}
-                    </td>
+                    {t(`vehicle_table.${vehicle.currentLocation || 'Unknown'}`)}
                   </div>
                 </div>
               </div>

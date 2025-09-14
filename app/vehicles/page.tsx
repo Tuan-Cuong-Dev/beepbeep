@@ -18,6 +18,7 @@ import { useUser } from '@/src/context/AuthContext';
 import { useVehicleData } from '@/src/hooks/useVehicleData';
 import { useVehicleModel } from '@/src/hooks/useVehicleModel';
 import { useRentalStations } from '@/src/hooks/useRentalStations';
+import { useCurrentCompanyId } from '@/src/hooks/useCurrentCompanyId'; // ✅ thêm vào
 import { db } from '@/src/firebaseConfig';
 import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 
@@ -41,11 +42,12 @@ const emptyVehicle: Vehicle = {
 
 export default function VehicleManagementPage() {
   const { t } = useTranslation('common');
-  const { companyId, stationId, role, loading: userLoading } = useUser();
+  const { role, loading: userLoading, stationId } = useUser();
+  const { companyId, loading: companyLoading } = useCurrentCompanyId(); // ✅ dùng hook mới
 
   const isAdmin = role?.toLowerCase() === 'admin';
   const isCompanyOwner = role === 'company_owner';
-  const isDataGateOpen = isAdmin || !!companyId; // cho phép vào trang khi là admin hoặc có companyId
+  const isDataGateOpen = isAdmin || !!companyId;
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -64,7 +66,6 @@ export default function VehicleManagementPage() {
     onConfirm: undefined as (() => void) | undefined,
   });
 
- // ✅ đúng
   const {
     Vehicles,
     setVehicles,
@@ -86,9 +87,6 @@ export default function VehicleManagementPage() {
   const [newVehicle, setNewVehicle] = useState<Vehicle | null>(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
 
-  const [modelPage, setModelPage] = useState(1);
-  const modelPageSize = 5;
-
   useEffect(() => {
     if (isDataGateOpen) {
       setNewVehicle({
@@ -97,7 +95,7 @@ export default function VehicleManagementPage() {
         stationId: stationId || '',
       });
     }
-  }, [companyId, stationId, isAdmin, isDataGateOpen]);
+  }, [companyId, stationId, isDataGateOpen]);
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -118,7 +116,10 @@ export default function VehicleManagementPage() {
   };
 
   const handleVehicleSaved = () => {
-    showDialog('success', isUpdateMode ? t('vehicle_management_page.vehicle_updated') : t('vehicle_management_page.vehicle_added'));
+    showDialog(
+      'success',
+      isUpdateMode ? t('vehicle_management_page.vehicle_updated') : t('vehicle_management_page.vehicle_added')
+    );
     setIsUpdateMode(false);
   };
 
@@ -139,11 +140,12 @@ export default function VehicleManagementPage() {
       open: true,
       type: 'confirm',
       title: t('vehicle_management_page.confirm_delete_title'),
-      description: t('vehicle_management_page.confirm_delete_description', { serialNumber: vehicle.serialNumber }),
+      description: t('vehicle_management_page.confirm_delete_description', {
+        serialNumber: vehicle.serialNumber,
+      }),
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'vehicles', vehicle.id));
-          // ✅ sửa bug: cập nhật danh sách Vehicles (không phải VehicleModels)
           setVehicles((prev) => prev.filter((v) => v.id !== vehicle.id));
           setDialog((prev) => ({ ...prev, open: false }));
           showDialog('success', t('vehicle_management_page.delete_success'));
@@ -177,12 +179,6 @@ export default function VehicleManagementPage() {
     currentPage * pageSize
   );
 
-  const totalModelPages = Math.ceil(VehicleModelForm.models.length / modelPageSize);
-  const paginatedModels = VehicleModelForm.models.slice(
-    (modelPage - 1) * modelPageSize,
-    modelPage * modelPageSize
-  );
-
   const VehicleStatusCount: Record<string, number> = {};
   Vehicles.forEach((bike) => {
     VehicleStatusCount[bike.status] = (VehicleStatusCount[bike.status] || 0) + 1;
@@ -190,10 +186,8 @@ export default function VehicleManagementPage() {
 
   const totalVehicleCount = Vehicles.length;
 
-  /* =========================
-     1) Loading gate
-     ========================= */
-  if (userLoading || (isDataGateOpen && stationsLoading)) {
+  /* ============ LOADING ============ */
+  if (userLoading || companyLoading || (isDataGateOpen && stationsLoading)) {
     return (
       <div className="flex justify-center items-center h-screen">
         {t('vehicle_management_page.loading')}
@@ -201,9 +195,7 @@ export default function VehicleManagementPage() {
     );
   }
 
-  /* =========================
-     2) No company (non-admin)
-     ========================= */
+  /* ============ NO COMPANY (non-admin) ============ */
   if (!isDataGateOpen) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -223,9 +215,7 @@ export default function VehicleManagementPage() {
     );
   }
 
-  /* =========================
-     3) Ensure newVehicle ready
-     ========================= */
+  /* ============ MAIN UI ============ */
   if (!newVehicle) {
     return (
       <div className="flex justify-center items-center h-screen">
