@@ -42,8 +42,11 @@ const emptyVehicle: Vehicle = {
 export default function VehicleManagementPage() {
   const { t } = useTranslation('common');
   const { companyId, stationId, role, loading: userLoading } = useUser();
+
   const isAdmin = role?.toLowerCase() === 'admin';
   const isCompanyOwner = role === 'company_owner';
+  const isDataGateOpen = isAdmin || !!companyId; // cho phép vào trang khi là admin hoặc có companyId
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [stationFilter, setStationFilter] = useState('');
@@ -52,6 +55,7 @@ export default function VehicleManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [qrModalOpen, setQrModalOpen] = useState(false);
+
   const [dialog, setDialog] = useState({
     open: false,
     type: 'info' as 'success' | 'error' | 'info' | 'confirm',
@@ -60,12 +64,13 @@ export default function VehicleManagementPage() {
     onConfirm: undefined as (() => void) | undefined,
   });
 
+ // ✅ đúng
   const {
     Vehicles,
     setVehicles,
     VehicleModels,
     setVehicleModels,
-  } = useVehicleData({ companyId: companyId || '', isAdmin });
+  } = useVehicleData({ companyId: companyId || '' });
 
   const VehicleModelForm = useVehicleModel({
     companyId: companyId ?? undefined,
@@ -77,25 +82,31 @@ export default function VehicleManagementPage() {
   });
 
   const { stations, loading: stationsLoading } = useRentalStations(companyId || '', isAdmin);
+
   const [newVehicle, setNewVehicle] = useState<Vehicle | null>(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
+
   const [modelPage, setModelPage] = useState(1);
   const modelPageSize = 5;
 
   useEffect(() => {
-    if (companyId || isAdmin) {
-      setNewVehicle({ ...emptyVehicle, companyId: companyId || '', stationId: stationId || '' });
+    if (isDataGateOpen) {
+      setNewVehicle({
+        ...emptyVehicle,
+        companyId: companyId || '',
+        stationId: stationId || '',
+      });
     }
-  }, [companyId, stationId, isAdmin]);
+  }, [companyId, stationId, isAdmin, isDataGateOpen]);
 
   useEffect(() => {
     const fetchCompanies = async () => {
       if (!isAdmin) return;
       const snapshot = await getDocs(collection(db, 'rentalCompanies'));
       const map: Record<string, string> = {};
-      snapshot.forEach((doc) => {
-        const data = doc.data() as RentalCompany;
-        map[doc.id] = data.name;
+      snapshot.forEach((d) => {
+        const data = d.data() as RentalCompany;
+        map[d.id] = data.name;
       });
       setCompanyMap(map);
     };
@@ -112,14 +123,14 @@ export default function VehicleManagementPage() {
   };
 
   const handleVehicleEdit = (vehicle: Vehicle) => {
-    const safVehicle = {
+    const safeVehicle: Vehicle = {
       ...vehicle,
       lastMaintained:
         vehicle.lastMaintained instanceof Timestamp
           ? vehicle.lastMaintained
           : Timestamp.fromDate(new Date()),
     };
-    setNewVehicle(safVehicle);
+    setNewVehicle(safeVehicle);
     setIsUpdateMode(true);
   };
 
@@ -132,7 +143,8 @@ export default function VehicleManagementPage() {
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'vehicles', vehicle.id));
-          setVehicleModels((prev) => prev.filter((b) => b.id !== vehicle.id));
+          // ✅ sửa bug: cập nhật danh sách Vehicles (không phải VehicleModels)
+          setVehicles((prev) => prev.filter((v) => v.id !== vehicle.id));
           setDialog((prev) => ({ ...prev, open: false }));
           showDialog('success', t('vehicle_management_page.delete_success'));
         } catch (err) {
@@ -151,9 +163,11 @@ export default function VehicleManagementPage() {
       bike.plateNumber?.toLowerCase().includes(term) ||
       bike.status?.toLowerCase().includes(term) ||
       bike.currentLocation?.toLowerCase().includes(term);
+
     const matchesStatus = statusFilter === 'All' ? true : bike.status === statusFilter;
     const matchesStation = stationFilter === '' ? true : bike.stationId === stationFilter;
     const matchesCompany = isAdmin ? (companyFilter === '' || bike.companyId === companyFilter) : true;
+
     return matchesSearch && matchesStatus && matchesStation && matchesCompany;
   });
 
@@ -176,8 +190,48 @@ export default function VehicleManagementPage() {
 
   const totalVehicleCount = Vehicles.length;
 
-  if (userLoading || stationsLoading || (!companyId && !isAdmin) || !newVehicle) {
-    return <div className="flex justify-center items-center h-screen">{t('vehicle_management_page.loading')}</div>;
+  /* =========================
+     1) Loading gate
+     ========================= */
+  if (userLoading || (isDataGateOpen && stationsLoading)) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        {t('vehicle_management_page.loading')}
+      </div>
+    );
+  }
+
+  /* =========================
+     2) No company (non-admin)
+     ========================= */
+  if (!isDataGateOpen) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <UserTopMenu />
+        <main className="p-6 mt-1 flex-grow flex items-center justify-center">
+          <div className="text-center space-y-3">
+            <h1 className="text-xl font-semibold">{t('vehicle_management_page.title')}</h1>
+            <p className="text-red-600">{t('station_management_page.no_company')}</p>
+            <a href="/my-business" className="underline">
+              {t('station_management_page.create_or_join_company')}
+            </a>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  /* =========================
+     3) Ensure newVehicle ready
+     ========================= */
+  if (!newVehicle) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        {t('vehicle_management_page.loading')}
+      </div>
+    );
   }
 
   return (
@@ -191,20 +245,16 @@ export default function VehicleManagementPage() {
         </h1>
 
         <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-4 mb-6">
-          {/* Tổng số: status để icon = 'Total', title để hiển thị = bản dịch */}
           <VehicleSummaryCard
             status="Total"
             title={t('vehicle_management_page.total')}
             count={totalVehicleCount}
             total={totalVehicleCount}
           />
-
           {Object.entries(VehicleStatusCount).map(([statusKey, count]) => (
             <VehicleSummaryCard
               key={statusKey}
-              // GIỮ statusKey gốc để VehicleSummaryCard nhận diện icon
               status={statusKey}
-              // DÙNG title để hiển thị bản dịch
               title={t(`vehicle_status.${statusKey}`)}
               count={count}
               total={totalVehicleCount}
@@ -261,8 +311,8 @@ export default function VehicleManagementPage() {
           onSaveComplete={handleVehicleSaved}
           showStationSelect={isCompanyOwner}
         />
-
       </main>
+
       <PrintQRModal
         open={qrModalOpen}
         onClose={() => setQrModalOpen(false)}

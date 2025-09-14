@@ -82,7 +82,7 @@ export default function BatteryStationEditForm({
       </div>
 
       <div>
-        <Label htmlFor="mapAddress">Địa chỉ Google Maps</Label>
+        <Label htmlFor="mapAddress">Địa chỉ Google Maps (không bắt buộc)</Label>
         <Input
           id="mapAddress"
           value={station.mapAddress || ''}

@@ -83,7 +83,7 @@ export default function BatteryChargingStationEditForm({ id, onClose }: Props) {
       </div>
 
       <div>
-        <Label htmlFor="mapAddress">Địa chỉ Google Maps</Label>
+        <Label htmlFor="mapAddress">Địa chỉ Google Maps (không bắt buộc)</Label>
         <Input
           id="mapAddress"
           value={station.mapAddress || ''}
