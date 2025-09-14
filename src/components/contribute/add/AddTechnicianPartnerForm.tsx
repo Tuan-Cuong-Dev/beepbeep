@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   addDoc,
   collection,
@@ -113,8 +113,53 @@ export default function AddTechnicianPartnerForm() {
   const [showDialog, setShowDialog] = useState(false);
   const [workingTimeError, setWorkingTimeError] = useState('');
 
-  // 🔎 Ưu tiên parse mapAddress (URL/lat,lng), fallback geocode address (debounce)
+  // 🆕 Trạng thái GPS
+  const [useCurrentPos, setUseCurrentPos] = useState(false);
+  const [gpsStatus, setGpsStatus] = useState<'idle'|'getting'|'ok'|'error'>('idle');
+  const [gpsError, setGpsError] = useState('');
+
+  /** Lấy GPS (dùng cho lần đầu bật checkbox & nút refresh) */
+  const getGps = useCallback(() => {
+    setGpsStatus('getting');
+    setGpsError('');
+
+    if (!('geolocation' in navigator)) {
+      setGpsStatus('error');
+      setGpsError('Trình duyệt không hỗ trợ Geolocation.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const latStr = String(latitude);
+        const lngStr = String(longitude);
+        setForm(prev => ({
+          ...prev,
+          _lat: latStr,
+          _lng: lngStr,
+          location: { ...(prev.location as any), location: `${latitude},${longitude}` } as any,
+        }));
+        setGpsStatus('ok');
+      },
+      (err) => {
+        setGpsStatus('error');
+        setGpsError(err.message || 'Không lấy được vị trí.');
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }, []);
+
+  // 🔔 Khi bật dùng GPS → gọi lấy vị trí
   useEffect(() => {
+    if (useCurrentPos) getGps();
+  }, [useCurrentPos, getGps]);
+
+  // 🔎 Ưu tiên parse mapAddress (URL/lat,lng), fallback geocode address (debounce)
+  // ⚠️ BỎ QUA nếu đang dùng GPS (tránh ghi đè toạ độ)
+  useEffect(() => {
+    if (useCurrentPos) return;
+
     const raw =
       (form.location as any)?.mapAddress?.trim() ||
       (form.location as any)?.address?.trim();
@@ -146,11 +191,11 @@ export default function AddTechnicianPartnerForm() {
 
     const id = setTimeout(() => geocodeRef.current(raw), 300);
     return () => clearTimeout(id);
-  }, [(form.location as any)?.mapAddress, (form.location as any)?.address]);
+  }, [useCurrentPos, (form.location as any)?.mapAddress, (form.location as any)?.address]);
 
-  // 📍 Khi có coords từ geocode → cập nhật preview lat/lng & location.location
+  // 📍 Khi có coords từ geocode → cập nhật preview lat/lng & location.location (NHƯNG không khi dùng GPS)
   useEffect(() => {
-    if (!coords) return;
+    if (!coords || useCurrentPos) return;
     setForm((prev) => {
       const newLatStr = String(coords.lat ?? '');
       const newLngStr = String(coords.lng ?? '');
@@ -166,7 +211,7 @@ export default function AddTechnicianPartnerForm() {
         location: { ...(prev.location as any), location: newLocStr } as any,
       };
     });
-  }, [coords]);
+  }, [coords, useCurrentPos]);
 
   const setField = (field: keyof TechnicianPartner, value: any) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -230,7 +275,8 @@ export default function AddTechnicianPartnerForm() {
       const parsed = parseLatLngString((form.location as any)?.location);
       if (parsed) ({ lat, lng } = parsed);
     }
-    if ((lat === undefined || lng === undefined) && coords) {
+    if ((lat === undefined || lng === undefined) && coords && !useCurrentPos) {
+      // chỉ dùng coords từ geocode hook khi không dùng GPS
       lat = coords.lat;
       lng = coords.lng;
     }
@@ -338,12 +384,35 @@ export default function AddTechnicianPartnerForm() {
         onChange={(e) => setLocationField('address', e.target.value)}
       />
 
-      {/* ✅ Google Maps URL → location.mapAddress (tự rút lat,lng) */}
-      <Input
-        placeholder={t('repair_shop_form.map_address')}
-        value={(form.location as any)?.mapAddress || ''}
-        onChange={(e) => setLocationField('mapAddress', e.target.value)}
-      />
+      {/* 🆕 Checkbox: dùng GPS */}
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={useCurrentPos}
+          onChange={(e) => setUseCurrentPos(e.target.checked)}
+        />
+        <span>Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps</span>
+      </label>
+
+      {useCurrentPos ? (
+        <div className="text-xs text-gray-600">
+          {gpsStatus === 'getting' && 'Đang lấy vị trí…'}
+          {gpsStatus === 'ok' && 'Đã lấy vị trí từ GPS.'}
+          {gpsStatus === 'error' && <span className="text-red-600">Lỗi: {gpsError}</span>}
+          <div className="mt-2">
+            <Button type="button" variant="outline" onClick={getGps}>
+              Lấy lại vị trí
+            </Button>
+          </div>
+        </div>
+      ) : (
+        // ✅ Google Maps URL → location.mapAddress (tự rút lat,lng) (ẩn khi dùng GPS)
+        <Input
+          placeholder={t('repair_shop_form.map_address')}
+          value={(form.location as any)?.mapAddress || ''}
+          onChange={(e) => setLocationField('mapAddress', e.target.value)}
+        />
+      )}
 
       {/* Lat/Lng hỗ trợ nhập tay (gộp một input) */}
       <Input
