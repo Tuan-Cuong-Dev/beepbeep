@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
@@ -27,6 +27,19 @@ interface Props {
   businessType: BusinessType;
 }
 
+type LatLng = { lat: number; lng: number };
+
+// Parse "lat,lng" nhanh gọn (fallback cho preview)
+function parseLatLngString(s?: string): LatLng | null {
+  if (!s) return null;
+  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lng = parseFloat(m[3]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
+}
+
 export default function CreateBusinessForm({ businessType }: Props) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -40,6 +53,8 @@ export default function CreateBusinessForm({ businessType }: Props) {
   }, [businessType, subtypeParam]);
 
   const { geocode, coords, error: geoError, loading: geoLoading } = useGeocodeAddress();
+  const geocodeRef = useRef(geocode);
+  geocodeRef.current = geocode;
 
   const [form, setForm] = useState({
     name: "",
@@ -59,11 +74,43 @@ export default function CreateBusinessForm({ businessType }: Props) {
     description: "",
   });
 
+  // 🆕 Toggle & state cho GPS
+  const [useCurrentPos, setUseCurrentPos] = useState(false);
+  const [gpsStatus, setGpsStatus] = useState<"idle" | "getting" | "ok" | "error">("idle");
+  const [gpsError, setGpsError] = useState("");
+  const [currentPos, setCurrentPos] = useState<LatLng | null>(null); // lưu toạ độ lấy từ GPS
+
+  /** Lấy vị trí hiện tại (GPS) */
+  const getGps = useCallback(() => {
+    setGpsStatus("getting");
+    setGpsError("");
+
+    if (!("geolocation" in navigator)) {
+      setGpsStatus("error");
+      setGpsError("Trình duyệt không hỗ trợ Geolocation.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const latlng: LatLng = { lat: latitude, lng: longitude };
+        setCurrentPos(latlng);
+        // điền vào input location để server parse và build LocationCore
+        setForm((prev) => ({ ...prev, location: `${latitude},${longitude}` }));
+        setGpsStatus("ok");
+      },
+      (err) => {
+        setGpsStatus("error");
+        setGpsError(err.message || "Không lấy được vị trí hiện tại.");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }, []);
+
   // Prefill từ current user (kể cả sau refresh)
   useEffect(() => {
-    // đảm bảo giữ phiên qua refresh
     setPersistence(auth, browserLocalPersistence).catch(() => { /* no-op */ });
-
     const unsub = onAuthStateChanged(auth, (u) => {
       if (u) {
         setForm((p) => ({
@@ -77,10 +124,16 @@ export default function CreateBusinessForm({ businessType }: Props) {
     return () => unsub();
   }, []);
 
-  // Khi geocode xong → ghi vào input location
+  // Khi bật dùng GPS → gọi getGps()
   useEffect(() => {
-    if (coords) setForm((prev) => ({ ...prev, location: `${coords.lat},${coords.lng}` }));
-  }, [coords]);
+    if (useCurrentPos) getGps();
+  }, [useCurrentPos, getGps]);
+
+  // Khi geocode xong → ghi vào input location (CHỈ khi KHÔNG dùng GPS để tránh ghi đè)
+  useEffect(() => {
+    if (!coords || useCurrentPos) return;
+    setForm((prev) => ({ ...prev, location: `${coords.lat},${coords.lng}` }));
+  }, [coords, useCurrentPos]);
 
   const showDialog = (type: "success" | "error" | "info", title: string, description = "") =>
     setDialog({ open: true, type, title, description });
@@ -90,8 +143,11 @@ export default function CreateBusinessForm({ businessType }: Props) {
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
+  // Chỉ geocode mapAddress khi KHÔNG dùng GPS
   const handleBlur = () => {
-    if (form.mapAddress.trim()) geocode(form.mapAddress.trim());
+    if (!useCurrentPos && form.mapAddress.trim()) {
+      geocodeRef.current(form.mapAddress.trim());
+    }
   };
 
   const handleSubmit = async () => {
@@ -105,7 +161,9 @@ export default function CreateBusinessForm({ businessType }: Props) {
     }
 
     const { name, phone, displayAddress, mapAddress, location } = form;
-    if (!name || !phone || !displayAddress || !mapAddress || !location) {
+
+    // mapAddress chỉ bắt buộc khi KHÔNG dùng GPS
+    if (!name || !phone || !displayAddress || (!useCurrentPos && !mapAddress) || !location) {
       return showDialog(
         "error",
         t("create_business_form.missing_fields_title"),
@@ -113,8 +171,11 @@ export default function CreateBusinessForm({ businessType }: Props) {
       );
     }
 
-    // Ưu tiên toạ độ từ hook geocode; fallback parse từ input
-    const parsed = coords ?? parseLatLng(location);
+    // Ưu tiên toạ độ từ GPS hoặc hook geocode; fallback parse từ input
+    const parsed =
+      currentPos ??
+      coords ??
+      parseLatLng(location); // util của bạn (parse an toàn "lat,lng")
     if (!parsed) {
       return showDialog(
         "error",
@@ -130,7 +191,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
       // LocationCore dùng chung (mapAddress/address nằm TRONG location)
       const locationCore = buildLocationCore({
         coords: parsed,
-        mapAddress: form.mapAddress,
+        mapAddress: useCurrentPos ? "" : form.mapAddress, // khi dùng GPS có thể bỏ qua mapAddress
         address: form.displayAddress,
       });
 
@@ -149,15 +210,14 @@ export default function CreateBusinessForm({ businessType }: Props) {
       let baseDoc: Record<string, any>;
 
       if (businessType === "private_provider") {
-        // ✅ Đồng bộ với PrivateProvider schema
         baseDoc = {
           id: docRef.id,
           ownerId: user.uid,
           name: form.name,
           email: form.email,
           phone: form.phone,
-          displayAddress: form.displayAddress, // top-level
-          location: locationCore,              // LocationCore
+          displayAddress: form.displayAddress,
+          location: locationCore,
           businessType: "private_provider",
           status: "active" as const,
           createdBy: user.uid,
@@ -165,7 +225,6 @@ export default function CreateBusinessForm({ businessType }: Props) {
           updatedAt: serverTimestamp(),
         };
       } else {
-        // Các loại business khác — cũng dùng LocationCore, tránh mapAddress top-level
         baseDoc = {
           id: docRef.id,
           name: form.name,
@@ -245,6 +304,13 @@ export default function CreateBusinessForm({ businessType }: Props) {
     }
   };
 
+  // Quyết định toạ độ nào để preview map:
+  const previewCoords: LatLng | null = (() => {
+    if (currentPos) return currentPos;
+    if (coords && !useCurrentPos) return coords; // chỉ dùng kết quả geocode khi không bật GPS
+    return parseLatLngString(form.location);
+  })();
+
   return (
     <>
       <div className="space-y-4">
@@ -269,16 +335,31 @@ export default function CreateBusinessForm({ businessType }: Props) {
           value={form.displayAddress}
           onChange={handleChange("displayAddress")}
         />
-        <Input
-          placeholder={t("create_business_form.map_address_placeholder")}
-          value={form.mapAddress}
-          onChange={handleChange("mapAddress")}
-          onBlur={handleBlur}
-        />
+
+        {/* ✅ Toggle: dùng vị trí hiện tại */}
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={useCurrentPos}
+            onChange={(e) => setUseCurrentPos(e.target.checked)}
+          />
+          <span>{t("use_current_location_label", "Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps")}</span>
+        </label>
+
+        {/* Ẩn mapAddress khi đang dùng GPS để tránh ghi đè */}
+        {!useCurrentPos && (
+          <Input
+            placeholder={t("create_business_form.map_address_placeholder")}
+            value={form.mapAddress}
+            onChange={handleChange("mapAddress")}
+            onBlur={handleBlur}
+          />
+        )}
+
         <Input
           placeholder={t("create_business_form.location_placeholder")}
           value={form.location}
-          readOnly={!!coords}
+          readOnly={useCurrentPos} // khi dùng GPS thì khoá input này
           onChange={handleChange("location")}
         />
 
@@ -290,17 +371,40 @@ export default function CreateBusinessForm({ businessType }: Props) {
           </p>
         )}
 
-        {geoLoading && (
+        {geoLoading && !useCurrentPos && (
           <p className="text-sm text-gray-500">
             {t("create_business_form.detecting_coordinates")}
           </p>
         )}
-        {geoError && <p className="text-sm text-red-500">{geoError}</p>}
+        {geoError && !useCurrentPos && <p className="text-sm text-red-500">{geoError}</p>}
 
-        {coords && (
+        {/* Trạng thái GPS */}
+        {useCurrentPos && (
+          <p className="text-xs text-gray-600">
+            {gpsStatus === "getting" && t("gps.getting", "Đang lấy vị trí…")}
+            {gpsStatus === "ok" && t("gps.ok", "Đã lấy vị trí từ GPS.")}
+            {gpsStatus === "error" && (
+              <span className="text-red-600">
+                {t("gps.error_prefix", "Lỗi:")} {gpsError}
+              </span>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              className="ml-2"
+              onClick={getGps}
+            >
+              {t("gps.refresh", "Lấy lại vị trí")}
+            </Button>
+          </p>
+        )}
+
+        {/* Map preview */}
+        {previewCoords && (
           <>
             <p className="text-sm text-gray-600">
-              {t("create_business_form.detected_coordinates")} {coords.lat}, {coords.lng}
+              {t("create_business_form.detected_coordinates")}{" "}
+              {previewCoords.lat}, {previewCoords.lng}
             </p>
             <iframe
               title="Map Preview"
@@ -309,7 +413,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
               style={{ border: 0, borderRadius: "8px" }}
               loading="lazy"
               allowFullScreen
-              src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&hl=vi&z=16&output=embed`}
+              src={`https://www.google.com/maps?q=${previewCoords.lat},${previewCoords.lng}&hl=vi&z=16&output=embed`}
             />
           </>
         )}

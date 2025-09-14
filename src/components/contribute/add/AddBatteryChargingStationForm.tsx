@@ -278,7 +278,7 @@ export default function AddBatteryChargingStationForm() {
           checked={useCurrentPos}
           onChange={(e) => setUseCurrentPos(e.target.checked)}
         />
-        <span>Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps</span>
+        <span>{t('use_current_location_label')}</span>
       </label>
 
       {/* mapAddress ẩn khi dùng GPS để tránh ghi đè */}

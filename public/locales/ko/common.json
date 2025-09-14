@@ -4634,7 +4634,9 @@
       "select_date": "날짜 선택",
       "clear": "필터 지우기"
     }
-  }
+  },
+
+   "use_current_location_label": "현재 위치 사용 (GPS) — Google 지도 링크를 붙여넣을 필요가 없습니다"
 
 
 

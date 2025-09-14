@@ -4612,7 +4612,10 @@
       "select_date": "日付を選択",
       "clear": "フィルターをクリア"
     }
-  }
+  },
+
+   "use_current_location_label": "現在地を使用 (GPS) — Google マップのリンクを貼り付ける必要はありません"
+
 
 
 

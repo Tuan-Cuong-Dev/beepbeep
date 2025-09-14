@@ -4569,7 +4569,9 @@
       "select_date": "Select a date",
       "clear": "Clear filters"
     }
-  }
+  },
+
+   "use_current_location_label": "Use current location (GPS) — no need to paste Google Maps link"
 
 
 

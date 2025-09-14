@@ -4659,7 +4659,9 @@
       "select_date": "Chọn ngày",
       "clear": "Xóa lọc"
     }
-  }
+  },
+
+  "use_current_location_label": "Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps"
   
 
 
