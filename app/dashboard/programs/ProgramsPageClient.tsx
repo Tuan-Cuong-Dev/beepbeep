@@ -15,7 +15,7 @@ import {
   Timestamp,
   Query,
   CollectionReference,
-  getCountFromServer,          // ✅ dùng aggregate count
+  getCountFromServer,
 } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { db } from '@/src/firebaseConfig';
 import { useUser } from '@/src/context/AuthContext';
+import { useCurrentCompanyId } from '@/src/hooks/useCurrentCompanyId'; // ✅ dùng hook resolve companyId
 import Header from '@/src/components/landingpage/Header';
 import Footer from '@/src/components/landingpage/Footer';
 import { Button } from '@/src/components/ui/button';
@@ -34,7 +35,7 @@ import type { Program, ProgramStatus } from '@/src/lib/programs/rental-programs/
 
 type ProgramEx = Program & {
   participantsCount?: number;
-  isArchived?: boolean;          // giữ cờ tương thích cũ nếu từng lưu
+  isArchived?: boolean;
   endedAt?: Timestamp | null;
   archivedAt?: Timestamp | null;
 };
@@ -47,17 +48,17 @@ const err = (...a: any[]) => LOG && console.error('[ProgramsPage]', ...a);
 const normalizeRole = (r?: string) => (r || '').toLowerCase();
 const useRoleFlags = (role?: string) => {
   const r = normalizeRole(role);
-  return {
-    isAgent: r === 'agent',
-    isAdmin: r === 'admin',
-    isCompanyCreator: ['company_owner', 'private_provider', 'company_admin', 'station_manager'].includes(r),
-  };
+  const isAgent = r === 'agent';
+  const isAdmin = r === 'admin';
+  const isCompanyCreator = ['company_owner', 'private_provider', 'company_admin', 'station_manager'].includes(r);
+  const isCompanyStaff = ['staff', 'technician', 'technician_assistant', 'cashier'].includes(r);
+  const isCompanyScoped = isCompanyCreator || isCompanyStaff;
+  return { isAgent, isAdmin, isCompanyCreator, isCompanyStaff, isCompanyScoped };
 };
 
 const isTs = (v: any): v is Timestamp => v instanceof Timestamp;
 const tsOrNull = (v: any): Timestamp | null => (isTs(v) ? v : null);
 
-/** Suy ra status từ thời gian & isActive (tương thích dữ liệu cũ) */
 function inferStatusFromDates(raw: any): ProgramStatus {
   const active = raw?.isActive !== false;
   const start = tsOrNull(raw?.startDate)?.toMillis?.() ?? null;
@@ -71,7 +72,6 @@ function inferStatusFromDates(raw: any): ProgramStatus {
   return 'active';
 }
 
-/** Chuẩn hóa Program đọc từ Firestore (có status) */
 const normalizeProgram = (raw: any, id: string): ProgramEx => {
   const status = inferStatusFromDates(raw);
   const isArchivedCompat = !!raw?.isArchived || status === 'archived';
@@ -88,10 +88,9 @@ const normalizeProgram = (raw: any, id: string): ProgramEx => {
     modelDiscounts: Array.isArray(raw?.modelDiscounts) ? raw.modelDiscounts : raw?.modelDiscounts ?? [],
     startDate: tsOrNull(raw?.startDate),
     endDate: tsOrNull(raw?.endDate),
-    status,                             // <-- đảm bảo luôn có
-    isActive: raw?.isActive ?? true,    // cờ tương thích, UI nên ưu tiên status
+    status,
+    isActive: raw?.isActive ?? true,
     participantsCount: typeof raw?.participantsCount === 'number' ? raw.participantsCount : 0,
-    // lifecycle
     createdAt: tsOrNull(raw?.createdAt) ?? Timestamp.now(),
     updatedAt: tsOrNull(raw?.updatedAt) ?? Timestamp.now(),
     endedAt: tsOrNull(raw?.endedAt),
@@ -100,16 +99,14 @@ const normalizeProgram = (raw: any, id: string): ProgramEx => {
   };
 };
 
-/** Đếm mẫu xe: hỗ trợ cả object legacy và array mới */
 function getModelCount(modelDiscounts: any): number {
   if (Array.isArray(modelDiscounts)) return modelDiscounts.length;
   if (modelDiscounts && typeof modelDiscounts === 'object') return Object.keys(modelDiscounts).length;
   return 0;
 }
 
-type StationCountMap = Record<string, number>; // companyId -> count
+type StationCountMap = Record<string, number>;
 
-/** Đếm trạm hiển thị cho card */
 function getStationCount(program: ProgramEx, stationCountByCompany: StationCountMap): number {
   const t = Array.isArray(program.stationTargets) ? program.stationTargets : [];
   if (t.length > 0) return t.length;
@@ -120,7 +117,7 @@ function getStationCount(program: ProgramEx, stationCountByCompany: StationCount
   return 0;
 }
 
-/* ================= Actions (card) ================= */
+/* ================= Card Actions ================= */
 
 type ActionsProps = {
   program: ProgramEx;
@@ -195,7 +192,6 @@ function ProgramActions({
             </Button>
           </>
         ) : (
-          // Chỉ render Xóa khi chưa ai tham gia
           <Button size="sm" variant="destructive" onClick={() => onDelete(program)}>
             {t('programs_page.delete_button')}
           </Button>
@@ -213,6 +209,7 @@ export default function ProgramsPageClient() {
   const { t } = useTranslation('common');
   const { user, role, companyId: ctxCompanyId } = useUser() as any;
 
+  const { companyId: hookCompanyId, loading: companyLoading } = useCurrentCompanyId(); // ✅ resolve companyId
   const search = useSearchParams();
   const qpCompanyId = search?.get('companyId') ?? null;
   const qpStationId = search?.get('stationId') ?? null;
@@ -222,10 +219,7 @@ export default function ProgramsPageClient() {
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
-  // Đếm trạm toàn công ty (áp dụng khi stationTargets rỗng)
   const [stationCountByCompany, setStationCountByCompany] = useState<StationCountMap>({});
-
-  // Dialog state
   const [dialog, setDialog] = useState<{
     open: boolean;
     type: 'confirm' | 'success' | 'error' | 'info' | 'custom';
@@ -234,9 +228,10 @@ export default function ProgramsPageClient() {
     onConfirm?: () => void;
   }>({ open: false, type: 'confirm', title: '' });
 
-  const { isAgent, isAdmin, isCompanyCreator } = useRoleFlags(role);
+  const { isAgent, isAdmin, isCompanyCreator, isCompanyScoped } = useRoleFlags(role);
 
-  const fetchCompanyId = async (uid: string) => {
+  // Chỉ còn dùng cho owner/provider cũ chưa có hookCompanyId/ctxCompanyId
+  const fetchCompanyIdForCreator = async (uid: string) => {
     const q1 = query(collection(db, 'rentalCompanies'), where('ownerId', '==', uid));
     const s1 = await getDocs(q1);
     if (!s1.empty) return s1.docs[0].id;
@@ -248,7 +243,6 @@ export default function ProgramsPageClient() {
     return null;
   };
 
-  // ✅ helper đếm aggregate participants cho 1 program
   const fetchRealParticipantsCount = async (programId: string) => {
     const qRef = query(collection(db, 'programParticipants'), where('programId', '==', programId));
     const agg = await getCountFromServer(qRef);
@@ -258,17 +252,21 @@ export default function ProgramsPageClient() {
   useEffect(() => {
     if (!user?.uid) return;
 
-    let isMounted = true;
+    let mounted = true;
     (async () => {
       setLoading(true);
       setErrMsg(null);
       try {
-        log('role/user', { uid: user.uid, role, ctxCompanyId, qpCompanyId, qpStationId });
-
         const forcedCompanyId = qpCompanyId || null;
-        const resolvedCompanyId =
-          forcedCompanyId ??
-          (isCompanyCreator && !ctxCompanyId ? await fetchCompanyId(user.uid) : ctxCompanyId ?? null);
+
+        // ✅ companyId hiệu lực: URL → hook → context → (fallback creator)
+        const effectiveCompanyId =
+          forcedCompanyId ||
+          hookCompanyId ||
+          ctxCompanyId ||
+          (isCompanyCreator ? await fetchCompanyIdForCreator(user.uid) : null);
+
+        log('role/user', { uid: user.uid, role, hookCompanyId, ctxCompanyId, effectiveCompanyId, qpCompanyId, qpStationId });
 
         let qRef: Query | CollectionReference = collection(db, 'programs');
 
@@ -282,25 +280,25 @@ export default function ProgramsPageClient() {
         } else if (isAgent) {
           qRef = query(collection(db, 'programs'), where('type', '==', 'agent_program'));
           log('Query agent default', { type: 'agent_program' });
-        } else if (isCompanyCreator) {
-          if (!resolvedCompanyId) {
-            warn('No companyId resolved for company role; empty result.');
-            if (isMounted) setPrograms([]);
+        } else if (isCompanyScoped) {
+          if (!effectiveCompanyId) {
+            warn('No companyId resolved for company-scoped role; empty result.');
+            if (mounted) setPrograms([]);
             setLoading(false);
             return;
           }
           qRef = query(
             collection(db, 'programs'),
             where('type', '==', 'rental_program'),
-            where('companyId', '==', resolvedCompanyId)
+            where('companyId', '==', effectiveCompanyId)
           );
-          log('Query company role', { type: 'rental_program', companyId: resolvedCompanyId });
+          log('Query company-scoped role', { type: 'rental_program', companyId: effectiveCompanyId });
         } else if (isAdmin) {
           qRef = collection(db, 'programs');
           log('Query admin: ALL programs');
         } else {
           log('Unknown role → empty list');
-          if (isMounted) setPrograms([]);
+          if (mounted) setPrograms([]);
           setLoading(false);
           return;
         }
@@ -308,7 +306,6 @@ export default function ProgramsPageClient() {
         const snap = await getDocs(qRef);
         log('Snapshot size:', snap.size);
 
-        // Chuẩn hoá & lọc theo station (nếu có)
         let list = snap.docs.map((d) => normalizeProgram(d.data() as any, d.id));
 
         if (qpStationId) {
@@ -320,7 +317,6 @@ export default function ProgramsPageClient() {
           log(`Filter by stationId=${qpStationId}: ${before} -> ${list.length}`);
         }
 
-        // ✅ Gán participantsCount CHÍNH XÁC bằng aggregate
         if (list.length) {
           const counts = await Promise.all(
             list.map(async (p) => {
@@ -334,9 +330,8 @@ export default function ProgramsPageClient() {
           list = list.map((p, i) => ({ ...p, participantsCount: counts[i] }));
         }
 
-        if (isMounted) setPrograms(list);
+        if (mounted) setPrograms(list);
 
-        // Build company station counts (apply-to-all stations)
         const companyIds = Array.from(
           new Set(list.filter((p) => !p.stationTargets?.length && p.companyId).map((p) => p.companyId as string))
         );
@@ -348,7 +343,7 @@ export default function ProgramsPageClient() {
               const stSnap = await getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', cid)));
               let count = stSnap.size;
 
-              // Fallback nếu là provider không có trạm vật lý → coi như 1 “trạm ảo”
+              // Fallback: privateProviders không có trạm vật lý → coi như 1 “trạm ảo”
               if (count === 0) {
                 const provSnap = await getDocs(query(collection(db, 'privateProviders'), where('__name__', '==', cid)));
                 if (!provSnap.empty) count = 1;
@@ -358,32 +353,31 @@ export default function ProgramsPageClient() {
               log('Station count for company', cid, '=>', count);
             })
           );
-          if (isMounted) setStationCountByCompany(entries);
+          if (mounted) setStationCountByCompany(entries);
         } else {
-          if (isMounted) setStationCountByCompany({});
+          if (mounted) setStationCountByCompany({});
         }
 
-        // Lấy danh sách program đã join (cho Agent)
         if (isAgent) {
           const joinedSnap = await getDocs(
             query(collection(db, 'programParticipants'), where('userId', '==', user.uid))
           );
           const joinedIds = joinedSnap.docs.map((d) => (d.data() as any).programId as string);
           log('Joined programs:', joinedIds);
-          if (isMounted) setJoinedPrograms(joinedIds);
+          if (mounted) setJoinedPrograms(joinedIds);
         }
       } catch (e: any) {
         err('Load programs error:', e);
-        if (isMounted) setErrMsg(e?.message || 'Failed to load programs');
+        if (mounted) setErrMsg(e?.message || 'Failed to load programs');
       } finally {
-        if (isMounted) setLoading(false);
+        if (mounted) setLoading(false);
       }
     })();
 
     return () => {
-      isMounted = false;
+      mounted = false;
     };
-  }, [user?.uid, role, ctxCompanyId, isCompanyCreator, isAgent, isAdmin, qpCompanyId, qpStationId]);
+  }, [user?.uid, role, ctxCompanyId, hookCompanyId, isCompanyCreator, isCompanyScoped, isAgent, isAdmin, qpCompanyId, qpStationId]);
 
   /* ================= Handlers ================= */
 
@@ -392,7 +386,6 @@ export default function ProgramsPageClient() {
     const { isAgent } = useRoleFlags(role);
     if (!isAgent || joinedPrograms.includes(programId)) return;
 
-    // ✅ idempotent check (programId + userId)
     const existed = await getDocs(
       query(
         collection(db, 'programParticipants'),
@@ -404,29 +397,22 @@ export default function ProgramsPageClient() {
       await addDoc(collection(db, 'programParticipants'), {
         programId,
         userId: user.uid,
-        userRole: role,               // role hiện tại của user
+        userRole: role,
         status: 'joined',
         joinedAt: serverTimestamp(),
       });
     }
 
-    // cập nhật state joined
     setJoinedPrograms((prev) => (prev.includes(programId) ? prev : [...prev, programId]));
 
-    // ✅ đếm lại CHUẨN bằng aggregate (tránh lệch khi nhiều client)
-    let accurate = (programs.find((p) => p.id === programId)?.participantsCount ?? 0);
+    let accurate = programs.find((p) => p.id === programId)?.participantsCount ?? 0;
     try {
       accurate = await fetchRealParticipantsCount(programId);
     } catch {
-      // fallback: +1 nếu không lấy được aggregate
       accurate = accurate + 1;
     }
 
-    setPrograms((prev) =>
-      prev.map((p) =>
-        p.id === programId ? { ...p, participantsCount: accurate } : p
-      )
-    );
+    setPrograms((prev) => prev.map((p) => (p.id === programId ? { ...p, participantsCount: accurate } : p)));
   };
 
   const confirm = (opts: { title: string; description?: string; onConfirm: () => void }) =>
@@ -434,14 +420,10 @@ export default function ProgramsPageClient() {
 
   const closeDialog = () => setDialog((d) => ({ ...d, open: false }));
 
-  // Kết thúc chương trình (status='ended', isActive=false, endedAt=now)
   const handleEnd = (program: ProgramEx) => {
     confirm({
       title: t('programs_page.confirm_end_title', 'Kết thúc chương trình?'),
-      description: t(
-        'programs_page.confirm_end_desc',
-        'Sau khi kết thúc, chương trình không còn hiệu lực cho đơn mới.'
-      ),
+      description: t('programs_page.confirm_end_desc', 'Sau khi kết thúc, chương trình không còn hiệu lực cho đơn mới.'),
       onConfirm: async () => {
         await updateDoc(doc(db, 'programs', program.id), {
           status: 'ended',
@@ -450,41 +432,29 @@ export default function ProgramsPageClient() {
           updatedAt: serverTimestamp(),
         });
         setPrograms((prev) =>
-          prev.map((p) =>
-            p.id === program.id ? { ...p, status: 'ended', isActive: false, endedAt: Timestamp.now() } : p
-          )
+          prev.map((p) => (p.id === program.id ? { ...p, status: 'ended', isActive: false, endedAt: Timestamp.now() } : p))
         );
         closeDialog();
       },
     });
   };
 
-  // Lưu trữ chương trình (status='archived', isActive=false)
   const handleArchive = (program: ProgramEx) => {
     confirm({
       title: t('programs_page.confirm_archive_title', 'Lưu trữ chương trình?'),
-      description: t(
-        'programs_page.confirm_archive_desc',
-        'Chương trình sẽ chuyển sang trạng thái lưu trữ (ẩn với người dùng).'
-      ),
+      description: t('programs_page.confirm_archive_desc', 'Chương trình sẽ chuyển sang trạng thái lưu trữ (ẩn với người dùng).'),
       onConfirm: async () => {
         await updateDoc(doc(db, 'programs', program.id), {
           status: 'archived',
           isActive: false,
-          isArchived: true, // giữ tương thích cũ nếu UI khác đang đọc cờ này
+          isArchived: true,
           archivedAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
         setPrograms((prev) =>
           prev.map((p) =>
             p.id === program.id
-              ? {
-                  ...p,
-                  status: 'archived',
-                  isActive: false,
-                  isArchived: true,
-                  archivedAt: Timestamp.now(),
-                }
+              ? { ...p, status: 'archived', isActive: false, isArchived: true, archivedAt: Timestamp.now() }
               : p
           )
         );
@@ -493,7 +463,6 @@ export default function ProgramsPageClient() {
     });
   };
 
-  // Xóa chương trình (CHỈ khi participantsCount===0)
   const handleDelete = (program: ProgramEx) => {
     if ((program.participantsCount ?? 0) > 0) {
       setDialog({
@@ -521,7 +490,6 @@ export default function ProgramsPageClient() {
   /* ================= Render helpers ================= */
 
   const renderStatus = (program: ProgramEx) => {
-    // Ưu tiên status chuẩn hoá
     switch (program.status) {
       case 'archived':
         return <Badge variant="secondary" size="sm">{t('programs_page.status.archived', 'Đã lưu trữ')}</Badge>;
@@ -543,6 +511,15 @@ export default function ProgramsPageClient() {
 
   /* ================= UI ================= */
 
+  // Gate loading cho hook company
+  if (companyLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -559,7 +536,7 @@ export default function ProgramsPageClient() {
           {(useRoleFlags(role).isCompanyCreator || useRoleFlags(role).isAdmin) && (
             <Link
               href="/dashboard/programs/rental-programs/new"
-              className="inline-block bg-[#00d289] hover:bg-[#00b67a] text-white font-medium px-4 py-2 sm:py-3 rounded-xl transition text-sm"
+              className="inline-block bg-[#00d289] hover:bg[#00b67a] text-white font-medium px-4 py-2 sm:py-3 rounded-xl transition text-sm"
             >
               ➕ {t('programs_page.create_button')}
             </Link>
@@ -593,28 +570,22 @@ export default function ProgramsPageClient() {
                       <p className="text-gray-600 text-sm sm:text-base line-clamp-3">{program.description}</p>
                     )}
 
-                    {/* Status + meta row */}
                     <div className="mt-2 sm:mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      {/* Left group: status + type */}
                       <div className="flex flex-wrap items-center gap-2">
                         {renderStatus(program)}
-
                         <Badge variant="outline" size="sm" className="whitespace-nowrap">
                           {t('programs_page.type')}:{' '}
                           <span className="capitalize ml-1">{program.type?.replace?.(/_/g, ' ')}</span>
                         </Badge>
                       </div>
 
-                      {/* Right group: counts */}
                       <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                         <Badge variant="outline" size="sm" className="whitespace-nowrap">
                           {t('programs_page.models', { count: modelCount })}
                         </Badge>
-
                         <Badge variant="outline" size="sm" className="whitespace-nowrap">
                           {t('programs_page.stations', { count: stationCount })}
                         </Badge>
-
                         <Badge variant="outline" size="sm" className="whitespace-nowrap">
                           {t('programs_page.participants', { count: program.participantsCount ?? 0 })}
                         </Badge>
@@ -651,7 +622,7 @@ export default function ProgramsPageClient() {
         type={dialog.type}
         title={dialog.title}
         description={dialog.description}
-        onClose={closeDialog}
+        onClose={() => setDialog((prev) => ({ ...prev, open: false }))}
         onConfirm={dialog.onConfirm}
       />
     </div>

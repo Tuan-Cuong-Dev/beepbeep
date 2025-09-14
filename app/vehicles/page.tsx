@@ -18,7 +18,7 @@ import { useUser } from '@/src/context/AuthContext';
 import { useVehicleData } from '@/src/hooks/useVehicleData';
 import { useVehicleModel } from '@/src/hooks/useVehicleModel';
 import { useRentalStations } from '@/src/hooks/useRentalStations';
-import { useCurrentCompanyId } from '@/src/hooks/useCurrentCompanyId'; // ✅ thêm vào
+import { useCurrentCompanyId } from '@/src/hooks/useCurrentCompanyId'; 
 import { db } from '@/src/firebaseConfig';
 import { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 
@@ -43,7 +43,7 @@ const emptyVehicle: Vehicle = {
 export default function VehicleManagementPage() {
   const { t } = useTranslation('common');
   const { role, loading: userLoading, stationId } = useUser();
-  const { companyId, loading: companyLoading } = useCurrentCompanyId(); // ✅ dùng hook mới
+  const { companyId, loading: companyLoading } = useCurrentCompanyId(); 
 
   const isAdmin = role?.toLowerCase() === 'admin';
   const isCompanyOwner = role === 'company_owner';
