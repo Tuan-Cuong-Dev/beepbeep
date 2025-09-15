@@ -1,16 +1,19 @@
+// components/rental-stations/RentalShopEditForm.tsx
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import { useTranslation } from 'react-i18next';
 import { doc, getDoc, updateDoc, Timestamp, GeoPoint } from 'firebase/firestore';
+
 import { db } from '@/src/firebaseConfig';
-import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
+import type { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
+
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
 import { Label } from '@/src/components/ui/label';
-import dynamic from 'next/dynamic';
-import { useTranslation } from 'react-i18next';
 
 const MapPreview = dynamic(() => import('@/src/components/map/MapPreview'), { ssr: false });
 
@@ -19,82 +22,196 @@ interface Props {
   onClose: () => void;
 }
 
+/* =========== Helpers =========== */
+
+type LatLng = { lat: number; lng: number };
+
+const parseLatLngPair = (s?: string): LatLng | null => {
+  if (!s) return null;
+  const m = s.match(/(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lng = parseFloat(m[3]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
+};
+
+const extractLatLngFromGMapUrl = (url?: string): LatLng | null => {
+  if (!url) return null;
+  try {
+    const at = url.match(/@(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)/);
+    if (at) {
+      const lat = parseFloat(at[1]);
+      const lng = parseFloat(at[3]);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+    }
+    const u = new URL(url);
+    for (const k of ['q', 'query', 'll']) {
+      const v = u.searchParams.get(k) || '';
+      const m = v.match(/(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)/);
+      if (m) {
+        const lat = parseFloat(m[1]);
+        const lng = parseFloat(m[3]);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+      }
+    }
+  } catch { /* ignore */ }
+  return null;
+};
+
+/* =========== Component =========== */
+
 export default function RentalShopEditForm({ id, onClose }: Props) {
   const { t } = useTranslation('common');
-  const [station, setStation] = useState<Partial<RentalStation> | null>(null);
-  const [saving, setSaving] = useState(false);
-  const { coords, geocode } = useGeocodeAddress();
 
-  // Fetch data on mount
+  // station + state nội bộ cho tọa độ
+  const [station, setStation] = useState<(Partial<RentalStation> & { _lat?: string; _lng?: string }) | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  // geocode
+  const { coords, geocode } = useGeocodeAddress();
+  const geocodeRef = useRef(geocode);
+  geocodeRef.current = geocode;
+
+  // fetch on mount
   useEffect(() => {
-    const fetchStation = async () => {
+    (async () => {
       const ref = doc(db, 'rentalStations', id);
       const snap = await getDoc(ref);
-      if (snap.exists()) {
-        setStation(snap.data() as RentalStation);
+      if (!snap.exists()) return;
+
+      const data = snap.data() as RentalStation;
+      // ưu tiên lấy lat/lng từ geo; fallback parse từ location
+      let lat: string | undefined;
+      let lng: string | undefined;
+
+      if (data.geo) {
+        lat = String((data.geo as any).latitude ?? data.geo.latitude);
+        lng = String((data.geo as any).longitude ?? data.geo.longitude);
+      } else {
+        const pair = parseLatLngPair(data.location);
+        if (pair) {
+          lat = String(pair.lat);
+          lng = String(pair.lng);
+        }
       }
-    };
-    fetchStation();
+
+      setStation({
+        ...data,
+        _lat: lat ?? '',
+        _lng: lng ?? '',
+      });
+    })();
   }, [id]);
 
-  // Auto geocode when mapAddress changes
-  const [lastGeocodedAddress, setLastGeocodedAddress] = useState<string | null>(null);
-
+  // Tự động geocode khi mapAddress đổi (debounce nhẹ)
+  const lastGeocoded = useRef<string | null>(null);
   useEffect(() => {
-    if (
-      station?.mapAddress &&
-      station.mapAddress !== lastGeocodedAddress
-    ) {
-      geocode(station.mapAddress);
-      setLastGeocodedAddress(station.mapAddress);
+    if (!station?.mapAddress) return;
+    const addr = station.mapAddress.trim();
+    if (!addr || addr === lastGeocoded.current) return;
+
+    // 1) Nếu là URL có lat,lng -> set ngay, khỏi gọi geocode
+    const fromUrl = extractLatLngFromGMapUrl(addr);
+    if (fromUrl) {
+      setCoordinates(fromUrl.lat, fromUrl.lng);
+      lastGeocoded.current = addr;
+      return;
     }
-  }, [station?.mapAddress, lastGeocodedAddress, geocode]);
 
+    // 2) Debounce geocode free-text
+    const id = setTimeout(() => {
+      geocodeRef.current(addr);
+      lastGeocoded.current = addr;
+    }, 300);
+    return () => clearTimeout(id);
+  }, [station?.mapAddress]);
 
-  // Update coordinates + location string
+  // nhận kết quả geocode
   useEffect(() => {
-    if (coords) {
-      const newLocation = `${coords.lat.toFixed(6)}° N, ${coords.lng.toFixed(6)}° E`;
-      const geo = new GeoPoint(coords.lat, coords.lng);
-
-      setStation((prev) => ({
-        ...prev,
-        geo,
-        location: newLocation,
-      }));
-    }
+    if (!coords) return;
+    setCoordinates(coords.lat, coords.lng);
   }, [coords]);
 
+  /** đồng bộ 1 chỗ: set _lat/_lng + location "lat,lng" + geo */
+  const setCoordinates = useCallback((lat: number, lng: number) => {
+    setStation(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        _lat: String(lat),
+        _lng: String(lng),
+        location: `${lat},${lng}`,
+        geo: new GeoPoint(lat, lng),
+      };
+    });
+  }, []);
+
+  /** ô tọa độ duy nhất */
+  const handleCoordinateChange = (value: string) => {
+    const pair = parseLatLngPair(value);
+    if (pair) {
+      setCoordinates(pair.lat, pair.lng);
+    } else {
+      // không hợp lệ -> clear _lat/_lng; không đụng location để user vẫn nhìn thấy dữ liệu cũ
+      setStation(prev => (prev ? { ...prev, _lat: '', _lng: '' } : prev));
+    }
+  };
+
   const handleChange = useCallback((field: keyof RentalStation, value: any) => {
-    setStation((prev) => ({ ...prev, [field]: value }));
+    setStation(prev => (prev ? { ...prev, [field]: value } : prev));
   }, []);
 
   const handleSave = async () => {
     if (!station) return;
     setSaving(true);
     try {
-      const updateData = {
+      // build geo từ _lat/_lng nếu hợp lệ
+      let geo: GeoPoint | undefined = undefined;
+      const lat = parseFloat(station._lat || '');
+      const lng = parseFloat(station._lng || '');
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        geo = new GeoPoint(lat, lng);
+      }
+
+      // luôn chuẩn hóa location từ _lat/_lng nếu hợp lệ
+      const normalizedLocation =
+        Number.isFinite(lat) && Number.isFinite(lng)
+          ? `${lat},${lng}`
+          : (station.location || '');
+
+      const updateData: Partial<RentalStation> = {
         name: station.name || '',
         displayAddress: station.displayAddress || '',
         mapAddress: station.mapAddress || '',
-        location: station.location || '',
+        location: normalizedLocation,
         contactPhone: station.contactPhone || '',
         vehicleType: station.vehicleType || 'motorbike',
-        geo: station.geo ?? undefined,
+        status: station.status ?? 'active',
+        geo: geo ?? undefined,
         updatedAt: Timestamp.now(),
       };
+
       await updateDoc(doc(db, 'rentalStations', id), updateData);
       onClose();
     } catch (err) {
+      console.error(err);
       alert(t('rental_shop_edit_form.update_error'));
     } finally {
       setSaving(false);
     }
   };
 
-  if (!station) {
-    return <p className="p-4 text-center">{t('loading')}</p>;
-  }
+  if (!station) return <p className="p-4 text-center">{t('loading')}</p>;
+
+  // Map preview từ geo (ưu tiên) hoặc parse từ location
+  const preview: LatLng | null = (() => {
+    if (station._lat && station._lng && Number.isFinite(parseFloat(station._lat)) && Number.isFinite(parseFloat(station._lng))) {
+      return { lat: parseFloat(station._lat), lng: parseFloat(station._lng) };
+    }
+    const pair = parseLatLngPair(station.location);
+    return pair ?? null;
+  })();
 
   return (
     <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
@@ -103,24 +220,29 @@ export default function RentalShopEditForm({ id, onClose }: Props) {
         value={station.name}
         onChange={(v) => handleChange('name', v)}
       />
+
       <StationField
         label={t('rental_shop_edit_form.display_address')}
         value={station.displayAddress}
         onChange={(v) => handleChange('displayAddress', v)}
         textarea
       />
+
       <StationField
         label={t('rental_shop_edit_form.map_address')}
         value={station.mapAddress}
         onChange={(v) => handleChange('mapAddress', v)}
         textarea
-        className="min-h-[180px]"
+        className="min-h-[140px]"
       />
+
+      {/* ✅ 1 ô tọa độ duy nhất */}
       <StationField
-        label={t('rental_shop_edit_form.location')}
-        value={station.location}
-        onChange={(v) => handleChange('location', v)}
+        label={t('rental_shop_edit_form.coordinates_one_field') /* ví dụ: "Tọa độ (16.07, 108.22 hoặc 16.07° N, 108.22° E)" */}
+        value={station._lat && station._lng ? `${station._lat}, ${station._lng}` : (station.location || '')}
+        onChange={handleCoordinateChange}
       />
+
       <StationField
         label={t('rental_shop_edit_form.phone')}
         value={station.contactPhone}
@@ -142,9 +264,9 @@ export default function RentalShopEditForm({ id, onClose }: Props) {
         </select>
       </div>
 
-      {station.geo && (
+      {preview && (
         <div className="h-48 rounded overflow-hidden border mt-2">
-          <MapPreview coords={{ lat: station.geo.latitude, lng: station.geo.longitude }} />
+          <MapPreview coords={preview} />
         </div>
       )}
 
@@ -159,6 +281,8 @@ export default function RentalShopEditForm({ id, onClose }: Props) {
     </div>
   );
 }
+
+/* =========== Small Field Component =========== */
 
 function StationField({
   label,
@@ -192,4 +316,3 @@ function StationField({
     </div>
   );
 }
-

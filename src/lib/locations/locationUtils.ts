@@ -1,4 +1,5 @@
 // 04/09/2025 Chuẩn hóa đối tượng cần tạo về vị trí theo chuẩn locationCore
+// Đã áp dụng vào việc tạo vị trí của người dùng trong CreatBusinessForm
 
 import { GeoPoint, serverTimestamp } from "firebase/firestore";
 import type { LocationCore } from "./locationTypes";

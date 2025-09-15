@@ -1,5 +1,5 @@
 // 📁 services/userLocationService.ts
-// Các dịch vụ xử lý vị trí người dùng
+// Các dịch vụ xử lý vị trí người dùng (User)
 
 import {
   doc,

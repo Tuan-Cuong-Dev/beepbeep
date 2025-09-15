@@ -1,4 +1,5 @@
 // Địa chỉ tĩnh (chuẩn, có cấu trúc)
+// Đây là dữ liệu dành riêng cho User (Người dùng)
 
 // 📁 lib/common/addressTypes.ts
 export interface AddressCore {

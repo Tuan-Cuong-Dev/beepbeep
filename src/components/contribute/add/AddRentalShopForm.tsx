@@ -1,36 +1,39 @@
+// hooks/forms/AddRentalShopForm.tsx
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Timestamp, collection, addDoc } from 'firebase/firestore';
 import dynamic from 'next/dynamic';
+import { useTranslation } from 'react-i18next';
+
 import { useUser } from '@/src/context/AuthContext';
-import { StationFormValues } from '@/src/lib/stations/stationTypes';
-import { db } from '@/src/firebaseConfig';
+import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
+import { useContributions } from '@/src/hooks/useContributions';
+
 import { Input } from '@/src/components/ui/input';
 import { Textarea } from '@/src/components/ui/textarea';
 import { Button } from '@/src/components/ui/button';
-import { useGeocodeAddress } from '@/src/hooks/useGeocodeAddress';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
-import { useTranslation } from 'react-i18next';
-import { useContributions } from '@/src/hooks/useContributions';
+
+import type { RentalStationFormValues } from '@/src/lib/rentalStations/rentalStationTypes';
+import { createRentalStation } from '@/src/lib/rentalStations/rentalStationService';
 
 const MapPreview = dynamic(() => import('@/src/components/map/MapPreview'), { ssr: false });
 
 type LatLng = { lat: number; lng: number };
 
-/** Parse "lat,lng" (chuẩn) */
-function parseLatLngString(s?: string): LatLng | null {
+/* ================= Helpers ================= */
+
+const parseLatLngPair = (s?: string): LatLng | null => {
   if (!s) return null;
-  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  const m = s.match(/(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/);
   if (!m) return null;
   const lat = parseFloat(m[1]);
   const lng = parseFloat(m[3]);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return { lat, lng };
-}
+};
 
-/** Parse URL Google Maps để lấy lat,lng (dạng @lat,lng hoặc ?q/query/ll=lat,lng) */
-function extractLatLngFromGMapUrl(url?: string): LatLng | null {
+const extractLatLngFromGMapUrl = (url?: string): LatLng | null => {
   if (!url) return null;
   try {
     const at = url.match(/@(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)/);
@@ -40,9 +43,8 @@ function extractLatLngFromGMapUrl(url?: string): LatLng | null {
       if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
     }
     const u = new URL(url);
-    const qs = u.searchParams;
     for (const k of ['q', 'query', 'll']) {
-      const v = qs.get(k) || '';
+      const v = u.searchParams.get(k) || '';
       const m = v.match(/(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)/);
       if (m) {
         const lat = parseFloat(m[1]);
@@ -52,25 +54,29 @@ function extractLatLngFromGMapUrl(url?: string): LatLng | null {
     }
   } catch { /* ignore */ }
   return null;
-}
+};
+
+/* ================= Component ================= */
 
 export default function AddRentalShopForm() {
   const { t } = useTranslation('common');
   const { user } = useUser();
+
   const { coords, geocode } = useGeocodeAddress();
   const geocodeRef = useRef(geocode);
   geocodeRef.current = geocode;
+
   const { submitContribution } = useContributions();
 
-  // Form state (thêm _lat/_lng nội bộ, KHÔNG ghi Firestore)
-  const [form, setForm] = useState<StationFormValues & { _lat?: string; _lng?: string }>({
+  // Form + state nội bộ cho preview
+  const [form, setForm] = useState<RentalStationFormValues & { _lat?: string; _lng?: string }>({
     name: '',
     displayAddress: '',
     mapAddress: '',
     location: '',
-    geo: undefined,
     contactPhone: '',
     vehicleType: 'motorbike',
+    status: 'inactive', // đóng góp mới -> chờ duyệt
     _lat: '',
     _lng: '',
   });
@@ -78,34 +84,44 @@ export default function AddRentalShopForm() {
   const [submitting, setSubmitting] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
-  // 🔔 Bật/tắt dùng GPS
+  // GPS toggle
   const [useCurrentPos, setUseCurrentPos] = useState(false);
-  const [gpsStatus, setGpsStatus] = useState<'idle'|'getting'|'ok'|'error'>('idle');
+  const [gpsStatus, setGpsStatus] = useState<'idle' | 'getting' | 'ok' | 'error'>('idle');
   const [gpsError, setGpsError] = useState('');
 
-  /** Lấy vị trí hiện tại (dùng khi bật checkbox hoặc bấm “Lấy lại vị trí”) */
+  /** Set đồng nhất lat/lng vào _lat/_lng + location("lat,lng") */
+  const setCoordinates = useCallback((lat: number, lng: number) => {
+    setForm(prev => ({
+      ...prev,
+      _lat: String(lat),
+      _lng: String(lng),
+      location: `${lat},${lng}`,
+    }));
+  }, []);
+
+  /** Một ô tọa độ duy nhất: nhận "16.07, 108.22" hoặc "16.07° N, 108.22° E" */
+  const handleCoordinateChange = (value: string) => {
+    const pair = parseLatLngPair(value);
+    if (pair) {
+      setCoordinates(pair.lat, pair.lng);
+    } else {
+      // Không hợp lệ -> clear _lat/_lng, giữ nguyên location
+      setForm(prev => ({ ...prev, _lat: '', _lng: '' }));
+    }
+  };
+
+  /** Lấy vị trí từ GPS */
   const getGps = useCallback(() => {
     setGpsStatus('getting');
     setGpsError('');
-
     if (!('geolocation' in navigator)) {
       setGpsStatus('error');
       setGpsError('Trình duyệt không hỗ trợ Geolocation.');
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { latitude, longitude } = pos.coords;
-        const latStr = String(latitude);
-        const lngStr = String(longitude);
-        setForm((prev) => ({
-          ...prev,
-          _lat: latStr,
-          _lng: lngStr,
-          location: `${latitude},${longitude}`,        // giữ location dạng "lat,lng"
-          geo: { lat: latitude, lng: longitude },      // giữ nguyên kiểu geo đang dùng của bạn
-        }));
+        setCoordinates(pos.coords.latitude, pos.coords.longitude);
         setGpsStatus('ok');
       },
       (err) => {
@@ -114,14 +130,14 @@ export default function AddRentalShopForm() {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }, []);
+  }, [setCoordinates]);
 
-  // Khi bật “dùng GPS” → gọi getGps()
+  // Auto lấy GPS khi bật switch
   useEffect(() => {
     if (useCurrentPos) getGps();
   }, [useCurrentPos, getGps]);
 
-  // Khi KHÔNG dùng GPS: parse toạ độ từ mapAddress hoặc location, nếu cần thì geocode
+  // Nếu KHÔNG dùng GPS: parse từ mapAddress/location hoặc geocode
   useEffect(() => {
     if (useCurrentPos) return;
 
@@ -129,74 +145,30 @@ export default function AddRentalShopForm() {
     if (!raw) return;
 
     // 1) Thử parse trực tiếp "lat,lng"
-    const byPair = parseLatLngString(raw);
+    const byPair = parseLatLngPair(raw);
     if (byPair) {
-      setForm((prev) => ({
-        ...prev,
-        _lat: String(byPair.lat),
-        _lng: String(byPair.lng),
-        location: `${byPair.lat},${byPair.lng}`,
-        geo: { lat: byPair.lat, lng: byPair.lng },
-      }));
+      setCoordinates(byPair.lat, byPair.lng);
       return;
     }
-
-    // 2) Thử parse từ URL Google Maps
+    // 2) Thử parse URL Google Maps
     const byUrl = extractLatLngFromGMapUrl(raw);
     if (byUrl) {
-      setForm((prev) => ({
-        ...prev,
-        _lat: String(byUrl.lat),
-        _lng: String(byUrl.lng),
-        location: `${byUrl.lat},${byUrl.lng}`,
-        geo: { lat: byUrl.lat, lng: byUrl.lng },
-      }));
+      setCoordinates(byUrl.lat, byUrl.lng);
       return;
     }
-
-    // 3) Geocode free-text (debounce nhẹ)
+    // 3) Geocode free-text
     const id = setTimeout(() => geocodeRef.current(raw), 300);
     return () => clearTimeout(id);
-  }, [useCurrentPos, form.mapAddress, form.location]);
+  }, [useCurrentPos, form.mapAddress, form.location, setCoordinates]);
 
-  // Nhận toạ độ từ hook geocode (chỉ khi KHÔNG dùng GPS để tránh ghi đè)
+  // Nhận kết quả geocode (chỉ khi không dùng GPS)
   useEffect(() => {
     if (!coords || useCurrentPos) return;
-    setForm((prev) => ({
-      ...prev,
-      _lat: String(coords.lat),
-      _lng: String(coords.lng),
-      location: `${coords.lat},${coords.lng}`,
-      geo: { lat: coords.lat, lng: coords.lng },
-    }));
-  }, [coords, useCurrentPos]);
+    setCoordinates(coords.lat, coords.lng);
+  }, [coords, useCurrentPos, setCoordinates]);
 
-  const handleChange = (field: keyof StationFormValues, value: any) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Gộp input toạ độ (nhập tay): nhận "16.07, 108.22" hoặc "16.07° N, 108.22° E"
-  const handleLatLngInput = (value: string) => {
-    const regex = /(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/;
-    const match = value.match(regex);
-    if (match) {
-      const latStr = match[1];
-      const lngStr = match[3];
-      const lat = parseFloat(latStr);
-      const lng = parseFloat(lngStr);
-      if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        setForm((prev) => ({
-          ...prev,
-          _lat: latStr,
-          _lng: lngStr,
-          location: `${lat},${lng}`,
-          geo: { lat, lng },
-        }));
-        return;
-      }
-    }
-    // Không hợp lệ → xoá _lat/_lng nhưng KHÔNG đụng location cũ
-    setForm((prev) => ({ ...prev, _lat: '', _lng: '' }));
+  const handleChange = (field: keyof RentalStationFormValues, value: any) => {
+    setForm(prev => ({ ...prev, [field]: value }));
   };
 
   const canSubmit =
@@ -209,40 +181,34 @@ export default function AddRentalShopForm() {
     if (!canSubmit) return;
     setSubmitting(true);
     try {
-      const payload: StationFormValues = {
+      const payload: RentalStationFormValues = {
         name: form.name.trim(),
         displayAddress: form.displayAddress.trim(),
         mapAddress: form.mapAddress?.trim() || '',
         location: form.location?.trim() || '',
-        geo: form.geo,                         // bạn đang dùng {lat,lng} → giữ nguyên
         contactPhone: form.contactPhone?.trim() || '',
         vehicleType: form.vehicleType || 'motorbike',
+        status: form.status ?? 'inactive',
       };
 
-      const data = {
-        ...payload,
-        companyId: 'contributed',
-        status: 'inactive',
-        createdBy: user!.uid,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
-      };
+      // Lưu vào hệ thống: companyId 'contributed'
+      const created = await createRentalStation(
+        { ...payload, companyId: 'contributed' },
+        user!.uid
+      );
 
-      // ➕ B1. Tạo station mới
-      await addDoc(collection(db, 'rentalStations'), data);
+      // Ghi nhận đóng góp
+      await submitContribution('rental_shop', created);
 
-      // ➕ B2. Ghi nhận đóng góp
-      await submitContribution('rental_shop', data);
-
-      // ➕ B3. Reset form + thông báo
+      // Reset
       setForm({
         name: '',
         displayAddress: '',
         mapAddress: '',
         location: '',
-        geo: undefined,
         contactPhone: '',
         vehicleType: 'motorbike',
+        status: 'inactive',
         _lat: '',
         _lng: '',
       });
@@ -258,8 +224,8 @@ export default function AddRentalShopForm() {
     if (form._lat && form._lng && Number.isFinite(parseFloat(form._lat)) && Number.isFinite(parseFloat(form._lng))) {
       return { lat: parseFloat(form._lat), lng: parseFloat(form._lng) };
     }
-    const parsed = parseLatLngString(form.location);
-    return parsed ?? null;
+    const pair = parseLatLngPair(form.location);
+    return pair ?? null;
   })();
 
   return (
@@ -276,17 +242,17 @@ export default function AddRentalShopForm() {
         onChange={(e) => handleChange('displayAddress', e.target.value)}
       />
 
-      {/* ✅ Bật dùng vị trí hiện tại (GPS) */}
+      {/* ✅ Dùng vị trí hiện tại (GPS) */}
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
           checked={useCurrentPos}
           onChange={(e) => setUseCurrentPos(e.target.checked)}
         />
-        <span>Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps</span>
+        <span>{t('use_current_location_label')}</span>
       </label>
 
-      {/* Ẩn mapAddress khi đang dùng GPS để tránh ghi đè */}
+      {/* Địa chỉ Google Maps (tùy chọn) — ẩn khi dùng GPS để tránh ghi đè */}
       {!useCurrentPos && (
         <Textarea
           className="min-h-[120px]"
@@ -296,21 +262,14 @@ export default function AddRentalShopForm() {
         />
       )}
 
-      {/* Vẫn cho phép chỉnh location thủ công (ví dụ text/ghi chú) */}
-      <Input
-        placeholder={t('rental_shop_form.location')}
-        value={form.location}
-        onChange={(e) => handleChange('location', e.target.value)}
-      />
-
-      {/* Ô nhập toạ độ gộp (tuỳ chọn) */}
+      {/* ✅ Chỉ còn 1 ô TỌA ĐỘ duy nhất */}
       <Input
         placeholder="Tọa độ (vd: 16.07, 108.22 hoặc 16.07° N, 108.22° E)"
-        value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : ''}
-        onChange={(e) => handleLatLngInput(e.target.value)}
+        value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : form.location}
+        onChange={(e) => handleCoordinateChange(e.target.value)}
       />
 
-      {/* Map preview (nếu có toạ độ hợp lệ) */}
+      {/* Map preview */}
       {previewLatLng && (
         <div className="h-48 rounded overflow-hidden border">
           <MapPreview coords={previewLatLng} />
