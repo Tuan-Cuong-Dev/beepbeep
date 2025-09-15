@@ -1,5 +1,5 @@
-// Lấy và xữ lý dữ liệu bookings
-// 10/09/2025
+// Lấy và xử lý dữ liệu bookings
+// 15/09/2025 - update: hỗ trợ Admin xem toàn hệ thống (__ALL__)
 
 'use client';
 
@@ -50,6 +50,9 @@ export function useBookingData(
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // ⬇️ cờ xem toàn hệ thống cho admin
+  const viewAll = ownerId === '__ALL__';
+
   // Field nhận diện chủ sở hữu tuỳ entity (agent → userId)
   const ownerField = useMemo(
     () =>
@@ -62,7 +65,7 @@ export function useBookingData(
   );
 
   useEffect(() => {
-    if (!ownerId) return;
+    if (!ownerId) return; // vẫn OK với '__ALL__' vì truthy
     fetchAllData(filters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ownerId, entityType, JSON.stringify(filters)]);
@@ -79,10 +82,10 @@ export function useBookingData(
   const fetchAllData = async (fs?: { startDate?: string; endDate?: string }) => {
     setLoading(true);
     try {
-      if (entityType === 'agent') {
+      if (entityType === 'agent' && !viewAll) {
         // 1) Lấy bookings của agent
         const list = await fetchBookings(fs);
-        // 2) Từ bookings → gom id để lấy meta theo nhu cầu
+        // 2) Meta theo nhu cầu
         const stationIds = uniq(list.map((b) => b.stationId));
         const companyIds = uniq(list.map((b) => b.companyId));
         const packageIds = uniq(list.map((b) => b.package || '').filter(Boolean));
@@ -93,9 +96,9 @@ export function useBookingData(
           fetchCompaniesByIds(companyIds),
           fetchPackagesNameMapByIds(packageIds),
           fetchUsersByIds(userIds),
-          // Agent không cần full vehicles/packages list theo owner → bỏ qua để nhẹ
         ]);
       } else {
+        // Admin viewAll hoặc các role theo owner
         await Promise.all([
           fetchBookings(fs),
           fetchStationsByOwner(),
@@ -117,7 +120,13 @@ export function useBookingData(
   const fetchBookings = async (fs?: { startDate?: string; endDate?: string }) => {
     const bookingRef = collection(db, 'bookings');
 
-    const conditions: any[] = [where(ownerField, '==', ownerId)];
+    const conditions: any[] = [];
+
+    // ⬇️ Chỉ where theo owner khi KHÔNG ở chế độ xem tất cả
+    if (!viewAll) {
+      conditions.push(where(ownerField, '==', ownerId));
+    }
+
     if (fs?.startDate) {
       conditions.push(
         where('createdAt', '>=', Timestamp.fromDate(new Date(fs.startDate + 'T00:00:00')))
@@ -129,7 +138,9 @@ export function useBookingData(
       );
     }
 
-    const bookingQuery: Query<DocumentData> = query(bookingRef, ...conditions);
+    const bookingQuery: Query<DocumentData> =
+      conditions.length ? query(bookingRef, ...conditions) : query(bookingRef);
+
     const snap = await getDocs(bookingQuery);
 
     const list: Booking[] = snap.docs.map((docSnap) => {
@@ -197,7 +208,11 @@ export function useBookingData(
   /* ================== STATIONS ================== */
   const fetchStationsByOwner = async () => {
     const col = collection(db, 'rentalStations');
-    const qy = query(col, where(ownerField, '==', ownerId));
+
+    const qy = viewAll
+      ? query(col) // ⬅️ admin xem tất cả
+      : query(col, where(ownerField, '==', ownerId));
+
     const snap = await getDocs(qy);
     const map: Record<string, string> = {};
     snap.docs.forEach((d) => (map[d.id] = (d.data() as any).name || 'Unnamed Station'));
@@ -219,10 +234,17 @@ export function useBookingData(
   /* ================== COMPANIES / PROVIDERS ================== */
   const fetchCompaniesByOwner = async () => {
     // tái sử dụng companyNames cho cả company hoặc provider tuỳ entity
-    const colName = entityType === 'privateProvider' ? 'privateProviders' : 'rentalCompanies';
-    const snap = await getDocs(collection(db, colName));
+    // Admin xem all: load cả hai
     const map: Record<string, string> = {};
-    snap.docs.forEach((d) => (map[d.id] = (d.data() as any).name || d.id));
+
+    // rentalCompanies
+    const s1 = await getDocs(collection(db, 'rentalCompanies'));
+    s1.docs.forEach((d) => (map[d.id] = (d.data() as any).name || d.id));
+
+    // privateProviders
+    const s2 = await getDocs(collection(db, 'privateProviders'));
+    s2.docs.forEach((d) => (map[d.id] = (d.data() as any).name || map[d.id] || d.id));
+
     setCompanyNames(map);
   };
 
@@ -230,12 +252,11 @@ export function useBookingData(
     if (!ids.length) return setCompanyNames({});
     const map: Record<string, string> = {};
     for (const part of chunk(ids, 10)) {
-      // rentalCompanies
       const s1 = await getDocs(
         query(collection(db, 'rentalCompanies'), where(documentId(), 'in', part))
       );
       s1.docs.forEach((d) => (map[d.id] = (d.data() as any).name || d.id));
-      // privateProviders (đề phòng booking ghi providerId vào companyId)
+
       const s2 = await getDocs(
         query(collection(db, 'privateProviders'), where(documentId(), 'in', part))
       );
@@ -246,8 +267,13 @@ export function useBookingData(
 
   /* ================== PACKAGES ================== */
   const fetchPackagesNameMapByOwner = async () => {
-    const col = collection(db, 'subscriptionPackages');
-    const snap = await getDocs(query(col, where(ownerField, '==', ownerId)));
+    const colRef = collection(db, 'subscriptionPackages');
+
+    const qy = viewAll
+      ? query(colRef) // admin xem tất cả
+      : query(colRef, where(ownerField, '==', ownerId));
+
+    const snap = await getDocs(qy);
     const map: Record<string, string> = {};
     snap.docs.forEach((d) => (map[d.id] = (d.data() as any).name || 'Unnamed Package'));
     setPackageNames(map);
@@ -266,12 +292,16 @@ export function useBookingData(
   };
 
   const fetchPackageListByOwner = async () => {
-    const snap = await getDocs(
-      query(collection(db, 'subscriptionPackages'), where(ownerField, '==', ownerId))
-    );
+    const colRef = collection(db, 'subscriptionPackages');
+
+    const qy = viewAll
+      ? query(colRef)
+      : query(colRef, where(ownerField, '==', ownerId));
+
+    const snap = await getDocs(qy);
     const list: SubscriptionPackage[] = snap.docs.map((d) => ({
       ...(d.data() as SubscriptionPackage),
-      id: d.id,                           // 👈 đặt id ở CUỐI
+      id: d.id, // 👈 đặt id ở CUỐI
     }));
     setPackages(list);
   };
@@ -306,15 +336,19 @@ export function useBookingData(
 
   /* ================== VEHICLES ================== */
   const fetchVehicleListByOwner = async () => {
-      const snap = await getDocs(
-        query(collection(db, 'vehicles'), where(ownerField, '==', ownerId))
-      );
-      const list: Vehicle[] = snap.docs.map((d) => ({
-        ...(d.data() as Vehicle),
-        id: d.id,                           // 👈 đặt id ở CUỐI
-      }));
-      setVehicles(list);
-    };
+    const colRef = collection(db, 'vehicles');
+
+    const qy = viewAll
+      ? query(colRef)
+      : query(colRef, where(ownerField, '==', ownerId));
+
+    const snap = await getDocs(qy);
+    const list: Vehicle[] = snap.docs.map((d) => ({
+      ...(d.data() as Vehicle),
+      id: d.id, // 👈 đặt id ở CUỐI
+    }));
+    setVehicles(list);
+  };
 
   /* ================== CREATE / UPDATE / DELETE ================== */
   const saveBooking = async (data: Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -333,12 +367,16 @@ export function useBookingData(
         };
 
         if (persistedEntityType === 'rentalCompany') {
+          const safeOwner =
+            !viewAll ? ownerId : undefined; // ⬅️ tránh ghi "__ALL__" vào companyId
           payload.companyId =
-            (editingBooking as any).companyId || (data as any).companyId || ownerId;
+            (editingBooking as any).companyId || (data as any).companyId || safeOwner;
           delete payload.providerId;
         } else if (persistedEntityType === 'privateProvider') {
+          const safeOwner =
+            !viewAll ? ownerId : undefined; // ⬅️ tránh ghi "__ALL__"
           payload.providerId =
-            (editingBooking as any).providerId || (data as any).providerId || ownerId;
+            (editingBooking as any).providerId || (data as any).providerId || safeOwner;
           delete payload.companyId;
         } else {
           // agent → đảm bảo userId
@@ -363,10 +401,11 @@ export function useBookingData(
         };
 
         if (entityType === 'rentalCompany') {
-          payload.companyId = (data as any).companyId || ownerId;
+          // ⬇️ nếu admin viewAll thì KHÔNG auto set companyId="__ALL__"
+          payload.companyId = (data as any).companyId || (!viewAll ? ownerId : undefined);
           delete payload.providerId;
         } else if (entityType === 'privateProvider') {
-          payload.providerId = (data as any).providerId || ownerId;
+          payload.providerId = (data as any).providerId || (!viewAll ? ownerId : undefined);
           delete payload.companyId;
         } else {
           payload.userId = (data as any).userId || ownerId; // agent

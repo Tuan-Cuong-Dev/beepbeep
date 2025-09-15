@@ -31,9 +31,10 @@ export default function BookingManagementPage() {
   const { user, role, companyId, stationId } = useUser();
   const normalizedRole = (role || '').toLowerCase();
   const isAgent = normalizedRole === 'agent';
-  const canManage = !isAgent; // ✅ Agent chỉ xem, không thao tác
+  const isAdmin = normalizedRole === 'admin';
+  const canManage = !isAgent; // Agent chỉ xem, không thao tác
 
-  // Xác định entityType + ownerId (companyId | providerId | agent userId)
+  // Xác định entityType + ownerId (companyId | providerId | agent userId | __ALL__ for admin)
   const [entityType, setEntityType] = useState<EntityType>('rentalCompany');
   const [ownerId, setOwnerId] = useState<string>('');
   const [resolvingOwner, setResolvingOwner] = useState<boolean>(true);
@@ -44,10 +45,12 @@ export default function BookingManagementPage() {
       setResolvingOwner(true);
       try {
         if (isAgent) {
-          // Agent theo dõi booking của chính mình -> dùng user.uid
           setEntityType('agent');
           if (mounted) setOwnerId(user?.uid ?? '');
-        } else if (normalizedRole === 'private_provider') {
+          return;
+        }
+
+        if (normalizedRole === 'private_provider') {
           setEntityType('privateProvider');
           if (user?.uid) {
             const snap = await getDocs(
@@ -58,16 +61,33 @@ export default function BookingManagementPage() {
           } else {
             if (mounted) setOwnerId('');
           }
-        } else {
-          setEntityType('rentalCompany');
-          if (mounted) setOwnerId(companyId ?? '');
+          return;
         }
+
+        // Các vai trò còn lại mặc định rentalCompany
+        setEntityType('rentalCompany');
+
+        if (companyId) {
+          if (mounted) setOwnerId(companyId);
+          return;
+        }
+
+        // Admin không có companyId → xem toàn hệ thống
+        if (isAdmin) {
+          if (mounted) setOwnerId('__ALL__');
+          return;
+        }
+
+        // Không phải admin và cũng không có companyId
+        if (mounted) setOwnerId('');
       } finally {
         if (mounted) setResolvingOwner(false);
       }
     })();
-    return () => { mounted = false; };
-  }, [normalizedRole, companyId, user?.uid, isAgent]);
+    return () => {
+      mounted = false;
+    };
+  }, [normalizedRole, companyId, user?.uid, isAgent, isAdmin]);
 
   // Lọc nâng cao
   const [searchText, setSearchText] = useState('');
@@ -75,7 +95,7 @@ export default function BookingManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<{ startDate?: string; endDate?: string }>({});
 
-  // ✅ Công tắc “Chỉ đơn của tôi” (mặc định bật cho Agent)
+  // Công tắc “Chỉ đơn của tôi” (mặc định bật cho Agent)
   const [onlyMine, setOnlyMine] = useState<boolean>(isAgent);
 
   // Hook data
@@ -90,7 +110,7 @@ export default function BookingManagementPage() {
     saveBooking,
     deleteBooking,
     loading,
-  } = useBookingData(ownerId, entityType, filters);
+  } = useBookingData(ownerId, entityType, filters); // hook đã hỗ trợ ownerId='__ALL__'
 
   const pageSize = 20;
 
@@ -141,12 +161,18 @@ export default function BookingManagementPage() {
 
   const getBadgeColor = (r: string) => {
     switch (r) {
-      case 'admin': return 'bg-red-100 text-red-800';
-      case 'company_owner': return 'bg-green-100 text-green-800';
-      case 'private_provider': return 'bg-blue-100 text-blue-800';
-      case 'station_manager': return 'bg-purple-100 text-purple-800';
-      case 'agent': return 'bg-amber-100 text-amber-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'admin':
+        return 'bg-red-100 text-red-800';
+      case 'company_owner':
+        return 'bg-green-100 text-green-800';
+      case 'private_provider':
+        return 'bg-blue-100 text-blue-800';
+      case 'station_manager':
+        return 'bg-purple-100 text-purple-800';
+      case 'agent':
+        return 'bg-amber-100 text-amber-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -179,6 +205,12 @@ export default function BookingManagementPage() {
     }
   };
 
+  const showNoOwner =
+    !resolvingOwner &&
+    !isAgent &&
+    !(isAdmin && ownerId === '__ALL__') &&
+    !ownerId;
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -202,16 +234,18 @@ export default function BookingManagementPage() {
               </label>
             )}
             <Badge className={`text-sm px-3 py-1 rounded-full ${getBadgeColor(normalizedRole)}`}>
-              {roleDisplayName[normalizedRole] || t('badge_roles.user', { defaultValue: 'Người dùng' })}
+              {roleDisplayName[normalizedRole] ||
+                t('badge_roles.user', { defaultValue: 'Người dùng' })}
             </Badge>
           </div>
         </div>
 
-        {/* Thông báo nếu chưa resolve owner (provider) */}
         {resolvingOwner && <p>{t('loading')}</p>}
-        {!resolvingOwner && !ownerId && !isAgent && (
+        {showNoOwner && (
           <p className="text-red-600">
-            {t('no_owner_found', { defaultValue: 'Không xác định được đơn vị quản lý cho tài khoản hiện tại.' })}
+            {t('no_owner_found', {
+              defaultValue: 'Không xác định được đơn vị quản lý cho tài khoản hiện tại.',
+            })}
           </p>
         )}
 
@@ -259,9 +293,6 @@ export default function BookingManagementPage() {
                 companyNames={companyNames}
                 packageNames={packageNames}
                 userNames={userNames}
-                /* ✅ Giữ nguyên UI; chỉ thêm logic:
-                   - Agent: ẩn cột thao tác (nếu table hỗ trợ showActions),
-                   - đồng thời không truyền onEdit/onDelete để table tự ẩn nếu có điều kiện. */
                 showActions={canManage}
                 onEdit={canManage ? (b) => setEditingBooking(b) : undefined}
                 onDelete={canManage ? (id) => handleDeleteBooking(id) : undefined}
@@ -273,13 +304,16 @@ export default function BookingManagementPage() {
         </Card>
 
         {totalPages > 1 && (
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         )}
       </main>
 
       <Footer />
 
-      {/* ✅ Không mở dialog edit cho Agent */}
       {canManage && (
         <Dialog open={!!editingBooking} onOpenChange={(open) => !open && setEditingBooking(null)}>
           <DialogContent className="!p-0 w-full max-w-none h-screen overflow-y-auto rounded-none bg-white">
@@ -299,7 +333,9 @@ export default function BookingManagementPage() {
                   packages={[]}
                   vehicles={[]}
                   onSave={async (data) => {
-                    await saveBooking(data as Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>);
+                    await saveBooking(
+                      data as Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>
+                    );
                     setEditingBooking(null);
                   }}
                   onCancel={() => setEditingBooking(null)}
