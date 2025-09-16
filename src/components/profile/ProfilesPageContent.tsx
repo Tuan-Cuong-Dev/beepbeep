@@ -1,5 +1,5 @@
 // Date : 16/09/2025
-// Đã logic để hiện thị tab nào public và private
+// Đã logic để hiện thị tab nào public và private + fallback publicProfiles cho khách (QR)
 
 'use client';
 
@@ -41,6 +41,9 @@ export default function ProfilesPageContent() {
   const searchParams = useSearchParams();
 
   const [userData, setUserData] = useState<any>(null);
+  const [loadingUser, setLoadingUser] = useState<boolean>(true);
+  const [readOnlyPublic, setReadOnlyPublic] = useState<boolean>(false);
+
   const [activeTab, setActiveTab] = useState<TabType>('activityFeed');
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
@@ -62,8 +65,64 @@ export default function ProfilesPageContent() {
     }
   }, [searchParams, currentUser?.uid]);
 
+  // Tải dữ liệu user của "profileUserId" (full → fallback public)
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchUserData = async () => {
+      setLoadingUser(true);
+      setReadOnlyPublic(false);
+      setUserData(null);
+
+      if (!profileUserId) {
+        setLoadingUser(false);
+        return;
+      }
+
+      // 1) Thử đọc full profile (users/{uid})
+      try {
+        const ref = doc(db, 'users', profileUserId);
+        const snap = await getDoc(ref);
+        if (!cancelled && snap.exists()) {
+          setUserData(snap.data());
+          setReadOnlyPublic(false);
+          setLoadingUser(false);
+          return;
+        }
+      } catch (_err) {
+        // console.warn('[ProfilesPageContent] users read failed:', _err);
+      }
+
+      // 2) Fallback: publicProfiles/{uid} (cho khách/không đủ quyền)
+      try {
+        const pref = doc(db, 'publicProfiles', profileUserId);
+        const psnap = await getDoc(pref);
+        if (!cancelled) {
+          if (psnap.exists()) {
+            setUserData(psnap.data());
+            setReadOnlyPublic(true);
+          } else {
+            setUserData(null);
+          }
+        }
+      } catch (_err2) {
+        if (!cancelled) setUserData(null);
+      } finally {
+        if (!cancelled) setLoadingUser(false);
+      }
+    };
+
+    fetchUserData();
+    return () => {
+      cancelled = true;
+    };
+  }, [profileUserId]);
+
   // Xác định quyền xem của người đang truy cập
-  const isOwner = !!(currentUser?.uid && profileUserId && currentUser.uid === profileUserId);
+  const isOwnerRaw = !!(currentUser?.uid && profileUserId && currentUser.uid === profileUserId);
+  // Nếu đang xem bản công khai (fallback) thì không cho quyền owner
+  const isOwner = isOwnerRaw && !readOnlyPublic;
+
   const allowedTabs = (isOwner ? ALL_TABS : PUBLIC_TABS) as TabType[];
 
   // Nếu người xem không phải chủ account mà đang đứng ở tab private → chuyển về activityFeed
@@ -92,20 +151,6 @@ export default function ProfilesPageContent() {
     setActiveTab(tab);
   };
 
-  // Tải dữ liệu user của "profileUserId"
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!profileUserId) {
-        setUserData(null);
-        return;
-      }
-      const ref = doc(db, 'users', profileUserId);
-      const snap = await getDoc(ref);
-      setUserData(snap.exists() ? snap.data() : null);
-    };
-    fetchUserData();
-  }, [profileUserId]);
-
   const businessTypeFromRole = useMemo<BusinessType | undefined>(() => {
     switch (userData?.role as string | undefined) {
       case 'company_owner': return 'rental_company';
@@ -121,6 +166,7 @@ export default function ProfilesPageContent() {
 
   const businessId = userData?.companyId as string | undefined;
 
+  // States hiển thị
   if (!profileUserId) {
     return (
       <div className="bg-gray-100 min-h-screen">
@@ -133,12 +179,26 @@ export default function ProfilesPageContent() {
     );
   }
 
-  if (!userData) {
+  if (loadingUser) {
     return (
       <div className="bg-gray-100 min-h-screen">
         <div className="max-w-4xl mx-auto p-6">
           <div className="rounded-lg bg-white p-6 border">
             <p className="text-gray-700">{t('loading')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="bg-gray-100 min-h-screen">
+        <div className="max-w-4xl mx-auto p-6">
+          <div className="rounded-lg bg-white p-6 border">
+            <p className="text-gray-700">
+              {t('profiles_page_content.not_available', 'Hồ sơ này hiện không khả dụng.')}
+            </p>
           </div>
         </div>
       </div>
@@ -151,9 +211,9 @@ export default function ProfilesPageContent() {
     <div className="bg-gray-100 min-h-screen">
       {/* Header + Avatar */}
       <ProfileOverview
-        userId={profileUserId!}
-        userPrefetched={userData}         // ✅ đúng prop name
-        isOwner={isOwner}                 // ✅ đúng prop name
+        userId={profileUserId}
+        userPrefetched={userData}         // dùng dữ liệu đã fetch (full hoặc public)
+        isOwner={isOwner}                 // chỉ true khi đúng chủ và không ở chế độ public
         onEditProfile={() => router.push('/account/profile')}
       />
 
@@ -163,8 +223,8 @@ export default function ProfilesPageContent() {
           activeTab={activeTab}
           setActiveTab={handleTabChange}
           userId={profileUserId || undefined}
-          allowedTabs={allowedTabs}          // ✅ chỉ hiển thị tab được phép
-          canConfigure={!!isOwner}           // ✅ chỉ chủ tài khoản mới được cấu hình
+          allowedTabs={allowedTabs}      // chỉ hiển thị tab được phép
+          canConfigure={!!isOwner}       // chỉ chủ tài khoản mới được cấu hình
         />
       </div>
 
@@ -188,12 +248,9 @@ export default function ProfilesPageContent() {
         <section className="w-full md:flex-[1_1_66.666%] md:max-w-[66.666%] space-y-6 mt-6 md:mt-0 min-w-0">
           {/* Public */}
           {activeTab === 'activityFeed' && <ProfileMainContent activeTab="activityFeed" />}
+
           {activeTab === 'showcase' && (
-            <AgentShowcase
-              agentId={profileUserId}
-              limitPerRow={12}
-              onlyAvailable
-            />
+            <AgentShowcase agentId={profileUserId} limitPerRow={12} onlyAvailable />
           )}
 
           {/* Private: chỉ chủ tài khoản mới xem được */}

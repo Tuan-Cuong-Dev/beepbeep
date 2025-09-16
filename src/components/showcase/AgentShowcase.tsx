@@ -1,13 +1,13 @@
 'use client';
 
 // Date : 16/09/2025
-// AgentJoinedModelsShowcaseLite — phiên bản rút gọn (không header)
+// AgentShowcase — phiên bản rút gọn (không header) + safe for guests
 
 import * as React from 'react';
 import Image, { type StaticImageData } from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
-  collection, getDocs, query, where, documentId,
+  collection, getDocs, query, where, documentId, Query, QueryConstraint,
 } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { Button } from '@/src/components/ui/button';
@@ -37,7 +37,7 @@ const DEFAULT_ICONS: Record<string, StaticImageData> = {
   bus: busIcon,
 };
 
-/* ===== Helpers ===== */
+/* ===================== Helpers ===================== */
 function chunk<T>(arr: T[], size = 10): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
@@ -99,38 +99,58 @@ function coerceModelDiscounts(raw: any): ProgramModelDiscount[] {
   return [];
 }
 
-/* ===== Firestore loaders ===== */
-async function loadJoinedPrograms(agentId: string) {
-  const snap = await getDocs(
-    query(
-      collection(db, 'programParticipants'),
-      where('userId', '==', agentId),
-      where('userRole', '==', 'agent'),
-      where('status', '==', 'joined')
-    )
-  );
-  const programIds = Array.from(new Set(snap.docs.map(d => (d.data() as any)?.programId).filter(Boolean)));
-  if (!programIds.length) return [];
-
-  const all: (Program & { modelDiscounts: ProgramModelDiscount[]; companyId?: string | null })[] = [];
-  for (const part of chunk(programIds, 10)) {
-    const ps = await getDocs(query(collection(db, 'programs'), where(documentId(), 'in', part)));
-    ps.docs.forEach(d => all.push({
-      id: d.id,
-      ...(d.data() as any),
-      modelDiscounts: coerceModelDiscounts((d.data() as any)?.modelDiscounts),
-      companyId: (d.data() as any)?.companyId || null,
-    }));
+/* ===================== Safe Firestore helpers ===================== */
+async function safeGetDocs<T = any>(q: Query<T>) {
+  try {
+    const snap = await getDocs(q);
+    return snap;
+  } catch (e) {
+    // permission-denied hoặc lỗi mạng… → trả về snap giả rỗng
+    // console.warn('[AgentShowcase] getDocs failed:', e);
+    return { docs: [] } as any;
   }
-  return all.filter(isProgramActiveNow).filter(p => p.modelDiscounts.length > 0);
+}
+
+/* ===== Firestore loaders (safe for guests) ===== */
+async function loadJoinedPrograms(agentId: string) {
+  try {
+    const snap = await safeGetDocs(
+      query(
+        collection(db, 'programParticipants'),
+        where('userId', '==', agentId),
+        where('userRole', '==', 'agent'),
+        where('status', '==', 'joined')
+      )
+    );
+    const programIds = Array.from(new Set((snap.docs || []).map((d: { data: () => any; }) => (d.data() as any)?.programId).filter(Boolean)));
+    if (!programIds.length) return [];
+
+    const all: (Program & { modelDiscounts: ProgramModelDiscount[]; companyId?: string | null })[] = [];
+    for (const part of chunk(programIds, 10)) {
+      const ps = await safeGetDocs(query(collection(db, 'programs'), where(documentId(), 'in', part)));
+      (ps.docs || []).forEach((d: { id: any; data: () => any; }) => all.push({
+        id: d.id,
+        ...(d.data() as any),
+        modelDiscounts: coerceModelDiscounts((d.data() as any)?.modelDiscounts),
+        companyId: (d.data() as any)?.companyId || null,
+      }));
+    }
+    return all.filter(isProgramActiveNow).filter(p => p.modelDiscounts.length > 0);
+  } catch {
+    return [];
+  }
 }
 
 async function loadVehicleModelsByIds(ids: string[], collectionName: string) {
   const map = new Map<string, VehicleModel>();
   if (!ids.length) return map;
   for (const part of chunk(ids, 10)) {
-    const snap = await getDocs(query(collection(db, collectionName), where(documentId(), 'in', part)));
-    snap.docs.forEach(d => map.set(d.id, { id: d.id, ...(d.data() as any) } as VehicleModel));
+    try {
+      const snap = await safeGetDocs(query(collection(db, collectionName), where(documentId(), 'in', part)));
+      (snap.docs || []).forEach((d: { id: string; data: () => any; }) => map.set(d.id, { id: d.id, ...(d.data() as any) } as VehicleModel));
+    } catch {
+      // ignore
+    }
   }
   return map;
 }
@@ -146,20 +166,24 @@ async function loadVehiclesFor(
 
   for (const companyId of companyIds) {
     for (const part of chunk(modelIds, 10)) {
-      const conds: any[] = [
-        where('companyId', '==', companyId),
-        where('modelId', 'in', part),
-      ];
-      if (statusFilter) conds.push(where('status', '==', statusFilter));
-      const q = query(collection(db, vehicleCollectionName), ...conds);
-      const snap = await getDocs(q);
-      snap.docs.forEach(d => results.push({ id: d.id, ...(d.data() as any) } as Vehicle));
+      try {
+        const conds: QueryConstraint[] = [
+          where('companyId', '==', companyId),
+          where('modelId', 'in', part),
+        ];
+        if (statusFilter) conds.push(where('status', '==', statusFilter));
+        const q = query(collection(db, vehicleCollectionName), ...conds);
+        const snap = await safeGetDocs(q);
+        (snap.docs || []).forEach((d: { id: any; data: () => any; }) => results.push({ id: d.id, ...(d.data() as any) } as Vehicle));
+      } catch {
+        // ignore
+      }
     }
   }
   return results;
 }
 
-/* ===== View types ===== */
+/* ===================== View types ===================== */
 type ModelCardRow = {
   key: string;
   model: VehicleModel;
@@ -178,7 +202,7 @@ interface ShowcaseProps {
   onlyAvailable?: boolean;
 }
 
-export default function AgentJoinedModelsShowcaseLite({
+export default function AgentShowcase({
   agentId,
   vehicleModelCollectionName = 'vehicleModels',
   vehiclesCollectionName = 'vehicles',
@@ -198,12 +222,19 @@ export default function AgentJoinedModelsShowcaseLite({
       setLoading(true);
       try {
         const programs = await loadJoinedPrograms(agentId);
-        if (!programs.length) { if (mounted) setRows([]); return; }
+        if (!mounted) return;
+
+        if (!programs.length) {
+          setRows([]);
+          return;
+        }
 
         const companyIds = Array.from(new Set(programs.map(p => p.companyId).filter(Boolean))) as string[];
         const modelIds = Array.from(new Set(programs.flatMap(p => p.modelDiscounts.map(md => md.modelId))));
+
         if (companyIds.length === 0 || modelIds.length === 0) {
-          if (mounted) setRows([]); return;
+          setRows([]);
+          return;
         }
 
         const [modelMap, vehicles] = await Promise.all([
@@ -216,7 +247,7 @@ export default function AgentJoinedModelsShowcaseLite({
         vehicles.forEach(v => {
           const vm = modelMap.get(v.modelId);
           if (!vm) return;
-          const base = typeof v.pricePerDay === 'number' ? v.pricePerDay : null;
+          const base = typeof (v as any).pricePerDay === 'number' ? (v as any).pricePerDay : null;
 
           const cur = byModel.get(v.modelId);
           if (!cur) {
@@ -225,7 +256,7 @@ export default function AgentJoinedModelsShowcaseLite({
               model: vm,
               baseFrom: base,
               vehicleCount: 1,
-              preferredCompanyId: v.companyId,
+              preferredCompanyId: (v as any).companyId,
               preferredStationId: (v as any).stationId,
               preferredVehicleId: v.id,
             });
@@ -233,7 +264,7 @@ export default function AgentJoinedModelsShowcaseLite({
             cur.vehicleCount += 1;
             if (base != null && (cur.baseFrom == null || base < cur.baseFrom)) {
               cur.baseFrom = base;
-              cur.preferredCompanyId = v.companyId;
+              cur.preferredCompanyId = (v as any).companyId;
               cur.preferredStationId = (v as any).stationId;
               cur.preferredVehicleId = v.id;
             }
@@ -248,7 +279,10 @@ export default function AgentJoinedModelsShowcaseLite({
           return (a.model?.name || '').localeCompare(b.model?.name || '');
         });
 
-        if (mounted) setRows(built);
+        setRows(built);
+      } catch (_err) {
+        // an toàn cho khách: lỗi → coi như không có dữ liệu
+        setRows([]);
       } finally {
         if (mounted) setLoading(false);
       }
