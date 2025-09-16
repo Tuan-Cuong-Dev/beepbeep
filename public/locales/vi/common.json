@@ -396,7 +396,8 @@
 "profiles_page_content": {
   "loading": "Đang tải hồ sơ...",
   "no_address": "Chưa cập nhật",
-  "no_contributions": "Bạn chưa có đóng góp nào."
+  "no_contributions": "Bạn chưa có đóng góp nào.",
+  "no_user_found": "Không tìm thấy người dùng."
 },
 
 "mobile_profile_overview": {
@@ -433,7 +434,8 @@
   "insurance": "Gói bảo hiểm",
   "issues": "Sự cố đã báo",
   "contributions": "Đóng góp",
-  "business": "Doanh nghiệp"
+  "business": "Doanh nghiệp",
+  "showcase": "Gian hàng"
 },
 
 
@@ -1180,7 +1182,8 @@
   "insurance": "Bảo hiểm",
   "issues": "Sự cố",
   "contributions": "Đóng góp",
-  "business": "Doanh nghiệp"
+  "business": "Doanh nghiệp",
+  "showcase":"Gian hàng"
 },
 
 "create_business_page": {

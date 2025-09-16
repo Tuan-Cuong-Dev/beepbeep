@@ -388,7 +388,8 @@
 "profiles_page_content": {
   "loading": "Loading profile...",
   "no_address": "Not updated",
-  "no_contributions": "You haven't made any contributions yet."
+  "no_contributions": "You haven't made any contributions yet.",
+  "no_user_found": "User not found."
 },
 
   "mobile_profile_overview": {
@@ -422,10 +423,11 @@
 "profile_tabs": {
   "activityFeed": "Activity Feed",
   "vehicles": "My Vehicles",
-  "insurance": "Insurance Packages",
+  "insurance": "Insurance",
   "issues": "Reported Issues",
   "contributions": "Contributions",
-  "business": "Business"
+  "business": "Business",
+  "showcase": "Showcase"
 },
 
   "activityFeed": {
@@ -1172,7 +1174,8 @@
     "insurance": "Insurance",
     "issues": "Issues",
     "contributions": "Contributions",
-    "business": "Business"
+    "business": "Business",
+    "showcase":"Showcase"
 },
 
 "create_business_page": {

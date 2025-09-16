@@ -1,7 +1,7 @@
 'use client';
 
 import { Dialog } from '@headlessui/react';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -31,7 +31,7 @@ function SortableItem({ id, visible, onToggle }: SortableItemProps) {
     >
       <div className="flex items-center gap-2">
         <input type="checkbox" checked={visible} onChange={() => onToggle(id)} />
-        <span {...attributes} {...listeners} className="cursor-move">
+        <span {...attributes} {...listeners} className="cursor-move select-none">
           {t(`tab_labels.${id}`)}
         </span>
       </div>
@@ -42,7 +42,7 @@ function SortableItem({ id, visible, onToggle }: SortableItemProps) {
 interface TabSettingsModalProps {
   visibleTabs: VisibleTab[];
   setVisibleTabs: (tabs: VisibleTab[]) => void;
-  storageKey: string;
+  storageKey: string; // có thể là '' nếu chưa có userId
   onClose: () => void;
 }
 
@@ -55,11 +55,14 @@ export function TabSettingsModal({
   const { t } = useTranslation('common');
   const [tabs, setTabs] = useState<VisibleTab[]>(visibleTabs);
 
+  // Đồng bộ prop -> state mỗi khi visibleTabs thay đổi
+  useEffect(() => {
+    setTabs(visibleTabs);
+  }, [visibleTabs]);
+
   const toggleTabVisibility = (id: string) => {
     setTabs(prev =>
-      prev.map(tab =>
-        tab.key === id ? { ...tab, visible: !tab.visible } : tab
-      )
+      prev.map(tab => (tab.key === id ? { ...tab, visible: !tab.visible } : tab))
     );
   };
 
@@ -74,12 +77,18 @@ export function TabSettingsModal({
 
   const handleSave = () => {
     setVisibleTabs(tabs);
-    localStorage.setItem(storageKey, JSON.stringify(tabs));
+    if (storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify(tabs));
+    }
     onClose();
   };
 
   return (
-    <Dialog open={true} onClose={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+    <Dialog
+      open={true}
+      onClose={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+    >
       <Dialog.Panel className="bg-white p-6 rounded shadow-md w-full max-w-md">
         <Dialog.Title className="text-lg font-semibold mb-4">
           {t('tab_settings_modal.title')}

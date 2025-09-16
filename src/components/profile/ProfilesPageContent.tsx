@@ -1,10 +1,13 @@
+// Date : 16/09/2025
+// Đã logic để hiện thị tab nào public và private
+
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useAuth } from '@/src/hooks/useAuth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 import ProfileOverview from '@/src/components/profile/ProfileOverview';
@@ -16,10 +19,12 @@ import MyInsuranceSection from '@/src/components/profile/MyInsuranceSection';
 import MyIssuesSectionContainer from '@/src/components/profile/MyIssuesSectionContainer';
 import MyContributionsSection from '@/src/components/profile/MyContributionsSection';
 import MyBusinessSection from '@/src/components/profile/MyBusinessSection';
+import AgentJoinedModelsShowcaseLite from '@/src/components/showcase/AgentJoinedModelsShowcaseLite';
 import type { BusinessType } from '@/src/lib/my-business/businessTypes';
 
-const validTabs: TabType[] = [
+const ALL_TABS: TabType[] = [
   'activityFeed',
+  'showcase',
   'vehicles',
   'insurance',
   'issues',
@@ -27,41 +32,82 @@ const validTabs: TabType[] = [
   'business',
 ];
 
+const PUBLIC_TABS: TabType[] = ['activityFeed', 'showcase'];
+
 export default function ProfilesPageContent() {
   const { t } = useTranslation('common');
   const { currentUser } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [userData, setUserData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>('activityFeed');
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
+  // Lấy tab & uid từ query
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab') as TabType | null;
-    if (tab && validTabs.includes(tab)) setActiveTab(tab);
-  }, []);
+    const tabParam = searchParams?.get('tab') as TabType | null;
+    const uidParam = searchParams?.get('uid');
 
-  const handleTabChange = (tab: TabType) => {
-    if (tab !== activeTab) {
-      setActiveTab(tab);
-      router.push(`?tab=${tab}`);
+    if (uidParam) {
+      setProfileUserId(uidParam);
+    } else if (currentUser?.uid) {
+      setProfileUserId(currentUser.uid);
+    } else {
+      setProfileUserId(null);
     }
+
+    if (tabParam && ALL_TABS.includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams, currentUser?.uid]);
+
+  // Xác định quyền xem của người đang truy cập
+  const isOwner = currentUser?.uid && profileUserId && currentUser.uid === profileUserId;
+  const allowedTabs = (isOwner ? ALL_TABS : PUBLIC_TABS) as TabType[];
+
+  // Nếu người xem không phải chủ account mà đang đứng ở tab private → chuyển về activityFeed
+  useEffect(() => {
+    if (!activeTab) return;
+    if (!allowedTabs.includes(activeTab)) {
+      const qs = new URLSearchParams();
+      qs.set('tab', 'activityFeed');
+      const uid = searchParams?.get('uid');
+      if (uid) qs.set('uid', uid);
+      router.replace(`?${qs.toString()}`);
+      setActiveTab('activityFeed');
+    }
+  }, [activeTab, allowedTabs, router, searchParams]);
+
+  // Đồng bộ URL khi đổi tab (giữ nguyên uid nếu có)
+  const handleTabChange = (tab: TabType) => {
+    if (tab === activeTab) return;
+
+    const qs = new URLSearchParams();
+    qs.set('tab', tab);
+    const uid = searchParams?.get('uid');
+    if (uid) qs.set('uid', uid);
+
+    router.push(`?${qs.toString()}`);
+    setActiveTab(tab);
   };
 
+  // Tải dữ liệu user của "profileUserId"
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!currentUser) return;
-      const ref = doc(db, 'users', currentUser.uid);
+      if (!profileUserId) {
+        setUserData(null);
+        return;
+      }
+      const ref = doc(db, 'users', profileUserId);
       const snap = await getDoc(ref);
-      if (snap.exists()) setUserData(snap.data());
+      setUserData(snap.exists() ? snap.data() : null);
     };
     fetchUserData();
-  }, [currentUser]);
+  }, [profileUserId]);
 
   const businessTypeFromRole = useMemo<BusinessType | undefined>(() => {
-    const role = userData?.role as string | undefined;
-    switch (role) {
+    switch (userData?.role as string | undefined) {
       case 'company_owner': return 'rental_company';
       case 'private_provider': return 'private_provider';
       case 'agent': return 'agent';
@@ -75,9 +121,30 @@ export default function ProfilesPageContent() {
 
   const businessId = userData?.companyId as string | undefined;
 
-  if (!currentUser || !userData) return null;
+  if (!profileUserId) {
+    return (
+      <div className="bg-gray-100 min-h-screen">
+        <div className="max-w-4xl mx-auto p-6">
+          <div className="rounded-lg bg-white p-6 border">
+            <p className="text-gray-700">{t('profiles_page_content.no_user_found')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // ✅ Mobile chỉ show sidebar khi tab = activityFeed
+  if (!userData) {
+    return (
+      <div className="bg-gray-100 min-h-screen">
+        <div className="max-w-4xl mx-auto p-6">
+          <div className="rounded-lg bg-white p-6 border">
+            <p className="text-gray-700">{t('loading')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const showSidebarOnMobile = activeTab === 'activityFeed';
 
   return (
@@ -92,7 +159,9 @@ export default function ProfilesPageContent() {
         <ProfileTabs
           activeTab={activeTab}
           setActiveTab={handleTabChange}
-          userId={currentUser.uid}
+          userId={profileUserId || undefined}
+          allowedTabs={allowedTabs}          // ✅ chỉ hiển thị tab được phép
+          canConfigure={!!isOwner}           // ✅ chỉ chủ tài khoản mới được cấu hình
         />
       </div>
 
@@ -105,7 +174,7 @@ export default function ProfilesPageContent() {
           <ProfileSidebar
             businessId={businessId}
             businessType={businessTypeFromRole}
-            currentUserId={currentUser.uid}
+            currentUserId={profileUserId}
             location={userData.address || t('profiles_page_content.no_address')}
             joinedDate={userData.joinedDate || '2025-01'}
             helpfulVotes={userData.helpfulVotes || 0}
@@ -114,12 +183,22 @@ export default function ProfilesPageContent() {
 
         {/* Main tab content */}
         <section className="w-full md:flex-[1_1_66.666%] md:max-w-[66.666%] space-y-6 mt-6 md:mt-0 min-w-0">
+          {/* Public */}
           {activeTab === 'activityFeed' && <ProfileMainContent activeTab="activityFeed" />}
-          {activeTab === 'vehicles' && <MyVehiclesSection />}
-          {activeTab === 'insurance' && <MyInsuranceSection />}
-          {activeTab === 'issues' && <MyIssuesSectionContainer />} 
-          {activeTab === 'contributions' && <MyContributionsSection />}
-          {activeTab === 'business' && <MyBusinessSection />}
+          {activeTab === 'showcase' && (
+            <AgentJoinedModelsShowcaseLite
+              agentId={profileUserId}
+              limitPerRow={12}
+              onlyAvailable
+            />
+          )}
+
+          {/* Private: chỉ chủ tài khoản mới xem được */}
+          {isOwner && activeTab === 'vehicles' && <MyVehiclesSection />}
+          {isOwner && activeTab === 'insurance' && <MyInsuranceSection />}
+          {isOwner && activeTab === 'issues' && <MyIssuesSectionContainer />}
+          {isOwner && activeTab === 'contributions' && <MyContributionsSection />}
+          {isOwner && activeTab === 'business' && <MyBusinessSection />}
         </section>
       </div>
     </div>

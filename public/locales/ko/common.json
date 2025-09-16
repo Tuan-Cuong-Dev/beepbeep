@@ -370,7 +370,8 @@
 "profiles_page_content": {
   "loading": "프로필 로딩 중...",
   "no_address": "업데이트되지 않음",
-  "no_contributions": "아직 기여한 내용이 없습니다."
+  "no_contributions": "아직 기여한 내용이 없습니다.",
+  "no_user_found": "사용자를 찾을 수 없습니다."
 },
 
 "mobile_profile_overview": {
@@ -404,10 +405,11 @@
 "profile_tabs": {
   "activityFeed": "활동 피드",
   "vehicles": "내 차량",
-  "insurance": "보험 패키지",
+  "insurance": "보험",
   "issues": "신고된 문제",
   "contributions": "기여",
-  "business": "비즈니스"
+  "business": "비즈니스",
+  "showcase": "쇼케이스"
 },
 
 "activityFeed": {
@@ -1150,7 +1152,8 @@
   "insurance": "보험",
   "issues": "문제",
   "contributions": "기여",
-  "business": "비즈니스"
+  "business": "비즈니스",
+  "showcase":"쇼케이스"
 },
 
 "create_business_page": {
