@@ -397,7 +397,9 @@
   "loading": "Đang tải hồ sơ...",
   "no_address": "Chưa cập nhật",
   "no_contributions": "Bạn chưa có đóng góp nào.",
-  "no_user_found": "Không tìm thấy người dùng."
+  "no_user_found": "Không tìm thấy người dùng.",
+  "please_login": "Vui lòng tạo tài khoản và đăng nhập, sau đó quét lại QR code để tiếp tục.",
+  "login_button": "Đăng nhập để tiếp tục"
 },
 
 "mobile_profile_overview": {

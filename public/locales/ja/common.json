@@ -366,8 +366,10 @@
 "profiles_page_content": {
   "loading": "プロフィールを読み込み中...",
   "no_address": "未更新",
-  "no_contributions": "まだ貢献がありません。",
-   "no_user_found": "ユーザーが見つかりません。"
+  "no_contributions": "まだ貢献はありません。",
+  "no_user_found": "ユーザーが見つかりません。",
+  "please_login": "アカウントを作成してログインし、もう一度QRコードをスキャンしてください。",
+  "login_button": "ログインして続行"
 },
 
 "mobile_profile_overview": {

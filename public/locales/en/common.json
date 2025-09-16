@@ -389,7 +389,9 @@
   "loading": "Loading profile...",
   "no_address": "Not updated",
   "no_contributions": "You haven't made any contributions yet.",
-  "no_user_found": "User not found."
+  "no_user_found": "User not found.",
+  "please_login": "Please create an account and log in, then scan the QR code again to continue.",
+  "login_button": "Login to continue"
 },
 
   "mobile_profile_overview": {

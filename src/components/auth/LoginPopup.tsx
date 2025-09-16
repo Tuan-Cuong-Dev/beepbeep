@@ -1,3 +1,4 @@
+// src/components/auth/LoginPopup.tsx
 'use client';
 
 import { useState } from 'react';
