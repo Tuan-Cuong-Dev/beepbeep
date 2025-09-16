@@ -1,3 +1,6 @@
+// Thông tin bên trái của UI của profiles
+// Date : 16/09/2025
+
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -20,13 +23,21 @@ import type { BusinessType } from '@/src/lib/my-business/businessTypes';
 import type { Staff } from '@/src/lib/staff/staffTypes';
 import type { RentalCompany } from '@/src/lib/rentalCompanies/rentalCompaniesTypes';
 
+// ✅ QR component để tạo link tới trang showcase của agent
+import ProfileQR from '@/src/components/profile/ProfileQR';
+
 interface ProfileSidebarProps {
   businessId?: string;
   businessType?: BusinessType;
-  currentUserId?: string; // nếu không truyền, sẽ fallback lấy từ Auth
+  currentUserId?: string;     // uid của profile đang xem (ưu tiên prop, fallback auth)
   location?: string;
   joinedDate?: string;
   helpfulVotes?: number;
+
+  /** QR config */
+  showQRForShowcase?: boolean;     // mặc định: true
+  qrBaseUrl?: string;              // ví dụ: 'http://192.168.31.91:3000'
+  onlyOwnerCanSeeQR?: boolean;     // chỉ chủ tài khoản mới thấy QR (mặc định: false)
 }
 
 export default function ProfileSidebar({
@@ -36,10 +47,14 @@ export default function ProfileSidebar({
   location = 'Da Nang, Vietnam',
   joinedDate = 'Mar 2025',
   helpfulVotes = 0,
+
+  showQRForShowcase = true,
+  qrBaseUrl,
+  onlyOwnerCanSeeQR = false,
 }: ProfileSidebarProps) {
   const { t } = useTranslation('common');
 
-  // ✅ Lấy uid từ prop hoặc từ auth listener
+  // ✅ Lấy uid đang render (profile) từ prop hoặc từ auth
   const [resolvedUserId, setResolvedUserId] = useState<string | undefined>(currentUserId);
   useEffect(() => {
     if (currentUserId) {
@@ -52,11 +67,19 @@ export default function ProfileSidebar({
     return () => unsub();
   }, [currentUserId]);
 
+  const [authUid, setAuthUid] = useState<string | undefined>(undefined);
+  // lưu auth uid để biết có phải chủ tài khoản không
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => setAuthUid(u?.uid || undefined));
+    return () => unsub();
+  }, []);
+
+  // auto-detect business nếu không truyền từ parent
   const [staffBusinessId, setStaffBusinessId] = useState<string | undefined>();
   const [staffBusinessType, setStaffBusinessType] = useState<BusinessType | undefined>();
   const [loadingAutoDetect, setLoadingAutoDetect] = useState(false);
 
-  // Riêng cho private_provider: lưu ownerId để ServicesAboutSection dùng userId
+  // Riêng private_provider: lấy ownerId để ServicesAboutSection dùng userId
   const [ownerUserId, setOwnerUserId] = useState<string | undefined>(undefined);
 
   const hasParentBusiness = useMemo(
@@ -81,7 +104,7 @@ export default function ProfileSidebar({
     const autoDetectOrg = async () => {
       setLoadingAutoDetect(true);
       try {
-        // 1) Ưu tiên: users/{uid}.business
+        // 1) users/{uid}.business
         const userRef = doc(db, 'users', resolvedUserId);
         const userSnap = await getDoc(userRef);
         if (!mounted) return;
@@ -98,7 +121,7 @@ export default function ProfileSidebar({
           return;
         }
 
-        // 2) Fallback staff → rentalCompanies
+        // 2) staff → rentalCompanies
         const qStaffs = query(
           collection(db, 'staffs'),
           where('userId', '==', resolvedUserId),
@@ -126,7 +149,7 @@ export default function ProfileSidebar({
           }
         }
 
-        // 3) Fallback owner → technicianPartners
+        // 3) owner → technicianPartners
         const qTech = query(
           collection(db, 'technicianPartners'),
           where('ownerId', '==', resolvedUserId)
@@ -142,7 +165,7 @@ export default function ProfileSidebar({
           return;
         }
 
-        // 4) ✅ Fallback owner → privateProviders (BỔ SUNG)
+        // 4) owner → privateProviders
         const qPrivate = query(
           collection(db, 'privateProviders'),
           where('ownerId', '==', resolvedUserId)
@@ -158,9 +181,9 @@ export default function ProfileSidebar({
           return;
         }
 
-        // 5) (tùy chọn) thêm các collection khác có ownerId == uid
+        // (tùy chọn) thêm collection khác…
 
-        // Không tìm được
+        // không tìm thấy
         setStaffBusinessId(undefined);
         setStaffBusinessType(undefined);
       } catch (e) {
@@ -179,11 +202,11 @@ export default function ProfileSidebar({
     };
   }, [hasParentBusiness, resolvedUserId]);
 
-  // Ưu tiên nguồn từ parent, nếu không có thì dùng auto-detect
+  // Ưu tiên dữ liệu business từ parent
   const finalBusinessId = hasParentBusiness ? businessId : staffBusinessId;
   const finalBusinessType = hasParentBusiness ? businessType : staffBusinessType;
 
-  // Khi đã biết businessId + businessType, nếu là private_provider thì lấy ownerId
+  // Lấy ownerId cho private_provider
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -204,8 +227,24 @@ export default function ProfileSidebar({
     return () => { mounted = false; };
   }, [finalBusinessId, finalBusinessType]);
 
+  // ⚙️ Quyết định có hiển thị QR không
+  const canShowQR = useMemo(() => {
+    if (!showQRForShowcase) return false;
+    if (!resolvedUserId) return false;              // cần uid để build URL
+    if (onlyOwnerCanSeeQR && authUid !== resolvedUserId) return false;
+    return true;
+  }, [showQRForShowcase, resolvedUserId, onlyOwnerCanSeeQR, authUid]);
+
   return (
     <div className="w-full space-y-6 rounded-lg">
+      {/* QR tới Showcase của agent */}
+      {canShowQR && (
+        <div className="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between">
+          <ProfileQR userId={resolvedUserId!} baseUrl={qrBaseUrl} />
+        </div>
+      )}
+
+      {/* Business + Services */}
       {finalBusinessId && finalBusinessType ? (
         <>
           <BusinessAboutSection

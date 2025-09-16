@@ -9,6 +9,7 @@ import { db } from '@/src/firebaseConfig';
 import { useAuth } from '@/src/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import ProfileQR from '@/src/components/profile/ProfileQR';
 
 import ProfileOverview from '@/src/components/profile/ProfileOverview';
 import ProfileTabs, { TabType } from '@/src/components/profile/ProfileTabs';
@@ -19,7 +20,7 @@ import MyInsuranceSection from '@/src/components/profile/MyInsuranceSection';
 import MyIssuesSectionContainer from '@/src/components/profile/MyIssuesSectionContainer';
 import MyContributionsSection from '@/src/components/profile/MyContributionsSection';
 import MyBusinessSection from '@/src/components/profile/MyBusinessSection';
-import AgentJoinedModelsShowcaseLite from '@/src/components/showcase/AgentShowcase';
+import AgentShowcase from '@/src/components/showcase/AgentShowcase';
 import type { BusinessType } from '@/src/lib/my-business/businessTypes';
 
 const ALL_TABS: TabType[] = [
@@ -186,7 +187,7 @@ export default function ProfilesPageContent() {
           {/* Public */}
           {activeTab === 'activityFeed' && <ProfileMainContent activeTab="activityFeed" />}
           {activeTab === 'showcase' && (
-            <AgentJoinedModelsShowcaseLite
+            <AgentShowcase
               agentId={profileUserId}
               limitPerRow={12}
               onlyAvailable

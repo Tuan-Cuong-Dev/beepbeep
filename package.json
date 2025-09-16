@@ -51,6 +51,7 @@
     "next": "^15.2.1",
     "next-i18next": "^15.4.2",
     "qr-scanner": "^1.4.2",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-datepicker": "^8.2.1",
     "react-day-picker": "^9.6.7",
