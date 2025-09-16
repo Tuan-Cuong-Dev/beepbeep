@@ -1,18 +1,18 @@
 // types.ts
-// Dùng cho việc chỉnh hiển thị các tab trong UI Profiles
-
-export type TabKey =
-  | 'activityFeed'
-  | 'showcase'
-  | 'vehicles'
-  | 'insurance'
-  | 'issues'
-  | 'contributions'
-  | 'business';
+// Dùng cho việc chỉnh hiển thị các tab trong UI Profiles.
+// components/profile/types.ts
 
 export interface VisibleTab {
-  key: string;
+  key:
+    | 'activityFeed'
+    | 'showcase'
+    | 'vehicles'
+    | 'insurance'
+    | 'issues'
+    | 'contributions'
+    | 'business';
   label: string;
   visible: boolean;
 }
 
+export type TabType = VisibleTab['key'];

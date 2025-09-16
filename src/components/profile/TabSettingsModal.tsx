@@ -1,12 +1,12 @@
 'use client';
 
 import { Dialog } from '@headlessui/react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
-import { VisibleTab } from './types';
+import type { VisibleTab } from './types';
 
 interface SortableItemProps {
   id: string;
@@ -30,9 +30,13 @@ function SortableItem({ id, visible, onToggle }: SortableItemProps) {
       className="flex items-center justify-between border px-3 py-2 rounded mb-2 bg-white shadow-sm"
     >
       <div className="flex items-center gap-2">
-        <input type="checkbox" checked={visible} onChange={() => onToggle(id)} />
+        <input
+          type="checkbox"
+          checked={visible}
+          onChange={() => onToggle(id)}
+        />
         <span {...attributes} {...listeners} className="cursor-move select-none">
-          {t(`tab_labels.${id}`)}
+          {t(`tab_labels.${id}`, { defaultValue: id })}
         </span>
       </div>
     </div>
@@ -41,8 +45,8 @@ function SortableItem({ id, visible, onToggle }: SortableItemProps) {
 
 interface TabSettingsModalProps {
   visibleTabs: VisibleTab[];
-  setVisibleTabs: (tabs: VisibleTab[]) => void;
-  storageKey: string; // có thể là '' nếu chưa có userId
+  setVisibleTabs: (tabs: VisibleTab[]) => void | Promise<void>;
+  storageKey: string;
   onClose: () => void;
 }
 
@@ -54,11 +58,16 @@ export function TabSettingsModal({
 }: TabSettingsModalProps) {
   const { t } = useTranslation('common');
   const [tabs, setTabs] = useState<VisibleTab[]>(visibleTabs);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Đồng bộ prop -> state mỗi khi visibleTabs thay đổi
   useEffect(() => {
     setTabs(visibleTabs);
   }, [visibleTabs]);
+
+  const hasChanges = useMemo(() => {
+    return JSON.stringify(tabs) !== JSON.stringify(visibleTabs);
+  }, [tabs, visibleTabs]);
 
   const toggleTabVisibility = (id: string) => {
     setTabs(prev =>
@@ -69,29 +78,42 @@ export function TabSettingsModal({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
     const oldIndex = tabs.findIndex(tab => tab.key === active.id);
     const newIndex = tabs.findIndex(tab => tab.key === over.id);
     setTabs(arrayMove(tabs, oldIndex, newIndex));
   };
 
-  const handleSave = () => {
-    setVisibleTabs(tabs);
-    if (storageKey) {
-      localStorage.setItem(storageKey, JSON.stringify(tabs));
+  const handleSave = async () => {
+    const next = tabs.some(t => t.visible)
+      ? tabs
+      : [{ ...tabs[0], visible: true }, ...tabs.slice(1)];
+
+    setError(null);
+    setSaving(true);
+    try {
+      await Promise.resolve(setVisibleTabs(next));
+
+      if (storageKey) {
+        localStorage.setItem(storageKey, JSON.stringify(next));
+      }
+
+      onClose();
+    } catch (e: any) {
+      setError('Failed to save. Please try again.');
+    } finally {
+      setSaving(false);
     }
-    onClose();
   };
 
   return (
     <Dialog
       open={true}
-      onClose={onClose}
+      onClose={() => !saving && onClose()}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
     >
       <Dialog.Panel className="bg-white p-6 rounded shadow-md w-full max-w-md">
         <Dialog.Title className="text-lg font-semibold mb-4">
-          {t('tab_settings_modal.title')}
+          {t('tab_settings_modal.title', { defaultValue: 'Manage Tabs' })}
         </Dialog.Title>
 
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -107,15 +129,20 @@ export function TabSettingsModal({
           </SortableContext>
         </DndContext>
 
+        {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+
         <div className="flex justify-end mt-4 gap-2">
-          <button onClick={onClose} className="text-gray-500 hover:text-black">
-            {t('tab_settings_modal.cancel')}
+          <button onClick={onClose} className="text-gray-500 hover:text-black" disabled={saving}>
+            {t('tab_settings_modal.cancel', { defaultValue: 'Cancel' })}
           </button>
           <button
             onClick={handleSave}
-            className="bg-[#00d289] text-white px-4 py-1 rounded"
+            className="bg-[#00d289] text-white px-4 py-1 rounded disabled:opacity-50"
+            disabled={saving || !hasChanges}
           >
-            {t('tab_settings_modal.save')}
+            {saving
+              ? t('tab_settings_modal.saving', { defaultValue: 'Saving…' })
+              : t('tab_settings_modal.save', { defaultValue: 'Save' })}
           </button>
         </div>
       </Dialog.Panel>

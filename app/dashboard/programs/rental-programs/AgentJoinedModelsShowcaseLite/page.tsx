@@ -4,7 +4,7 @@ import * as React from 'react'
 import Header from '@/src/components/landingpage/Header'
 import Footer from '@/src/components/landingpage/Footer'
 import { useUser } from '@/src/context/AuthContext'
-import AgentJoinedModelsShowcaseLite from '@/src/components/showcase/AgentJoinedModelsShowcaseLite';
+import AgentJoinedModelsShowcaseLite from '@/src/components/showcase/AgentShowcase';
 import { useTranslation } from 'react-i18next'
 
 interface ShowcaseProps {

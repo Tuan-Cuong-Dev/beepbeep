@@ -1,14 +1,7 @@
 'use client';
 
-// Đối với đối tượng là Agent thì chúng ta lấy các xe mà Agent đã tham gia chương trình
 // Date : 16/09/2025
-
-/**
- * AgentJoinedModelsShowcaseLite — phiên bản rút gọn (không header)
- * - Gom xe theo MODEL từ các chương trình agent đã tham gia (status=joined, active).
- * - Giá hiển thị: baseFrom = MIN(vehicle.pricePerDay) (không áp KM).
- * - Nút Đặt xe: /bookings/new?modelId=...&companyId=...&stationId=...&vehicleId=...
- */
+// AgentJoinedModelsShowcaseLite — phiên bản rút gọn (không header)
 
 import * as React from 'react';
 import Image, { type StaticImageData } from 'next/image';
@@ -23,7 +16,7 @@ import SkeletonCard from '@/src/components/skeletons/SkeletonCard';
 import { useTranslation } from 'react-i18next';
 
 import type { Program, ProgramModelDiscount } from '@/src/lib/programs/rental-programs/programsType';
-import type { VehicleModel } from '@/src/lib/vehicle-models/vehicleModelTypes';
+import type { VehicleModel, FuelType } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import type { Vehicle, VehicleStatus } from '@/src/lib/vehicles/vehicleTypes';
 
 /* ===== Brand color ===== */
@@ -45,9 +38,6 @@ const DEFAULT_ICONS: Record<string, StaticImageData> = {
 };
 
 /* ===== Helpers ===== */
-const DEBUG = false;
-const log = (...a: any[]) => DEBUG && console.log('[AgentJoinedModelsShowcaseLite]', ...a);
-
 function chunk<T>(arr: T[], size = 10): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
@@ -77,7 +67,6 @@ function getDirectDriveImageUrl(url?: string): string | undefined {
 
 /* ===== Chuẩn hoá vehicleType ===== */
 type CanonType = 'bike' | 'motorbike' | 'car' | 'van' | 'bus' | 'other';
-
 function normalizeVehicleType(input?: string): CanonType {
   const s = (input || '').trim().toLowerCase();
   if (!s) return 'other';
@@ -89,8 +78,6 @@ function normalizeVehicleType(input?: string): CanonType {
   if ((['bike','motorbike','car','van','bus'] as string[]).includes(s)) return s as CanonType;
   return 'other';
 }
-
-/** Ưu tiên imageUrl → default icon theo type (đã chuẩn hoá) */
 function resolveModelImage(vm: VehicleModel): string | StaticImageData {
   const direct = getDirectDriveImageUrl(vm.imageUrl);
   if (direct) return direct;
@@ -98,76 +85,21 @@ function resolveModelImage(vm: VehicleModel): string | StaticImageData {
   return DEFAULT_ICONS[key] ?? DEFAULT_ICONS.bike;
 }
 
-/* ===== Coerce modelDiscounts (đa schema) ===== */
-function coerceModelDiscounts(raw: any, rawDocForLog?: any): ProgramModelDiscount[] {
-  const out: ProgramModelDiscount[] = [];
-  const push = (modelId: any, discountType?: any, discountValue?: any, ctx?: any) => {
-    const id =
-      (typeof modelId === 'string' && modelId) ||
-      modelId?.modelId || modelId?.vehicleModelId || modelId?.id ||
-      modelId?.model?.id || modelId?.modelRef?.id;
-    if (!id) return;
-    let type: 'fixed' | 'percentage' | undefined = discountType;
-    let val = Number(discountValue);
-
-    if (!type) {
-      if (typeof (ctx?.percentage ?? ctx?.pct ?? ctx?.off) === 'number') {
-        type = 'percentage'; val = Number(ctx.percentage ?? ctx.pct ?? ctx.off);
-      } else if (typeof (ctx?.finalPrice ?? ctx?.price ?? ctx?.fixed) === 'number') {
-        type = 'fixed'; val = Number(ctx.finalPrice ?? ctx.price ?? ctx.fixed);
-      } else if (typeof ctx?.value === 'number' && (ctx?.type === 'percentage' || ctx?.type === 'fixed')) {
-        type = ctx.type; val = Number(ctx.value);
-      } else if (typeof ctx === 'number') {
-        type = ctx <= 100 ? 'percentage' : 'fixed'; val = Number(ctx);
-      }
-    }
-    if (type !== 'fixed' && type !== 'percentage') type = 'fixed';
-    if (Number.isNaN(val)) val = 0;
-    out.push({ modelId: id, discountType: type, discountValue: val });
-  };
-
-  if (Array.isArray(raw)) {
-    raw.forEach((it) => {
-      if (typeof it === 'string') return push(it, 'fixed', 0, it);
-      if (it && typeof it === 'object') return push(it, (it as any).discountType, (it as any).discountValue, it);
-    });
-    return out;
+/* ===== Coerce modelDiscounts ===== */
+function coerceModelDiscounts(raw: any): ProgramModelDiscount[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.filter((it: any) => typeof it?.modelId === 'string');
+  if (typeof raw === 'object') {
+    return Object.entries(raw).map(([modelId, v]) => ({
+      modelId,
+      discountType: (v as any)?.discountType || 'fixed',
+      discountValue: Number((v as any)?.discountValue || 0),
+    }));
   }
-  if (raw && typeof raw === 'object') {
-    Object.entries(raw).forEach(([k, v]) => {
-      if (typeof v === 'number') return push(k, undefined, undefined, v);
-      if (v && typeof v === 'object') return push({ modelId: k }, (v as any).discountType, (v as any).discountValue, v);
-    });
-    if (!out.length) {
-      const fb = (rawDocForLog && (rawDocForLog.models || rawDocForLog.vehicleModels)) || [];
-      if (Array.isArray(fb) && fb.length) fb.forEach((x) => push(x, 'fixed', 0, x));
-    }
-    return out;
-  }
-  return out;
+  return [];
 }
 
-/** extract companyId */
-function extractCompanyId(raw: any): string | null {
-  return (
-    raw?.companyId ||
-    raw?.organizerCompanyId ||
-    raw?.providerCompanyId ||
-    raw?.company?.id ||
-    raw?.companyRef?.id ||
-    null
-  );
-}
-
-function normalizeProgram(raw: any): Program & {
-  modelDiscounts: ProgramModelDiscount[]; companyId?: string | null; title?: string
-} {
-  const modelDiscounts = coerceModelDiscounts(raw?.modelDiscounts, raw);
-  const companyId = extractCompanyId(raw);
-  return { ...(raw as Program), modelDiscounts, companyId, title: (raw as any)?.title };
-}
-
-/* ===== Firestore loaders (y hệt bản full) ===== */
+/* ===== Firestore loaders ===== */
 async function loadJoinedPrograms(agentId: string) {
   const snap = await getDocs(
     query(
@@ -180,10 +112,15 @@ async function loadJoinedPrograms(agentId: string) {
   const programIds = Array.from(new Set(snap.docs.map(d => (d.data() as any)?.programId).filter(Boolean)));
   if (!programIds.length) return [];
 
-  const all: (Program & { modelDiscounts: ProgramModelDiscount[]; companyId?: string | null; title?: string })[] = [];
+  const all: (Program & { modelDiscounts: ProgramModelDiscount[]; companyId?: string | null })[] = [];
   for (const part of chunk(programIds, 10)) {
     const ps = await getDocs(query(collection(db, 'programs'), where(documentId(), 'in', part)));
-    ps.docs.forEach(d => all.push(normalizeProgram({ id: d.id, ...(d.data() as any) })));
+    ps.docs.forEach(d => all.push({
+      id: d.id,
+      ...(d.data() as any),
+      modelDiscounts: coerceModelDiscounts((d.data() as any)?.modelDiscounts),
+      companyId: (d.data() as any)?.companyId || null,
+    }));
   }
   return all.filter(isProgramActiveNow).filter(p => p.modelDiscounts.length > 0);
 }
@@ -261,20 +198,18 @@ export default function AgentJoinedModelsShowcaseLite({
       setLoading(true);
       try {
         const programs = await loadJoinedPrograms(agentId);
-        log('programs', programs);
+        if (!programs.length) { if (mounted) setRows([]); return; }
 
         const companyIds = Array.from(new Set(programs.map(p => p.companyId).filter(Boolean))) as string[];
         const modelIds = Array.from(new Set(programs.flatMap(p => p.modelDiscounts.map(md => md.modelId))));
         if (companyIds.length === 0 || modelIds.length === 0) {
-          if (mounted) setRows([]);
-          return;
+          if (mounted) setRows([]); return;
         }
 
         const [modelMap, vehicles] = await Promise.all([
           loadVehicleModelsByIds(modelIds, vehicleModelCollectionName),
           loadVehiclesFor(companyIds, modelIds, vehiclesCollectionName, onlyAvailable ? 'Available' : undefined),
         ]);
-
         if (!mounted) return;
 
         const byModel = new Map<string, ModelCardRow>();
@@ -306,7 +241,6 @@ export default function AgentJoinedModelsShowcaseLite({
         });
 
         const built = Array.from(byModel.values());
-        // Sort theo giá tăng dần, rồi theo tên model
         built.sort((a, b) => {
           const aBase = a.baseFrom ?? Infinity;
           const bBase = b.baseFrom ?? Infinity;
@@ -373,6 +307,16 @@ export default function AgentJoinedModelsShowcaseLite({
                     <span className="text-sm font-semibold" style={{ color: BRAND }}>
                       {formatVND(r.baseFrom)}{r.baseFrom != null ? ` ${t('agent_joined_models_showcase.per_day')}` : ''}
                     </span>
+                  </div>
+
+                  {/* Extra info grid */}
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-gray-600 mt-2">
+                    {r.model.brand && <div>🏷 {r.model.brand}</div>}
+                    {r.model.fuelType && <div>⛽ {String(r.model.fuelType as FuelType)}</div>}
+                    {typeof r.model.topSpeed === 'number' && <div>🚀 {r.model.topSpeed} km/h</div>}
+                    {typeof r.model.range === 'number' && <div>📏 {r.model.range} km</div>}
+                    {typeof r.model.maxLoad === 'number' && <div>🏋️ {r.model.maxLoad} kg</div>}
+                    {typeof r.model.capacity === 'number' && <div>🪑 {r.model.capacity}</div>}
                   </div>
 
                   <div className="mt-4">

@@ -19,7 +19,7 @@ import MyInsuranceSection from '@/src/components/profile/MyInsuranceSection';
 import MyIssuesSectionContainer from '@/src/components/profile/MyIssuesSectionContainer';
 import MyContributionsSection from '@/src/components/profile/MyContributionsSection';
 import MyBusinessSection from '@/src/components/profile/MyBusinessSection';
-import AgentJoinedModelsShowcaseLite from '@/src/components/showcase/AgentJoinedModelsShowcaseLite';
+import AgentJoinedModelsShowcaseLite from '@/src/components/showcase/AgentShowcase';
 import type { BusinessType } from '@/src/lib/my-business/businessTypes';
 
 const ALL_TABS: TabType[] = [
@@ -63,7 +63,7 @@ export default function ProfilesPageContent() {
   }, [searchParams, currentUser?.uid]);
 
   // Xác định quyền xem của người đang truy cập
-  const isOwner = currentUser?.uid && profileUserId && currentUser.uid === profileUserId;
+  const isOwner = !!(currentUser?.uid && profileUserId && currentUser.uid === profileUserId);
   const allowedTabs = (isOwner ? ALL_TABS : PUBLIC_TABS) as TabType[];
 
   // Nếu người xem không phải chủ account mà đang đứng ở tab private → chuyển về activityFeed
