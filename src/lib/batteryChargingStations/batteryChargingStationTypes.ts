@@ -9,17 +9,19 @@ export interface Coordinates {
 
 export interface BatteryChargingStation {
   id: string;
-
   // Basic Info
   name: string;
-  displayAddress: string;
-  mapAddress: string;
   phone: string;
   vehicleType?: VehicleType;
-  coordinates?: Coordinates;
   description?: string;
-  isActive: boolean;
+  
+  // Địa chỉ trạm đổi pin
+  displayAddress: string;
+  mapAddress: string;
+  coordinates?: Coordinates;
 
+
+  isActive: boolean;
   // Metadata
   createdBy?: string;
   createdAt?: Timestamp | FieldValue;

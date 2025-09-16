@@ -831,7 +831,8 @@
   "vehicle_bike": "Bike",
   "vehicle_motorbike": "Motorbike",
   "vehicle_car": "Car",
-  "update_error": "Failed to update rental shop."
+  "update_error": "Failed to update rental shop.",
+  "coordinates_one_field": "Coordinates (e.g., 16.07, 108.22 or 16.07° N, 108.22° E)"
 },
 
 "battery_station_edit_form": {

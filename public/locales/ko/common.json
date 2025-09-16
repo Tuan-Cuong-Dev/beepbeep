@@ -812,7 +812,8 @@
   "vehicle_bike": "자전거",
   "vehicle_motorbike": "오토바이",
   "vehicle_car": "자동차",
-  "update_error": "대여소 업데이트에 실패했습니다."
+  "update_error": "대여소 업데이트에 실패했습니다.",
+  "coordinates_one_field": "좌표 (예: 16.07, 108.22 또는 16.07° N, 108.22° E)"
 },
 
 "battery_station_edit_form": {

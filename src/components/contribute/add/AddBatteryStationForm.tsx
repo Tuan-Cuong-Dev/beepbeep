@@ -1,3 +1,5 @@
+// Trạm đổi pin
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -16,17 +18,17 @@ const MapPreview = dynamic(() => import('@/src/components/map/MapPreview'), { ss
 
 type LatLng = { lat: number; lng: number };
 
-function parseLatLngString(s?: string): LatLng | null {
+const parseLatLngPair = (s?: string): LatLng | null => {
   if (!s) return null;
-  const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
+  const m = s.match(/(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/);
   if (!m) return null;
   const lat = parseFloat(m[1]);
   const lng = parseFloat(m[3]);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return { lat, lng };
-}
+};
 
-function extractLatLngFromGMapUrl(url?: string): LatLng | null {
+const extractLatLngFromGMapUrl = (url?: string): LatLng | null => {
   if (!url) return null;
   try {
     const at = url.match(/@(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)/);
@@ -47,7 +49,7 @@ function extractLatLngFromGMapUrl(url?: string): LatLng | null {
     }
   } catch {}
   return null;
-}
+};
 
 export default function AddBatteryStationForm() {
   const { t } = useTranslation('common');
@@ -62,11 +64,12 @@ export default function AddBatteryStationForm() {
     name: '',
     displayAddress: '',
     mapAddress: '',
-    location: '', // sẽ lưu "lat,lng" khi có toạ độ
+    // không render input riêng cho location, nhưng vẫn lưu chuỗi "lat,lng"
+    location: '',
     coordinates: undefined as { lat: number; lng: number } | undefined,
     vehicleType: 'motorbike' as 'motorbike' | 'car',
-    _lat: '' as string, // internal only
-    _lng: '' as string, // internal only
+    _lat: '' as string, // nội bộ cho ô tọa độ duy nhất
+    _lng: '' as string,
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -81,27 +84,29 @@ export default function AddBatteryStationForm() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  /** Đồng bộ 1 chỗ: _lat/_lng + location "lat,lng" + coordinates */
+  const setCoordinates = useCallback((lat: number, lng: number) => {
+    setForm(prev => ({
+      ...prev,
+      _lat: String(lat),
+      _lng: String(lng),
+      location: `${lat},${lng}`,
+      coordinates: { lat, lng },
+    }));
+  }, []);
+
   /** Lấy vị trí hiện tại */
   const getGps = useCallback(() => {
     setGpsStatus('getting');
     setGpsError('');
-
     if (!('geolocation' in navigator)) {
       setGpsStatus('error');
       setGpsError('Trình duyệt không hỗ trợ Geolocation.');
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { latitude, longitude } = pos.coords;
-        setForm((prev) => ({
-          ...prev,
-          _lat: String(latitude),
-          _lng: String(longitude),
-          location: `${latitude},${longitude}`,
-          coordinates: { lat: latitude, lng: longitude },
-        }));
+        setCoordinates(pos.coords.latitude, pos.coords.longitude);
         setGpsStatus('ok');
       },
       (err) => {
@@ -110,85 +115,56 @@ export default function AddBatteryStationForm() {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }, []);
+  }, [setCoordinates]);
 
   // Bật GPS → tự get
   useEffect(() => {
     if (useCurrentPos) getGps();
   }, [useCurrentPos, getGps]);
 
-  // KHÔNG dùng GPS: parse từ mapAddress/location → nếu không ra thì geocode free-text
+  // KHÔNG dùng GPS: parse từ mapAddress → nếu không ra thì geocode free-text
   useEffect(() => {
     if (useCurrentPos) return;
 
-    const raw = (form.mapAddress || '').trim() || (form.location || '').trim();
+    const raw = (form.mapAddress || '').trim();
     if (!raw) return;
 
-    const byPair = parseLatLngString(raw);
+    const byPair = parseLatLngPair(raw);
     if (byPair) {
-      setForm((prev) => ({
-        ...prev,
-        _lat: String(byPair.lat),
-        _lng: String(byPair.lng),
-        location: `${byPair.lat},${byPair.lng}`,
-        coordinates: { lat: byPair.lat, lng: byPair.lng },
-      }));
+      setCoordinates(byPair.lat, byPair.lng);
       return;
     }
-
     const byUrl = extractLatLngFromGMapUrl(raw);
     if (byUrl) {
-      setForm((prev) => ({
-        ...prev,
-        _lat: String(byUrl.lat),
-        _lng: String(byUrl.lng),
-        location: `${byUrl.lat},${byUrl.lng}`,
-        coordinates: { lat: byUrl.lat, lng: byUrl.lng },
-      }));
+      setCoordinates(byUrl.lat, byUrl.lng);
       return;
     }
 
     const id = setTimeout(() => geocodeRef.current(raw), 300);
     return () => clearTimeout(id);
-  }, [useCurrentPos, form.mapAddress, form.location]);
+  }, [useCurrentPos, form.mapAddress, setCoordinates]);
 
-  // Nhận kết quả geocode (tránh ghi đè khi đang dùng GPS)
+  // Nhận kết quả geocode (chỉ khi không dùng GPS)
   useEffect(() => {
     if (!coords || useCurrentPos) return;
-    setForm((prev) => ({
-      ...prev,
-      _lat: String(coords.lat),
-      _lng: String(coords.lng),
-      location: `${coords.lat},${coords.lng}`,
-      coordinates: { lat: coords.lat, lng: coords.lng },
-    }));
-  }, [coords, useCurrentPos]);
+    setCoordinates(coords.lat, coords.lng);
+  }, [coords, useCurrentPos, setCoordinates]);
 
-  // Ô nhập gộp toạ độ (tuỳ chọn)
-  const handleLatLngInput = (value: string) => {
-    const regex = /(-?\d+(\.\d+)?)\D+(-?\d+(\.\d+)?)/;
-    const match = value.match(regex);
-    if (match) {
-      const lat = parseFloat(match[1]);
-      const lng = parseFloat(match[3]);
-      if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        setForm((prev) => ({
-          ...prev,
-          _lat: String(lat),
-          _lng: String(lng),
-          location: `${lat},${lng}`,
-          coordinates: { lat, lng },
-        }));
-        return;
-      }
+  // Ô tọa độ duy nhất (nhập tay)
+  const handleCoordinateInput = (value: string) => {
+    const pair = parseLatLngPair(value);
+    if (pair) {
+      setCoordinates(pair.lat, pair.lng);
+    } else {
+      setForm(prev => ({ ...prev, _lat: '', _lng: '' }));
     }
-    setForm((prev) => ({ ...prev, _lat: '', _lng: '' }));
   };
 
   const canSubmit =
     !!user?.uid &&
     !!form.name.trim() &&
     !!form.displayAddress.trim() &&
+    // cần có tọa độ (từ GPS/parse/geocode)
     !!form.location.trim() &&
     // mapAddress chỉ bắt buộc khi KHÔNG dùng GPS
     (useCurrentPos || !!form.mapAddress.trim());
@@ -232,7 +208,7 @@ export default function AddBatteryStationForm() {
     if (form._lat && form._lng && Number.isFinite(parseFloat(form._lat)) && Number.isFinite(parseFloat(form._lng))) {
       return { lat: parseFloat(form._lat), lng: parseFloat(form._lng) };
     }
-    const parsed = parseLatLngString(form.location);
+    const parsed = parseLatLngPair(form.location);
     return parsed ?? null;
   })();
 
@@ -262,24 +238,18 @@ export default function AddBatteryStationForm() {
       {/* mapAddress ẩn khi dùng GPS để tránh ghi đè */}
       {!useCurrentPos && (
         <Textarea
-          className="min-h-[180px]"
+          className="min-h-[160px]"
           placeholder={t('battery_station_form.map_address')}
           value={form.mapAddress}
           onChange={(e) => handleChange('mapAddress', e.target.value)}
         />
       )}
 
-      <Input
-        placeholder={t('battery_station_form.location')}
-        value={form.location}
-        onChange={(e) => handleChange('location', e.target.value)}
-      />
-
-      {/* Ô nhập gộp toạ độ */}
+      {/* ✅ Chỉ còn 1 ô TỌA ĐỘ duy nhất */}
       <Input
         placeholder="Tọa độ (vd: 16.07, 108.22 hoặc 16.07° N, 108.22° E)"
-        value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : ''}
-        onChange={(e) => handleLatLngInput(e.target.value)}
+        value={form._lat && form._lng ? `${form._lat}, ${form._lng}` : form.location}
+        onChange={(e) => handleCoordinateInput(e.target.value)}
       />
 
       {/* Map preview nếu có toạ độ */}

@@ -793,7 +793,8 @@
   "vehicle_bike": "自転車",
   "vehicle_motorbike": "バイク",
   "vehicle_car": "自動車",
-  "update_error": "レンタルステーションの更新に失敗しました。"
+  "update_error": "レンタルステーションの更新に失敗しました。",
+  "coordinates_one_field": "座標 (例: 16.07, 108.22 または 16.07° 北, 108.22° 東)"
 },
 
 "battery_station_edit_form": {

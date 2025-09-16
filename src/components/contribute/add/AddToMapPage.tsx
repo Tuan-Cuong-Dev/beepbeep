@@ -25,7 +25,7 @@ export default function AddToMapPage() {
       case 'battery':
         return <AddBatteryStationForm />;
       case 'charging':
-        return <AddBatteryChargingStationForm />; // ✅ NEW
+        return <AddBatteryChargingStationForm />; 
       default:
         return null;
     }

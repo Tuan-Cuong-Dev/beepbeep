@@ -839,7 +839,8 @@
   "vehicle_bike": "Xe đạp",
   "vehicle_motorbike": "Xe máy",
   "vehicle_car": "Ô tô",
-  "update_error": "Cập nhật điểm cho thuê thất bại."
+  "update_error": "Cập nhật điểm cho thuê thất bại.",
+  "coordinates_one_field": "Tọa độ (vd: 16.07, 108.22 hoặc 16.07° N, 108.22° E)"
 },
 
 "battery_station_edit_form": {

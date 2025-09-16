@@ -6,12 +6,15 @@ export type VehicleType = 'car' | 'motorbike'; // ✅ Loại xe hỗ trợ
 export interface BatteryStation {
   id: string;
   name: string;
+
+  // Địa chỉ trạm sạc pin
   displayAddress: string;
-  mapAddress?: string; // 🌐 Google Maps formatted address (nếu có)
+  mapAddress?: string; 
   coordinates?: {
     lat: number;
     lng: number;
   };
+
   vehicleType?: VehicleType; // ✅ Loại phương tiện được hỗ trợ (car, motorbike)
   isActive: boolean;
   createdBy?: string; // ✅ thêm dòng này
