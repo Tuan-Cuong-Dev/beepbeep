@@ -9,7 +9,6 @@ import { db } from '@/src/firebaseConfig';
 import { useAuth } from '@/src/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import ProfileQR from '@/src/components/profile/ProfileQR';
 
 import ProfileOverview from '@/src/components/profile/ProfileOverview';
 import ProfileTabs, { TabType } from '@/src/components/profile/ProfileTabs';
@@ -151,9 +150,12 @@ export default function ProfilesPageContent() {
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Header + Avatar */}
-      <div className="bg-white shadow-sm">
-        <ProfileOverview />
-      </div>
+      <ProfileOverview
+        userId={profileUserId!}
+        userPrefetched={userData}         // ✅ đúng prop name
+        isOwner={isOwner}                 // ✅ đúng prop name
+        onEditProfile={() => router.push('/account/profile')}
+      />
 
       {/* Tabs */}
       <div className="bg-white border-t border-b sticky top-0 z-10">
