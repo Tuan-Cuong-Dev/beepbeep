@@ -17,14 +17,26 @@ import { useSubscriptionPackageData } from '@/src/hooks/useSubscriptionPackageDa
 import { exportSubscriptionPackagesToExcel } from '@/src/lib/subscriptionPackages/exportSubscriptionPackages';
 import { SubscriptionPackage } from '@/src/lib/subscriptionPackages/subscriptionPackagesType';
 import { useUser } from '@/src/context/AuthContext';
+import { useCurrentCompanyId } from '@/src/hooks/useCurrentCompanyId'; // ✅ NEW
 import { useTranslation } from 'react-i18next';
+
+function normalizeRole(r?: string) {
+  return (r || '').toLowerCase();
+}
 
 export default function SubscriptionPackageManagerPage() {
   const { t } = useTranslation('common');
-  const { companyId: rawCompanyId, role, loading: userLoading } = useUser();
-  const isAdmin = role === 'Admin';
-  const companyId = rawCompanyId ?? '';
-  const companyIdToUse = isAdmin ? '' : companyId;
+
+  // Chỉ lấy role + user loading từ context
+  const { role, loading: userLoading } = useUser();
+  const normRole = normalizeRole(role);
+  const isAdmin = normRole === 'admin';
+
+  // ✅ companyId đã resolve (owner → staff → users.business → legacy)
+  const { companyId: resolvedCompanyId, loading: companyLoading } = useCurrentCompanyId();
+
+  // Admin: cho phép xem tất cả (truyền ''), Non-admin: bắt buộc companyId
+  const companyIdToUse = isAdmin ? '' : (resolvedCompanyId ?? '');
 
   const {
     packages,
@@ -55,11 +67,13 @@ export default function SubscriptionPackageManagerPage() {
     setCurrentPage(1);
   }, [searchTerm, durationFilter, statusFilter]);
 
-  if (userLoading) {
+  // Gates
+  if (userLoading || companyLoading) {
     return <div className="flex justify-center items-center h-screen">{t('subscription_package_manager_page.loading_user')}</div>;
   }
 
-  if (!companyId && !isAdmin) {
+  // Non-admin mà chưa resolve được companyId → báo đúng ngữ cảnh
+  if (!isAdmin && !resolvedCompanyId) {
     return <div className="flex justify-center items-center h-screen">{t('subscription_package_manager_page.no_company')}</div>;
   }
 
@@ -76,6 +90,10 @@ export default function SubscriptionPackageManagerPage() {
     currentPage * itemsPerPage
   );
 
+  const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
+    setDialog({ open: true, type, title, description });
+  };
+
   const handleSave = async (data: Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingPackage) {
       await updatePackage(editingPackage.id!, data);
@@ -88,7 +106,8 @@ export default function SubscriptionPackageManagerPage() {
         }
         await createPackage({ ...data, companyId: data.companyId });
       } else {
-        await createPackage({ ...data, companyId });
+        // Non-admin: dùng companyId đã resolve
+        await createPackage({ ...data, companyId: resolvedCompanyId! });
       }
       showDialog('success', t('subscription_package_manager_page.created'));
     }
@@ -96,9 +115,7 @@ export default function SubscriptionPackageManagerPage() {
     setEditingPackage(null);
   };
 
-  const handleDelete = (id: string) => {
-    setDeleteConfirmId(id);
-  };
+  const handleDelete = (id: string) => setDeleteConfirmId(id);
 
   const confirmDelete = async () => {
     if (deleteConfirmId) {
@@ -111,14 +128,12 @@ export default function SubscriptionPackageManagerPage() {
 
   const handleImportComplete = async (imported: Omit<SubscriptionPackage, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     for (const pkg of imported) {
-      await createPackage(pkg);
+      // Admin: import theo file (đã chứa companyId); Non-admin: ép về company của user
+      const payload = isAdmin ? pkg : { ...pkg, companyId: resolvedCompanyId! };
+      await createPackage(payload);
     }
     await fetchPackages();
     showDialog('success', t('subscription_package_manager_page.imported', { count: imported.length }));
-  };
-
-  const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
-    setDialog({ open: true, type, title, description });
   };
 
   return (
@@ -146,7 +161,7 @@ export default function SubscriptionPackageManagerPage() {
             await fetchPackages();
             showDialog('success', t('subscription_package_manager_page.deleted_all'));
           }}
-          companyId={companyId}
+          companyId={isAdmin ? '' : (resolvedCompanyId ?? '')}  // ✅ truyền đúng cho component con
         />
 
         {loading ? (
@@ -191,7 +206,7 @@ export default function SubscriptionPackageManagerPage() {
         onClose={() => setDialog((prev) => ({ ...prev, open: false }))}
       />
 
-      <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
+      <Dialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-red-600">{t('subscription_package_manager_page.confirm_title')}</DialogTitle>
