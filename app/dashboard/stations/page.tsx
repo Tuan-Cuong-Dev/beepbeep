@@ -16,7 +16,7 @@ import CreateStationForm from '@/src/components/rental-stations/CreateStationFor
 import EditStationForm from '@/src/components/rental-stations/EditStationForm';
 import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import { useCurrentCompanyId } from '@/src/hooks/useCurrentCompanyId';
-import { Station } from '@/src/lib/stations/stationTypes';
+import { RentalStation } from '@/src/lib/rentalStations/rentalStationTypes';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import Link from 'next/link';
@@ -25,8 +25,8 @@ import { useTranslation } from 'react-i18next';
 export default function StationManagementPage() {
   const { t } = useTranslation('common');
   const { companyId, loading } = useCurrentCompanyId();
-  const [stations, setStations] = useState<Station[]>([]);
-  const [editingStation, setEditingStation] = useState<Station | null>(null);
+  const [stations, setStations] = useState<RentalStation[]>([]);
+  const [editingStation, setEditingStation] = useState<RentalStation | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -48,9 +48,9 @@ export default function StationManagementPage() {
     try {
       const q = query(collection(db, 'rentalStations'), where('companyId', '==', companyId));
       const snapshot = await getDocs(q);
-      const result: Station[] = snapshot.docs.map((doc) => ({
+      const result: RentalStation[] = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...(doc.data() as Omit<Station, 'id'>),
+        ...(doc.data() as Omit<RentalStation, 'id'>),
       }));
       setStations(result);
     } catch (err) {
@@ -204,7 +204,7 @@ export default function StationManagementPage() {
 
             </>
           ) : (
-            <p className="text-center text-red-600">{t('station_management_page.no_company')}</p>
+            <p className="text-center   text-red-600">{t('station_management_page.no_company')}</p>
           )}
         </div>
       </main>
