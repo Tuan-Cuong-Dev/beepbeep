@@ -1,10 +1,10 @@
 'use client';
 
-// Date : 16/09/2025
-// AgentShowcase — phiên bản rút gọn (không header)
+// Date: 17/09/2025
+// PrivateProviderShowcase — Show các model mà Private Provider (user cá nhân) đang cho thuê (không header)
 
 import * as React from 'react';
-import Image, { type StaticImageData } from 'next/image';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, query, where, documentId,
@@ -15,26 +15,19 @@ import NotificationDialog from '@/src/components/ui/NotificationDialog';
 import SkeletonCard from '@/src/components/skeletons/SkeletonCard';
 import { useTranslation } from 'react-i18next';
 
-import type { Program, ProgramModelDiscount } from '@/src/lib/programs/rental-programs/programsType';
 import type { VehicleModel, FuelType } from '@/src/lib/vehicle-models/vehicleModelTypes';
 import type { Vehicle, VehicleStatus } from '@/src/lib/vehicles/vehicleTypes';
 
 /* ===== Brand color ===== */
 const BRAND = '#00d289';
 
-/* ===== Default icons ===== */
-import bicycleIcon from '@/public/assets/images/vehicles/bicycle.png';
-import motorbikeIcon from '@/public/assets/images/vehicles/motorbike.png';
-import carIcon from '@/public/assets/images/vehicles/car.png';
-import vanIcon from '@/public/assets/images/vehicles/van.png';
-import busIcon from '@/public/assets/images/vehicles/bus.png';
-
-const DEFAULT_ICONS: Record<string, StaticImageData> = {
-  bike: bicycleIcon,
-  motorbike: motorbikeIcon,
-  car: carIcon,
-  van: vanIcon,
-  bus: busIcon,
+/* ===== Default icons (string paths) ===== */
+const DEFAULT_ICONS: Record<string, string> = {
+  bike: '/assets/images/vehicles/bicycle.png',
+  motorbike: '/assets/images/vehicles/motorbike.png',
+  car: '/assets/images/vehicles/car.png',
+  van: '/assets/images/vehicles/van.png',
+  bus: '/assets/images/vehicles/bus.png',
 };
 
 /* ===== Helpers ===== */
@@ -42,15 +35,6 @@ function chunk<T>(arr: T[], size = 10): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
   return out;
-}
-const safeToMillis = (t?: any): number | null => {
-  try { const ms = t?.toMillis?.(); return typeof ms === 'number' ? ms : null; } catch { return null; }
-};
-function isProgramActiveNow(p: Program): boolean {
-  const now = Date.now();
-  const s = safeToMillis((p as any).startDate);
-  const e = safeToMillis((p as any).endDate);
-  return !((s && s > now) || (e && e < now)) && p.isActive !== false;
 }
 function formatVND(n?: number | null): string {
   if (n == null) return '—';
@@ -78,51 +62,78 @@ function normalizeVehicleType(input?: string): CanonType {
   if ((['bike','motorbike','car','van','bus'] as string[]).includes(s)) return s as CanonType;
   return 'other';
 }
-function resolveModelImage(vm: VehicleModel): string | StaticImageData {
+
+/* ===== Resolve image (Vehicle → Model → Default) ===== */
+function getVehiclePrimaryImage(v?: any): string | undefined {
+  if (!v) return undefined;
+  // các field thường gặp
+  const candidates: any[] = [
+    v.imageUrl,
+    v.photoURL,
+    v.thumbnailUrl,
+    v.coverUrl,
+    v.coverImage,
+    v.mainImage,
+    v?.images?.[0]?.url,
+    v?.images?.[0],
+    v?.photos?.[0]?.url,
+    v?.photos?.[0],
+    v?.gallery?.[0]?.url,
+    v?.gallery?.[0],
+    v?.media?.[0]?.url,
+  ].filter(Boolean);
+
+  for (const c of candidates) {
+    const direct = getDirectDriveImageUrl(String(c));
+    if (direct) return direct;
+    if (typeof c === 'string') return c;
+  }
+  return undefined;
+}
+
+function resolveModelImage(vm: VehicleModel): string | undefined {
   const direct = getDirectDriveImageUrl(vm.imageUrl);
   if (direct) return direct;
   const key = normalizeVehicleType(vm.vehicleType);
   return DEFAULT_ICONS[key] ?? DEFAULT_ICONS.bike;
 }
 
-/* ===== Coerce modelDiscounts ===== */
-function coerceModelDiscounts(raw: any): ProgramModelDiscount[] {
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw.filter((it: any) => typeof it?.modelId === 'string');
-  if (typeof raw === 'object') {
-    return Object.entries(raw).map(([modelId, v]) => ({
-      modelId,
-      discountType: (v as any)?.discountType || 'fixed',
-      discountValue: Number((v as any)?.discountValue || 0),
-    }));
-  }
-  return [];
+function resolveShowcaseImage(vm: VehicleModel, vehicle?: Vehicle): string {
+  // 1) Ưu tiên ảnh từ vehicle (chiếc pref có giá thấp nhất)
+  const fromVehicle = getVehiclePrimaryImage(vehicle);
+  if (fromVehicle) return fromVehicle;
+
+  // 2) fallback ảnh của model
+  const fromModel = resolveModelImage(vm);
+  if (fromModel) return fromModel;
+
+  // 3) fallback default icon
+  const key = normalizeVehicleType(vm.vehicleType);
+  return DEFAULT_ICONS[key] ?? DEFAULT_ICONS.bike;
 }
 
 /* ===== Firestore loaders ===== */
-async function loadJoinedPrograms(agentId: string) {
-  const snap = await getDocs(
-    query(
-      collection(db, 'programParticipants'),
-      where('userId', '==', agentId),
-      where('userRole', '==', 'agent'),
-      where('status', '==', 'joined')
-    )
-  );
-  const programIds = Array.from(new Set(snap.docs.map(d => (d.data() as any)?.programId).filter(Boolean)));
-  if (!programIds.length) return [];
+async function loadVehiclesOfPrivateProvider(
+  providerUserId: string,
+  vehiclesCollectionName: string,
+  statusFilter?: VehicleStatus
+): Promise<Vehicle[]> {
+  const condSets: any[][] = [
+    [where('ownerUserId', '==', providerUserId)],
+    [where('providerUserId', '==', providerUserId)],
+    [where('userId', '==', providerUserId)],
+  ];
+  const resultsMap = new Map<string, Vehicle>();
 
-  const all: (Program & { modelDiscounts: ProgramModelDiscount[]; companyId?: string | null })[] = [];
-  for (const part of chunk(programIds, 10)) {
-    const ps = await getDocs(query(collection(db, 'programs'), where(documentId(), 'in', part)));
-    ps.docs.forEach(d => all.push({
-      id: d.id,
-      ...(d.data() as any),
-      modelDiscounts: coerceModelDiscounts((d.data() as any)?.modelDiscounts),
-      companyId: (d.data() as any)?.companyId || null,
-    }));
+  for (const baseConds of condSets) {
+    const conds = [...baseConds];
+    if (statusFilter) conds.push(where('status', '==', statusFilter));
+    const q = query(collection(db, vehiclesCollectionName), ...conds);
+    const snap = await getDocs(q);
+    snap.docs.forEach(d => resultsMap.set(d.id, { id: d.id, ...(d.data() as any) } as Vehicle));
   }
-  return all.filter(isProgramActiveNow).filter(p => p.modelDiscounts.length > 0);
+
+  return Array.from(resultsMap.values());
 }
 
 async function loadVehicleModelsByIds(ids: string[], collectionName: string) {
@@ -135,51 +146,28 @@ async function loadVehicleModelsByIds(ids: string[], collectionName: string) {
   return map;
 }
 
-async function loadVehiclesFor(
-  companyIds: string[],
-  modelIds: string[],
-  vehicleCollectionName: string,
-  statusFilter?: VehicleStatus
-): Promise<Vehicle[]> {
-  const results: Vehicle[] = [];
-  if (!companyIds.length || !modelIds.length) return results;
-
-  for (const companyId of companyIds) {
-    for (const part of chunk(modelIds, 10)) {
-      const conds: any[] = [
-        where('companyId', '==', companyId),
-        where('modelId', 'in', part),
-      ];
-      if (statusFilter) conds.push(where('status', '==', statusFilter));
-      const q = query(collection(db, vehicleCollectionName), ...conds);
-      const snap = await getDocs(q);
-      snap.docs.forEach(d => results.push({ id: d.id, ...(d.data() as any) } as Vehicle));
-    }
-  }
-  return results;
-}
-
 /* ===== View types ===== */
 type ModelCardRow = {
   key: string;
   model: VehicleModel;
-  baseFrom: number | null;
-  vehicleCount: number;
-  preferredCompanyId?: string;
+  baseFrom: number | null;         // min pricePerDay của provider
+  vehicleCount: number;            // tổng/khả dụng theo filter
+  preferredCompanyId?: string;     // nếu vehicle có companyId thì pref kèm
   preferredStationId?: string;
-  preferredVehicleId?: string;
+  preferredVehicleId?: string;     // id xe có giá thấp nhất
+  preferredVehicle?: Vehicle;      // giữ lại để lấy ảnh vehicle
 };
 
 interface ShowcaseProps {
-  agentId: string;
+  providerUserId: string;                // ✅ user id của Private Provider
   vehicleModelCollectionName?: string;
   vehiclesCollectionName?: string;
   limitPerRow?: number;
-  onlyAvailable?: boolean;
+  onlyAvailable?: boolean;               // mặc định chỉ show xe Available
 }
 
-export default function AgentShowcase({
-  agentId,
+export default function PrivateProviderShowcase({
+  providerUserId,
   vehicleModelCollectionName = 'vehicleModels',
   vehiclesCollectionName = 'vehicles',
   limitPerRow = 20,
@@ -197,50 +185,63 @@ export default function AgentShowcase({
     (async () => {
       setLoading(true);
       try {
-        const programs = await loadJoinedPrograms(agentId);
-        if (!programs.length) { if (mounted) setRows([]); return; }
-
-        const companyIds = Array.from(new Set(programs.map(p => p.companyId).filter(Boolean))) as string[];
-        const modelIds = Array.from(new Set(programs.flatMap(p => p.modelDiscounts.map(md => md.modelId))));
-        if (companyIds.length === 0 || modelIds.length === 0) {
-          if (mounted) setRows([]); return;
-        }
-
-        const [modelMap, vehicles] = await Promise.all([
-          loadVehicleModelsByIds(modelIds, vehicleModelCollectionName),
-          loadVehiclesFor(companyIds, modelIds, vehiclesCollectionName, onlyAvailable ? 'Available' : undefined),
-        ]);
+        // 1) Lấy tất cả xe thuộc Private Provider
+        const vehicles = await loadVehiclesOfPrivateProvider(
+          providerUserId,
+          vehiclesCollectionName,
+          onlyAvailable ? 'Available' : undefined
+        );
         if (!mounted) return;
 
-        const byModel = new Map<string, ModelCardRow>();
-        vehicles.forEach(v => {
-          const vm = modelMap.get(v.modelId);
-          if (!vm) return;
-          const base = typeof v.pricePerDay === 'number' ? v.pricePerDay : null;
+        if (!vehicles.length) {
+          setRows([]);
+          return;
+        }
 
-          const cur = byModel.get(v.modelId);
+        // 2) Gom theo modelId + xác định baseFrom / preferredVehicle
+        const byModel = new Map<string, { baseFrom: number | null; count: number; prefVehicle?: Vehicle }>();
+        vehicles.forEach(v => {
+          const modelId = (v as any).modelId;
+          if (!modelId) return;
+
+          const price = typeof (v as any).pricePerDay === 'number' ? (v as any).pricePerDay : null;
+          const cur = byModel.get(modelId);
           if (!cur) {
-            byModel.set(v.modelId, {
-              key: v.modelId,
-              model: vm,
-              baseFrom: base,
-              vehicleCount: 1,
-              preferredCompanyId: v.companyId,
-              preferredStationId: (v as any).stationId,
-              preferredVehicleId: v.id,
-            });
+            byModel.set(modelId, { baseFrom: price, count: 1, prefVehicle: price != null ? v : undefined });
           } else {
-            cur.vehicleCount += 1;
-            if (base != null && (cur.baseFrom == null || base < cur.baseFrom)) {
-              cur.baseFrom = base;
-              cur.preferredCompanyId = v.companyId;
-              cur.preferredStationId = (v as any).stationId;
-              cur.preferredVehicleId = v.id;
+            cur.count += 1;
+            if (price != null && (cur.baseFrom == null || price < cur.baseFrom)) {
+              cur.baseFrom = price;
+              cur.prefVehicle = v;
             }
           }
         });
 
-        const built = Array.from(byModel.values());
+        const modelIds = Array.from(byModel.keys());
+        if (!modelIds.length) { setRows([]); return; }
+
+        // 3) Load thông tin model
+        const modelMap = await loadVehicleModelsByIds(modelIds, vehicleModelCollectionName);
+        if (!mounted) return;
+
+        const built: ModelCardRow[] = [];
+        byModel.forEach((agg, modelId) => {
+          const vm = modelMap.get(modelId);
+          if (!vm) return;
+          const pref = agg.prefVehicle as any;
+          built.push({
+            key: modelId,
+            model: vm,
+            baseFrom: agg.baseFrom ?? null,
+            vehicleCount: agg.count,
+            preferredCompanyId: pref?.companyId,
+            preferredStationId: pref?.stationId,
+            preferredVehicleId: pref?.id,
+            preferredVehicle: pref, // giữ lại để ưu tiên ảnh vehicle
+          });
+        });
+
+        // 4) Sort by base price then model name
         built.sort((a, b) => {
           const aBase = a.baseFrom ?? Infinity;
           const bBase = b.baseFrom ?? Infinity;
@@ -248,23 +249,23 @@ export default function AgentShowcase({
           return (a.model?.name || '').localeCompare(b.model?.name || '');
         });
 
-        if (mounted) setRows(built);
+        setRows(built);
       } finally {
         if (mounted) setLoading(false);
       }
     })();
     return () => { mounted = false; };
-  }, [agentId, vehicleModelCollectionName, vehiclesCollectionName, onlyAvailable, limitPerRow]);
+  }, [providerUserId, vehicleModelCollectionName, vehiclesCollectionName, onlyAvailable, limitPerRow]);
 
   /* ==== BOOK action ==== */
   const handleBook = (r: ModelCardRow) => {
     const params = new URLSearchParams();
     params.set('modelId', r.model.id);
     if (r.preferredCompanyId) params.set('companyId', r.preferredCompanyId);
-    if (r.preferredStationId) params.set('stationId', r.preferredStationId);
+    if (r.preferredStationId) params.set('stationId', r.preferredStationId as string);
     if (r.preferredVehicleId) params.set('vehicleId', r.preferredVehicleId);
     if (r.baseFrom != null) params.set('basePricePerDay', String(r.baseFrom));
-    params.set('source', 'agent_showcase');
+    params.set('source', 'private_provider_showcase');
     router.push(`/bookings/new?${params.toString()}`);
   };
 
@@ -274,7 +275,7 @@ export default function AgentShowcase({
       {loading && (
         <div className="-mx-4 overflow-x-auto">
           <div className="flex w-max gap-3 px-4 py-3">
-            {[...Array(3)].map((_, i) => <SkeletonCard key={`sk-lite-${i}`} />)}
+            {[...Array(3)].map((_, i) => <SkeletonCard key={`sk-pp-${i}`} />)}
           </div>
         </div>
       )}
@@ -290,7 +291,7 @@ export default function AgentShowcase({
               >
                 <div className="bg-white rounded-t-2xl overflow-hidden">
                   <Image
-                    src={resolveModelImage(r.model)}
+                    src={resolveShowcaseImage(r.model, r.preferredVehicle)}
                     alt={r.model.name}
                     width={640}
                     height={360}
@@ -319,7 +320,7 @@ export default function AgentShowcase({
                     {typeof r.model.capacity === 'number' && <div>🪑 {r.model.capacity}</div>}
                   </div>
 
-                  {/* Badge số xe khả dụng */}
+                  {/* Badge số xe khả dụng (hoặc tổng nếu onlyAvailable=false) */}
                   <div className="mt-2">
                     <span
                       className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full"

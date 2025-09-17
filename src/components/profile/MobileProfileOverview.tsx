@@ -139,7 +139,8 @@ export default function MobileProfileOverview({
               {user.name || t('mobile_profile_overview.unknown_name')}
             </p>
             <p className="text-gray-400 text-xs truncate">
-              {t('mobile_profile_overview.role')} {user.role || 'Customer'}
+              {t('mobile_profile_overview.role')}{' '}
+              {t(`roles.${user.role || 'customer'}`)}
             </p>
             <p className="text-gray-500 truncate">{addressText}</p>
           </div>

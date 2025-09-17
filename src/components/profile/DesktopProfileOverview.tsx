@@ -151,8 +151,9 @@ export default function DesktopProfileOverview({
               )}
 
               <div className="text-sm text-gray-600">
-                <p>
-                  {t('desktop_profile_overview.role')} {user.role || 'Customer'}
+                <p className="text-gray-400 text-xs truncate">
+                  {t('mobile_profile_overview.role')}{' '}
+                  {t(`roles.${user.role || 'customer'}`)}
                 </p>
                 <p className="truncate">{addressText}</p>
                 <p>

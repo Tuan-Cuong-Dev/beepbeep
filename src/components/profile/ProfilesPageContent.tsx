@@ -20,6 +20,9 @@ import MyIssuesSectionContainer from '@/src/components/profile/MyIssuesSectionCo
 import MyContributionsSection from '@/src/components/profile/MyContributionsSection';
 import MyBusinessSection from '@/src/components/profile/MyBusinessSection';
 import AgentShowcase from '@/src/components/showcase/AgentShowcase';
+import CompanyOwnerShowcase from '@/src/components/showcase/CompanyOwnerShowcase';
+import PrivateProviderShowcase from '@/src/components/showcase/PrivateProviderShowcase';
+
 import LoginPopup from '@/src/components/auth/LoginPopup';
 import type { BusinessType } from '@/src/lib/my-business/businessTypes';
 
@@ -190,8 +193,19 @@ export default function ProfilesPageContent() {
             <>
               {activeTab === 'activityFeed' && <ProfileMainContent activeTab="activityFeed" />}
               {activeTab === 'showcase' && (
-                <AgentShowcase agentId={profileUserId!} limitPerRow={12} onlyAvailable />
+                <>
+                  {userData?.role === 'agent' && (
+                    <AgentShowcase agentId={profileUserId!} limitPerRow={12} onlyAvailable />
+                  )}
+                  {userData?.role === 'company_owner' && (
+                    <CompanyOwnerShowcase companyId={userData?.companyId} limitPerRow={12} onlyAvailable />
+                  )}
+                  {userData?.role === 'private_provider' && (
+                    <PrivateProviderShowcase providerUserId={profileUserId!} limitPerRow={12} onlyAvailable />
+                  )}
+                </>
               )}
+
 
               {isOwner && activeTab === 'vehicles' && <MyVehiclesSection />}
               {isOwner && activeTab === 'insurance' && <MyInsuranceSection />}
