@@ -1154,7 +1154,9 @@
     "tour_guide": "ツアーガイドを作成"
   },
   "subtitle": "以下の情報を入力して開始してください。",
-  "invalid_type": "プロフィールから事業を作成してください。"
+  "invalid_type": "プロフィールから事業を作成してください。",
+   "choose_title": "事業タイプを選択",
+    "choose_subtitle": "あなたの事業に合ったタイプを選んでください。"
 },
 
 "create_business_form": {

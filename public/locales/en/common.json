@@ -1194,7 +1194,9 @@
     "tour_guide": "Create Tour Guide"
   },
   "subtitle": "Please fill in the information below to get started.",
-  "invalid_type": "Go to Profile to create your business."
+  "invalid_type": "Go to Profile to create your business.",
+   "choose_title": "Choose your organization",
+    "choose_subtitle": "Pick the type that fits your business."
 },
 
 "create_business_form": {

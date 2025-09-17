@@ -1189,21 +1189,23 @@
 },
 
 "create_business_page": {
-  "title": {
-    "rental_company": "Tạo Công ty cho thuê xe",
-    "private_provider": "Tạo Nhà cung cấp cá nhân",
-    "agent": "Tạo Cộng tác viên",
-    "technician_partner": "Tạo Kỹ thuật viên đối tác",
-    "city_driver": "Tạo Tài xế thành phố",
-    "intercity_driver": "Tạo Tài xế liên tỉnh",
-    "delivery_partner": "Tạo Đối tác giao hàng",
-    "intercity_bus": "Tạo Đơn vị xe liên tỉnh",
-    "vehicle_transport": "Tạo Đơn vị vận chuyển xe",
-    "tour_guide": "Tạo Hướng dẫn viên"
+    "title": {
+      "rental_company": "Tạo Công ty cho thuê xe",
+      "private_provider": "Tạo Nhà cung cấp cá nhân",
+      "agent": "Tạo Cộng tác viên",
+      "technician_partner": "Tạo Kỹ thuật viên đối tác",
+      "city_driver": "Tạo Tài xế thành phố",
+      "intercity_driver": "Tạo Tài xế liên tỉnh",
+      "delivery_partner": "Tạo Đối tác giao hàng",
+      "intercity_bus": "Tạo Đơn vị xe liên tỉnh",
+      "vehicle_transport": "Tạo Đơn vị vận chuyển xe",
+      "tour_guide": "Tạo Hướng dẫn viên"
+    },
+    "subtitle": "Vui lòng điền thông tin bên dưới để bắt đầu.",
+    "choose_title": "Chọn loại hình tổ chức",
+    "choose_subtitle": "Hãy chọn loại phù hợp với hoạt động của bạn.",
+    "invalid_type": "Hãy vào Hồ Sơ để tạo doanh nghiệp của bạn"
   },
-  "subtitle": "Vui lòng điền thông tin bên dưới để bắt đầu.",
-  "invalid_type": "Hãy vào Hồ Sơ để tạo doanh nghiệp của bạn"
-},
 
 "create_business_form": {
     "name_placeholder": "Tên cá nhân / doanh nghiệp / tổ chức",

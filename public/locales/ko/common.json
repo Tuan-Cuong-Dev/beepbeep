@@ -1172,7 +1172,9 @@
     "tour_guide": "관광 가이드를 생성"
   },
   "subtitle": "시작하려면 아래 정보를 입력하세요.",
-  "invalid_type": "프로필에서 사업을 생성하세요."
+  "invalid_type": "프로필에서 사업을 생성하세요.",
+  "choose_title": "조직 유형 선택",
+    "choose_subtitle": "비즈니스에 맞는 유형을 선택하세요."
 },
 
 "create_business_form": {
