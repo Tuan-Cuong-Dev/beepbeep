@@ -18,9 +18,9 @@ export function parseLatLng(s?: string): Coords | null {
 }
 
 export function buildLocationCore(params: {
-  coords?: Coords | null;
+  coords?: Coords | null; // Có thể để trống
   latLngString?: string;
-  mapAddress?: string;
+  mapAddress?: string | null; // Có thể để trống khi lấy vị trí tự động bằng GPS
   address?: string;
 }): LocationCore {
   const c = params.coords ?? parseLatLng(params.latLngString || "");

@@ -20,7 +20,14 @@ import { Button } from '@/src/components/ui/button';
 import { Badge } from '@/src/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/src/components/ui/dialog';
 import NotificationDialog, { NotificationType } from '@/src/components/ui/NotificationDialog';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  getDoc,
+} from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 
 type EntityType = 'rentalCompany' | 'privateProvider' | 'agent';
@@ -41,53 +48,91 @@ export default function BookingManagementPage() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+
+    const resolveOwner = async () => {
       setResolvingOwner(true);
       try {
-        if (isAgent) {
-          setEntityType('agent');
-          if (mounted) setOwnerId(user?.uid ?? '');
-          return;
-        }
-
-        if (normalizedRole === 'private_provider') {
-          setEntityType('privateProvider');
-          if (user?.uid) {
-            const snap = await getDocs(
-              query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid))
-            );
-            const providerId = snap.docs[0]?.id ?? '';
-            if (mounted) setOwnerId(providerId);
-          } else {
-            if (mounted) setOwnerId('');
+        // Chưa đăng nhập → chờ đến khi có user
+        if (!user?.uid) {
+          if (mounted) {
+            setEntityType('rentalCompany');
+            setOwnerId('');
           }
           return;
         }
 
-        // Các vai trò còn lại mặc định rentalCompany
-        setEntityType('rentalCompany');
+        // 1) Agent → entity=agent, ownerId = uid
+        if (isAgent) {
+          if (mounted) {
+            setEntityType('agent');
+            setOwnerId(user.uid);
+          }
+          return;
+        }
 
+        // 2) Private provider → tra theo ownerId
+        if (normalizedRole === 'private_provider') {
+          if (mounted) setEntityType('privateProvider');
+
+          const snap = await getDocs(
+            query(collection(db, 'privateProviders'), where('ownerId', '==', user.uid))
+          );
+          const providerId = snap.docs[0]?.id ?? '';
+          if (mounted) setOwnerId(providerId); // rỗng → sẽ hiện thông báo
+          return;
+        }
+
+        // 3) Mặc định rentalCompany
+        if (mounted) setEntityType('rentalCompany');
+
+        // 3a) Nếu context đã có companyId → dùng luôn
         if (companyId) {
           if (mounted) setOwnerId(companyId);
           return;
         }
 
-        // Admin không có companyId → xem toàn hệ thống
+        // 3b) Admin không có companyId → xem toàn hệ thống
         if (isAdmin) {
           if (mounted) setOwnerId('__ALL__');
           return;
         }
 
-        // Không phải admin và cũng không có companyId
-        if (mounted) setOwnerId('');
+        // 3c) Company owner → tự tìm rentalCompany theo ownerId
+        if (normalizedRole === 'company_owner') {
+          const rcSnap = await getDocs(
+            query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid))
+          );
+          const rcId = rcSnap.docs[0]?.id ?? '';
+          if (mounted) setOwnerId(rcId);
+          if (rcId) return;
+        }
+
+        // 3d) Nếu có stationId (ví dụ station_manager) → lấy companyId từ station
+        if (stationId) {
+          const stDoc = await getDoc(doc(db, 'rentalStations', stationId));
+          const stData = stDoc.exists() ? stDoc.data() as any : null;
+          const stCompanyId = stData?.companyId || '';
+          if (mounted) setOwnerId(stCompanyId);
+          if (stCompanyId) return;
+        }
+
+        // 3e) Các role staff khác → tìm trong collection 'staff' theo userId để lấy companyId
+        const staffSnap = await getDocs(
+          query(collection(db, 'staff'), where('userId', '==', user.uid))
+        );
+        const staffCompanyId = staffSnap.docs[0]?.data()?.companyId || '';
+        if (mounted) setOwnerId(staffCompanyId);
+
       } finally {
         if (mounted) setResolvingOwner(false);
       }
-    })();
+    };
+
+    resolveOwner();
     return () => {
       mounted = false;
     };
-  }, [normalizedRole, companyId, user?.uid, isAgent, isAdmin]);
+  }, [normalizedRole, companyId, stationId, user?.uid, isAgent, isAdmin]);
 
   // Lọc nâng cao
   const [searchText, setSearchText] = useState('');
@@ -126,21 +171,22 @@ export default function BookingManagementPage() {
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
       const matchesAgentScope =
-        isAgent && onlyMine ? b.userId === user?.uid || (b as any)?.agentId === user?.uid : true;
+        isAgent && onlyMine ? (b as any)?.userId === user?.uid || (b as any)?.agentId === user?.uid : true;
 
       const matchesRole =
         normalizedRole === 'station_manager' && stationId
-          ? b.stationId === stationId
+          ? (b as any)?.stationId === stationId
           : true;
 
       const matchesSearch = searchText
-        ? (b.fullName || '').toLowerCase().includes(searchText.toLowerCase()) ||
-          (b.phone || '').includes(searchText) ||
-          (b.vin || '').includes(searchText)
+        ? ((b as any)?.fullName || '').toLowerCase().includes(searchText.toLowerCase()) ||
+          ((b as any)?.phone || '').includes(searchText) ||
+          ((b as any)?.vin || '').includes(searchText)
         : true;
 
+      const bStatus = ((b as any)?.bookingStatus || '').toLowerCase();
       const matchesStatus =
-        statusFilter === 'All' || (b.bookingStatus || '').toLowerCase() === statusFilter.toLowerCase();
+        statusFilter === 'All' || bStatus === statusFilter.toLowerCase();
 
       return matchesAgentScope && matchesRole && matchesSearch && matchesStatus;
     });

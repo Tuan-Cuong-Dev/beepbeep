@@ -29,7 +29,7 @@ interface Props {
 
 type LatLng = { lat: number; lng: number };
 
-// Parse "lat,lng" nhanh gọn (fallback cho preview)
+/** Parse "lat,lng" fallback cho preview */
 function parseLatLngString(s?: string): LatLng | null {
   if (!s) return null;
   const m = s.match(/^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/);
@@ -38,6 +38,20 @@ function parseLatLngString(s?: string): LatLng | null {
   const lng = parseFloat(m[3]);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return { lat, lng };
+}
+
+/** Helper: loại bỏ toàn bộ field undefined (deep) */
+function stripUndefined<T>(obj: T): T {
+  if (obj === null || typeof obj !== "object") return obj as T;
+  if (Array.isArray(obj)) {
+    return obj.map(stripUndefined).filter((v) => v !== undefined) as unknown as T;
+  }
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj as Record<string, any>)) {
+    if (v === undefined) continue;
+    out[k] = stripUndefined(v);
+  }
+  return out as T;
 }
 
 export default function CreateBusinessForm({ businessType }: Props) {
@@ -49,7 +63,9 @@ export default function CreateBusinessForm({ businessType }: Props) {
   const subtypeParam = (searchParams?.get("subtype") || "").toLowerCase();
   const technicianSubtype = useMemo<"mobile" | "shop" | undefined>(() => {
     if (businessType !== "technician_partner") return undefined;
-    return subtypeParam === "mobile" || subtypeParam === "shop" ? subtypeParam : "mobile";
+    return subtypeParam === "mobile" || subtypeParam === "shop"
+      ? subtypeParam
+      : "mobile";
   }, [businessType, subtypeParam]);
 
   const { geocode, coords, error: geoError, loading: geoLoading } = useGeocodeAddress();
@@ -78,7 +94,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
   const [useCurrentPos, setUseCurrentPos] = useState(false);
   const [gpsStatus, setGpsStatus] = useState<"idle" | "getting" | "ok" | "error">("idle");
   const [gpsError, setGpsError] = useState("");
-  const [currentPos, setCurrentPos] = useState<LatLng | null>(null); // lưu toạ độ lấy từ GPS
+  const [currentPos, setCurrentPos] = useState<LatLng | null>(null);
 
   /** Lấy vị trí hiện tại (GPS) */
   const getGps = useCallback(() => {
@@ -96,7 +112,6 @@ export default function CreateBusinessForm({ businessType }: Props) {
         const { latitude, longitude } = pos.coords;
         const latlng: LatLng = { lat: latitude, lng: longitude };
         setCurrentPos(latlng);
-        // điền vào input location để server parse và build LocationCore
         setForm((prev) => ({ ...prev, location: `${latitude},${longitude}` }));
         setGpsStatus("ok");
       },
@@ -108,9 +123,9 @@ export default function CreateBusinessForm({ businessType }: Props) {
     );
   }, []);
 
-  // Prefill từ current user (kể cả sau refresh)
+  // Prefill từ current user
   useEffect(() => {
-    setPersistence(auth, browserLocalPersistence).catch(() => { /* no-op */ });
+    setPersistence(auth, browserLocalPersistence).catch(() => {});
     const unsub = onAuthStateChanged(auth, (u) => {
       if (u) {
         setForm((p) => ({
@@ -129,7 +144,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
     if (useCurrentPos) getGps();
   }, [useCurrentPos, getGps]);
 
-  // Khi geocode xong → ghi vào input location (CHỈ khi KHÔNG dùng GPS để tránh ghi đè)
+  // Khi geocode xong → ghi vào input location (chỉ khi KHÔNG dùng GPS)
   useEffect(() => {
     if (!coords || useCurrentPos) return;
     setForm((prev) => ({ ...prev, location: `${coords.lat},${coords.lng}` }));
@@ -143,7 +158,6 @@ export default function CreateBusinessForm({ businessType }: Props) {
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
-  // Chỉ geocode mapAddress khi KHÔNG dùng GPS
   const handleBlur = () => {
     if (!useCurrentPos && form.mapAddress.trim()) {
       geocodeRef.current(form.mapAddress.trim());
@@ -162,8 +176,13 @@ export default function CreateBusinessForm({ businessType }: Props) {
 
     const { name, phone, displayAddress, mapAddress, location } = form;
 
-    // mapAddress chỉ bắt buộc khi KHÔNG dùng GPS
-    if (!name || !phone || !displayAddress || (!useCurrentPos && !mapAddress) || !location) {
+    if (
+      !name ||
+      !phone ||
+      !displayAddress ||
+      (!useCurrentPos && !mapAddress) ||
+      !location
+    ) {
       return showDialog(
         "error",
         t("create_business_form.missing_fields_title"),
@@ -171,11 +190,8 @@ export default function CreateBusinessForm({ businessType }: Props) {
       );
     }
 
-    // Ưu tiên toạ độ từ GPS hoặc hook geocode; fallback parse từ input
-    const parsed =
-      currentPos ??
-      coords ??
-      parseLatLng(location); // util của bạn (parse an toàn "lat,lng")
+    // Ưu tiên GPS → geocode → parse
+    const parsed = currentPos ?? coords ?? parseLatLng(location);
     if (!parsed) {
       return showDialog(
         "error",
@@ -188,11 +204,10 @@ export default function CreateBusinessForm({ businessType }: Props) {
     setLoading(true);
 
     try {
-      // LocationCore dùng chung (mapAddress/address nằm TRONG location)
       const locationCore = buildLocationCore({
         coords: parsed,
-        mapAddress: useCurrentPos ? "" : form.mapAddress, // khi dùng GPS có thể bỏ qua mapAddress
-        address: form.displayAddress,
+        mapAddress: useCurrentPos ? null : (form.mapAddress?.trim() || null),
+        address: form.displayAddress?.trim() || "",
       });
 
       const userMeta = {
@@ -205,7 +220,7 @@ export default function CreateBusinessForm({ businessType }: Props) {
       };
 
       const batch = writeBatch(db);
-      const docRef = doc(collection(db, cfg.collection)); // tạo sẵn id
+      const docRef = doc(collection(db, cfg.collection));
 
       let baseDoc: Record<string, any>;
 
@@ -252,30 +267,26 @@ export default function CreateBusinessForm({ businessType }: Props) {
         }
       }
 
-      batch.set(docRef, baseDoc);
+      const safeDoc = stripUndefined(baseDoc);
+      batch.set(docRef, safeDoc);
 
-      // Update user profile with role & business ref
       const userRef = doc(db, "users", user.uid);
-      batch.set(
-        userRef,
-        {
-          role: cfg.role,
-          business: {
-            id: docRef.id,
-            type: businessType,
-            collection: cfg.collection,
-            ...(businessType === "technician_partner" && technicianSubtype
-              ? { subtype: technicianSubtype }
-              : {}),
-          },
-          updatedAt: serverTimestamp(),
+      const userPatch = stripUndefined({
+        role: cfg.role,
+        business: {
+          id: docRef.id,
+          type: businessType,
+          collection: cfg.collection,
+          ...(businessType === "technician_partner" && technicianSubtype
+            ? { subtype: technicianSubtype }
+            : {}),
         },
-        { merge: true }
-      );
+        updatedAt: serverTimestamp(),
+      });
+      batch.set(userRef, userPatch, { merge: true });
 
       await batch.commit();
 
-      // Custom claims cho rental_company (nếu dùng)
       if (businessType === "rental_company") {
         await fetch("/api/setCustomClaims", {
           method: "POST",
@@ -304,10 +315,10 @@ export default function CreateBusinessForm({ businessType }: Props) {
     }
   };
 
-  // Quyết định toạ độ nào để preview map:
+  // Quyết định toạ độ nào để preview map
   const previewCoords: LatLng | null = (() => {
     if (currentPos) return currentPos;
-    if (coords && !useCurrentPos) return coords; // chỉ dùng kết quả geocode khi không bật GPS
+    if (coords && !useCurrentPos) return coords;
     return parseLatLngString(form.location);
   })();
 
@@ -336,17 +347,21 @@ export default function CreateBusinessForm({ businessType }: Props) {
           onChange={handleChange("displayAddress")}
         />
 
-        {/* ✅ Toggle: dùng vị trí hiện tại */}
+        {/* ✅ Toggle GPS */}
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
             checked={useCurrentPos}
             onChange={(e) => setUseCurrentPos(e.target.checked)}
           />
-          <span>{t("use_current_location_label", "Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps")}</span>
+          <span>
+            {t(
+              "use_current_location_label",
+              "Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps"
+            )}
+          </span>
         </label>
 
-        {/* Ẩn mapAddress khi đang dùng GPS để tránh ghi đè */}
         {!useCurrentPos && (
           <Input
             placeholder={t("create_business_form.map_address_placeholder")}
@@ -359,14 +374,16 @@ export default function CreateBusinessForm({ businessType }: Props) {
         <Input
           placeholder={t("create_business_form.location_placeholder")}
           value={form.location}
-          readOnly={useCurrentPos} // khi dùng GPS thì khoá input này
+          readOnly={useCurrentPos}
           onChange={handleChange("location")}
         />
 
         {businessType === "technician_partner" && (
           <p className="text-xs text-gray-600">
             {t("create_business_form.technician_subtype_hint", {
-              subtype: t(`create_business_form.subtype.${technicianSubtype ?? "mobile"}`),
+              subtype: t(
+                `create_business_form.subtype.${technicianSubtype ?? "mobile"}`
+              ),
             })}
           </p>
         )}
@@ -376,7 +393,9 @@ export default function CreateBusinessForm({ businessType }: Props) {
             {t("create_business_form.detecting_coordinates")}
           </p>
         )}
-        {geoError && !useCurrentPos && <p className="text-sm text-red-500">{geoError}</p>}
+        {geoError && !useCurrentPos && (
+          <p className="text-sm text-red-500">{geoError}</p>
+        )}
 
         {/* Trạng thái GPS */}
         {useCurrentPos && (
@@ -399,7 +418,6 @@ export default function CreateBusinessForm({ businessType }: Props) {
           </p>
         )}
 
-        {/* Map preview */}
         {previewCoords && (
           <>
             <p className="text-sm text-gray-600">
@@ -422,8 +440,8 @@ export default function CreateBusinessForm({ businessType }: Props) {
           {loading
             ? t("create_business_form.creating_button")
             : !authReady
-              ? t("common.loading")
-              : t("create_business_form.create_button")}
+            ? t("common.loading")
+            : t("create_business_form.create_button")}
         </Button>
       </div>
 

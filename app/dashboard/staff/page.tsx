@@ -29,13 +29,83 @@ interface Invitation {
 
 export default function StaffManagementPage() {
   const { t } = useTranslation('common');
-  const { role, companyId, loading, user } = useUser();
-  const normalizedRole = role?.toLowerCase();
+  const { role, companyId, stationId, loading, user } = useUser();
+
+  const normalizedRole = (role || '').toLowerCase();
   const isAdmin = normalizedRole === 'admin';
+  const isAssistant = normalizedRole === 'technician_assistant';
+
+  // NEW: companyId được suy luận nếu context chưa có
+  const [resolvedCompanyId, setResolvedCompanyId] = useState<string | undefined>(companyId);
+  const [resolvingCompany, setResolvingCompany] = useState<boolean>(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const resolveCompany = async () => {
+      setResolvingCompany(true);
+      try {
+        // Admin & Assistant xem all -> không cần companyId
+        if (isAdmin || isAssistant) {
+          if (mounted) setResolvedCompanyId(undefined);
+          return;
+        }
+
+        // Nếu context đã có companyId -> dùng luôn
+        if (companyId) {
+          if (mounted) setResolvedCompanyId(companyId);
+          return;
+        }
+
+        // Nếu có stationId -> lấy companyId từ station
+        if (stationId) {
+          const st = await getDoc(doc(db, 'rentalStations', stationId));
+          if (st.exists()) {
+            const cid = (st.data() as any)?.companyId || '';
+            if (mounted) setResolvedCompanyId(cid || undefined);
+            if (cid) return;
+          }
+        }
+
+        // Nếu là company_owner -> tìm rentalCompanies theo ownerId
+        if (normalizedRole === 'company_owner' && user?.uid) {
+          const rcSnap = await getDocs(
+            query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid))
+          );
+          const cid = rcSnap.docs[0]?.id || '';
+          if (mounted) setResolvedCompanyId(cid || undefined);
+          if (cid) return;
+        }
+
+        // Các staff khác -> tìm trong collection 'staff' theo userId để lấy companyId
+        if (user?.uid) {
+          const staffSnap = await getDocs(
+            query(collection(db, 'staff'), where('userId', '==', user.uid))
+          );
+          const cid = staffSnap.docs[0]?.data()?.companyId || '';
+          if (mounted) setResolvedCompanyId(cid || undefined);
+          return;
+        }
+
+        // Không xác định được
+        if (mounted) setResolvedCompanyId(undefined);
+      } finally {
+        if (mounted) setResolvingCompany(false);
+      }
+    };
+
+    resolveCompany();
+    return () => {
+      mounted = false;
+    };
+  }, [isAdmin, isAssistant, companyId, stationId, normalizedRole, user?.uid]);
+
+  // Quyền xem: admin/assistant luôn OK; còn lại cần có companyId đã resolve
   const canViewStaff =
     isAdmin ||
-    normalizedRole === 'technician_assistant' ||
-    (['company_owner', 'company_admin'].includes(normalizedRole || '') && !!companyId);
+    isAssistant ||
+    (['company_owner', 'company_admin', 'station_manager'].includes(normalizedRole) &&
+      !!resolvedCompanyId);
 
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -51,59 +121,61 @@ export default function StaffManagementPage() {
   const [companyNames, setCompanyNames] = useState<Record<string, string>>({});
   const [refreshInvites, setRefreshInvites] = useState(false);
 
+  // useStaffData: admin/assistant -> không truyền companyId (xem tất cả)
   const { staffs, loading: staffLoading, handleUpdate, handleDelete } = useStaffData({
     role: role ?? undefined,
-    companyId: companyId ?? undefined,
+    companyId: isAdmin || isAssistant ? undefined : resolvedCompanyId,
   });
 
   useEffect(() => {
-    if (!loading && canViewStaff) {
-      if (isAdmin || normalizedRole === 'technician_assistant') {
-        loadAllCompanyNames();
-        loadAllStations();
-      } else if (companyId) {
-        loadCompanyName(companyId);
-        loadStations(companyId);
-        loadPendingInvitations(companyId);
+    if (!loading && canViewStaff && !resolvingCompany) {
+      if (isAdmin || isAssistant) {
+        void loadAllCompanyNames();
+        void loadAllStations();
+      } else if (resolvedCompanyId) {
+        void loadCompanyName(resolvedCompanyId);
+        void loadStations(resolvedCompanyId);
+        void loadPendingInvitations(resolvedCompanyId);
       }
     }
-  }, [loading, companyId, isAdmin, canViewStaff, refreshInvites]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, isAdmin, isAssistant, canViewStaff, resolvingCompany, resolvedCompanyId, refreshInvites]);
 
   const loadCompanyName = async (id: string) => {
     const snap = await getDoc(doc(db, 'rentalCompanies', id));
-    if (snap.exists()) setCompanyNames(prev => ({ ...prev, [id]: snap.data().name }));
+    if (snap.exists()) setCompanyNames(prev => ({ ...prev, [id]: (snap.data() as any).name }));
   };
 
   const loadAllCompanyNames = async () => {
     const snapshot = await getDocs(collection(db, 'rentalCompanies'));
     const map: Record<string, string> = {};
-    snapshot.docs.forEach(doc => (map[doc.id] = doc.data().name));
+    snapshot.docs.forEach(d => (map[d.id] = (d.data() as any).name));
     setCompanyNames(map);
   };
 
-  const loadStations = async (companyId: string) => {
-    const snapshot = await getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', companyId)));
+  const loadStations = async (cid: string) => {
+    const snapshot = await getDocs(query(collection(db, 'rentalStations'), where('companyId', '==', cid)));
     const map: Record<string, string> = {};
-    snapshot.docs.forEach(doc => (map[doc.id] = doc.data().name));
+    snapshot.docs.forEach(d => (map[d.id] = (d.data() as any).name));
     setStationMap(map);
   };
 
   const loadAllStations = async () => {
     const snapshot = await getDocs(collection(db, 'rentalStations'));
     const map: Record<string, string> = {};
-    snapshot.docs.forEach(doc => (map[doc.id] = doc.data().name));
+    snapshot.docs.forEach(d => (map[d.id] = (d.data() as any).name));
     setStationMap(map);
   };
 
-  const loadPendingInvitations = async (companyId: string) => {
+  const loadPendingInvitations = async (cid: string) => {
     const q = query(
       collection(db, 'messages'),
-      where('companyId', '==', companyId),
+      where('companyId', '==', cid),
       where('type', '==', 'invitation'),
       where('status', '==', 'pending')
     );
     const snap = await getDocs(q);
-    const invites = snap.docs.map(doc => ({ ...(doc.data() as Invitation), id: doc.id }));
+    const invites = snap.docs.map(d => ({ ...(d.data() as Invitation), id: d.id }));
     setPendingInvites(invites);
   };
 
@@ -132,8 +204,13 @@ export default function StaffManagementPage() {
     }
   };
 
-  if (loading) return <div className="text-center py-10">{t('staff_management_page.loading')}</div>;
-  if (!canViewStaff) return <div className="text-center py-10 text-red-500">{t('staff_management_page.no_permission')}</div>;
+  if (loading || resolvingCompany) {
+    return <div className="text-center py-10">{t('staff_management_page.loading')}</div>;
+  }
+
+  if (!canViewStaff) {
+    return <div className="text-center py-10 text-red-500">{t('staff_management_page.no_permission')}</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -143,14 +220,19 @@ export default function StaffManagementPage() {
       <main className="flex-1 p-6 space-y-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">
-            {isAdmin ? t('staff_management_page.title_admin') : t('staff_management_page.title_company')}
+            {isAdmin || isAssistant
+              ? t('staff_management_page.title_admin')
+              : t('staff_management_page.title_company')}
           </h1>
 
-          {role !== 'technician_assistant' && (
-            <Button onClick={() => {
-              setEditingStaff(null);
-              setShowForm(true);
-            }}>
+          {/* Assistant không tạo/sửa xoá staff */}
+          {!isAssistant && (
+            <Button
+              onClick={() => {
+                setEditingStaff(null);
+                setShowForm(true);
+              }}
+            >
               {t('staff_management_page.add_staff')}
             </Button>
           )}
@@ -161,25 +243,28 @@ export default function StaffManagementPage() {
         <ResponsiveStaffTable
           staffs={staffs}
           onEdit={(staff) => {
+            if (isAssistant) return; // Assistant chỉ xem
             setEditingStaff(staff);
             setShowForm(true);
           }}
           onDelete={(staff) =>
-            showDialog(
-              'confirm',
-              t('staff_management_page.delete_staff_title'),
-              t('staff_management_page.delete_staff_confirm', { name: staff.name || staff.email }),
-              () => confirmDeleteStaff(staff)
-            )
+            isAssistant
+              ? undefined
+              : showDialog(
+                  'confirm',
+                  t('staff_management_page.delete_staff_title'),
+                  t('staff_management_page.delete_staff_confirm', { name: staff.name || (staff as any).email }),
+                  () => confirmDeleteStaff(staff)
+                )
           }
           stationMap={stationMap}
           companyNames={companyNames}
         />
 
-        {showForm && (
+        {showForm && !isAssistant && (
           <StaffForm
             editingStaff={editingStaff}
-            companyId={companyId || ''}
+            companyId={resolvedCompanyId || ''} // dùng companyId đã resolve
             onSave={() => {
               setShowForm(false);
               setEditingStaff(null);
@@ -201,19 +286,21 @@ export default function StaffManagementPage() {
                     <p className="font-medium">{invite.name || invite.email}</p>
                     <p className="text-sm text-gray-500">{t('staff_management_page.role')}: {invite.role}</p>
                   </div>
-                  <Button
-                    variant="destructive"
-                    onClick={() =>
-                      showDialog(
-                        'confirm',
-                        t('staff_management_page.delete_invitation_title'),
-                        t('staff_management_page.delete_invitation_confirm', { name: invite.name || invite.email }),
-                        () => confirmDeleteInvitation(invite)
-                      )
-                    }
-                  >
-                    {t('staff_management_page.delete_invitation_button')}
-                  </Button>
+                  {!isAssistant && (
+                    <Button
+                      variant="destructive"
+                      onClick={() =>
+                        showDialog(
+                          'confirm',
+                          t('staff_management_page.delete_invitation_title'),
+                          t('staff_management_page.delete_invitation_confirm', { name: invite.name || invite.email }),
+                          () => confirmDeleteInvitation(invite)
+                        )
+                      }
+                    >
+                      {t('staff_management_page.delete_invitation_button')}
+                    </Button>
+                  )}
                 </li>
               ))}
             </ul>

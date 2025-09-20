@@ -21,6 +21,8 @@ export default function FormBuilderPage() {
   const { t } = useTranslation('common');
   const { user, companyId, role, loading } = useUser();
   const normalizedRole = (role || '').toLowerCase();
+
+  // Chỉ admin, company_owner, private_provider được chỉnh
   const canEdit = ['admin', 'company_owner', 'private_provider'].includes(normalizedRole);
 
   // Loại thực thể đang chỉnh sửa cấu hình
@@ -41,23 +43,52 @@ export default function FormBuilderPage() {
       return;
     }
 
-    // Company owner: dùng rentalCompany theo companyId của context
-    if (normalizedRole === 'company_owner' && companyId) {
-      (async () => {
-        setEntityType('rentalCompany');
-        setLoadingOwners(true);
-        // lấy tên công ty
-        try {
-          const snap = await getDoc(doc(db, 'rentalCompanies', companyId));
-          const name = snap.exists() ? (snap.data() as any).name || companyId : companyId;
-          setOwners([{ id: companyId, name }]);
-          setSelectedOwnerId(companyId);
-        } finally {
-          setLoadingOwners(false);
+  // Company owner: ưu tiên companyId từ context; nếu thiếu thì tự resolve theo ownerId
+  if (normalizedRole === 'company_owner') {
+    (async () => {
+      setEntityType('rentalCompany');
+      setLoadingOwners(true);
+      try {
+        // 🔧 companyToUse có thể chưa xác định → dùng union type
+        let companyToUse: string | undefined = companyId ?? undefined;
+
+        // Nếu context chưa có companyId → tìm theo ownerId
+        if (!companyToUse) {
+          const rcSnap = await getDocs(
+            query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid))
+          );
+          companyToUse = rcSnap.docs[0]?.id ?? undefined;
+
+          // Dự phòng: nếu vẫn chưa có, thử 'staff' theo userId để lấy companyId
+          if (!companyToUse) {
+            const staffSnap = await getDocs(
+              query(collection(db, 'staff'), where('userId', '==', user.uid))
+            );
+            companyToUse = (staffSnap.docs[0]?.data() as any)?.companyId ?? undefined;
+          }
         }
-      })();
-      return;
-    }
+
+        // 🔒 Chỉ thao tác Firestore & set state khi đã có string
+        if (companyToUse) {
+          const snap = await getDoc(doc(db, 'rentalCompanies', companyToUse));
+          const name = snap.exists()
+            ? ((snap.data() as any).name as string) || companyToUse
+            : companyToUse;
+
+          setOwners([{ id: companyToUse, name }]);
+          setSelectedOwnerId(companyToUse);
+        } else {
+          // Không resolve được
+          setOwners([]);
+          setSelectedOwnerId(null);
+        }
+      } finally {
+        setLoadingOwners(false);
+      }
+    })();
+    return;
+  }
+
 
     // Private provider: tìm provider do user sở hữu
     if (normalizedRole === 'private_provider') {
@@ -104,7 +135,7 @@ export default function FormBuilderPage() {
 
   if (loading || loadingOwners) return <div>{t('form_builder_page.loading')}</div>;
   if (!user) return <div>{t('form_builder_page.please_sign_in')}</div>;
-  if (!canEdit) return <div>{t('form_builder_page.no_permission')}</div>;
+  if (!canEdit) return <div className="text-red-500">{t('form_builder_page.no_permission')}</div>;
 
   return (
     <>
@@ -153,7 +184,7 @@ export default function FormBuilderPage() {
         )}
 
         {/* Company owner / Private provider: hiển thị tên thực thể (không cho đổi) */}
-        {normalizedRole !== 'admin' && owners[0] && (
+        {normalizedRole !== 'admin' && owners.length > 0 && owners[0] && (
           <div className="mb-2 text-sm text-gray-700">
             <span className="mr-2">
               {entityType === 'privateProvider' ? '🧑‍💼' : '🏢'}
@@ -162,10 +193,17 @@ export default function FormBuilderPage() {
           </div>
         )}
 
+        {/* Trạng thái khi chưa xác định được ownerId */}
+        {!selectedOwnerId && (
+          <div className="text-amber-600 text-sm">
+            {entityType === 'privateProvider'
+              ? t('form_builder_page.no_provider_found')
+              : t('form_builder_page.no_company_found')}
+          </div>
+        )}
+
         {selectedOwnerId && (
-          // ⬇️ FormBuilder cần nhận ownerId + entityType để đọc/ghi đúng:
-          // getFormConfigurationByEntity(ownerId, entityType)
-          // saveFormConfigurationByEntity({ targetId: ownerId, targetType: entityType, ... })
+          // FormBuilder cần ownerId + entityType để đọc/ghi đúng kho cấu hình
           <FormBuilder ownerId={selectedOwnerId} entityType={entityType} userId={user.uid} />
         )}
       </main>

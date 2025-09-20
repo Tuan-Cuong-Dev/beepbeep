@@ -4669,7 +4669,28 @@
     }
   },
 
-  "use_current_location_label": "Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps"
+  "use_current_location_label": "Dùng vị trí hiện tại (GPS) — không cần dán link Google Maps",
+
+  "notifications": {
+    "title": "Thông báo",
+    "mark_all_read": "Đánh dấu đã đọc hết",
+    "empty": "Chưa có thông báo.",
+    "topics": {
+      "booking": "Đơn thuê",
+      "dispatch": "Điều phối",
+      "commission": "Hoa hồng",
+      "invitation": "Lời mời",
+      "system": "Hệ thống",
+      "marketing": "Khuyến mại"
+    },
+    "preferences": {
+      "title": "Tuỳ chọn nhận thông báo",
+      "quiet_start": "Bắt đầu yên lặng",
+      "quiet_end": "Kết thúc yên lặng",
+      "link_zalo_viber": "Liên kết Zalo/Viber"
+    }
+  }
+
   
 
 

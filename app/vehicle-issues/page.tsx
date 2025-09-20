@@ -16,7 +16,8 @@ import AssignTechnicianForm from '@/src/components/vehicle-issues/AssignTechnici
 import VehicleIssuesSummaryCard from '@/src/components/vehicle-issues/VehicleIssuesSummaryCard';
 import VehicleIssuesSearchFilter from '@/src/components/vehicle-issues/VehicleIssuesSearchFilter';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@/src/components/ui/dialog';
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp, collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/src/firebaseConfig';
 import VehicleIssueTable from '@/src/components/vehicle-issues/VehicleIssueTable';
 import ProposalPopup from '@/src/components/vehicle-issues/ProposalPopup';
 import ActualResultPopup from '@/src/components/vehicle-issues/ActualResultPopup';
@@ -27,12 +28,92 @@ import { useTranslation } from 'react-i18next';
 export default function VehicleIssuesManagementPage() {
   const { t } = useTranslation('common');
 
-  const { role, companyId, user, loading: userLoading } = useUser();
-  const normalizedRole = role?.toLowerCase();
+  const { role, companyId, stationId, user, loading: userLoading } = useUser();
+  const normalizedRole = (role || '').toLowerCase();
+
   const isAdmin = normalizedRole === 'admin';
   const isTechnician = normalizedRole === 'technician';
   const isTechnicianPartner = normalizedRole === 'technician_partner';
+  const isAssistant = normalizedRole === 'technician_assistant';
+  const isCompanyRole = ['company_owner', 'company_admin', 'station_manager', 'technician'].includes(normalizedRole);
 
+  // ===== Resolve companyId nếu context chưa có =====
+  const [resolvedCompanyId, setResolvedCompanyId] = useState<string | undefined>(companyId || undefined);
+  const [resolvingCompany, setResolvingCompany] = useState<boolean>(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const resolveCompany = async () => {
+      setResolvingCompany(true);
+      try {
+        // Admin/Assistant không cần companyId
+        if (isAdmin || isAssistant) {
+          if (mounted) setResolvedCompanyId(undefined);
+          return;
+        }
+
+        // Nếu đã có companyId trong context -> dùng luôn
+        if (companyId) {
+          if (mounted) setResolvedCompanyId(companyId);
+          return;
+        }
+
+        // Nếu có stationId -> lấy companyId từ station
+        if (stationId) {
+          const st = await getDoc(doc(db, 'rentalStations', stationId));
+          if (st.exists()) {
+            const cid = (st.data() as any)?.companyId || '';
+            if (mounted) setResolvedCompanyId(cid || undefined);
+            if (cid) return;
+          }
+        }
+
+        // company_owner -> tìm rentalCompanies theo ownerId
+        if (normalizedRole === 'company_owner' && user?.uid) {
+          const rcSnap = await getDocs(
+            query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid))
+          );
+          const cid = rcSnap.docs[0]?.id || '';
+          if (mounted) setResolvedCompanyId(cid || undefined);
+          if (cid) return;
+        }
+
+        // Các staff khác (bao gồm technician) -> tìm trong 'staff' theo userId
+        if (user?.uid) {
+          const staffSnap = await getDocs(
+            query(collection(db, 'staff'), where('userId', '==', user.uid))
+          );
+          const cid = staffSnap.docs[0]?.data()?.companyId || '';
+          if (mounted) setResolvedCompanyId(cid || undefined);
+          return;
+        }
+
+        // Không xác định được
+        if (mounted) setResolvedCompanyId(undefined);
+      } finally {
+        if (mounted) setResolvingCompany(false);
+      }
+    };
+    resolveCompany();
+    return () => {
+      mounted = false;
+    };
+  }, [isAdmin, isAssistant, companyId, stationId, normalizedRole, user?.uid]);
+
+  // ===== Technician map & issues hooks với phạm vi đúng =====
+  const { technicianMap, loading: technicianMapLoading } =
+    useTechnicianMap(isAdmin || isAssistant ? undefined : resolvedCompanyId);
+
+  const { issues, loading: issuesLoading, updateIssue } = useVehicleIssues({
+    role: role ?? undefined,
+    companyId: isAdmin || isAssistant ? undefined : resolvedCompanyId,
+    // Lọc theo assignedTo cho technician & technician_partner
+    technicianUserId: (isTechnician || isTechnicianPartner) ? user?.uid : undefined,
+  });
+
+  const loading = userLoading || technicianMapLoading || issuesLoading || resolvingCompany;
+
+  // ===== UI local states =====
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | string>('All');
   const [stationFilter, setStationFilter] = useState('');
@@ -45,35 +126,15 @@ export default function VehicleIssuesManagementPage() {
     description: '',
   });
 
-  // Close issue
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closingIssue, setClosingIssue] = useState<ExtendedVehicleIssue | null>(null);
   const [closeComment, setCloseComment] = useState('');
 
-  // Proposal / Actual
   const [proposingIssue, setProposingIssue] = useState<ExtendedVehicleIssue | null>(null);
   const [updatingActualIssue, setUpdatingActualIssue] = useState<ExtendedVehicleIssue | null>(null);
 
-  // View / Approve proposal
   const [viewingProposal, setViewingProposal] = useState<ExtendedVehicleIssue | null>(null);
   const [approvingProposal, setApprovingProposal] = useState<ExtendedVehicleIssue | null>(null);
-
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
-  const { technicianMap, loading: technicianMapLoading } = useTechnicianMap(companyId ?? undefined);
-  const { issues, loading: issuesLoading, updateIssue } = useVehicleIssues({
-    role: role ?? undefined,
-    companyId: companyId ?? undefined,
-    technicianUserId: isTechnician ? user?.uid : undefined,
-  });
-
-  const loading = userLoading || technicianMapLoading || issuesLoading;
-
-  const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
-    setDialog({ open: true, type, title, description });
-  };
 
   useEffect(() => {
     if (dialog.open) {
@@ -82,7 +143,21 @@ export default function VehicleIssuesManagementPage() {
     }
   }, [dialog.open]);
 
+  // ===== Permission =====
+  // - Admin / Assistant: luôn có quyền
+  // - Company roles: cần resolvedCompanyId
+  // - Technician partner: được vào nhưng chỉ thấy việc của chính họ (lọc bằng technicianUserId)
+  const canViewIssues =
+    isAdmin ||
+    isAssistant ||
+    (isCompanyRole && !!resolvedCompanyId) ||
+    isTechnicianPartner;
+
   // ===== Handlers =====
+  const showDialog = (type: 'success' | 'error' | 'info', title: string, description = '') => {
+    setDialog({ open: true, type, title, description });
+  };
+
   const handleAssignTechnician = async (userId: string) => {
     if (!editingIssue) return;
     try {
@@ -137,30 +212,17 @@ export default function VehicleIssuesManagementPage() {
 
   const handleApproveProposal = async () => {
     if (!approvingProposal) return;
-    await updateIssue(approvingProposal.id!, {
-      status: 'confirmed',
-    });
+    await updateIssue(approvingProposal.id!, { status: 'confirmed' });
     showDialog('success', t('vehicle_issues_management_page.approve_success'));
     setApprovingProposal(null);
   };
 
   const handleRejectProposal = async (reason: string) => {
     if (!approvingProposal) return;
-    await updateIssue(approvingProposal.id!, {
-      status: 'rejected',
-      statusComment: reason || '',
-    });
+    await updateIssue(approvingProposal.id!, { status: 'rejected', statusComment: reason || '' });
     showDialog('success', t('vehicle_issues_management_page.reject_success'));
     setApprovingProposal(null);
   };
-
-  // ===== Permissions =====
-  const canViewIssues =
-    isAdmin ||
-    (!!companyId &&
-      ['company_owner', 'company_admin', 'technician', 'technician_partner', 'station_manager'].includes(
-        normalizedRole || '',
-      ));
 
   // ===== Filters / Sorting / Paging =====
   const filteredIssues = issues.filter((issue) => {
@@ -177,29 +239,31 @@ export default function VehicleIssuesManagementPage() {
     (a, b) => (b.reportedAt?.toDate().getTime() ?? 0) - (a.reportedAt?.toDate().getTime() ?? 0),
   );
 
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(sortedIssues.length / itemsPerPage);
+  const [currentPage, setCurrentPage] = useState(1);
   const paginatedIssues = sortedIssues.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const stationOptions: { label: string; value: string }[] = Array.from(
     new Set(issues.map((i) => i.stationName).filter((name): name is string => !!name)),
-  ).map((name) => ({
-    label: name,
-    value: name,
-  }));
+  ).map((name) => ({ label: name, value: name }));
 
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, stationFilter]);
 
-  if (loading)
+  // ===== Render =====
+  if (loading) {
     return <div className="text-center py-10">{t('vehicle_issues_management_page.loading')}</div>;
+  }
 
-  if (!canViewIssues)
+  if (!canViewIssues) {
     return (
       <div className="text-center py-10 text-red-500">
         {t('vehicle_issues_management_page.no_permission')}
       </div>
     );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -266,8 +330,10 @@ export default function VehicleIssuesManagementPage() {
             <h2 className="text-2xl font-bold">
               {t('vehicle_issues_management_page.assign_technician')}
             </h2>
-            {/* Nếu form của bạn cần filter theo companyId / region / category, truyền thêm props phù hợp */}
-            <AssignTechnicianForm companyId={companyId || ''} onAssign={handleAssignTechnician} />
+            <AssignTechnicianForm
+              companyId={resolvedCompanyId || ''} // dùng companyId đã resolve
+              onAssign={handleAssignTechnician}
+            />
             <div className="flex justify-end">
               <Button
                 variant="ghost"
