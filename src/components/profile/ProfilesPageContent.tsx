@@ -222,7 +222,7 @@ export default function ProfilesPageContent() {
       )}
 
       {/* Main layout (GIỮ NGUYÊN BỐ CỤC) */}
-      <div className="max-w-6xl mx-auto px_4 md:px-8 py-6 md:flex md:gap-6">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:flex md:gap-6">
         {/* Sidebar luôn hiển thị */}
         <aside
           className={`${showSidebarOnMobile ? 'block' : 'hidden'} md:block w-full md:flex-[1_1_33.333%] md:max-w-[33.333%]`}
