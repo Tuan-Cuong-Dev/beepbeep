@@ -4,7 +4,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { useAuth } from '@/src/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -19,9 +19,7 @@ import MyInsuranceSection from '@/src/components/profile/MyInsuranceSection';
 import MyIssuesSectionContainer from '@/src/components/profile/MyIssuesSectionContainer';
 import MyContributionsSection from '@/src/components/profile/MyContributionsSection';
 import MyBusinessSection from '@/src/components/profile/MyBusinessSection';
-import AgentShowcase from '@/src/components/showcase/AgentShowcase';
-import CompanyOwnerShowcase from '@/src/components/showcase/CompanyOwnerShowcase';
-import PrivateProviderShowcase from '@/src/components/showcase/PrivateProviderShowcase';
+import ShowcaseSwitcher from '@/src/components/showcase/ShowcaseSwitcher';
 
 import LoginPopup from '@/src/components/auth/LoginPopup';
 import type { BusinessType } from '@/src/lib/my-business/businessTypes';
@@ -48,6 +46,9 @@ export default function ProfilesPageContent() {
   const [activeTab, setActiveTab] = useState<TabType>('activityFeed');
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+  // ⬇️ NEW: companyId suy luận khi users/{uid} chưa có companyId
+  const [derivedCompanyId, setDerivedCompanyId] = useState<string | undefined>(undefined);
 
   // Lấy tab & uid từ query (giữ nguyên)
   useEffect(() => {
@@ -83,6 +84,58 @@ export default function ProfilesPageContent() {
     run();
     return () => { cancelled = true; };
   }, [profileUserId]);
+
+  // ⬇️ NEW: tự resolve companyId chuẩn theo vai trò khi thiếu
+  useEffect(() => {
+    let cancelled = false;
+
+    const resolveCompanyId = async () => {
+      setDerivedCompanyId(undefined);
+
+      if (!profileUserId || !userData) return;
+
+      const role = String(userData.role || '').toLowerCase();
+
+      // Nếu users/{uid} đã có companyId thì không cần resolve
+      if (userData.companyId) return;
+
+      try {
+        // 1) company_owner → rentalCompanies.ownerId == profileUserId
+        if (role === 'company_owner') {
+          const snap = await getDocs(
+            query(collection(db, 'rentalCompanies'), where('ownerId', '==', profileUserId))
+          );
+          const cid = snap.docs[0]?.id as string | undefined;
+          if (!cancelled && cid) {
+            setDerivedCompanyId(cid);
+            return;
+          }
+        }
+
+        // 2) station_manager → lấy từ rentalStations/{stationId}
+        if (role === 'station_manager' && userData.stationId) {
+          const st = await getDoc(doc(db, 'rentalStations', userData.stationId as string));
+          const cid = st.exists() ? ((st.data() as any)?.companyId as string | undefined) : undefined;
+          if (!cancelled && cid) {
+            setDerivedCompanyId(cid);
+            return;
+          }
+        }
+
+        // 3) Dự phòng staff → staff.userId == profileUserId ⇒ companyId
+        const staffSnap = await getDocs(
+          query(collection(db, 'staff'), where('userId', '==', profileUserId))
+        );
+        const cid = (staffSnap.docs[0]?.data() as any)?.companyId as string | undefined;
+        if (!cancelled && cid) setDerivedCompanyId(cid);
+      } catch {
+        if (!cancelled) setDerivedCompanyId(undefined);
+      }
+    };
+
+    resolveCompanyId();
+    return () => { cancelled = true; };
+  }, [profileUserId, userData?.role, userData?.companyId, userData?.stationId]);
 
   const isOwner = !!(currentUser?.uid && profileUserId && currentUser.uid === profileUserId);
   const allowedTabs = (isOwner ? ALL_TABS : PUBLIC_TABS) as TabType[];
@@ -123,7 +176,8 @@ export default function ProfilesPageContent() {
     }
   }, [userData?.role]);
 
-  const businessId = userData?.companyId as string | undefined;
+  // ⬇️ NEW: ưu tiên users/{uid}.companyId; nếu thiếu dùng derivedCompanyId
+  const businessId = (userData?.companyId ?? derivedCompanyId) as string | undefined;
 
   if (!profileUserId) {
     return (
@@ -168,7 +222,7 @@ export default function ProfilesPageContent() {
       )}
 
       {/* Main layout (GIỮ NGUYÊN BỐ CỤC) */}
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:flex md:gap-6">
+      <div className="max-w-6xl mx-auto px_4 md:px-8 py-6 md:flex md:gap-6">
         {/* Sidebar luôn hiển thị */}
         <aside
           className={`${showSidebarOnMobile ? 'block' : 'hidden'} md:block w-full md:flex-[1_1_33.333%] md:max-w-[33.333%]`}
@@ -183,29 +237,21 @@ export default function ProfilesPageContent() {
           />
         </aside>
 
-        {/* Content cột phải:
-            - Chưa đăng nhập: KHÔNG render activityFeed/showcase (để trống, vẫn giữ layout)
-            - Đã đăng nhập & không phải chủ: chỉ render 2 tab public
-            - Chủ: render đầy đủ như cũ
-        */}
+        {/* Content cột phải */}
         <section className="w-full md:flex-[1_1_66.666%] md:max-w-[66.666%] space-y-6 mt-6 md:mt-0 min-w-0">
           {currentUser && (
             <>
               {activeTab === 'activityFeed' && <ProfileMainContent activeTab="activityFeed" />}
-              {activeTab === 'showcase' && (
-                <>
-                  {userData?.role === 'agent' && (
-                    <AgentShowcase agentId={profileUserId!} limitPerRow={12} onlyAvailable />
-                  )}
-                  {userData?.role === 'company_owner' && (
-                    <CompanyOwnerShowcase companyId={userData?.companyId} limitPerRow={12} onlyAvailable />
-                  )}
-                  {userData?.role === 'private_provider' && (
-                    <PrivateProviderShowcase providerUserId={profileUserId!} limitPerRow={12} onlyAvailable />
-                  )}
-                </>
-              )}
 
+              {activeTab === 'showcase' && (
+                <ShowcaseSwitcher
+                  role={userData?.role}
+                  profileUserId={profileUserId!}
+                  companyId={businessId}  
+                  limitPerRow={12}
+                  onlyAvailable
+                />
+              )}
 
               {isOwner && activeTab === 'vehicles' && <MyVehiclesSection />}
               {isOwner && activeTab === 'insurance' && <MyInsuranceSection />}

@@ -272,6 +272,7 @@ export default function ProgramsFormPage() {
       try {
         setLoading(true);
         setError(null);
+
         if (isAdmin) {
           const snap = await getDocs(collection(db, 'rentalCompanies'));
           if (!mounted) return;
@@ -280,6 +281,7 @@ export default function ProgramsFormPage() {
           if (!selectedOwnerId && list.length) setSelectedOwnerId(list[0].id);
           return;
         }
+
         if (isPrivateProvider) {
           if (!user?.uid) return;
           const snap = await getDocs(
@@ -289,11 +291,38 @@ export default function ProgramsFormPage() {
           setSelectedOwnerId(snap.docs[0]?.id ?? null);
           return;
         }
+
         if (isCompanyOwner) {
-          if (!mounted) return;
-          setSelectedOwnerId(companyId ?? null);
+          // Ưu tiên companyId từ context; nếu thiếu, tự resolve theo ownerId hoặc staff.userId
+          if (companyId) {
+            if (mounted) setSelectedOwnerId(companyId);
+            return;
+          }
+
+          if (user?.uid) {
+            // 1) rentalCompanies.ownerId == uid
+            const rcSnap = await getDocs(
+              query(collection(db, 'rentalCompanies'), where('ownerId', '==', user.uid))
+            );
+            const foundCompanyId = rcSnap.docs[0]?.id as string | undefined;
+            if (mounted && foundCompanyId) {
+              setSelectedOwnerId(foundCompanyId);
+              return;
+            }
+
+            // 2) Dự phòng: staff.userId == uid -> companyId
+            const staffSnap = await getDocs(
+              query(collection(db, 'staff'), where('userId', '==', user.uid))
+            );
+            const staffCompanyId = (staffSnap.docs[0]?.data() as any)?.companyId as string | undefined;
+            if (mounted) setSelectedOwnerId(staffCompanyId ?? null);
+            return;
+          }
+
+          if (mounted) setSelectedOwnerId(null);
           return;
         }
+
         setSelectedOwnerId(null);
       } catch (e: any) {
         if (mounted) setError(e?.message || 'Failed to resolve owner');
@@ -309,6 +338,7 @@ export default function ProgramsFormPage() {
   /* --------- 2) Load stations + models ---------- */
   useEffect(() => {
     let mounted = true;
+
     const loadStations = async (ownerId: string) => {
       if (isPrivateProvider) {
         setStations([]);
@@ -320,6 +350,7 @@ export default function ProgramsFormPage() {
       if (!mounted) return;
       setStations(snap.docs.map((d) => ({ id: d.id, name: (d.data() as any).name })));
     };
+
     const loadModels = async (ownerId: string) => {
       const [v1, v2] = await Promise.all([
         getDocs(query(collection(db, 'vehicles'), where('companyId', '==', ownerId))),
@@ -332,10 +363,12 @@ export default function ProgramsFormPage() {
             .filter(Boolean)
         )
       ) as string[];
+
       if (modelIds.length === 0) {
         if (mounted) setModels([]);
         return;
       }
+
       const map = new Map<string, Model>();
       for (const group of chunk(modelIds, 10)) {
         const msnap = await getDocs(
@@ -351,6 +384,7 @@ export default function ProgramsFormPage() {
         (a.name ?? '').localeCompare(b.name ?? '', 'vi', { sensitivity: 'base' })
       );
       setModels(sorted);
+
       setModelDiscountsUI((prev) => {
         const copy = { ...prev };
         sorted.forEach((m) => {
@@ -359,6 +393,7 @@ export default function ProgramsFormPage() {
         return copy;
       });
     };
+
     (async () => {
       if (!selectedOwnerId) {
         setStations([]);
@@ -375,6 +410,7 @@ export default function ProgramsFormPage() {
         if (mounted) setLoading(false);
       }
     })();
+
     return () => {
       mounted = false;
     };

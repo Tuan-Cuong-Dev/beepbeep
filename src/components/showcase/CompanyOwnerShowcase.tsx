@@ -1,7 +1,7 @@
 'use client';
 
 // Date: 17/09/2025
-// CompanyOwnerModelsShowcaseLite — Show các model mà Company Owner đang cho thuê (không header)
+// CompanyOwnerModelsShowcaseLite — Show các model mà Company Owner đang cho thuê (không header, có DEBUG log)
 
 import * as React from 'react';
 import Image from 'next/image';
@@ -20,6 +20,12 @@ import type { Vehicle, VehicleStatus } from '@/src/lib/vehicles/vehicleTypes';
 
 /* ===== Brand color ===== */
 const BRAND = '#00d289';
+
+/* ===== DEBUG utils ===== */
+const DEBUG = true;
+const dlog = (...a: any[]) => DEBUG && console.log('[CO-Showcase]', ...a);
+const dwarn = (...a: any[]) => DEBUG && console.warn('[CO-Showcase]', ...a);
+const derr = (...a: any[]) => DEBUG && console.error('[CO-Showcase]', ...a);
 
 /* ===== Default icons (string paths, từ public/) ===== */
 const DEFAULT_ICONS: Record<string, string> = {
@@ -40,7 +46,6 @@ function formatVND(n?: number | null): string {
   if (n == null) return '—';
   try { return new Intl.NumberFormat('vi-VN').format(n) + '₫'; } catch { return `${n}₫`; }
 }
-/** Google Drive share/view → direct served URL */
 function getDirectDriveImageUrl(url?: string): string | undefined {
   if (!url) return undefined;
   const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -62,8 +67,6 @@ function normalizeVehicleType(input?: string): CanonType {
   if ((['bike','motorbike','car','van','bus'] as string[]).includes(s)) return s as CanonType;
   return 'other';
 }
-
-/** Ưu tiên ảnh model → fallback icon theo loại */
 function resolveModelImage(vm: VehicleModel): string {
   const direct = getDirectDriveImageUrl(vm.imageUrl);
   if (direct) return direct;
@@ -72,13 +75,6 @@ function resolveModelImage(vm: VehicleModel): string {
 }
 
 /* ===== Firestore loaders ===== */
-/**
- * Lấy xe thuộc Company Owner.
- * Tùy schema, xe có thể cầm theo nhiều field liên quan tới công ty:
- * - companyId == companyId
- * - providerCompanyId == companyId
- * - organizerCompanyId == companyId
- */
 async function loadVehiclesOfCompany(
   companyId: string,
   vehiclesCollectionName: string,
@@ -94,21 +90,39 @@ async function loadVehiclesOfCompany(
   for (const baseConds of condSets) {
     const conds = [...baseConds];
     if (statusFilter) conds.push(where('status', '==', statusFilter));
-    const q = query(collection(db, vehiclesCollectionName), ...conds);
-    const snap = await getDocs(q);
-    snap.docs.forEach(d => resultsMap.set(d.id, { id: d.id, ...(d.data() as any) } as Vehicle));
+    dlog('Query vehicles:', { companyId, vehiclesCollectionName, conds });
+
+    try {
+      const qy = query(collection(db, vehiclesCollectionName), ...conds);
+      const snap = await getDocs(qy);
+      dlog(' → snapshot size =', snap.size);
+      snap.docs.forEach(d => {
+        resultsMap.set(d.id, { id: d.id, ...(d.data() as any) } as Vehicle);
+      });
+    } catch (e) {
+      derr('Query vehicles failed:', e);
+    }
   }
 
+  dlog('TOTAL vehicles collected:', resultsMap.size);
   return Array.from(resultsMap.values());
 }
 
 async function loadVehicleModelsByIds(ids: string[], collectionName: string) {
   const map = new Map<string, VehicleModel>();
   if (!ids.length) return map;
+  dlog('Load models by ids:', ids);
+
   for (const part of chunk(ids, 10)) {
-    const snap = await getDocs(query(collection(db, collectionName), where(documentId(), 'in', part)));
-    snap.docs.forEach(d => map.set(d.id, { id: d.id, ...(d.data() as any) } as VehicleModel));
+    try {
+      const snap = await getDocs(query(collection(db, collectionName), where(documentId(), 'in', part)));
+      dlog(` → models chunk (${part.length}) snapshot size =`, snap.size);
+      snap.docs.forEach(d => map.set(d.id, { id: d.id, ...(d.data() as any) } as VehicleModel));
+    } catch (e) {
+      derr('Load models chunk failed:', e);
+    }
   }
+  dlog('TOTAL models loaded:', map.size);
   return map;
 }
 
@@ -116,19 +130,19 @@ async function loadVehicleModelsByIds(ids: string[], collectionName: string) {
 type ModelCardRow = {
   key: string;
   model: VehicleModel;
-  baseFrom: number | null;         // min pricePerDay của company
-  vehicleCount: number;            // tổng/khả dụng theo filter
-  preferredCompanyId?: string;     // companyId (prefill booking)
+  baseFrom: number | null;
+  vehicleCount: number;
+  preferredCompanyId?: string;
   preferredStationId?: string;
-  preferredVehicleId?: string;     // id xe có giá thấp nhất
+  preferredVehicleId?: string;
 };
 
 interface ShowcaseProps {
-  companyId: string;                     // ✅ ID công ty (Company Owner)
+  companyId: string;
   vehicleModelCollectionName?: string;
   vehiclesCollectionName?: string;
   limitPerRow?: number;
-  onlyAvailable?: boolean;               // mặc định chỉ show xe Available
+  onlyAvailable?: boolean;
 }
 
 export default function CompanyOwnerModelsShowcaseLite({
@@ -149,8 +163,8 @@ export default function CompanyOwnerModelsShowcaseLite({
     let mounted = true;
     (async () => {
       setLoading(true);
+      dlog('MOUNT with', { companyId, vehiclesCollectionName, vehicleModelCollectionName, onlyAvailable });
       try {
-        // 1) Lấy tất cả xe thuộc công ty
         const vehicles = await loadVehiclesOfCompany(
           companyId,
           vehiclesCollectionName,
@@ -158,17 +172,17 @@ export default function CompanyOwnerModelsShowcaseLite({
         );
         if (!mounted) return;
 
+        dlog('Vehicles sample(3):', vehicles.slice(0, 3));
         if (!vehicles.length) {
+          dlog('No vehicles → rows=[]');
           setRows([]);
           return;
         }
 
-        // 2) Gom theo modelId + xác định baseFrom / preferredVehicle
         const byModel = new Map<string, { baseFrom: number | null; count: number; prefVehicle?: Vehicle }>();
         vehicles.forEach(v => {
           const modelId = (v as any).modelId;
           if (!modelId) return;
-
           const price = typeof (v as any).pricePerDay === 'number' ? (v as any).pricePerDay : null;
           const cur = byModel.get(modelId);
           if (!cur) {
@@ -183,29 +197,29 @@ export default function CompanyOwnerModelsShowcaseLite({
         });
 
         const modelIds = Array.from(byModel.keys());
+        dlog('Model IDs computed:', modelIds);
         if (!modelIds.length) { setRows([]); return; }
 
-        // 3) Load thông tin model
         const modelMap = await loadVehicleModelsByIds(modelIds, vehicleModelCollectionName);
         if (!mounted) return;
 
         const built: ModelCardRow[] = [];
         byModel.forEach((agg, modelId) => {
           const vm = modelMap.get(modelId);
-          if (!vm) return;
+          if (!vm) { dwarn('Model not found for modelId:', modelId); return; }
           const pref = agg.prefVehicle as any;
           built.push({
             key: modelId,
             model: vm,
             baseFrom: agg.baseFrom ?? null,
             vehicleCount: agg.count,
-            preferredCompanyId: pref?.companyId ?? companyId, // fallback companyId hiện tại
+            preferredCompanyId: pref?.companyId ?? companyId,
             preferredStationId: pref?.stationId,
             preferredVehicleId: pref?.id,
           });
         });
 
-        // 4) Sort by base price then model name
+        dlog('Built rows sample(3):', built.slice(0, 3));
         built.sort((a, b) => {
           const aBase = a.baseFrom ?? Infinity;
           const bBase = b.baseFrom ?? Infinity;
@@ -214,6 +228,9 @@ export default function CompanyOwnerModelsShowcaseLite({
         });
 
         setRows(built);
+      } catch (e) {
+        derr('Effect failed:', e);
+        setRows([]);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -221,7 +238,6 @@ export default function CompanyOwnerModelsShowcaseLite({
     return () => { mounted = false; };
   }, [companyId, vehicleModelCollectionName, vehiclesCollectionName, onlyAvailable, limitPerRow]);
 
-  /* ==== BOOK action ==== */
   const handleBook = (r: ModelCardRow) => {
     const params = new URLSearchParams();
     params.set('modelId', r.model.id);
@@ -235,7 +251,6 @@ export default function CompanyOwnerModelsShowcaseLite({
 
   return (
     <section className="pt-0 pb-6">
-      {/* Loading skeletons */}
       {loading && (
         <div className="-mx-4 overflow-x-auto">
           <div className="flex w-max gap-3 px-4 py-3">
@@ -244,7 +259,6 @@ export default function CompanyOwnerModelsShowcaseLite({
         </div>
       )}
 
-      {/* Content */}
       {!loading && rows.length > 0 && (
         <div className="-mx-4 overflow-x-auto">
           <div className="flex w-max gap-3 px-4 py-3">
@@ -274,7 +288,6 @@ export default function CompanyOwnerModelsShowcaseLite({
                     </span>
                   </div>
 
-                  {/* Extra info grid */}
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-gray-600 mt-2">
                     {r.model.brand && <div>🏷 {r.model.brand}</div>}
                     {r.model.fuelType && <div>⛽ {String(r.model.fuelType as FuelType)}</div>}
@@ -284,7 +297,6 @@ export default function CompanyOwnerModelsShowcaseLite({
                     {typeof r.model.capacity === 'number' && <div>🪑 {r.model.capacity}</div>}
                   </div>
 
-                  {/* Badge số xe khả dụng (hoặc tổng nếu onlyAvailable=false) */}
                   <div className="mt-2">
                     <span
                       className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full"
@@ -313,7 +325,6 @@ export default function CompanyOwnerModelsShowcaseLite({
         </div>
       )}
 
-      {/* Empty state */}
       {!loading && rows.length === 0 && (
         <div className="px-4 mt-6">
           <div className="rounded-2xl bg-white border p-6 text-sm text-gray-600 text-center">
