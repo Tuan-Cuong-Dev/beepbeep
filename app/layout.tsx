@@ -43,6 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
+        {/* Xữ lý xác thực cho Zalo OA */}
+        <meta name="zalo-platform-site-verification" content="VzgkD9da8pTQqlSodE5CE5xgdmQod4XUDZ4r" />
       </head>
       <body className={`${inter.variable} antialiased`}>
         <Providers>

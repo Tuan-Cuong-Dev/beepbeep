@@ -29,7 +29,6 @@ const Home: React.FC = () => {
       <Head>
         <title>Bíp Bíp - Thuê xe dễ như bấm còi!</title>
         <meta name="description" content="Dịch vụ thuê xe tiện lợi chỉ với một tiếng bíp." />
-        <meta name="zalo-platform-site-verification" content="VzgkD9da8pTQqlSodE5CE5xgdmQod4XUDZ4r" />
       </Head>
 
       <Header />
