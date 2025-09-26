@@ -1,11 +1,12 @@
 // functions/src/notifications/channelWorkers/sendFcm.ts
 import * as functions from 'firebase-functions';
-import { db } from '../../utils/db.js'; 
+import { db } from '../../utils/db.js';
 import { sendFcm as sendFcmProvider } from '../deliveryProviders/fcmProvider.js';
 
 type SendPayload = { title: string; body: string; actionUrl?: string };
 
 export const sendFcm = functions
+  .runWith({ secrets: ['FCM_SERVER_KEY'] }) // 👈 nạp secret cho prod & emulator
   .region('asia-southeast1')
   .https.onRequest(async (req, res) => {
     try {
@@ -26,11 +27,12 @@ export const sendFcm = functions
         return;
       }
 
-      // Gọi provider (đảm bảo target luôn là object)
-      const result = await sendFcmProvider(target || {}, payload, { jobId, uid });
+      // ✅ Đảm bảo target là object (có thể rỗng)
+      const safeTarget = target || {};
+      const result = await sendFcmProvider(safeTarget, payload, { jobId, uid });
 
-      // Nếu không có uid, dùng 'topic' hoặc 'unknown' để tránh null trong id
-      const idKey = uid || target?.topic || 'unknown';
+      // ✅ Nếu không có uid, dùng topic hoặc 'unknown' cho key
+      const idKey = uid || safeTarget.topic || 'unknown';
       const delivId = `${jobId}_push_${idKey}`;
 
       await db.collection('deliveries').doc(delivId).set({
@@ -49,9 +51,7 @@ export const sendFcm = functions
       });
 
       res.json({ ok: result.status !== 'failed', result, deliveryId: delivId });
-      return;
     } catch (e: any) {
       res.status(500).json({ ok: false, error: e?.message || String(e) });
-      return;
     }
   });

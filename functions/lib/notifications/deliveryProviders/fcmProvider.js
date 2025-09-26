@@ -1,5 +1,5 @@
-// src/lib/notifications/deliveryProviders/fcmProvider.ts
-import * as admin from 'firebase-admin';
+// functions/src/notifications/deliveryProviders/fcmProvider.ts
+import admin from 'firebase-admin';
 export async function sendFcm(target, payload, ctx) {
     try {
         const baseData = {
@@ -19,18 +19,25 @@ export async function sendFcm(target, payload, ctx) {
                 },
             },
         };
+        // (Optional) Hỗ trợ Web Push
+        const baseWebpush = {
+            fcmOptions: payload.actionUrl ? { link: payload.actionUrl } : undefined,
+            notification: {
+                // icon: '/icons/icon-192x192.png', // nếu có
+                vibrate: [100, 50, 100],
+                requireInteraction: true,
+            },
+        };
         // 1) Multicast
         const tokens = (target.tokens || []).filter(Boolean);
         if (tokens.length > 0) {
             const multi = {
                 tokens,
-                notification: {
-                    title: payload.title,
-                    body: payload.body,
-                },
+                notification: { title: payload.title, body: payload.body },
                 data: baseData,
                 android: baseAndroid,
                 apns: baseApns,
+                webpush: baseWebpush,
             };
             const res = await admin.messaging().sendEachForMulticast(multi);
             const okCount = res.responses.filter(r => r.success).length;
@@ -49,13 +56,11 @@ export async function sendFcm(target, payload, ctx) {
         if (target.topic) {
             const msg = {
                 topic: target.topic,
-                notification: {
-                    title: payload.title,
-                    body: payload.body,
-                },
+                notification: { title: payload.title, body: payload.body },
                 data: baseData,
                 android: baseAndroid,
                 apns: baseApns,
+                webpush: baseWebpush,
             };
             const id = await admin.messaging().send(msg);
             return { provider: 'fcm', status: 'sent', providerMessageId: id };
@@ -63,14 +68,12 @@ export async function sendFcm(target, payload, ctx) {
         // 3) Single token
         if (target.token) {
             const msg = {
-                token: target.token, // token chắc chắn là string ở đây
-                notification: {
-                    title: payload.title,
-                    body: payload.body,
-                },
+                token: target.token,
+                notification: { title: payload.title, body: payload.body },
                 data: baseData,
                 android: baseAndroid,
                 apns: baseApns,
+                webpush: baseWebpush,
             };
             const id = await admin.messaging().send(msg);
             return { provider: 'fcm', status: 'sent', providerMessageId: id };

@@ -1,5 +1,5 @@
-// src/lib/notifications/deliveryProviders/fcmProvider.ts
-import * as admin from 'firebase-admin';
+// functions/src/notifications/deliveryProviders/fcmProvider.ts
+import admin from 'firebase-admin';
 import type { ProviderContext, ProviderResult, SendPayload } from './types.js';
 
 export interface FcmTarget {
@@ -34,18 +34,26 @@ export async function sendFcm(
       },
     };
 
+    // (Optional) Hỗ trợ Web Push
+    const baseWebpush: admin.messaging.WebpushConfig = {
+      fcmOptions: payload.actionUrl ? { link: payload.actionUrl } : undefined,
+      notification: {
+        // icon: '/icons/icon-192x192.png', // nếu có
+        vibrate: [100, 50, 100],
+        requireInteraction: true,
+      },
+    };
+
     // 1) Multicast
     const tokens = (target.tokens || []).filter(Boolean) as string[];
     if (tokens.length > 0) {
       const multi: admin.messaging.MulticastMessage = {
         tokens,
-        notification: {
-          title: payload.title,
-          body: payload.body,
-        },
+        notification: { title: payload.title, body: payload.body },
         data: baseData,
         android: baseAndroid,
         apns: baseApns,
+        webpush: baseWebpush,
       };
 
       const res = await admin.messaging().sendEachForMulticast(multi);
@@ -67,13 +75,11 @@ export async function sendFcm(
     if (target.topic) {
       const msg: admin.messaging.Message = {
         topic: target.topic,
-        notification: {
-          title: payload.title,
-          body: payload.body,
-        },
+        notification: { title: payload.title, body: payload.body },
         data: baseData,
         android: baseAndroid,
         apns: baseApns,
+        webpush: baseWebpush,
       };
 
       const id = await admin.messaging().send(msg);
@@ -83,14 +89,12 @@ export async function sendFcm(
     // 3) Single token
     if (target.token) {
       const msg: admin.messaging.Message = {
-        token: target.token, // token chắc chắn là string ở đây
-        notification: {
-          title: payload.title,
-          body: payload.body,
-        },
+        token: target.token,
+        notification: { title: payload.title, body: payload.body },
         data: baseData,
         android: baseAndroid,
         apns: baseApns,
+        webpush: baseWebpush,
       };
 
       const id = await admin.messaging().send(msg);

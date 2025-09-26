@@ -1,8 +1,9 @@
 // functions/src/notifications/channelWorkers/sendViber.ts
 import * as functions from 'firebase-functions';
-import { db } from '../../utils/db.js'; // initializeApp + getFirestore được export ở đây
+import { db } from '../../utils/db.js';
 import { sendViber as sendViberProvider } from '../deliveryProviders/viberProvider.js';
 export const sendViber = functions
+    .runWith({ secrets: ['VIBER_BOT_TOKEN'], timeoutSeconds: 15, memory: '128MB' })
     .region('asia-southeast1')
     .https.onRequest(async (req, res) => {
     try {
@@ -15,10 +16,11 @@ export const sendViber = functions
             res.status(400).json({ ok: false, error: 'Missing jobId|payload' });
             return;
         }
-        // Bảo đảm luôn có viberUserId string
+        // ✅ bảo đảm luôn có viberUserId dạng string
         const viberTarget = { viberUserId: target?.viberUserId ?? '' };
         const result = await sendViberProvider(viberTarget, payload, { jobId, uid });
-        const delivId = `${jobId}_viber_${uid || viberTarget.viberUserId || 'unknown'}`;
+        const idKey = uid || viberTarget.viberUserId || 'unknown';
+        const delivId = `${jobId}_viber_${idKey}`;
         await db.collection('deliveries').doc(delivId).set({
             id: delivId,
             jobId,
@@ -34,10 +36,8 @@ export const sendViber = functions
             meta: result.meta ?? null,
         });
         res.json({ ok: result.status !== 'failed', result, deliveryId: delivId });
-        return;
     }
     catch (e) {
         res.status(500).json({ ok: false, error: e?.message || String(e) });
-        return;
     }
 });

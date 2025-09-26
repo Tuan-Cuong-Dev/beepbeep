@@ -6,15 +6,26 @@ import { sendEmail as sendEmailProvider } from '../deliveryProviders/emailProvid
 type SendPayload = { title: string; body: string; actionUrl?: string };
 
 export const sendEmail = functions
+  .runWith({ secrets: ['SENDGRID_API_KEY'] }) // 👈 gắn secret để prod & emulator nạp biến môi trường
   .region('asia-southeast1')
   .https.onRequest(async (req, res) => {
     try {
-      if (req.method !== 'POST') { res.status(405).send('Method Not Allowed'); return; }
+      if (req.method !== 'POST') {
+        res.status(405).send('Method Not Allowed');
+        return;
+      }
 
       const { jobId, uid, payload, target } = req.body as {
-        jobId: string; uid?: string; payload: SendPayload; target?: { to?: string };
+        jobId: string;
+        uid?: string;
+        payload: SendPayload;
+        target?: { to?: string };
       };
-      if (!jobId || !payload?.title || !payload?.body) { res.status(400).json({ ok:false, error:'Missing jobId|payload' }); return; }
+
+      if (!jobId || !payload?.title || !payload?.body) {
+        res.status(400).json({ ok: false, error: 'Missing jobId|payload' });
+        return;
+      }
 
       const emailTarget = { to: target?.to ?? '' };
       const result = await sendEmailProvider(emailTarget, payload, { jobId, uid });
@@ -36,6 +47,6 @@ export const sendEmail = functions
 
       res.json({ ok: result.status !== 'failed', result, deliveryId: delivId });
     } catch (e: any) {
-      res.status(500).json({ ok:false, error: e?.message || String(e) });
+      res.status(500).json({ ok: false, error: e?.message || String(e) });
     }
   });

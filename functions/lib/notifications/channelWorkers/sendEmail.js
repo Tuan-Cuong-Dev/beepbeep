@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import { db } from '../../utils/db.js';
 import { sendEmail as sendEmailProvider } from '../deliveryProviders/emailProvider.js';
 export const sendEmail = functions
+    .runWith({ secrets: ['SENDGRID_API_KEY'] }) // 👈 gắn secret để prod & emulator nạp biến môi trường
     .region('asia-southeast1')
     .https.onRequest(async (req, res) => {
     try {

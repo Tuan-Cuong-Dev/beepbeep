@@ -1,4 +1,5 @@
-import * as admin from 'firebase-admin';
+// ✅ use default import
+import admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { DateTime } from 'luxon';
 const RUNTIME_REGION = 'asia-southeast1';

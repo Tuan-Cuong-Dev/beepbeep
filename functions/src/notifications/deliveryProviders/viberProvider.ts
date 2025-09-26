@@ -1,11 +1,11 @@
 /**
  * Viber Bot (Public Account) API
- * Tài liệu: https://developers.viber.com/docs/api/rest-bot-api/
+ * Docs: https://developers.viber.com/docs/api/rest-bot-api/
  *
- * ENV cần có:
- * - VIBER_BOT_TOKEN
+ * ENV:
+ * - VIBER_BOT_TOKEN (đặt qua Secret Manager)
  *
- * Yêu cầu user đã "Start" bot → có viberUserId.
+ * Yêu cầu: user đã "Start" bot → có viberUserId.
  */
 import type { ProviderContext, ProviderResult, SendPayload } from './types.js';
 
@@ -17,29 +17,54 @@ export async function sendViber(
   ctx: ProviderContext
 ): Promise<ProviderResult> {
   try {
+    const token = process.env.VIBER_BOT_TOKEN || '';
+
+    // Guard điều kiện tối thiểu
+    if (!token) {
+      return {
+        provider: 'viber',
+        status: 'skipped',
+        errorCode: 'MISSING_TOKEN',
+        errorMessage: 'VIBER_BOT_TOKEN is not set',
+      };
+    }
+    if (!target?.viberUserId) {
+      return {
+        provider: 'viber',
+        status: 'skipped',
+        errorCode: 'MISSING_TARGET',
+        errorMessage: 'viberUserId is required',
+      };
+    }
+
+    // Ghép message gọn gàng
+    const parts = [payload.title?.trim(), payload.body?.trim(), payload.actionUrl?.trim()].filter(Boolean);
+    const text = parts.join('\n');
+
     const res = await fetch('https://chatapi.viber.com/pa/send_message', {
       method: 'POST',
       headers: {
-        'X-Viber-Auth-Token': process.env.VIBER_TOKEN || '',
+        'X-Viber-Auth-Token': token,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         receiver: target.viberUserId,
         type: 'text',
-        text: `${payload.title}\n${payload.body}${payload.actionUrl ? `\n${payload.actionUrl}` : ''}`,
-        tracking_data: ctx.jobId,
+        text,
+        tracking_data: ctx.jobId, // để đối soát ngược về deliveries
       }),
     });
 
-    const json: any = await res.json().catch(() => ({}));
+    const json = (await res.json().catch(() => ({}))) as Record<string, any>;
 
-    if (json?.status !== 0) {
+    // Viber: status === 0 => OK
+    if (!res.ok || json?.status !== 0) {
       return {
         provider: 'viber',
         status: 'failed',
-        errorCode: String(json?.status),
+        errorCode: String(json?.status ?? res.status),
         errorMessage: json?.status_message || `HTTP ${res.status}`,
-        meta: (json ?? {}) as Record<string, any>,
+        meta: json,
       };
     }
 
@@ -47,7 +72,7 @@ export async function sendViber(
       provider: 'viber',
       status: 'sent',
       providerMessageId: json?.message_token?.toString?.(),
-      meta: (json ?? {}) as Record<string, any>,
+      meta: json,
     };
   } catch (e: any) {
     return {

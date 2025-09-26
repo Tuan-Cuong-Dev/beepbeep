@@ -1,11 +1,12 @@
 // functions/src/notifications/channelWorkers/sendSms.ts
 import * as functions from 'firebase-functions';
-import { db } from '../../utils/db.js'; // getFirestore() đã init trong utils/db
+import { db } from '../../utils/db.js';
 import { sendSms as sendSmsProvider } from '../deliveryProviders/smsProvider.js';
 
 type SendPayload = { title: string; body: string; actionUrl?: string };
 
 export const sendSms = functions
+  .runWith({ timeoutSeconds: 15, memory: '128MB' }) // cấu hình runtime nhẹ
   .region('asia-southeast1')
   .https.onRequest(async (req, res) => {
     try {
@@ -26,12 +27,14 @@ export const sendSms = functions
         return;
       }
 
-      // Bảo đảm target luôn có to:string
+      // ✅ đảm bảo có to:string (kể cả rỗng để hợp type)
       const smsTarget = { to: target?.to ?? '' };
 
       const result = await sendSmsProvider(smsTarget, payload, { jobId, uid });
 
-      const delivId = `${jobId}_sms_${uid || smsTarget.to || 'unknown'}`;
+      // ✅ key ổn định cho doc id
+      const idKey = uid || smsTarget.to || 'unknown';
+      const delivId = `${jobId}_sms_${idKey}`;
 
       await db.collection('deliveries').doc(delivId).set({
         id: delivId,
@@ -49,9 +52,7 @@ export const sendSms = functions
       });
 
       res.json({ ok: result.status !== 'failed', result, deliveryId: delivId });
-      return;
     } catch (e: any) {
       res.status(500).json({ ok: false, error: e?.message || String(e) });
-      return;
     }
   });
