@@ -1,82 +1,65 @@
+import { readStore, writeStore } from "../zalo/tokenStore.js";
+import { refreshZaloViaOAuth } from "../zalo/refresh.js";
 export async function sendZalo(target, payload, ctx) {
-    const isEmu = process.env.FUNCTIONS_EMULATOR === 'true' ||
-        !!process.env.FIREBASE_EMULATOR_HUB;
-    // ✅ Emulator: không gọi ra ngoài, trả kết quả giả lập
-    if (isEmu) {
-        return {
-            provider: 'zalo',
-            status: 'sent',
-            providerMessageId: `emul_${Date.now()}`,
-            meta: { emulated: true, target, payload, jobId: ctx.jobId },
-        };
+    // 1) Emulator: giả lập thành công
+    const isEmu = process.env.FUNCTIONS_EMULATOR === "true" || !!process.env.FIREBASE_EMULATOR_HUB;
+    if (isEmu)
+        return { provider: "zalo", status: "sent", providerMessageId: `emul_${Date.now()}` };
+    // 2) Validate target
+    if (!target?.zaloUserId) {
+        return { provider: "zalo", status: "skipped", errorCode: "BAD_TARGET", errorMessage: "Missing zaloUserId" };
     }
-    // 🧰 Validate tối thiểu
-    if (!target?.zaloUserId || typeof target.zaloUserId !== 'string') {
-        return {
-            provider: 'zalo',
-            status: 'skipped',
-            errorCode: 'BAD_TARGET',
-            errorMessage: 'Missing or invalid target.zaloUserId',
-        };
-    }
-    const token = process.env.ZALO_OA_TOKEN || '';
+    // 3) Lấy token từ Firestore (ưu tiên), fallback Secret ENV
+    const store = await readStore(); // phải dùng path doc: "zalo_oa/config"
+    let token = (store?.access_token || process.env.ZALO_OA_TOKEN || "").trim();
     if (!token) {
-        return {
-            provider: 'zalo',
-            status: 'failed',
-            errorCode: 'NO_TOKEN',
-            errorMessage: 'ZALO_OA_TOKEN is missing (set Secret in Functions).',
-        };
+        return { provider: "zalo", status: "failed", errorCode: "NO_TOKEN", errorMessage: "No OA token" };
     }
-    // ✉️ Nội dung text
-    const text = `${payload.title ?? ''}\n${payload.body ?? ''}` +
-        (payload.actionUrl ? `\n${payload.actionUrl}` : '');
-    // ⏱️ Timeout an toàn để không treo function
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10s
-    try {
-        const res = await fetch('https://openapi.zalo.me/v3.0/oa/message', {
-            method: 'POST',
+    const text = [payload.title?.trim(), payload.body?.trim(), payload.actionUrl?.trim()]
+        .filter(Boolean)
+        .join("\n");
+    async function callWith(tok) {
+        const res = await fetch("https://openapi.zalo.me/v3.0/oa/message/cs", {
+            method: "POST",
             headers: {
-                'access_token': token, // Zalo OA yêu cầu header này
-                'Content-Type': 'application/json',
+                "access_token": tok, // ✅ DÙNG tham số 'tok', KHÔNG dùng biến ngoài
+                "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 recipient: { user_id: target.zaloUserId },
                 message: { text },
                 tracking_id: ctx.jobId,
             }),
-            signal: controller.signal,
-        }).finally(() => clearTimeout(timeout));
-        // Zalo trả về JSON cả khi lỗi
+        });
         const json = await res.json().catch(() => ({}));
-        // ❌ HTTP lỗi hoặc payload có error từ Zalo
-        if (!res.ok || json?.error) {
-            return {
-                provider: 'zalo',
-                status: 'failed',
-                errorCode: json?.error?.code?.toString?.() ?? String(res.status),
-                errorMessage: json?.error?.message || `HTTP ${res.status}`,
-                meta: { responseStatus: res.status, ...(json ?? {}) },
-            };
+        // Zalo trả error = 0 khi OK, error = -216 khi token invalid
+        const code = (typeof json?.error === "number")
+            ? json.error
+            : (json?.error?.code ?? json?.error_code ?? json?.code);
+        // ok khi HTTP OK và không có error, hoặc error === 0
+        const ok = res.ok && (code === undefined || code === 0);
+        return { ok, json, code };
+    }
+    // 4) Gọi lần 1
+    let { ok, json, code } = await callWith(token);
+    // 5) Nếu token invalid (-216) → refresh & retry 1 lần
+    if (code === -216) {
+        try {
+            token = await refreshZaloViaOAuth(); // bạn đã có hàm này
+            await writeStore({ access_token: token, refreshed_at: Date.now() });
+            ({ ok, json, code } = await callWith(token));
         }
-        // ✅ Thành công
-        const pmid = json?.message_id ??
-            json?.data?.message_id ??
-            undefined;
-        return {
-            provider: 'zalo',
-            status: 'sent',
-            providerMessageId: pmid ? String(pmid) : undefined,
-            meta: { responseStatus: res.status, ...(json ?? {}) },
-        };
+        catch (e) {
+            return { provider: "zalo", status: "failed", errorCode: "REFRESH_FAIL", errorMessage: e?.message || String(e) };
+        }
     }
-    catch (e) {
-        return {
-            provider: 'zalo',
-            status: 'failed',
-            errorCode: e?.code || 'FETCH_ERROR',
-            errorMessage: e?.message || String(e),
-        };
+    // 6) Nếu vẫn fail → trả lỗi
+    if (!ok) {
+        const errMsg = json?.message || JSON.stringify(json).slice(0, 200);
+        return { provider: "zalo", status: "failed", errorCode: String(code ?? "HTTP"), errorMessage: errMsg, meta: json };
     }
+    // 7) Thành công
+    const pmid = json?.data?.message_id ?? json?.message_id;
+    return { provider: "zalo", status: "sent", providerMessageId: pmid ? String(pmid) : undefined, meta: json };
 }
+//# sourceMappingURL=zaloProvider.js.map

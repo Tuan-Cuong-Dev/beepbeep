@@ -8,3 +8,4 @@ export const COLLECTIONS = {
 export function makeDeliveryId(jobId, channel, key) {
     return `${jobId}_${channel}_${key || 'unknown'}`;
 }
+//# sourceMappingURL=types.js.map

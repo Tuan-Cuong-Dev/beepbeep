@@ -1,4 +1,6 @@
 // functions/src/notifications/webhooks/viberWebhook.ts
+// Chỉ dùng nếu bạn muốn di chuyển webhook từ Next.js sang Functions. 
+// (Bạn đang có webhook ở Next chạy ổn thì thư mục này có thể chưa cần.)
 import * as functions from 'firebase-functions';
 import { db, FieldValue } from '../../utils/db.js';
 export const viberWebhook = functions
@@ -44,3 +46,4 @@ export const viberWebhook = functions
         res.status(200).json({ ok: true });
     }
 });
+//# sourceMappingURL=viberWebhook.js.map

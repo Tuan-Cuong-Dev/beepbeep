@@ -6,3 +6,4 @@ if (admin.apps.length === 0) {
 }
 export { admin };
 export const db = admin.firestore();
+//# sourceMappingURL=firebase.js.map

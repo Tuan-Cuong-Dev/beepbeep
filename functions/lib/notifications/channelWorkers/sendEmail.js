@@ -1,14 +1,25 @@
 // functions/src/notifications/channelWorkers/sendEmail.ts
+// Date 27/09
 import * as functions from 'firebase-functions';
-import { db } from '../../utils/db.js';
+import { db, FieldValue } from '../../utils/db.js';
 import { sendEmail as sendEmailProvider } from '../deliveryProviders/emailProvider.js';
+const REGION = 'asia-southeast1';
+const INTERNAL_WORKER_SECRET = process.env.INTERNAL_WORKER_SECRET;
 export const sendEmail = functions
-    .runWith({ secrets: ['SENDGRID_API_KEY'] }) // 👈 gắn secret để prod & emulator nạp biến môi trường
-    .region('asia-southeast1')
+    .runWith({
+    secrets: ['SENDGRID_API_KEY', 'INTERNAL_WORKER_SECRET'],
+    timeoutSeconds: 30,
+    memory: '256MB',
+})
+    .region(REGION)
     .https.onRequest(async (req, res) => {
     try {
         if (req.method !== 'POST') {
             res.status(405).send('Method Not Allowed');
+            return;
+        }
+        if (req.header('x-internal-secret') !== INTERNAL_WORKER_SECRET) {
+            res.status(401).send('Unauthorized');
             return;
         }
         const { jobId, uid, payload, target } = req.body;
@@ -16,25 +27,32 @@ export const sendEmail = functions
             res.status(400).json({ ok: false, error: 'Missing jobId|payload' });
             return;
         }
-        const emailTarget = { to: target?.to ?? '' };
-        const result = await sendEmailProvider(emailTarget, payload, { jobId, uid });
-        const delivId = `${jobId}_email_${uid || emailTarget.to || 'unknown'}`;
-        await db.collection('deliveries').doc(delivId).set({
-            id: delivId,
+        const to = target?.to?.trim();
+        if (!to) {
+            res.status(400).json({ ok: false, error: 'Missing target.to' });
+            return;
+        }
+        const result = await sendEmailProvider({ to }, payload, { jobId, uid });
+        const deliveryId = `${jobId}_email_${uid || to}`;
+        await db.collection('deliveries').doc(deliveryId).set({
+            id: deliveryId,
             jobId,
             uid: uid ?? null,
             channel: 'email',
-            status: result.status,
+            status: result.status, // 'sent' | 'queued' | 'failed'
             providerMessageId: result.providerMessageId ?? null,
             errorCode: result.errorCode ?? null,
             errorMessage: result.errorMessage ?? null,
-            attempts: 1,
-            createdAt: Date.now(),
-            sentAt: result.status !== 'failed' ? Date.now() : null,
-        });
-        res.json({ ok: result.status !== 'failed', result, deliveryId: delivId });
+            attempts: FieldValue.increment(1),
+            createdAt: FieldValue.serverTimestamp(),
+            sentAt: result.status !== 'failed' ? FieldValue.serverTimestamp() : null,
+        }, { merge: true });
+        res.json({ ok: result.status !== 'failed', result, deliveryId });
+        return;
     }
     catch (e) {
         res.status(500).json({ ok: false, error: e?.message || String(e) });
+        return;
     }
 });
+//# sourceMappingURL=sendEmail.js.map

@@ -1,26 +1,42 @@
+/**
+ * Viber Bot (Public Account) API
+ * Docs: https://developers.viber.com/docs/api/rest-bot-api/
+ *
+ * ENV:
+ * - VIBER_BOT_TOKEN (Secret)
+ *
+ * Yêu cầu: user đã "Start" bot → có viberUserId (lấy từ webhook conversation_started).
+ */
+// Date 27/09
+function parseRetryAfter(h) {
+    if (!h)
+        return undefined;
+    if (/^\d+$/.test(h))
+        return Math.max(0, parseInt(h, 10));
+    const t = Date.parse(h);
+    if (Number.isFinite(t)) {
+        const s = Math.round((t - Date.now()) / 1000);
+        return s > 0 ? s : 0;
+    }
+    return undefined;
+}
 export async function sendViber(target, payload, ctx) {
     try {
         const token = process.env.VIBER_BOT_TOKEN || '';
-        // Guard điều kiện tối thiểu
         if (!token) {
-            return {
-                provider: 'viber',
-                status: 'skipped',
-                errorCode: 'MISSING_TOKEN',
-                errorMessage: 'VIBER_BOT_TOKEN is not set',
-            };
+            return { provider: 'viber', status: 'skipped', errorCode: 'MISSING_TOKEN', errorMessage: 'VIBER_BOT_TOKEN is not set' };
         }
         if (!target?.viberUserId) {
-            return {
-                provider: 'viber',
-                status: 'skipped',
-                errorCode: 'MISSING_TARGET',
-                errorMessage: 'viberUserId is required',
-            };
+            return { provider: 'viber', status: 'skipped', errorCode: 'MISSING_TARGET', errorMessage: 'viberUserId is required' };
         }
-        // Ghép message gọn gàng
         const parts = [payload.title?.trim(), payload.body?.trim(), payload.actionUrl?.trim()].filter(Boolean);
-        const text = parts.join('\n');
+        const text = parts.join('\n').trim();
+        if (!text) {
+            return { provider: 'viber', status: 'skipped', errorCode: 'EMPTY_MESSAGE', errorMessage: 'Empty message content' };
+        }
+        // Timeout 10s để tránh treo
+        const ctrl = new AbortController();
+        const to = setTimeout(() => ctrl.abort(), 10_000);
         const res = await fetch('https://chatapi.viber.com/pa/send_message', {
             method: 'POST',
             headers: {
@@ -31,18 +47,31 @@ export async function sendViber(target, payload, ctx) {
                 receiver: target.viberUserId,
                 type: 'text',
                 text,
-                tracking_data: ctx.jobId, // để đối soát ngược về deliveries
+                tracking_data: ctx.jobId ?? undefined, // để đối soát ngược về deliveries
+                // optional:
+                // keyboard: {...}, // nếu muốn nút bấm
+                // sender: { name: 'Beep Bip', avatar: 'https://...' },
             }),
-        });
+            signal: ctrl.signal,
+        }).catch((e) => { throw { code: 'FETCH_ERR', message: String(e) }; });
+        clearTimeout(to);
         const json = (await res.json().catch(() => ({})));
         // Viber: status === 0 => OK
         if (!res.ok || json?.status !== 0) {
+            const retryAfterSec = parseRetryAfter(res.headers.get('retry-after'));
+            const statusFamily = Math.floor(res.status / 100);
+            const retryable = res.status === 429 || statusFamily === 5;
             return {
                 provider: 'viber',
                 status: 'failed',
                 errorCode: String(json?.status ?? res.status),
                 errorMessage: json?.status_message || `HTTP ${res.status}`,
-                meta: json,
+                meta: {
+                    ...json,
+                    retryAfterSec,
+                    retryable,
+                    responseSnippet: JSON.stringify(json).slice(0, 500),
+                },
             };
         }
         return {
@@ -61,3 +90,4 @@ export async function sendViber(target, payload, ctx) {
         };
     }
 }
+//# sourceMappingURL=viberProvider.js.map

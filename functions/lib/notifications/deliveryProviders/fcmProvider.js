@@ -1,5 +1,22 @@
 // functions/src/notifications/deliveryProviders/fcmProvider.ts
-import admin from 'firebase-admin';
+// Date 27/09
+import { admin } from '../../utils/db.js';
+const MAX_MULTICAST = 500;
+function chunk(arr, size) {
+    const out = [];
+    for (let i = 0; i < arr.length; i += size)
+        out.push(arr.slice(i, i + size));
+    return out;
+}
+function isRetryable(code) {
+    // Các mã thường có thể retry
+    return [
+        'messaging/internal-error',
+        'messaging/server-unavailable',
+        'messaging/unknown-error',
+        'messaging/quota-exceeded',
+    ].includes(code ?? '');
+}
 export async function sendFcm(target, payload, ctx) {
     try {
         const baseData = {
@@ -10,46 +27,64 @@ export async function sendFcm(target, payload, ctx) {
         const baseAndroid = {
             priority: 'high',
             notification: { sound: 'default' },
+            // collapseKey: String(ctx.jobId ?? ''), // bật nếu muốn gộp
         };
         const baseApns = {
-            payload: {
-                aps: {
-                    sound: 'default',
-                    'thread-id': String(ctx.jobId ?? ''),
-                },
-            },
+            payload: { aps: { sound: 'default', 'thread-id': String(ctx.jobId ?? '') } },
         };
-        // (Optional) Hỗ trợ Web Push
         const baseWebpush = {
             fcmOptions: payload.actionUrl ? { link: payload.actionUrl } : undefined,
-            notification: {
-                // icon: '/icons/icon-192x192.png', // nếu có
-                vibrate: [100, 50, 100],
-                requireInteraction: true,
-            },
+            notification: { vibrate: [100, 50, 100], requireInteraction: true },
         };
-        // 1) Multicast
         const tokens = (target.tokens || []).filter(Boolean);
+        // 1) Multicast (chunk ≤ 500)
         if (tokens.length > 0) {
-            const multi = {
-                tokens,
-                notification: { title: payload.title, body: payload.body },
-                data: baseData,
-                android: baseAndroid,
-                apns: baseApns,
-                webpush: baseWebpush,
-            };
-            const res = await admin.messaging().sendEachForMulticast(multi);
-            const okCount = res.responses.filter(r => r.success).length;
-            const firstOk = res.responses.find(r => r.success)?.messageId;
-            const firstErr = res.responses.find(r => !r.success)?.error;
+            let totalOk = 0;
+            let totalFail = 0;
+            let firstOkId;
+            const invalidTokens = [];
+            let retryable = false;
+            for (const batch of chunk(tokens, MAX_MULTICAST)) {
+                const multi = {
+                    tokens: batch,
+                    notification: { title: payload.title, body: payload.body },
+                    data: baseData,
+                    android: baseAndroid,
+                    apns: baseApns,
+                    webpush: baseWebpush,
+                };
+                const res = await admin.messaging().sendEachForMulticast(multi);
+                totalOk += res.successCount;
+                totalFail += res.failureCount;
+                for (let i = 0; i < res.responses.length; i++) {
+                    const r = res.responses[i];
+                    if (r.success) {
+                        if (!firstOkId)
+                            firstOkId = r.messageId;
+                    }
+                    else {
+                        const code = r.error?.code;
+                        if (code === 'messaging/registration-token-not-registered' ||
+                            code === 'messaging/invalid-registration-token') {
+                            invalidTokens.push(batch[i]);
+                        }
+                        if (isRetryable(code))
+                            retryable = true;
+                    }
+                }
+            }
             return {
                 provider: 'fcm',
-                status: okCount > 0 ? 'sent' : 'failed',
-                providerMessageId: firstOk,
-                errorCode: firstErr?.code,
-                errorMessage: firstErr?.message,
-                meta: { successCount: okCount, failureCount: res.failureCount },
+                status: totalOk > 0 ? 'sent' : 'failed',
+                providerMessageId: firstOkId,
+                errorCode: totalOk > 0 ? undefined : 'MULTICAST_FAILED',
+                errorMessage: totalOk > 0 ? undefined : 'All tokens failed',
+                meta: {
+                    successCount: totalOk,
+                    failureCount: totalFail,
+                    invalidTokens,
+                    retryable,
+                },
             };
         }
         // 2) Topic
@@ -63,7 +98,7 @@ export async function sendFcm(target, payload, ctx) {
                 webpush: baseWebpush,
             };
             const id = await admin.messaging().send(msg);
-            return { provider: 'fcm', status: 'sent', providerMessageId: id };
+            return { provider: 'fcm', status: 'sent', providerMessageId: id, meta: { topic: target.topic } };
         }
         // 3) Single token
         if (target.token) {
@@ -94,3 +129,4 @@ export async function sendFcm(target, payload, ctx) {
         };
     }
 }
+//# sourceMappingURL=fcmProvider.js.map

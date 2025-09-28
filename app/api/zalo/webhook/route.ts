@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
-export const runtime = "nodejs";
+export const runtime = "nodejs"; // quan trọng
 
 function safeEqual(a: string, b: string) {
   const A = Buffer.from(a);
@@ -10,59 +10,89 @@ function safeEqual(a: string, b: string) {
   return A.length === B.length && crypto.timingSafeEqual(A, B);
 }
 
-// trả về kết quả gửi để debug
-async function sendCsMessage(userId: string, text: string) {
-  const accessToken = process.env.ZALO_OA_ACCESS_TOKEN; // TODO: lấy từ DB khi lên prod
-  if (!accessToken) return { ok: false, reason: "NO_TOKEN" };
-
-  const res = await fetch("https://openapi.zalo.me/v3.0/oa/message/cs", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "access_token": accessToken,
-    },
-    body: JSON.stringify({
-      recipient: { user_id: userId },
-      message: { text },
-    }),
-  });
-
-  let data: any = null;
-  try { data = await res.json(); } catch { /* noop */ }
-
-  return { ok: res.ok && !(data && data.error), status: res.status, data };
-}
-
 export async function POST(req: NextRequest) {
   try {
     const secret = process.env.ZALO_APP_SECRET;
-    if (!secret) return new NextResponse("Server misconfigured", { status: 500 });
+    const fnBase = process.env.FUNCTIONS_BASE_URL; // ví dụ https://asia-southeast1-<project>.cloudfunctions.net
+    const internal = process.env.INTERNAL_WORKER_SECRET;
 
+    if (!secret || !fnBase || !internal) {
+      console.error("Missing env", { hasSecret: !!secret, hasFnBase: !!fnBase, hasInternal: !!internal });
+      return new NextResponse("Server misconfigured", { status: 500 });
+    }
+
+    // 1) raw body + signature verify
     const raw = await req.text();
     const sig = (req.headers.get("x-zalo-signature") || "").trim();
     if (!sig) return new NextResponse("Missing signature", { status: 400 });
 
-    const hex = crypto.createHmac("sha256", secret).update(raw).digest("hex");
+    const h = crypto.createHmac("sha256", secret);
+    h.update(raw);
+    const hex = h.digest("hex");
     const b64 = Buffer.from(hex, "hex").toString("base64");
-    const okSig = safeEqual(sig.toLowerCase(), hex.toLowerCase()) || safeEqual(sig, b64);
-    if (!okSig) return new NextResponse("Invalid signature", { status: 401 });
 
+    const ok = safeEqual(sig.toLowerCase(), hex.toLowerCase()) || safeEqual(sig, b64);
+    if (!ok) return new NextResponse("Invalid signature", { status: 401 });
+
+    // 2) parse JSON sau khi verify
     const body = JSON.parse(raw);
+    const eventName: string = body?.event_name || body?.event || "unknown";
 
-    // 🔧 CHỖ QUAN TRỌNG: AWAIT để đảm bảo gửi xong rồi mới trả response
-    let autoReply: any = null;
-    if (body?.event_name === "user_send_text") {
-      const uid = body?.sender?.id as string | undefined;
-      const txt = (body?.message?.text as string | undefined) || "";
-      if (uid) {
-        autoReply = await sendCsMessage(uid, `Bíp Bíp đã nhận: "${txt}" ✅`);
+    // Try best-effort lấy Zalo user id từ các nơi có thể xuất hiện
+    const zaloUserId: string | undefined =
+      body?.sender?.id ||
+      body?.follower?.id ||
+      body?.user_id ||
+      body?.user?.id;
+
+    // 3) Phân loại
+    // 3.a) user_send_text có LINK-<code>
+    if (eventName === "user_send_text") {
+      const text: string = body?.message?.text?.trim?.() || "";
+      const m = text.match(/^LINK-([A-Za-z0-9_-]{4,})$/);
+      if (m && zaloUserId) {
+        const code = m[1];
+
+        // forward sang Cloud Function để link account
+        const r = await fetch(`${fnBase}/zaloIngest`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-internal-secret": internal
+          },
+          body: JSON.stringify({ action: "link", zaloUserId, code, raw: body })
+        });
+        if (!r.ok) {
+          const t = await r.text().catch(() => "");
+          console.error("link forward failed", r.status, t);
+        }
       }
     }
 
-    return NextResponse.json({ ok: true, autoReply });
+    // 3.b) follow
+    if (eventName === "user_follow" && zaloUserId) {
+      await fetch(`${fnBase}/zaloIngest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-internal-secret": internal },
+        body: JSON.stringify({ action: "follow", zaloUserId, raw: body })
+      }).catch(() => null);
+    }
+
+    // 3.c) unfollow
+    if (eventName === "user_unfollow" && zaloUserId) {
+      await fetch(`${fnBase}/zaloIngest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-internal-secret": internal },
+        body: JSON.stringify({ action: "unfollow", zaloUserId, raw: body })
+      }).catch(() => null);
+    }
+
+    // Done
+    return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("Webhook error:", e);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    // Không để OA retry quá gắt
+    return NextResponse.json({ ok: true });
   }
 }
 

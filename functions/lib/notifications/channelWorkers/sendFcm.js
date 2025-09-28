@@ -1,14 +1,25 @@
 // functions/src/notifications/channelWorkers/sendFcm.ts
 import * as functions from 'firebase-functions';
-import { db } from '../../utils/db.js';
+import { db, FieldValue } from '../../utils/db.js';
 import { sendFcm as sendFcmProvider } from '../deliveryProviders/fcmProvider.js';
+const REGION = 'asia-southeast1';
+const INTERNAL_WORKER_SECRET = process.env.INTERNAL_WORKER_SECRET; // set trong Secrets
 export const sendFcm = functions
-    .runWith({ secrets: ['FCM_SERVER_KEY'] }) // 👈 nạp secret cho prod & emulator
-    .region('asia-southeast1')
+    .runWith({
+    secrets: ['FCM_SERVER_KEY', 'INTERNAL_WORKER_SECRET'],
+    timeoutSeconds: 30,
+    memory: '256MB',
+})
+    .region(REGION)
     .https.onRequest(async (req, res) => {
     try {
         if (req.method !== 'POST') {
             res.status(405).send('Method Not Allowed');
+            return;
+        }
+        // ⛔ chỉ orchestrator nội bộ mới được gọi
+        if (req.header('x-internal-secret') !== INTERNAL_WORKER_SECRET) {
+            res.status(401).send('Unauthorized');
             return;
         }
         const { jobId, uid, payload, target } = req.body;
@@ -16,29 +27,52 @@ export const sendFcm = functions
             res.status(400).json({ ok: false, error: 'Missing jobId|payload' });
             return;
         }
-        // ✅ Đảm bảo target là object (có thể rỗng)
-        const safeTarget = target || {};
+        // ✅ Chuẩn hoá target
+        const safeTarget = target ?? {};
+        const hasAnyTarget = (Array.isArray(safeTarget.tokens) && safeTarget.tokens.length > 0) ||
+            !!safeTarget.token ||
+            !!safeTarget.topic;
+        if (!hasAnyTarget) {
+            // Không có đích gửi: đánh dấu failed/hoặc skipped tuỳ policy
+            const deliveryId = `${jobId}_push_${uid || 'unknown'}`;
+            await db.collection('deliveries').doc(deliveryId).set({
+                id: deliveryId,
+                jobId,
+                uid: uid ?? null,
+                channel: 'push',
+                status: 'failed', // hoặc 'skipped'
+                errorMessage: 'No target token/topic',
+                attempts: FieldValue.increment(1),
+                createdAt: FieldValue.serverTimestamp(),
+            }, { merge: true });
+            res.json({ ok: false, error: 'No target token/topic', deliveryId });
+            return;
+        }
+        // Gửi qua provider
         const result = await sendFcmProvider(safeTarget, payload, { jobId, uid });
-        // ✅ Nếu không có uid, dùng topic hoặc 'unknown' cho key
-        const idKey = uid || safeTarget.topic || 'unknown';
-        const delivId = `${jobId}_push_${idKey}`;
-        await db.collection('deliveries').doc(delivId).set({
-            id: delivId,
+        // ✅ Idempotent deliveryId
+        const idKey = uid || safeTarget.topic || (safeTarget.token ? 'single' : 'multi');
+        const deliveryId = `${jobId}_push_${idKey}`;
+        await db.collection('deliveries').doc(deliveryId).set({
+            id: deliveryId,
             jobId,
             uid: uid ?? null,
             channel: 'push',
-            status: result.status, // 'sent' | 'failed' | 'skipped'
+            status: result.status, // 'sent' | 'failed' | 'skipped' (chuẩn hoá ở provider)
             providerMessageId: result.providerMessageId ?? null,
             errorCode: result.errorCode ?? null,
             errorMessage: result.errorMessage ?? null,
-            attempts: 1,
-            createdAt: Date.now(),
-            sentAt: result.status !== 'failed' ? Date.now() : null,
             meta: result.meta ?? null,
-        });
-        res.json({ ok: result.status !== 'failed', result, deliveryId: delivId });
+            attempts: FieldValue.increment(1),
+            createdAt: FieldValue.serverTimestamp(),
+            sentAt: result.status !== 'failed' ? FieldValue.serverTimestamp() : null,
+        }, { merge: true });
+        res.json({ ok: result.status !== 'failed', result, deliveryId });
+        return;
     }
     catch (e) {
         res.status(500).json({ ok: false, error: e?.message || String(e) });
+        return;
     }
 });
+//# sourceMappingURL=sendFcm.js.map

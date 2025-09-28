@@ -55,3 +55,4 @@ ocrServiceKey.json
 secret/
 .secrets/
 src/admin_tools/serviceAccountKey.json
+secret.txt
