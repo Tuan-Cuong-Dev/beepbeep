@@ -1,15 +1,7 @@
 // src/lib/zalo-link.ts
 import { db } from '@/src/lib/firebase-client';
 import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  where,
-  Timestamp,
+  collection, doc, getDoc, getDocs, limit, orderBy, query, where, Timestamp,
 } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 
@@ -27,34 +19,48 @@ type LinkStatus = {
 export async function getLinkStatus(uid: string): Promise<LinkStatus> {
   if (!uid) throw new Error('Missing uid');
 
-  // 1) Nếu user đã được map zaloUserId thì trả luôn linked=true
+  // 1) Nếu user đã map zaloUserId thì coi như linked
   const prefSnap = await getDoc(doc(db, 'userNotificationPreferences', uid));
   const zaloUserId = prefSnap.exists()
     ? (prefSnap.data()?.contact?.zaloUserId ?? null)
     : null;
   if (zaloUserId) return { linked: true, zaloUserId };
 
-  // 2) Chưa map → tìm mã link chưa dùng, mới nhất
-  //    LƯU Ý: index bạn tạo là (uid, used, expiresAt DESC)
+  // 2) Chưa map → tìm mã còn hạn (mới nhất)
+  // Cần composite index: (uid ASC, used ASC, expiresAt DESC)
   const q = query(
     collection(db, 'zalo_link_codes'),
     where('uid', '==', uid),
     where('used', '==', false),
-    orderBy('expiresAt', 'desc'),
+    orderBy('expiresAt', 'desc'), // nếu DB của bạn dùng expiresAtMs, xem fallback bên dưới
     limit(1)
   );
 
-  const snap = await getDocs(q);
+  let snap;
+  try {
+    snap = await getDocs(q);
+  } catch (e) {
+    // Fallback nếu project cũ đang để field là expiresAtMs thay vì expiresAt
+    const q2 = query(
+      collection(db, 'zalo_link_codes'),
+      where('uid', '==', uid),
+      where('used', '==', false),
+      orderBy('expiresAtMs', 'desc'),
+      limit(1)
+    );
+    snap = await getDocs(q2);
+  }
+
   if (snap.empty) return { linked: false, code: null, expiresAtMs: undefined };
 
   const docSnap = snap.docs[0];
   const d = docSnap.data() as {
     code?: string;
     expiresAt?: number | Timestamp;
-    expiresAtMs?: number | Timestamp; // phòng trường hợp bản cũ
+    expiresAtMs?: number | Timestamp;
   };
 
-  // Chuẩn hoá expiresAtMs từ number/Timestamp và cả key cũ/new
+  // Chuẩn hoá expiresAtMs (hỗ trợ cả number lẫn Timestamp và cả 2 tên trường)
   const expiresAtMs =
     d.expiresAt instanceof Timestamp
       ? d.expiresAt.toMillis()
@@ -66,13 +72,13 @@ export async function getLinkStatus(uid: string): Promise<LinkStatus> {
       ? d.expiresAtMs
       : undefined;
 
-  // code ưu tiên field 'code', fallback doc.id nếu bạn dùng docId làm mã
+  // code: ưu tiên field 'code', fallback docId nếu dùng docId làm mã
   const code = d.code ?? docSnap.id;
 
   return { linked: false, code, expiresAtMs };
 }
 
-/** Tạo/cấp lại mã liên kết. Server có thể tái dùng mã còn hạn nếu có */
+/** Tạo/cấp lại mã liên kết. Server có thể tái dùng mã còn hạn */
 export async function ensureLinkCode(
   uid: string,
   ttlMinutes = 10,
@@ -81,13 +87,13 @@ export async function ensureLinkCode(
   if (!uid) throw new Error('Missing uid');
 
   const callable = httpsCallable(functions, 'createZaloLinkCode');
-  const res = await callable({ length, ttlMinutes });
+  const res = await callable({ length, ttlMinutes }); // uid lấy từ context.auth ở server
 
   const data = (res.data as any) ?? {};
   const code: string | undefined = data.code ?? data.id;
   if (!code) throw new Error(data.error ?? 'Không nhận được code');
 
-  // Chuẩn hoá expiresAtMs từ payload server (hỗ trợ cả expiresAt|expiresAtMs và Timestamp)
+  // Chuẩn hoá expiresAtMs từ payload server
   const expiresAtMs =
     data.expiresAt instanceof Timestamp
       ? data.expiresAt.toMillis()
