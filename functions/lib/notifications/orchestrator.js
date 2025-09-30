@@ -21,6 +21,12 @@ function renderTemplate(tplStr = "", data) {
         return (v ?? "").toString();
     });
 }
+// Hỗ trợ cả string và object đa ngôn ngữ {vi,en,...}
+function pickLocalized(v, lang) {
+    if (typeof v === "string")
+        return v;
+    return v?.[lang] ?? v?.vi ?? v?.en ?? "";
+}
 function isQuietHours(pref) {
     const zone = pref?.timezone || "Asia/Ho_Chi_Minh";
     const nowHHmm = DateTime.now().setZone(zone).toFormat("HH:mm");
@@ -28,8 +34,9 @@ function isQuietHours(pref) {
     if (!q?.start || !q?.end)
         return false;
     // ví dụ 22:00–07:00 (wrap qua nửa đêm)
-    return q.start < q.end ? (nowHHmm >= q.start && nowHHmm < q.end)
-        : (nowHHmm >= q.start || nowHHmm < q.end);
+    return q.start < q.end
+        ? nowHHmm >= q.start && nowHHmm < q.end
+        : nowHHmm >= q.start || nowHHmm < q.end;
 }
 async function callWorker(path, body) {
     if (!FUNCTIONS_BASE)
@@ -58,29 +65,46 @@ export const onNotificationJobCreate = functions
     // MVP: audience = 1 user
     const uids = job?.audience?.type === "user" ? [job.audience.uid] : [];
     if (uids.length === 0) {
-        await snap.ref.update({ status: "failed", error: "no_audience", finishedAt: FieldValue.serverTimestamp() });
+        await snap.ref.update({
+            status: "failed",
+            error: "no_audience",
+            finishedAt: FieldValue.serverTimestamp(),
+        });
         return;
     }
     // Template
-    const tplDoc = await db.collection("notificationTemplates").doc(job.templateId).get();
+    const tplDoc = await db
+        .collection("notificationTemplates")
+        .doc(job.templateId)
+        .get();
     if (!tplDoc.exists) {
-        await snap.ref.update({ status: "failed", error: "template_not_found", finishedAt: FieldValue.serverTimestamp() });
+        await snap.ref.update({
+            status: "failed",
+            error: "template_not_found",
+            finishedAt: FieldValue.serverTimestamp(),
+        });
         return;
     }
     const tpl = tplDoc.data();
-    await snap.ref.update({ status: "processing", startedAt: FieldValue.serverTimestamp() });
+    await snap.ref.update({
+        status: "processing",
+        startedAt: FieldValue.serverTimestamp(),
+    });
     for (const uid of uids) {
-        const prefDoc = await db.collection("userNotificationPreferences").doc(uid).get();
+        const prefDoc = await db
+            .collection("userNotificationPreferences")
+            .doc(uid)
+            .get();
         if (!prefDoc.exists) {
             functions.logger.warn("pref_missing", { uid, jobId });
             continue;
         }
         const pref = prefDoc.data();
-        // Render payload
+        // Render payload (string hoặc đa ngôn ngữ)
         const lang = pref.language ?? "vi";
         const payload = {
-            title: renderTemplate(tpl.title?.[lang] || tpl.title?.vi || "", job.data),
-            body: renderTemplate(tpl.body?.[lang] || tpl.body?.vi || "", job.data),
+            title: renderTemplate(pickLocalized(tpl.title, lang), job.data),
+            body: renderTemplate(pickLocalized(tpl.body, lang), job.data),
             actionUrl: job.data?.actionUrl,
         };
         // Chọn kênh
@@ -89,14 +113,25 @@ export const onNotificationJobCreate = functions
         const inQuiet = isQuietHours(pref);
         // In-app luôn (không tạo pending)
         if (channels.includes("inapp")) {
-            await callWorker("sendInapp", { jobId, uid, payload, topic: job.topic })
-                .catch(e => functions.logger.error("sendInapp error", { jobId, uid, e: String(e) }));
+            await callWorker("sendInapp", {
+                jobId,
+                uid,
+                payload,
+                topic: job.topic,
+            }).catch((e) => functions.logger.error("sendInapp error", {
+                jobId,
+                uid,
+                e: String(e),
+            }));
         }
         // Các kênh còn lại
-        for (const ch of channels.filter(c => c !== "inapp")) {
+        for (const ch of channels.filter((c) => c !== "inapp")) {
             const deliveryId = `${jobId}_${ch}_${uid}`;
             if (inQuiet) {
-                await db.collection("deliveries").doc(deliveryId).set({
+                await db
+                    .collection("deliveries")
+                    .doc(deliveryId)
+                    .set({
                     id: deliveryId,
                     jobId,
                     uid,
@@ -115,11 +150,18 @@ export const onNotificationJobCreate = functions
                 sms: { to: pref.contact?.phone },
             }[ch] ?? {};
             const path = PATH_BY_CHANNEL[ch];
-            await callWorker(path, { jobId, uid, payload, target })
-                .catch(e => functions.logger.error(`worker ${path} error`, { jobId, uid, ch, e: String(e) }));
+            await callWorker(path, { jobId, uid, payload, target }).catch((e) => functions.logger.error(`worker ${path} error`, {
+                jobId,
+                uid,
+                ch,
+                e: String(e),
+            }));
         }
     }
-    await snap.ref.update({ status: "processing_done", finishedAt: FieldValue.serverTimestamp() });
+    await snap.ref.update({
+        status: "processing_done",
+        finishedAt: FieldValue.serverTimestamp(),
+    });
 });
 /* ========== Scheduler: gỡ deliveries pending sau quiet hours ========== */
 export const processNotificationJobs = functions
@@ -138,12 +180,20 @@ export const processNotificationJobs = functions
         try {
             const d = doc.data();
             if (!d?.jobId || !d?.channel || !d?.uid) {
-                await doc.ref.set({ status: "failed", error: "missing_fields", finishedAt: FieldValue.serverTimestamp() }, { merge: true });
+                await doc.ref.set({
+                    status: "failed",
+                    error: "missing_fields",
+                    finishedAt: FieldValue.serverTimestamp(),
+                }, { merge: true });
                 continue;
             }
             // Không xử lý inapp ở pending (inapp đã gửi ngay từ onCreate)
             if (d.channel === "inapp") {
-                await doc.ref.set({ status: "skipped", error: "inapp_has_no_pending", finishedAt: FieldValue.serverTimestamp() }, { merge: true });
+                await doc.ref.set({
+                    status: "skipped",
+                    error: "inapp_has_no_pending",
+                    finishedAt: FieldValue.serverTimestamp(),
+                }, { merge: true });
                 continue;
             }
             // Load job + pref + template
@@ -152,29 +202,44 @@ export const processNotificationJobs = functions
                 db.collection("userNotificationPreferences").doc(d.uid).get(),
             ]);
             if (!jobSnap.exists) {
-                await doc.ref.set({ status: "failed", error: "job_not_found", finishedAt: FieldValue.serverTimestamp() }, { merge: true });
+                await doc.ref.set({
+                    status: "failed",
+                    error: "job_not_found",
+                    finishedAt: FieldValue.serverTimestamp(),
+                }, { merge: true });
                 continue;
             }
             const job = jobSnap.data();
-            const tplSnap = await db.collection("notificationTemplates").doc(job.templateId).get();
+            const tplSnap = await db
+                .collection("notificationTemplates")
+                .doc(job.templateId)
+                .get();
             if (!tplSnap.exists) {
-                await doc.ref.set({ status: "failed", error: "template_not_found", finishedAt: FieldValue.serverTimestamp() }, { merge: true });
+                await doc.ref.set({
+                    status: "failed",
+                    error: "template_not_found",
+                    finishedAt: FieldValue.serverTimestamp(),
+                }, { merge: true });
                 continue;
             }
             const tpl = tplSnap.data();
             if (!prefSnap.exists) {
-                await doc.ref.set({ status: "failed", error: "pref_not_found", finishedAt: FieldValue.serverTimestamp() }, { merge: true });
+                await doc.ref.set({
+                    status: "failed",
+                    error: "pref_not_found",
+                    finishedAt: FieldValue.serverTimestamp(),
+                }, { merge: true });
                 continue;
             }
             const pref = prefSnap.data();
             // Nếu vẫn trong quiet hours → để pending tiếp
             if (isQuietHours(pref))
                 continue;
-            // Render payload
+            // Render payload (string hoặc đa ngôn ngữ)
             const lang = pref.language ?? "vi";
             const payload = {
-                title: renderTemplate(tpl.title?.[lang] || tpl.title?.vi || "", job.data),
-                body: renderTemplate(tpl.body?.[lang] || tpl.body?.vi || "", job.data),
+                title: renderTemplate(pickLocalized(tpl.title, lang), job.data),
+                body: renderTemplate(pickLocalized(tpl.body, lang), job.data),
                 actionUrl: job.data?.actionUrl,
             };
             // Build target đủ key (TS happy)
@@ -194,7 +259,11 @@ export const processNotificationJobs = functions
             await doc.ref.set({ resumedAt: FieldValue.serverTimestamp() }, { merge: true });
         }
         catch (err) {
-            await doc.ref.set({ status: "failed", error: String(err), finishedAt: FieldValue.serverTimestamp() }, { merge: true });
+            await doc.ref.set({
+                status: "failed",
+                error: String(err),
+                finishedAt: FieldValue.serverTimestamp(),
+            }, { merge: true });
         }
     }
 });

@@ -2,6 +2,7 @@
 import "./utils/db.js";
 // Triggers & schedulers
 export { onNotificationJobCreate, processNotificationJobs } from "./notifications/orchestrator.js";
+export { enqueueNotificationJob } from './notifications/enqueue.js';
 export { refreshZaloToken } from "./notifications/cron/refreshZalo.js";
 // Webhooks
 export { zaloWebhook } from "./notifications/webhooks/zaloWebhook.js";
@@ -9,6 +10,7 @@ export { zaloWebhook } from "./notifications/webhooks/zaloWebhook.js";
 export { sendInapp } from "./notifications/channelWorkers/sendInapp.js";
 export { sendZalo } from "./notifications/channelWorkers/sendZalo.js";
 export { zaloIngest } from "./notifications/webhooks/zaloIngest.js";
+export { createZaloLinkCode } from './notifications/zalo/createLinkCode.js';
 // (tùy bạn cần thì export thêm)
 // export { sendFcm }  from "./notifications/channelWorkers/sendFcm.js";
 // export { sendEmail } from "./notifications/channelWorkers/sendEmail.js";

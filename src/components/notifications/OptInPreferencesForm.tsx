@@ -1,5 +1,5 @@
 // Phần Notification Platform phát triển từ 18/09/2025
-
+// Xữ lý xong Zalo thì mới quay lại xữ lý thử cái này
 'use client';
 
 import { useNotificationPreferences } from '@/src/hooks/useNotificationPreferences';

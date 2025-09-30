@@ -13,11 +13,11 @@ type SendPayload = { title: string; body: string; actionUrl?: string };
 
 const PATH_BY_CHANNEL: Record<Channel, string> = {
   inapp: "sendInapp",
-  push:  "sendFcm", // push -> sendFcm
-  zalo:  "sendZalo",
+  push: "sendFcm", // push -> sendFcm
+  zalo: "sendZalo",
   viber: "sendViber",
   email: "sendEmail",
-  sms:   "sendSms",
+  sms: "sendSms",
 };
 
 /* ========== Helpers ========== */
@@ -28,14 +28,21 @@ function renderTemplate(tplStr = "", data: any): string {
   });
 }
 
+// Hỗ trợ cả string và object đa ngôn ngữ {vi,en,...}
+function pickLocalized(v: any, lang: string): string {
+  if (typeof v === "string") return v;
+  return v?.[lang] ?? v?.vi ?? v?.en ?? "";
+}
+
 function isQuietHours(pref: any): boolean {
   const zone = pref?.timezone || "Asia/Ho_Chi_Minh";
   const nowHHmm = DateTime.now().setZone(zone).toFormat("HH:mm");
   const q = pref?.quietHours;
   if (!q?.start || !q?.end) return false;
   // ví dụ 22:00–07:00 (wrap qua nửa đêm)
-  return q.start < q.end ? (nowHHmm >= q.start && nowHHmm < q.end)
-                         : (nowHHmm >= q.start || nowHHmm < q.end);
+  return q.start < q.end
+    ? nowHHmm >= q.start && nowHHmm < q.end
+    : nowHHmm >= q.start || nowHHmm < q.end;
 }
 
 async function callWorker(path: string, body: unknown) {
@@ -64,83 +71,129 @@ export const onNotificationJobCreate = functions
     const job = snap.data() as any;
 
     // MVP: audience = 1 user
-    const uids: string[] = job?.audience?.type === "user" ? [job.audience.uid] : [];
+    const uids: string[] =
+      job?.audience?.type === "user" ? [job.audience.uid] : [];
     if (uids.length === 0) {
-      await snap.ref.update({ status: "failed", error: "no_audience", finishedAt: FieldValue.serverTimestamp() });
+      await snap.ref.update({
+        status: "failed",
+        error: "no_audience",
+        finishedAt: FieldValue.serverTimestamp(),
+      });
       return;
     }
 
     // Template
-    const tplDoc = await db.collection("notificationTemplates").doc(job.templateId).get();
+    const tplDoc = await db
+      .collection("notificationTemplates")
+      .doc(job.templateId)
+      .get();
     if (!tplDoc.exists) {
-      await snap.ref.update({ status: "failed", error: "template_not_found", finishedAt: FieldValue.serverTimestamp() });
+      await snap.ref.update({
+        status: "failed",
+        error: "template_not_found",
+        finishedAt: FieldValue.serverTimestamp(),
+      });
       return;
     }
     const tpl = tplDoc.data() as any;
 
-    await snap.ref.update({ status: "processing", startedAt: FieldValue.serverTimestamp() });
+    await snap.ref.update({
+      status: "processing",
+      startedAt: FieldValue.serverTimestamp(),
+    });
 
     for (const uid of uids) {
-      const prefDoc = await db.collection("userNotificationPreferences").doc(uid).get();
+      const prefDoc = await db
+        .collection("userNotificationPreferences")
+        .doc(uid)
+        .get();
       if (!prefDoc.exists) {
         functions.logger.warn("pref_missing", { uid, jobId });
         continue;
       }
       const pref = prefDoc.data() as any;
 
-      // Render payload
+      // Render payload (string hoặc đa ngôn ngữ)
       const lang = pref.language ?? "vi";
       const payload: SendPayload = {
-        title: renderTemplate(tpl.title?.[lang] || tpl.title?.vi || "", job.data),
-        body:  renderTemplate(tpl.body?.[lang]  || tpl.body?.vi  || "", job.data),
+        title: renderTemplate(pickLocalized(tpl.title, lang), job.data),
+        body: renderTemplate(pickLocalized(tpl.body, lang), job.data),
         actionUrl: job.data?.actionUrl,
       };
 
       // Chọn kênh
-      const channels: Channel[] = job.requiredChannels || tpl.channels || ["inapp", "push"];
+      const channels: Channel[] =
+        job.requiredChannels || tpl.channels || ["inapp", "push"];
 
       // Quiet hours?
       const inQuiet = isQuietHours(pref);
 
       // In-app luôn (không tạo pending)
       if (channels.includes("inapp")) {
-        await callWorker("sendInapp", { jobId, uid, payload, topic: job.topic })
-          .catch(e => functions.logger.error("sendInapp error", { jobId, uid, e: String(e) }));
+        await callWorker("sendInapp", {
+          jobId,
+          uid,
+          payload,
+          topic: job.topic,
+        }).catch((e) =>
+          functions.logger.error("sendInapp error", {
+            jobId,
+            uid,
+            e: String(e),
+          })
+        );
       }
 
       // Các kênh còn lại
-      for (const ch of channels.filter(c => c !== "inapp")) {
+      for (const ch of channels.filter((c) => c !== "inapp")) {
         const deliveryId = `${jobId}_${ch}_${uid}`;
 
         if (inQuiet) {
-          await db.collection("deliveries").doc(deliveryId).set({
-            id: deliveryId,
-            jobId,
-            uid,
-            channel: ch,
-            status: "pending",
-            createdAt: FieldValue.serverTimestamp(),
-          }, { merge: true });
+          await db
+            .collection("deliveries")
+            .doc(deliveryId)
+            .set(
+              {
+                id: deliveryId,
+                jobId,
+                uid,
+                channel: ch,
+                status: "pending",
+                createdAt: FieldValue.serverTimestamp(),
+              },
+              { merge: true }
+            );
           continue;
         }
 
         // Build target từ user pref
         const target =
-          ({
-            push:  { tokens: pref.contact?.fcmTokens || [] },
-            zalo:  { zaloUserId: pref.contact?.zaloUserId },
-            viber: { viberUserId: pref.contact?.viberUserId },
-            email: { to:        pref.contact?.email },
-            sms:   { to:        pref.contact?.phone },
-          } as const)[ch] ?? {};
+          (
+            {
+              push: { tokens: pref.contact?.fcmTokens || [] },
+              zalo: { zaloUserId: pref.contact?.zaloUserId },
+              viber: { viberUserId: pref.contact?.viberUserId },
+              email: { to: pref.contact?.email },
+              sms: { to: pref.contact?.phone },
+            } as const
+          )[ch] ?? {};
 
         const path = PATH_BY_CHANNEL[ch];
-        await callWorker(path, { jobId, uid, payload, target })
-          .catch(e => functions.logger.error(`worker ${path} error`, { jobId, uid, ch, e: String(e) }));
+        await callWorker(path, { jobId, uid, payload, target }).catch((e) =>
+          functions.logger.error(`worker ${path} error`, {
+            jobId,
+            uid,
+            ch,
+            e: String(e),
+          })
+        );
       }
     }
 
-    await snap.ref.update({ status: "processing_done", finishedAt: FieldValue.serverTimestamp() });
+    await snap.ref.update({
+      status: "processing_done",
+      finishedAt: FieldValue.serverTimestamp(),
+    });
   });
 
 /* ========== Scheduler: gỡ deliveries pending sau quiet hours ========== */
@@ -168,7 +221,11 @@ export const processNotificationJobs = functions
 
         if (!d?.jobId || !d?.channel || !d?.uid) {
           await doc.ref.set(
-            { status: "failed", error: "missing_fields", finishedAt: FieldValue.serverTimestamp() },
+            {
+              status: "failed",
+              error: "missing_fields",
+              finishedAt: FieldValue.serverTimestamp(),
+            },
             { merge: true }
           );
           continue;
@@ -177,7 +234,11 @@ export const processNotificationJobs = functions
         // Không xử lý inapp ở pending (inapp đã gửi ngay từ onCreate)
         if (d.channel === "inapp") {
           await doc.ref.set(
-            { status: "skipped", error: "inapp_has_no_pending", finishedAt: FieldValue.serverTimestamp() },
+            {
+              status: "skipped",
+              error: "inapp_has_no_pending",
+              finishedAt: FieldValue.serverTimestamp(),
+            },
             { merge: true }
           );
           continue;
@@ -191,17 +252,28 @@ export const processNotificationJobs = functions
 
         if (!jobSnap.exists) {
           await doc.ref.set(
-            { status: "failed", error: "job_not_found", finishedAt: FieldValue.serverTimestamp() },
+            {
+              status: "failed",
+              error: "job_not_found",
+              finishedAt: FieldValue.serverTimestamp(),
+            },
             { merge: true }
           );
           continue;
         }
         const job = jobSnap.data() as any;
 
-        const tplSnap = await db.collection("notificationTemplates").doc(job.templateId).get();
+        const tplSnap = await db
+          .collection("notificationTemplates")
+          .doc(job.templateId)
+          .get();
         if (!tplSnap.exists) {
           await doc.ref.set(
-            { status: "failed", error: "template_not_found", finishedAt: FieldValue.serverTimestamp() },
+            {
+              status: "failed",
+              error: "template_not_found",
+              finishedAt: FieldValue.serverTimestamp(),
+            },
             { merge: true }
           );
           continue;
@@ -210,7 +282,11 @@ export const processNotificationJobs = functions
 
         if (!prefSnap.exists) {
           await doc.ref.set(
-            { status: "failed", error: "pref_not_found", finishedAt: FieldValue.serverTimestamp() },
+            {
+              status: "failed",
+              error: "pref_not_found",
+              finishedAt: FieldValue.serverTimestamp(),
+            },
             { merge: true }
           );
           continue;
@@ -220,22 +296,22 @@ export const processNotificationJobs = functions
         // Nếu vẫn trong quiet hours → để pending tiếp
         if (isQuietHours(pref)) continue;
 
-        // Render payload
+        // Render payload (string hoặc đa ngôn ngữ)
         const lang = pref.language ?? "vi";
         const payload: SendPayload = {
-          title: renderTemplate(tpl.title?.[lang] || tpl.title?.vi || "", job.data),
-          body:  renderTemplate(tpl.body?.[lang]  || tpl.body?.vi  || "", job.data),
+          title: renderTemplate(pickLocalized(tpl.title, lang), job.data),
+          body: renderTemplate(pickLocalized(tpl.body, lang), job.data),
           actionUrl: job.data?.actionUrl,
         };
 
         // Build target đủ key (TS happy)
         const targetMap = {
           inapp: undefined,
-          push:  { tokens: pref.contact?.fcmTokens || [] },
-          zalo:  { zaloUserId: pref.contact?.zaloUserId },
+          push: { tokens: pref.contact?.fcmTokens || [] },
+          zalo: { zaloUserId: pref.contact?.zaloUserId },
           viber: { viberUserId: pref.contact?.viberUserId },
-          email: { to:        pref.contact?.email },
-          sms:   { to:        pref.contact?.phone },
+          email: { to: pref.contact?.email },
+          sms: { to: pref.contact?.phone },
         } satisfies Partial<Record<Channel, unknown>>;
 
         const target = targetMap[d.channel] ?? {};
@@ -245,10 +321,17 @@ export const processNotificationJobs = functions
         await callWorker(path, { jobId: d.jobId, uid: d.uid, payload, target });
 
         // Ghi dấu resume (merge, tránh đè nội dung worker đã set)
-        await doc.ref.set({ resumedAt: FieldValue.serverTimestamp() }, { merge: true });
+        await doc.ref.set(
+          { resumedAt: FieldValue.serverTimestamp() },
+          { merge: true }
+        );
       } catch (err) {
         await doc.ref.set(
-          { status: "failed", error: String(err), finishedAt: FieldValue.serverTimestamp() },
+          {
+            status: "failed",
+            error: String(err),
+            finishedAt: FieldValue.serverTimestamp(),
+          },
           { merge: true }
         );
       }

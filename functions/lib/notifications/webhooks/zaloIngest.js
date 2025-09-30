@@ -1,4 +1,5 @@
 // functions/src/notifications/webhooks/zaloIngest.ts
+// Cloud Function: ghi Firestore cho follow/unfollow/link
 import * as functions from "firebase-functions";
 import { db, FieldValue } from "../../utils/db.js";
 const REGION = "asia-southeast1";

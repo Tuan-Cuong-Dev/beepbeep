@@ -8,7 +8,8 @@ import { useInvitations } from '@/src/hooks/useInvitationSystem';
 import { acceptStaffInvitation } from '@/src/lib/invitations/staff/acceptStaffInvitation';
 import { declineStaffInvitation } from '@/src/lib/invitations/staff/declineStaffInvitation';
 import NotificationCenter from '@/src/components/notifications/NotificationCenter';
-import OptInPreferencesForm from '@/src/components/notifications/OptInPreferencesForm';
+// import OptInPreferencesForm from '@/src/components/notifications/OptInPreferencesForm';
+import ZaloLinkCard from '@/src/components/notifications/ZaloLinkCard';
 import { Button } from '@/src/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
@@ -128,21 +129,18 @@ export default function MessagesPage() {
 
         {/* Notifications Center */}
         <section className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
-            <h2 className="text-xl font-semibold text-gray-700 mb-3">
-              {t('messages_page.notifications_title')}
-            </h2>
-            <NotificationCenter />
-          </div>
-          <div className="md:col-span-1">
-            <h2 className="text-xl font-semibold text-gray-700 mb-3">
-              {t('messages_page.preferences_title', {
-                defaultValue: 'Notification Preferences',
-              })}
-            </h2>
-            <OptInPreferencesForm />
-          </div>
-        </section>
+        <div className="md:col-span-2">
+          <h2 className="text-xl font-semibold text-gray-700 mb-3">
+            {t('messages_page.notifications_title')}
+          </h2>
+          <NotificationCenter />
+        </div>
+
+        <div className="md:col-span-1 space-y-6">
+          {/* 👉 Thêm card Zalo ở đây */}
+          {user?.uid && <ZaloLinkCard uid={user.uid} />}
+        </div>
+      </section>
       </main>
 
       <Footer />

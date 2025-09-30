@@ -37,7 +37,6 @@ export function useInvitations(userId: string | null) {
     const list: Invitation[] = snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Invitation) }));
     setInvitations(list);
     setLoading(false);
-    console.log('[Invitations]', list);
   };
 
   const acceptInvitation = async (invitation: Invitation) => {
