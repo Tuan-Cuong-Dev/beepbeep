@@ -134,17 +134,35 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
 
-  // ?adminPing=1 → test ghi Firestore bằng Admin SDK
   if (url.searchParams.get("adminPing") === "1") {
     try {
       const ref = db.collection("_debug_admin_ping").doc();
       await ref.set({ at: Timestamp.now(), where: "webhook" });
-      return NextResponse.json({ ok: true, wroteDoc: ref.id });
+
+      return NextResponse.json({
+        ok: true,
+        via: (await import("@/src/lib/firebaseAdmin")).__adminLoadedVia || null,
+        envPresence: {
+          FIREBASE_PROJECT_ID: !!process.env.FIREBASE_PROJECT_ID,
+          FIREBASE_CLIENT_EMAIL: !!process.env.FIREBASE_CLIENT_EMAIL,
+          FIREBASE_PRIVATE_KEY: !!process.env.FIREBASE_PRIVATE_KEY,
+          FIREBASE_ADMIN_CREDENTIALS: !!process.env.FIREBASE_ADMIN_CREDENTIALS,
+        },
+      });
     } catch (e: any) {
-      return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
+      return NextResponse.json({
+        ok: false,
+        via: (await import("@/src/lib/firebaseAdmin")).__adminLoadedVia || null,
+        error: String(e?.message || e),
+        envPresence: {
+          FIREBASE_PROJECT_ID: !!process.env.FIREBASE_PROJECT_ID,
+          FIREBASE_CLIENT_EMAIL: !!process.env.FIREBASE_CLIENT_EMAIL,
+          FIREBASE_PRIVATE_KEY: !!process.env.FIREBASE_PRIVATE_KEY,
+          FIREBASE_ADMIN_CREDENTIALS: !!process.env.FIREBASE_ADMIN_CREDENTIALS,
+        },
+      }, { status: 500 });
     }
   }
 
-  // Healthcheck mặc định
   return NextResponse.json({ ok: true });
 }

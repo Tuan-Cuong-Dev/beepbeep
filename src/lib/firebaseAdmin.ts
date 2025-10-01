@@ -14,16 +14,11 @@ function initAdmin() {
   const key = process.env.FIREBASE_PRIVATE_KEY;
 
   if (rawJson) {
-    try {
-      const parsed = JSON.parse(rawJson);
-      if (parsed.private_key) parsed.private_key = String(parsed.private_key).replace(/\\n/g, "\n");
-      initializeApp({ credential: cert(parsed) });
-      __loadedVia = "json";
-      return;
-    } catch (e) {
-      console.error("[FIREBASE_ADMIN] Invalid FIREBASE_ADMIN_CREDENTIALS JSON");
-      throw e;
-    }
+    const parsed = JSON.parse(rawJson);
+    if (parsed.private_key) parsed.private_key = String(parsed.private_key).replace(/\\n/g, "\n");
+    initializeApp({ credential: cert(parsed) });
+    __loadedVia = "json";
+    return;
   }
 
   if (pid && email && key) {
@@ -38,18 +33,14 @@ function initAdmin() {
     return;
   }
 
-  console.error("[FIREBASE_ADMIN] Missing credentials env. Need FIREBASE_ADMIN_CREDENTIALS or PROJECT_ID/CLIENT_EMAIL/PRIVATE_KEY.");
+  // Không fallback ADC trên Vercel → fail-fast để lộ ra lỗi cấu hình
+  console.error("[FIREBASE_ADMIN] Missing credentials env");
   throw new Error("MISSING_FIREBASE_ADMIN_CREDS");
 }
-
 initAdmin();
 
 export const adminAuth = getAuth();
 export const adminDb = getFirestore();
-
-// Back-compat
 export const db = adminDb;
 export { FieldValue, Timestamp, GeoPoint };
-
-// expose để route debug có thể cho biết đang dùng nguồn nào (không lộ secret)
 export const __adminLoadedVia = __loadedVia;
