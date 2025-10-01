@@ -1,6 +1,25 @@
 {
   "indexes": [
     {
+      "collectionGroup": "zalo_link_codes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid",  "order": "ASCENDING" },
+        { "fieldPath": "used", "order": "ASCENDING" },
+        { "fieldPath": "expiresAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "zalo_link_codes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid",  "order": "ASCENDING" },
+        { "fieldPath": "used", "order": "ASCENDING" },
+        { "fieldPath": "expiresAt", "order": "ASCENDING" }
+      ]
+    },
+
+    {
       "collectionGroup": "deliveries",
       "queryScope": "COLLECTION",
       "fields": [
@@ -12,18 +31,17 @@
       "collectionGroup": "deliveries",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "jobId", "order": "ASCENDING" },
-        { "fieldPath": "channel", "order": "ASCENDING" },
-        { "fieldPath": "uid", "order": "ASCENDING" }
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "retryAt", "order": "DESCENDING" }
       ]
     },
     {
-      "collectionGroup": "zalo_link_codes",
+      "collectionGroup": "deliveries",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "uid", "order": "ASCENDING" },
-        { "fieldPath": "used", "order": "ASCENDING" },
-        { "fieldPath": "expiresAt", "order": "DESCENDING" }
+        { "fieldPath": "jobId",   "order": "ASCENDING" },
+        { "fieldPath": "channel", "order": "ASCENDING" },
+        { "fieldPath": "uid",     "order": "ASCENDING" }
       ]
     }
   ],
