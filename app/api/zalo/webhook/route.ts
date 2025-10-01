@@ -1,13 +1,13 @@
 // src/app/api/zalo/webhook/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { db, FieldValue } from "@/src/lib/firebaseAdmin";
+import { db, FieldValue, Timestamp } from "@/src/lib/firebaseAdmin";
 
 export const runtime = "nodejs";           // cần Node để dùng crypto
-export const dynamic = "force-dynamic";    // tránh cache trên edge
+export const dynamic = "force-dynamic";    // tránh cache
 
 const APP_SECRET = process.env.ZALO_APP_SECRET || "";
-const SKIP_SIG = process.env.ZALO_SKIP_SIGNATURE === "1"; // chỉ dùng khi test
+const SKIP_SIG = process.env.ZALO_SKIP_SIGNATURE === "1"; // bật khi debug
 const DEBUG = process.env.ZALO_DEBUG === "1";
 
 function log(...args: any[]) {
@@ -17,13 +17,12 @@ function log(...args: any[]) {
 function verifySignature(raw: string, headerSig?: string | null): boolean {
   if (SKIP_SIG) return true;
   if (!headerSig || !APP_SECRET) return false;
-  // OA có nơi dùng base64, có nơi dùng hex → hỗ trợ cả 2
+  // Hỗ trợ cả hex và base64
   const hex = crypto.createHmac("sha256", APP_SECRET).update(raw).digest("hex");
   const b64 = crypto.createHmac("sha256", APP_SECRET).update(raw).digest("base64");
   return headerSig === hex || headerSig === b64;
 }
 
-// Bắt nhiều biến thể payload OA (v3/v4, events[])
 function extractZaloUserId(body: any): string | null {
   if (body?.sender?.id) return String(body.sender.id);
   if (body?.from?.id) return String(body.from.id);
@@ -54,18 +53,17 @@ function extractText(body: any): string {
 }
 
 function extractLinkCode(text: string): string | null {
-  // hỗ trợ: "link-ABC123", "Link ABC123", "LINK_ABC123", "link: ABC123"
+  // Hỗ trợ: "link-ABC123", "Link ABC123", "LINK_ABC123", "link: ABC123"
   const m = /link[\s:_-]*([A-Za-z0-9]{4,32})/i.exec(text || "");
   return m?.[1] ?? null;
 }
 
 export async function POST(req: NextRequest) {
-  // Lấy raw body để verify chữ ký
   const raw = await req.text();
   const sig = req.headers.get("x-zalo-signature") || req.headers.get("X-Zalo-Signature");
 
   if (!verifySignature(raw, sig)) {
-    log("signature mismatch", { sig });
+    log("signature mismatch", { sigPresent: !!sig });
     return NextResponse.json({ ok: false, error: "invalid_signature" }, { status: 401 });
   }
 
@@ -84,7 +82,7 @@ export async function POST(req: NextRequest) {
 
   // Không đủ dữ liệu → vẫn trả 200 để OA không retry
   if (!zaloUserId || !code) {
-    return NextResponse.json({ ok: true, linked: false, reason: "MISSING_USER_OR_CODE" });
+    return NextResponse.json({ ok: true, linked: false, reason: "MISSING_USER_OR_CODE", text });
   }
 
   const codeRef = db.collection("zalo_link_codes").doc(code);
@@ -96,6 +94,7 @@ export async function POST(req: NextRequest) {
 
       const d = snap.data() as any;
       if (d.used) throw new Error("CODE_USED");
+
       const now = Date.now();
       const expMs = d.expiresAtMs ?? d.expiresAt; // tương thích cũ
       if (expMs && Number(expMs) < now) throw new Error("CODE_EXPIRED");
@@ -108,7 +107,7 @@ export async function POST(req: NextRequest) {
         codeRef,
         {
           used: true,
-          usedAt: FieldValue.serverTimestamp(),
+          usedAt: Timestamp.now(),
           linkedZaloUserId: zaloUserId,
         },
         { merge: true }
@@ -118,7 +117,7 @@ export async function POST(req: NextRequest) {
         db.collection("userNotificationPreferences").doc(uid),
         {
           contact: { zaloUserId },
-          updatedAt: FieldValue.serverTimestamp(),
+          updatedAt: Timestamp.now(),
         },
         { merge: true }
       );
@@ -132,7 +131,20 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// (tùy chọn) OA đôi khi gọi GET để health-check
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+
+  // ?adminPing=1 → test ghi Firestore bằng Admin SDK
+  if (url.searchParams.get("adminPing") === "1") {
+    try {
+      const ref = db.collection("_debug_admin_ping").doc();
+      await ref.set({ at: Timestamp.now(), where: "webhook" });
+      return NextResponse.json({ ok: true, wroteDoc: ref.id });
+    } catch (e: any) {
+      return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
+    }
+  }
+
+  // Healthcheck mặc định
   return NextResponse.json({ ok: true });
 }
