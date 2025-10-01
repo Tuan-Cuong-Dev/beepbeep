@@ -1,90 +1,100 @@
-// app/api/zalo/webhook/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+import { db, FieldValue } from '@/src/lib/firebaseAdmin';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs'; // cần Node để dùng crypto
 
-function safeEqual(a: string, b: string) {
-  const A = Buffer.from(a);
-  const B = Buffer.from(b);
-  return A.length === B.length && crypto.timingSafeEqual(A, B);
+const APP_SECRET = process.env.ZALO_APP_SECRET!;
+const SKIP_SIG = process.env.ZALO_SKIP_SIGNATURE === '1'; // chỉ dùng khi test
+
+function verifySignature(raw: string, headerSig?: string | null): boolean {
+  if (SKIP_SIG) return true;
+  if (!headerSig || !APP_SECRET) return false;
+  const h1 = crypto.createHmac('sha256', APP_SECRET).update(raw).digest('hex');
+  const h2 = crypto.createHmac('sha256', APP_SECRET).update(raw).digest('base64');
+  return headerSig === h1 || headerSig === h2;
+}
+
+function extractZaloUserId(body: any): string | null {
+  return (
+    body?.sender?.id ||
+    body?.from?.id ||
+    body?.user_id ||
+    body?.message?.user_id ||
+    null
+  );
+}
+
+function extractText(body: any): string {
+  return body?.message?.text || body?.message?.content || '';
+}
+
+function extractLinkCode(text: string): string | null {
+  // hỗ trợ: "link-ABC123", "Link ABC123", "LINK_ABC123"
+  const m = /link[\s:_-]*([A-Za-z0-9]{4,32})/i.exec(text);
+  return m?.[1] ?? null;
 }
 
 export async function POST(req: NextRequest) {
+  const raw = await req.text();
+  const sig = req.headers.get('x-zalo-signature') || req.headers.get('X-Zalo-Signature');
+
+  if (!verifySignature(raw, sig)) {
+    console.error('[ZALO] signature mismatch');
+    return NextResponse.json({ ok: false, error: 'invalid_signature' }, { status: 401 });
+  }
+
+  let body: any;
+  try { body = JSON.parse(raw); } catch (e) {
+    console.error('[ZALO] invalid JSON body');
+    return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 });
+  }
+
+  const zaloUserId = extractZaloUserId(body);
+  const text = extractText(body);
+  const code = extractLinkCode(text);
+
+  if (!zaloUserId || !code) {
+    console.warn('[ZALO] missing zaloUserId or code', { zaloUserId, text });
+    return NextResponse.json({ ok: true }); // vẫn 200 để OA không retry, nhưng không liên kết
+  }
+
+  const codeRef = db.collection('zalo_link_codes').doc(code);
+
   try {
-    const secret  = process.env.ZALO_APP_SECRET;
-    const fnBase  = process.env.FUNCTIONS_BASE_URL; // https://asia-southeast1-<project>.cloudfunctions.net
-    const internal = process.env.INTERNAL_WORKER_SECRET;
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(codeRef);
+      if (!snap.exists) throw new Error('INVALID_CODE');
 
-    if (!secret || !fnBase || !internal) {
-      console.error("Missing env", { hasSecret: !!secret, hasFnBase: !!fnBase, hasInternal: !!internal });
-      return new NextResponse("Server misconfigured", { status: 500 });
-    }
+      const d = snap.data() as any;
+      if (d.used) throw new Error('CODE_USED');
+      if (d.expiresAtMs && d.expiresAtMs < Date.now()) throw new Error('CODE_EXPIRED');
 
-    // 1) raw body + signature
-    const raw = await req.text();
-    const sig = (req.headers.get("x-zalo-signature") || "").trim();
-    if (!sig) return new NextResponse("Missing signature", { status: 400 });
+      const uid = d.uid;
+      if (!uid) throw new Error('MISSING_UID');
 
-    const h = crypto.createHmac("sha256", secret);
-    h.update(raw);
-    const hex = h.digest("hex");
-    const b64 = Buffer.from(hex, "hex").toString("base64");
+      // cập nhật code & mapping
+      tx.set(codeRef, {
+        used: true,
+        usedAt: FieldValue.serverTimestamp(),
+        linkedZaloUserId: zaloUserId
+      }, { merge: true });
 
-    const ok = safeEqual(sig.toLowerCase(), hex.toLowerCase()) || safeEqual(sig, b64);
-    if (!ok) return new NextResponse("Invalid signature", { status: 401 });
+      tx.set(db.collection('userNotificationPreferences').doc(uid), {
+        contact: { zaloUserId }
+      }, { merge: true });
+    });
 
-    // 2) parse JSON sau verify
-    const body = JSON.parse(raw);
-    const eventName: string = body?.event_name || body?.event || "unknown";
-
-    // lấy zaloUserId tốt nhất có thể
-    const zaloUserId: string | undefined =
-      body?.sender?.id ||
-      body?.follower?.id ||
-      body?.user_id ||
-      body?.user?.id;
-
-    // 3a) user_send_text với LINK-<code>
-    if (eventName === "user_send_text") {
-      const text: string = body?.message?.text?.trim?.() || "";
-      const m = text.match(/^LINK-([A-Za-z0-9_-]{4,})$/);
-      if (m && zaloUserId) {
-        const code = m[1];
-        await fetch(`${fnBase}/zaloIngest`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "x-internal-secret": internal },
-          body: JSON.stringify({ action: "link", zaloUserId, code, raw: body }),
-        }).catch(() => null);
-      }
-    }
-
-    // 3b) follow
-    if (eventName === "user_follow" && zaloUserId) {
-      await fetch(`${fnBase}/zaloIngest`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-internal-secret": internal },
-        body: JSON.stringify({ action: "follow", zaloUserId, raw: body }),
-      }).catch(() => null);
-    }
-
-    // 3c) unfollow
-    if (eventName === "user_unfollow" && zaloUserId) {
-      await fetch(`${fnBase}/zaloIngest`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-internal-secret": internal },
-        body: JSON.stringify({ action: "unfollow", zaloUserId, raw: body }),
-      }).catch(() => null);
-    }
-
-    return NextResponse.json({ ok: true });
-  } catch (e) {
-    console.error("Webhook error:", e);
-    // Trả 200 để OA không retry dồn dập
-    return NextResponse.json({ ok: true });
+    // (tùy chọn) gửi reply qua OA API nếu bạn muốn — có thể thêm sau
+    return NextResponse.json({ ok: true, linked: true });
+  } catch (err: any) {
+    console.error('[ZALO] link error', err?.message);
+    // vẫn trả 200 để OA không spam retry, kèm reason cho bạn xem log
+    return NextResponse.json({ ok: true, linked: false, reason: String(err?.message || err) });
   }
 }
 
-export function GET() {
-  return new NextResponse("Method Not Allowed", { status: 405 });
+// (tùy chọn) OA đôi khi gọi GET để health-check
+export async function GET() {
+  return NextResponse.json({ ok: true });
 }
