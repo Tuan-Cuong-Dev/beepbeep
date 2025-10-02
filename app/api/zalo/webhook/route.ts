@@ -62,6 +62,13 @@ export async function POST(req: NextRequest) {
   const raw = await req.text();
   const sig = req.headers.get("x-zalo-signature") || req.headers.get("X-Zalo-Signature");
 
+  // Thêm 2 dòng log để soi nhanh
+  console.log('[ZALO] hit', { len: raw.length, hasSig: !!sig });
+  if (!verifySignature(raw, sig)) {
+    console.warn('[ZALO] signature mismatch', { headerSigLen: sig?.length ?? 0 });
+    return NextResponse.json({ ok: false, error: 'invalid_signature' }, { status: 401 });
+  }
+
   // ✅ Cho phép "Kiểm tra" từ portal (thường không có chữ ký và body trống/nhỏ)
   const looksLikePortalPing = !sig && (!raw || raw === "{}" || raw.length < 512);
   if (looksLikePortalPing) {
