@@ -15,12 +15,21 @@ type LinkStatus = {
   expiresAtMs?: number;
 };
 
+async function parseJsonSafe(res: Response) {
+  const text = await res.text();           // đọc thô
+  try { return JSON.parse(text); }         // thử parse JSON
+  catch { return { __nonjson: true, text }; }
+}
+
 export async function getLinkStatus(uid: string) {
-  const r = await fetch(`/api/zalo/status?uid=${encodeURIComponent(uid)}`, {
-    cache: "no-store",         // <- tắt cache browser/Next
-  });
-  const d = await r.json();
-  if (!r.ok || !d?.ok) throw new Error(d?.error || "STATUS_FAILED");
+  const r = await fetch(`/api/zalo/status?uid=${encodeURIComponent(uid)}`, { cache: "no-store" });
+  const d: any = await parseJsonSafe(r);
+
+  if (!r.ok || d?.ok === false) {
+    // ném lỗi rõ nghĩa để UI hiển thị
+    const msg = d?.error || (d?.__nonjson ? `STATUS_NON_JSON(${r.status})` : `STATUS_FAILED(${r.status})`);
+    throw new Error(msg);
+  }
   return d as { ok: true; linked: boolean; zaloUserId?: string; code?: string; expiresAtMs?: number };
 }
 
@@ -51,7 +60,7 @@ export async function ensureLinkCode(
 //  Unlink
 export async function unlinkZalo(uid: string): Promise<void> {
   const secret = process.env.NEXT_PUBLIC_INTERNAL_WORKER_SECRET || "";
-  const res = await fetch("/api/zalo/unlink", {
+  const res = await fetch("/api/admin/zalo/unlink", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -59,9 +68,11 @@ export async function unlinkZalo(uid: string): Promise<void> {
     },
     body: JSON.stringify({ uid }),
   });
-  const data = await res.json();
-  if (!res.ok || !data?.ok) {
-    throw new Error(data?.error || "UNLINK_FAILED");
+
+  const d: any = await parseJsonSafe(res);
+  if (!res.ok || d?.ok !== true) {
+    const msg = d?.error || (d?.__nonjson ? `UNLINK_NON_JSON(${res.status})` : `UNLINK_FAILED(${res.status})`);
+    throw new Error(msg);
   }
 }
 
