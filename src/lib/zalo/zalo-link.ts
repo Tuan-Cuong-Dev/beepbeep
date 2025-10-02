@@ -77,7 +77,7 @@ export async function ensureLinkCode(
 //  Unlink
 export async function unlinkZalo(uid: string): Promise<void> {
   const secret = process.env.NEXT_PUBLIC_INTERNAL_WORKER_SECRET || "";
-  const res = await fetch("/api/admin/zalo/unlink", {
+  const res = await fetch("/api/zalo/unlink", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
