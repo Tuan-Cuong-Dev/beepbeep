@@ -6,6 +6,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const APP_SECRET = process.env.ZALO_APP_SECRET || "";
+const APP_ID     = process.env.ZALO_APP_ID || ""; // "1297631520475149508"
+const ALLOW_UNSIGNED = process.env.ZALO_ACCEPT_NO_SIGNATURE === "1";
 
 function verifySignature(raw: string, headerSig?: string | null): boolean {
   if (!headerSig || !APP_SECRET) return false;
@@ -52,9 +54,6 @@ function extractLinkCode(text: string): string | null {
     const last = tokens.pop();
     if (last && last.length >= 4 && last.length <= 32) return last.toUpperCase();
   }
-  // // Fallback nếu muốn nhận mã trần:
-  // const m2 = /([A-Za-z0-9]{4,32})/.exec(text);
-  // if (m2) return m2[1].toUpperCase();
   return null;
 }
 
@@ -64,28 +63,43 @@ export async function POST(req: NextRequest) {
   const ip  = (req.headers.get("x-forwarded-for") || "").split(",")[0]?.trim() || "unknown";
   const ua  = req.headers.get("user-agent") || "";
 
-  // Log mọi request vào webhook (hỗ trợ debug)
-  console.log("[ZALO] hit", { ip, len: raw.length, hasSig: !!sig, ua });
+  // Parse JSON SỚM để phân biệt ping vs event
+  let body: any = {};
+  try { body = raw ? JSON.parse(raw) : {}; } catch { /* body = {} */ }
 
-  // ✅ Cho phép “Kiểm tra” từ portal (thường không có chữ ký, body rất nhỏ)
-  const looksLikePortalPing = !sig && (!raw || raw === "{}" || raw.length < 512);
-  if (looksLikePortalPing) {
+  const eventName = String(body?.event_name || "");
+  const hasMessage =
+    !!body?.message?.text ||
+    eventName === "user_send_text" ||
+    (Array.isArray(body?.events) && body.events.some((e: any) => e?.message?.text || e?.event_name === "user_send_text"));
+
+  console.log("[ZALO] hit", { ip, len: raw.length, hasSig: !!sig, ua, eventName, hasMessage });
+
+  // ✅ Portal "Kiểm tra": không chữ ký và KHÔNG có message/event_name
+  const isPortalPing = !sig && !hasMessage;
+  if (isPortalPing) {
     console.log("[ZALO] portal ping OK");
     return NextResponse.json({ ok: true, ping: "zalo-portal" });
   }
 
-  // Các request thật bắt buộc chữ ký
-  if (!verifySignature(raw, sig)) {
-    console.warn("[ZALO] signature mismatch");
-    return NextResponse.json({ ok: false, error: "invalid_signature" }, { status: 401 });
-  }
-
-  // Parse JSON
-  let body: any;
-  try { body = raw ? JSON.parse(raw) : {}; }
-  catch {
-    console.warn("[ZALO] invalid json");
-    return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
+  // ✅ Event thật:
+  // 1) Có chữ ký ⇒ bắt buộc khớp
+  if (sig) {
+    if (!verifySignature(raw, sig)) {
+      console.warn("[ZALO] signature mismatch");
+      return NextResponse.json({ ok: false, error: "invalid_signature" }, { status: 401 });
+    }
+  } else {
+    // 2) Không chữ ký ⇒ chỉ chấp nhận khi mở cờ QA và app_id đúng
+    if (!ALLOW_UNSIGNED) {
+      console.warn("[ZALO] unsigned event rejected");
+      return NextResponse.json({ ok: false, error: "missing_signature" }, { status: 401 });
+    }
+    if (APP_ID && String(body?.app_id || "") !== APP_ID) {
+      console.warn("[ZALO] unsigned event app_id mismatch", { got: body?.app_id, expect: APP_ID });
+      return NextResponse.json({ ok: false, error: "app_id_mismatch" }, { status: 401 });
+    }
+    console.log("[ZALO] unsigned event accepted (guarded by APP_ID)");
   }
 
   const zaloUserId = extractZaloUserId(body);
@@ -113,17 +127,8 @@ export async function POST(req: NextRequest) {
       const uid = d.uid;
       if (!uid) throw new Error("MISSING_UID");
 
-      // Cập nhật code + ánh xạ user
-      tx.set(
-        codeRef,
-        { used: true, usedAt: Timestamp.now(), linkedZaloUserId: zaloUserId },
-        { merge: true }
-      );
-      tx.set(
-        db.collection("userNotificationPreferences").doc(uid),
-        { contact: { zaloUserId }, updatedAt: Timestamp.now() },
-        { merge: true }
-      );
+      tx.set(codeRef, { used: true, usedAt: Timestamp.now(), linkedZaloUserId: zaloUserId }, { merge: true });
+      tx.set(db.collection("userNotificationPreferences").doc(uid), { contact: { zaloUserId }, updatedAt: Timestamp.now() }, { merge: true });
     });
 
     return NextResponse.json({ ok: true, linked: true });
