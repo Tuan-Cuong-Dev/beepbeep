@@ -43,10 +43,27 @@ function extractText(body: any): string {
   return "";
 }
 
+// Thay thế hàm cũ bằng hàm dưới
 function extractLinkCode(text: string): string | null {
-  const m = /link[\s:_-]*([A-Za-z0-9]{4,32})/i.exec(text || "");
-  return m?.[1] ?? null;
+  if (!text) return null;
+
+  // 1) Ưu tiên chuỗi sau "link" (link-ABCD, LINK: ABCD, link__ABCD, link-LINK-ABCD, ...)
+  const m = /link[\s:_-]*([A-Za-z0-9][A-Za-z0-9-_]*)/i.exec(text);
+  if (m && m[1]) {
+    // tách theo ký tự không phải a-z0-9, lấy token CUỐI
+    const tokens = m[1].split(/[^A-Za-z0-9]+/).filter(Boolean);
+    const last = tokens.pop();
+    if (last && last.length >= 4 && last.length <= 32) return last.toUpperCase();
+  }
+
+  // 2) (tuỳ chọn) fallback: nếu user chỉ gửi "ABCD12" không có "link"
+  // bật nếu bạn muốn chấp nhận cả mã trần
+  // const m2 = /([A-Za-z0-9]{4,32})/.exec(text);
+  // if (m2) return m2[1].toUpperCase();
+
+  return null;
 }
+
 
 export async function POST(req: NextRequest) {
   const raw = await req.text();
