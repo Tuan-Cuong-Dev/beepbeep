@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { db, FieldValue, Timestamp } from "@/src/lib/firebaseAdmin";
+import { db, Timestamp } from "@/src/lib/firebaseAdmin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,37 +43,42 @@ function extractText(body: any): string {
   return "";
 }
 
-// Thay thế hàm cũ bằng hàm dưới
+// Lấy token CUỐI sau "link", chấp nhận "link-LINK-XXXX"
 function extractLinkCode(text: string): string | null {
   if (!text) return null;
-
-  // 1) Ưu tiên chuỗi sau "link" (link-ABCD, LINK: ABCD, link__ABCD, link-LINK-ABCD, ...)
   const m = /link[\s:_-]*([A-Za-z0-9][A-Za-z0-9-_]*)/i.exec(text);
   if (m && m[1]) {
-    // tách theo ký tự không phải a-z0-9, lấy token CUỐI
     const tokens = m[1].split(/[^A-Za-z0-9]+/).filter(Boolean);
     const last = tokens.pop();
     if (last && last.length >= 4 && last.length <= 32) return last.toUpperCase();
   }
-
-  // 2) (tuỳ chọn) fallback: nếu user chỉ gửi "ABCD12" không có "link"
-  // bật nếu bạn muốn chấp nhận cả mã trần
+  // // Fallback nếu muốn nhận mã trần (không có "link"):
   // const m2 = /([A-Za-z0-9]{4,32})/.exec(text);
   // if (m2) return m2[1].toUpperCase();
-
   return null;
 }
-
 
 export async function POST(req: NextRequest) {
   const raw = await req.text();
   const sig = req.headers.get("x-zalo-signature") || req.headers.get("X-Zalo-Signature");
+
+  // ✅ Cho phép "Kiểm tra" từ portal (thường không có chữ ký và body trống/nhỏ)
+  const looksLikePortalPing = !sig && (!raw || raw === "{}" || raw.length < 512);
+  if (looksLikePortalPing) {
+    return NextResponse.json({ ok: true, ping: "zalo-portal" });
+  }
+
+  // Các request thật bắt buộc chữ ký
   if (!verifySignature(raw, sig)) {
     return NextResponse.json({ ok: false, error: "invalid_signature" }, { status: 401 });
   }
 
   let body: any;
-  try { body = JSON.parse(raw); } catch { return NextResponse.json({ ok:false, error:"invalid_json" }, { status: 400 }); }
+  try {
+    body = raw ? JSON.parse(raw) : {};
+  } catch {
+    return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
+  }
 
   const zaloUserId = extractZaloUserId(body);
   const text = extractText(body);
@@ -93,15 +98,23 @@ export async function POST(req: NextRequest) {
       const d = snap.data() as any;
       if (d.used) throw new Error("CODE_USED");
 
-      const now = Date.now();
       const expMs = d.expiresAtMs ?? d.expiresAt;
-      if (expMs && Number(expMs) < now) throw new Error("CODE_EXPIRED");
+      if (expMs && Number(expMs) < Date.now()) throw new Error("CODE_EXPIRED");
 
       const uid = d.uid;
       if (!uid) throw new Error("MISSING_UID");
 
-      tx.set(codeRef, { used: true, usedAt: Timestamp.now(), linkedZaloUserId: zaloUserId }, { merge: true });
-      tx.set(db.collection("userNotificationPreferences").doc(uid), { contact: { zaloUserId }, updatedAt: Timestamp.now() }, { merge: true });
+      // Cập nhật code + mapping user
+      tx.set(
+        codeRef,
+        { used: true, usedAt: Timestamp.now(), linkedZaloUserId: zaloUserId },
+        { merge: true }
+      );
+      tx.set(
+        db.collection("userNotificationPreferences").doc(uid),
+        { contact: { zaloUserId }, updatedAt: Timestamp.now() },
+        { merge: true }
+      );
     });
 
     return NextResponse.json({ ok: true, linked: true });
@@ -111,6 +124,5 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  // Healthcheck đơn giản
   return NextResponse.json({ ok: true });
 }
