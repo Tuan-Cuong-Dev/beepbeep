@@ -43,7 +43,7 @@ function extractText(body: any): string {
   return "";
 }
 
-// Lấy token CUỐI sau "link", chấp nhận "link-LINK-XXXX"
+// Lấy token CUỐI sau "link", chấp nhận cả "link-LINK-XXXX"
 function extractLinkCode(text: string): string | null {
   if (!text) return null;
   const m = /link[\s:_-]*([A-Za-z0-9][A-Za-z0-9-_]*)/i.exec(text);
@@ -52,7 +52,7 @@ function extractLinkCode(text: string): string | null {
     const last = tokens.pop();
     if (last && last.length >= 4 && last.length <= 32) return last.toUpperCase();
   }
-  // // Fallback nếu muốn nhận mã trần (không có "link"):
+  // // Fallback nếu muốn nhận mã trần:
   // const m2 = /([A-Za-z0-9]{4,32})/.exec(text);
   // if (m2) return m2[1].toUpperCase();
   return null;
@@ -61,34 +61,36 @@ function extractLinkCode(text: string): string | null {
 export async function POST(req: NextRequest) {
   const raw = await req.text();
   const sig = req.headers.get("x-zalo-signature") || req.headers.get("X-Zalo-Signature");
+  const ip  = (req.headers.get("x-forwarded-for") || "").split(",")[0]?.trim() || "unknown";
+  const ua  = req.headers.get("user-agent") || "";
 
-  // Thêm 2 dòng log để soi nhanh
-  console.log('[ZALO] hit', { len: raw.length, hasSig: !!sig });
-  if (!verifySignature(raw, sig)) {
-    console.warn('[ZALO] signature mismatch', { headerSigLen: sig?.length ?? 0 });
-    return NextResponse.json({ ok: false, error: 'invalid_signature' }, { status: 401 });
-  }
+  // Log mọi request vào webhook (hỗ trợ debug)
+  console.log("[ZALO] hit", { ip, len: raw.length, hasSig: !!sig, ua });
 
-  // ✅ Cho phép "Kiểm tra" từ portal (thường không có chữ ký và body trống/nhỏ)
+  // ✅ Cho phép “Kiểm tra” từ portal (thường không có chữ ký, body rất nhỏ)
   const looksLikePortalPing = !sig && (!raw || raw === "{}" || raw.length < 512);
   if (looksLikePortalPing) {
+    console.log("[ZALO] portal ping OK");
     return NextResponse.json({ ok: true, ping: "zalo-portal" });
   }
 
   // Các request thật bắt buộc chữ ký
   if (!verifySignature(raw, sig)) {
+    console.warn("[ZALO] signature mismatch");
     return NextResponse.json({ ok: false, error: "invalid_signature" }, { status: 401 });
   }
 
+  // Parse JSON
   let body: any;
-  try {
-    body = raw ? JSON.parse(raw) : {};
-  } catch {
+  try { body = raw ? JSON.parse(raw) : {}; }
+  catch {
+    console.warn("[ZALO] invalid json");
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
   const zaloUserId = extractZaloUserId(body);
   const text = extractText(body);
+  console.log("[ZALO] message", (text || "").slice(0, 80));
   const code = extractLinkCode(text);
 
   if (!zaloUserId || !code) {
@@ -111,7 +113,7 @@ export async function POST(req: NextRequest) {
       const uid = d.uid;
       if (!uid) throw new Error("MISSING_UID");
 
-      // Cập nhật code + mapping user
+      // Cập nhật code + ánh xạ user
       tx.set(
         codeRef,
         { used: true, usedAt: Timestamp.now(), linkedZaloUserId: zaloUserId },
@@ -126,6 +128,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, linked: true });
   } catch (err: any) {
+    console.warn("[ZALO] link error", err?.message || err);
     return NextResponse.json({ ok: true, linked: false, reason: String(err?.message || err) });
   }
 }
