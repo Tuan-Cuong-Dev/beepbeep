@@ -73,3 +73,21 @@ export async function ensureLinkCode(
   if (!expiresAtMs) throw new Error("Thiếu expiresAt từ server");
   return { code, expiresAtMs };
 }
+
+//  Unlink
+export async function unlinkZalo(uid: string): Promise<void> {
+  const secret = process.env.NEXT_PUBLIC_INTERNAL_WORKER_SECRET || "";
+  const res = await fetch("/api/admin/zalo/unlink", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-internal-secret": secret,
+    },
+    body: JSON.stringify({ uid }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data?.ok) {
+    throw new Error(data?.error || "UNLINK_FAILED");
+  }
+}
+

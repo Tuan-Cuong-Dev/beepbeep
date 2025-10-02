@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Copy, Link2, MessageSquareText, Loader } from 'lucide-react';
+import { Copy, Link2, MessageSquareText, Loader, Unlink as UnlinkIcon } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
-import { getLinkStatus, ensureLinkCode } from '@/src/lib/zalo-link';
+import { getLinkStatus, ensureLinkCode, unlinkZalo } from '@/src/lib/zalo/zalo-link'; // NEW
 import { enqueueNotification } from '@/src/lib/notify';
 
 type Props = { uid: string; templateId?: string };
@@ -14,6 +14,13 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
   const [code, setCode] = useState<string | null>(null);
   const [expiresAtMs, setExpiresAtMs] = useState<number | undefined>(undefined);
   const [msg, setMsg] = useState<string | null>(null);
+
+  // NEW: tick mỗi giây để TTL hiển thị “sống”
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   // tải trạng thái ban đầu
   useEffect(() => {
@@ -82,14 +89,33 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
     }
   };
 
+  // NEW: unlink
+  const doUnlink = async () => {
+    if (!uid) return;
+    if (!confirm('Hủy liên kết Zalo với tài khoản này?')) return;
+    setLoading(true);
+    setMsg(null);
+    try {
+      await unlinkZalo(uid);
+      setZaloId(null);
+      setCode(null);
+      setExpiresAtMs(undefined);
+      setMsg('Đã hủy liên kết. Tạo mã mới để liên kết lại.');
+    } catch (e: any) {
+      setMsg(e?.message || 'Không hủy liên kết được');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const ttlLabel = useMemo(() => {
     if (!expiresAtMs) return '';
-    const remain = expiresAtMs - Date.now();
+    const remain = expiresAtMs - now; // NEW: dùng now thay vì Date.now() trực tiếp
     if (remain <= 0) return 'Hết hạn — tạo mã mới';
     const m = Math.floor(remain / 60000);
     const s = Math.floor((remain % 60000) / 1000);
     return `Hết hạn sau ${m}m${s.toString().padStart(2, '0')}s`;
-  }, [expiresAtMs]);
+  }, [expiresAtMs, now]); // NEW: phụ thuộc now
 
   return (
     <div className="bg-white border rounded-xl p-4 space-y-3">
@@ -135,10 +161,22 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
         <Button onClick={sendTest} disabled={loading || !uid}>
           Gửi thử qua Zalo
         </Button>
+
         {zaloId && (
-          <span className="text-xs text-gray-500">
-            zaloUserId: <b>{zaloId}</b>
-          </span>
+          <>
+            <span className="text-xs text-gray-500">
+              zaloUserId: <b>{zaloId}</b>
+            </span>
+            <Button
+              variant="outline"
+              onClick={doUnlink}
+              disabled={loading}
+              className="ml-auto"
+              title="Hủy liên kết Zalo (QA)"
+            >
+              <UnlinkIcon className="w-4 h-4 mr-2" /> Hủy liên kết
+            </Button>
+          </>
         )}
       </div>
 
