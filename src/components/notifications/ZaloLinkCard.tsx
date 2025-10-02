@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { Copy, Link2, MessageSquareText, Loader, Unlink as UnlinkIcon } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Copy, Link2, MessageSquareText, Loader, Unlink as UnlinkIcon, RefreshCw } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
-import { getLinkStatus, ensureLinkCode, unlinkZalo } from '@/src/lib/zalo/zalo-link'; // NEW
+import { getLinkStatus, ensureLinkCode, unlinkZalo } from '@/src/lib/zalo/zalo-link';
 import { enqueueNotification } from '@/src/lib/notify';
 
 type Props = { uid: string; templateId?: string };
@@ -15,38 +15,64 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
   const [expiresAtMs, setExpiresAtMs] = useState<number | undefined>(undefined);
   const [msg, setMsg] = useState<string | null>(null);
 
-  // NEW: tick mỗi giây để TTL hiển thị “sống”
+  // đồng hồ 1s cho countdown TTL
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // tải trạng thái ban đầu
-  useEffect(() => {
+  // ---- helpers ----
+  const refreshStatus = useCallback(async () => {
     if (!uid) return;
-    (async () => {
-      setLoading(true);
-      setMsg(null);
-      try {
-        const st = await getLinkStatus(uid);
-        if (st.linked) {
-          setZaloId(st.zaloUserId ?? null);
-          setCode(null);
-          setExpiresAtMs(undefined);
-        } else {
-          setZaloId(null);
-          setCode(st.code ?? null);
-          setExpiresAtMs(st.expiresAtMs);
-        }
-      } catch (e: any) {
-        setMsg(e?.message || 'Không tải được trạng thái liên kết');
-      } finally {
-        setLoading(false);
+    try {
+      const st = await getLinkStatus(uid);
+      if (st.linked) {
+        setZaloId(st.zaloUserId ?? null);
+        setCode(null);
+        setExpiresAtMs(undefined);
+      } else {
+        setZaloId(null);
+        setCode(st.code ?? null);
+        setExpiresAtMs(st.expiresAtMs);
       }
-    })();
+    } catch (e: any) {
+      setMsg(e?.message || 'Không tải được trạng thái liên kết');
+    }
   }, [uid]);
 
+  // tải trạng thái lần đầu
+  useEffect(() => {
+    if (!uid) return;
+    setLoading(true);
+    setMsg(null);
+    refreshStatus().finally(() => setLoading(false));
+  }, [uid, refreshStatus]);
+
+  // auto-poll mỗi 2s đến khi linked hoặc hết hạn (tối đa ~2 phút)
+  useEffect(() => {
+    if (zaloId || !code || !expiresAtMs) return;
+    let stopped = false;
+    let tries = 0;
+
+    const tick = async () => {
+      if (stopped) return;
+      await refreshStatus();
+      tries++;
+      const expired = expiresAtMs <= Date.now();
+      if (!zaloId && !expired && tries < 60) {
+        setTimeout(tick, 2000);
+      }
+    };
+
+    const id = setTimeout(tick, 2000);
+    return () => {
+      stopped = true;
+      clearTimeout(id);
+    };
+  }, [zaloId, code, expiresAtMs, refreshStatus]);
+
+  // ---- actions ----
   const genCode = async () => {
     if (!uid) return;
     setLoading(true);
@@ -55,6 +81,7 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
       const { code, expiresAtMs } = await ensureLinkCode(uid, 10); // TTL 10'
       setCode(code);
       setExpiresAtMs(expiresAtMs);
+      setZaloId(null);
       setMsg('Đã tạo mã. Mở Zalo, vào OA và gửi: LINK-' + code);
     } catch (e: any) {
       setMsg(e?.message || 'Không tạo được mã');
@@ -89,7 +116,6 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
     }
   };
 
-  // NEW: unlink
   const doUnlink = async () => {
     if (!uid) return;
     if (!confirm('Hủy liên kết Zalo với tài khoản này?')) return;
@@ -101,6 +127,8 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
       setCode(null);
       setExpiresAtMs(undefined);
       setMsg('Đã hủy liên kết. Tạo mã mới để liên kết lại.');
+      // refetch để chắc chắn
+      await refreshStatus();
     } catch (e: any) {
       setMsg(e?.message || 'Không hủy liên kết được');
     } finally {
@@ -110,18 +138,28 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
 
   const ttlLabel = useMemo(() => {
     if (!expiresAtMs) return '';
-    const remain = expiresAtMs - now; // NEW: dùng now thay vì Date.now() trực tiếp
+    const remain = expiresAtMs - now;
     if (remain <= 0) return 'Hết hạn — tạo mã mới';
     const m = Math.floor(remain / 60000);
     const s = Math.floor((remain % 60000) / 1000);
     return `Hết hạn sau ${m}m${s.toString().padStart(2, '0')}s`;
-  }, [expiresAtMs, now]); // NEW: phụ thuộc now
+  }, [expiresAtMs, now]);
 
+  // ---- UI ----
   return (
     <div className="bg-white border rounded-xl p-4 space-y-3">
       <div className="flex items-center gap-2">
         <MessageSquareText className="w-5 h-5 text-sky-600" />
         <h3 className="font-semibold">Zalo</h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="ml-auto"
+          onClick={() => { setLoading(true); refreshStatus().finally(() => setLoading(false)); }}
+          title="Làm mới"
+        >
+          <RefreshCw className="w-4 h-4 mr-2" /> Làm mới
+        </Button>
       </div>
 
       {loading && (

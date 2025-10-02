@@ -15,41 +15,15 @@ type LinkStatus = {
   expiresAtMs?: number;
 };
 
-export async function getLinkStatus(uid: string): Promise<LinkStatus> {
-  if (!uid) throw new Error("Missing uid");
-
-  // 1) đã map?
-  const pref = await getDoc(doc(db, "userNotificationPreferences", uid));
-  const zaloUserId = pref.exists() ? (pref.data()?.contact?.zaloUserId ?? null) : null;
-  if (zaloUserId) return { linked: true, zaloUserId };
-
-  // 2) chưa map → lấy mã còn hạn gần nhất
-  const snap = await getDocs(query(
-    collection(db, "zalo_link_codes"),
-    where("uid", "==", uid),
-    where("used", "==", false),
-    orderBy("expiresAtMs", "desc"),
-    limit(1)
-  ));
-
-  if (snap.empty) return { linked: false, code: null, expiresAtMs: undefined };
-
-  const d = snap.docs[0].data() as {
-    code?: string;
-    expiresAt?: number | Timestamp;
-    expiresAtMs?: number | Timestamp;
-  };
-
-  const expiresAtMs =
-    d.expiresAtMs instanceof Timestamp ? d.expiresAtMs.toMillis()
-    : d.expiresAt      instanceof Timestamp ? d.expiresAt.toMillis()
-    : typeof d.expiresAtMs === "number"      ? d.expiresAtMs
-    : typeof d.expiresAt === "number"        ? d.expiresAt
-    : undefined;
-
-  const code = d.code ?? snap.docs[0].id;
-  return { linked: false, code, expiresAtMs };
+export async function getLinkStatus(uid: string) {
+  const r = await fetch(`/api/zalo/status?uid=${encodeURIComponent(uid)}`, {
+    cache: "no-store",         // <- tắt cache browser/Next
+  });
+  const d = await r.json();
+  if (!r.ok || !d?.ok) throw new Error(d?.error || "STATUS_FAILED");
+  return d as { ok: true; linked: boolean; zaloUserId?: string; code?: string; expiresAtMs?: number };
 }
+
 
 export async function ensureLinkCode(
   uid: string,
