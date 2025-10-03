@@ -17,8 +17,6 @@ import { useState } from 'react';
 export default function MessagesPage() {
   const { user } = useUser();
   const { t } = useTranslation('common');
-
-  // Invitations hook
   const {
     invitations,
     loading: invitationLoading,
@@ -53,94 +51,124 @@ export default function MessagesPage() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
-      <main className="flex-1 px-6 py-10 max-w-6xl mx-auto space-y-12">
-        <h1 className="text-3xl font-bold text-center text-gray-800">
-          {t('messages_page.title')}
-        </h1>
-
-        {/* Invitations */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-700">
-            {t('messages_page.invitations_title')}
-          </h2>
-
-          {invitationLoading ? (
-            <div className="flex justify-center items-center gap-2 py-8 text-gray-500">
-              <Loader className="animate-spin w-5 h-5" />
-              <span>{t('messages_page.loading_invitations')}</span>
-            </div>
-          ) : invitations.length === 0 ? (
-            <p className="text-gray-500">{t('messages_page.no_invitations')}</p>
-          ) : (
-            <div className="space-y-4">
-              {invitations.map((invite) => {
-                const isActioning = actionLoadingId === invite.id;
-                return (
-                  <div
-                    key={invite.id}
-                    className="bg-white shadow rounded-xl p-4 border space-y-2"
-                  >
-                    <p className="text-sm text-gray-700">{invite.content}</p>
-                    <div className="text-sm text-gray-500">
-                      {t('messages_page.role_label')}: <b>{invite.role}</b>
-                    </div>
-                    <div className="flex gap-2">
-                      {invite.status === 'pending' ? (
-                        <>
-                          <Button
-                            onClick={() => handleAccept(invite)}
-                            disabled={isActioning}
-                          >
-                            {isActioning ? (
-                              <span className="flex items-center gap-2">
-                                <Loader className="animate-spin w-4 h-4" />
-                                {t('messages_page.processing')}
-                              </span>
-                            ) : (
-                              t('messages_page.accept')
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleReject(invite.id!)}
-                            disabled={isActioning}
-                          >
-                            {t('messages_page.reject')}
-                          </Button>
-                        </>
-                      ) : (
-                        <p
-                          className={
-                            invite.status === 'accepted'
-                              ? 'text-green-600 text-sm'
-                              : 'text-red-600 text-sm'
-                          }
-                        >
-                          {t(`messages_page.${invite.status}_message`)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {/* Notifications Center */}
-        <section className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <h2 className="text-xl font-semibold text-gray-700 mb-3">
-            {t('messages_page.notifications_title')}
-          </h2>
-          <NotificationCenter />
+      <main className="flex-1">
+        {/* Page header */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            {t('messages_page.title')}
+          </h1>
         </div>
 
-        <div className="md:col-span-1 space-y-6">
-          {/* 👉 Thêm card Zalo ở đây */}
-          {user?.uid && <ZaloLinkCard uid={user.uid} />}
+        {/* Content layout: 2 columns on desktop; stacked on mobile */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left: Invitations + Notifications */}
+            <div className="lg:col-span-8 space-y-8">
+              {/* Invitations */}
+              <section className="rounded-2xl border bg-white shadow-sm">
+                <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+                    {t('messages_page.invitations_title')}
+                  </h2>
+                </div>
+
+                <div className="px-4 sm:px-5 py-4">
+                  {invitationLoading ? (
+                    <div className="flex justify-center items-center gap-2 py-8 text-gray-500">
+                      <Loader className="animate-spin w-5 h-5" />
+                      <span>{t('messages_page.loading_invitations')}</span>
+                    </div>
+                  ) : invitations.length === 0 ? (
+                    <p className="text-gray-500">{t('messages_page.no_invitations')}</p>
+                  ) : (
+                    <ul className="space-y-4">
+                      {invitations.map((invite) => {
+                        const isActioning = actionLoadingId === invite.id;
+                        return (
+                          <li
+                            key={invite.id}
+                            className="rounded-xl border bg-white/80 p-4 sm:p-5"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-sm text-gray-800 break-words">
+                                {invite.content}
+                              </p>
+                              <div className="mt-1 text-xs text-gray-500">
+                                {t('messages_page.role_label')}: <b>{invite.role}</b>
+                              </div>
+                            </div>
+
+                            <div className="mt-3 flex flex-col sm:flex-row gap-2 sm:items-center">
+                              {invite.status === 'pending' ? (
+                                <>
+                                  <Button
+                                    className="sm:w-auto"
+                                    onClick={() => handleAccept(invite)}
+                                    disabled={isActioning}
+                                  >
+                                    {isActioning ? (
+                                      <span className="flex items-center gap-2">
+                                        <Loader className="animate-spin w-4 h-4" />
+                                        {t('messages_page.processing')}
+                                      </span>
+                                    ) : (
+                                      t('messages_page.accept')
+                                    )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    className="sm:w-auto"
+                                    onClick={() => handleReject(invite.id!)}
+                                    disabled={isActioning}
+                                  >
+                                    {t('messages_page.reject')}
+                                  </Button>
+                                </>
+                              ) : (
+                                <p
+                                  className={
+                                    invite.status === 'accepted'
+                                      ? 'text-green-600 text-sm'
+                                      : 'text-red-600 text-sm'
+                                  }
+                                >
+                                  {t(`messages_page.${invite.status}_message`)}
+                                </p>
+                              )}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+              </section>
+
+              {/* Notifications Center */}
+              <section className="rounded-2xl border bg-white shadow-sm">
+                <div className="px-4 sm:px-5 py-4 border-b">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+                    {t('messages_page.notifications_title')}
+                  </h2>
+                </div>
+                <div className="px-2 sm:px-4 py-4">
+                  {/* Wrap to keep inner list aligned with card edges */}
+                  <NotificationCenter />
+                </div>
+              </section>
+            </div>
+
+            {/* Right: Sidebar (sticky on large screens) */}
+            <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 self-start">
+              {user?.uid && (
+                <ZaloLinkCard uid={user.uid} />
+              )}
+
+              {/* You can place more cards here later
+              <OptInPreferencesForm /> */}
+            </aside>
+          </div>
         </div>
-      </section>
       </main>
 
       <Footer />
