@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Copy, Link2, MessageSquareText, Loader, Unlink as UnlinkIcon, RefreshCw } from 'lucide-react';
+import {
+  Copy, Link2, MessageSquareText, Loader, Unlink as UnlinkIcon, RefreshCw, Send
+} from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { getLinkStatus, ensureLinkCode, unlinkZalo } from '@/src/lib/zalo/zalo-link';
 import { enqueueNotification } from '@/src/lib/notify';
@@ -127,7 +129,6 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
       setCode(null);
       setExpiresAtMs(undefined);
       setMsg('Đã hủy liên kết. Tạo mã mới để liên kết lại.');
-      // refetch để chắc chắn
       await refreshStatus();
     } catch (e: any) {
       setMsg(e?.message || 'Không hủy liên kết được');
@@ -145,80 +146,125 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
     return `Hết hạn sau ${m}m${s.toString().padStart(2, '0')}s`;
   }, [expiresAtMs, now]);
 
-  // ---- UI ----
+  // ---- sub components ----
+  const StatusBadge = ({ linked }: { linked: boolean }) => (
+    <span
+      className={[
+        'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium',
+        linked
+          ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+          : 'border-amber-200 bg-amber-50 text-amber-700',
+      ].join(' ')}
+    >
+      <span
+        className={[
+          'h-1.5 w-1.5 rounded-full',
+          linked ? 'bg-emerald-500' : 'bg-amber-500',
+        ].join(' ')}
+      />
+      {linked ? 'ĐÃ LIÊN KẾT' : 'CHƯA LIÊN KẾT'}
+    </span>
+  );
+
   return (
-    <div className="bg-white border rounded-xl p-4 space-y-3">
-      <div className="flex items-center gap-2">
-        <MessageSquareText className="w-5 h-5 text-sky-600" />
-        <h3 className="font-semibold">Zalo</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="ml-auto"
-          onClick={() => { setLoading(true); refreshStatus().finally(() => setLoading(false)); }}
-          title="Làm mới"
-        >
-          <RefreshCw className="w-4 h-4 mr-2" /> Làm mới
-        </Button>
+    <div className="rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="rounded-xl bg-sky-50 p-2">
+          <MessageSquareText className="h-5 w-5 text-sky-600" />
+        </div>
+        <div className="min-w-0">
+          <h3 className="text-base font-semibold text-slate-800">Zalo</h3>
+          <p className="text-xs text-slate-500">Liên kết tài khoản Zalo với hồ sơ của bạn</p>
+        </div>
+
+        <div className="ml-auto flex items-center gap-2">
+          <StatusBadge linked={!!zaloId} />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-1"
+            title="Làm mới"
+            onClick={() => {
+              setLoading(true);
+              refreshStatus().finally(() => setLoading(false));
+            }}
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
+      {/* Loading line */}
       {loading && (
-        <p className="text-sm text-gray-500 flex items-center gap-2">
-          <Loader className="w-4 h-4 animate-spin" /> Đang xử lý…
-        </p>
-      )}
-
-      <div className="text-sm text-gray-700">
-        Trạng thái:{' '}
-        {zaloId ? (
-          <span className="text-green-700">ĐÃ LIÊN KẾT</span>
-        ) : (
-          <span className="text-amber-700">CHƯA LIÊN KẾT</span>
-        )}
-      </div>
-
-      {!zaloId && (
-        <div className="rounded-lg bg-slate-50 border p-3 space-y-2">
-          <div className="text-sm">Bước 1: Tạo mã liên kết</div>
-          <div className="flex gap-2">
-            <Button onClick={genCode} disabled={loading}>
-              <Link2 className="w-4 h-4 mr-2" /> Tạo mã
-            </Button>
-            <Button variant="ghost" onClick={copyCode} disabled={!code}>
-              <Copy className="w-4 h-4 mr-2" /> Copy LINK-{code ?? '------'}
-            </Button>
-          </div>
-          <div className="text-xs text-gray-500">
-            Bước 2: Mở Zalo → chat với OA → gửi tin: <b>LINK-{code ?? 'MÃ'}</b>.
-            Webhook sẽ tự map tài khoản. {ttlLabel && <span>({ttlLabel})</span>}
-          </div>
+        <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+          <Loader className="h-4 w-4 animate-spin" />
+          <span>Đang xử lý…</span>
         </div>
       )}
 
-      <div className="flex gap-2 items-center">
-        <Button onClick={sendTest} disabled={loading || !uid}>
-          Gửi thử qua Zalo
-        </Button>
+      {/* Body */}
+      <div className="mt-4 space-y-4">
+        {!zaloId && (
+          <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <div className="mb-3 text-sm font-medium text-slate-700">Bước 1 · Tạo mã liên kết</div>
 
-        {zaloId && (
-          <>
-            <span className="text-xs text-gray-500">
-              zaloUserId: <b>{zaloId}</b>
-            </span>
-            <Button
-              variant="outline"
-              onClick={doUnlink}
-              disabled={loading}
-              className="ml-auto"
-              title="Hủy liên kết Zalo (QA)"
-            >
-              <UnlinkIcon className="w-4 h-4 mr-2" /> Hủy liên kết
-            </Button>
-          </>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <Button onClick={genCode} disabled={loading} className="sm:w-auto">
+                <Link2 className="mr-2 h-4 w-4" /> Tạo mã
+              </Button>
+
+              <div className="flex flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2">
+                <code className="flex-1 truncate font-mono text-sm text-slate-800">
+                  {code ? `LINK-${code}` : 'LINK-········'}
+                </code>
+                <Button variant="ghost" size="sm" onClick={copyCode} disabled={!code}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy
+                </Button>
+              </div>
+            </div>
+
+            <p className="mt-2 text-xs text-slate-500">
+              Bước 2 · Mở Zalo → Chat với OA → gửi tin: <b>LINK-{code ?? 'MÃ'}</b>.
+              Webhook sẽ tự map tài khoản. {ttlLabel && <span>({ttlLabel})</span>}
+            </p>
+          </div>
+        )}
+
+        {/* Action row */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Button onClick={sendTest} disabled={loading || !uid} className="sm:w-auto">
+            <Send className="mr-2 h-4 w-4" />
+            Gửi thử qua Zalo
+          </Button>
+
+          {zaloId && (
+            <div className="flex w-full flex-1 items-center gap-2">
+              <div className="flex-1 truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                <span className="mr-1 text-slate-500">zaloUserId:</span>
+                <b className="font-mono">{zaloId}</b>
+              </div>
+
+              <Button
+                variant="outline"
+                onClick={doUnlink}
+                disabled={loading}
+                title="Hủy liên kết Zalo"
+                className="border-red-200 text-red-600 hover:bg-red-50"
+              >
+                <UnlinkIcon className="mr-2 h-4 w-4" /> Hủy liên kết
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {msg && (
+          <p className="text-xs text-slate-600" aria-live="polite">
+            {msg}
+          </p>
         )}
       </div>
-
-      {msg && <p className="text-xs text-gray-600">{msg}</p>}
     </div>
   );
 }
