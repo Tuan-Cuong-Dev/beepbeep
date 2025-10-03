@@ -7,10 +7,13 @@ import {
 import { Button } from '@/src/components/ui/button';
 import { getLinkStatus, ensureLinkCode, unlinkZalo } from '@/src/lib/zalo/zalo-link';
 import { enqueueNotification } from '@/src/lib/notify';
+import { useTranslation } from 'react-i18next';
 
 type Props = { uid: string; templateId?: string };
 
 export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
+  const { t } = useTranslation('common', { useSuspense: false });
+
   const [loading, setLoading] = useState(false);
   const [zaloId, setZaloId] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
@@ -20,8 +23,8 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
   // đồng hồ 1s cho countdown TTL
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
+    const tmr = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(tmr);
   }, []);
 
   // ---- helpers ----
@@ -39,9 +42,9 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
         setExpiresAtMs(st.expiresAtMs);
       }
     } catch (e: any) {
-      setMsg(e?.message || 'Không tải được trạng thái liên kết');
+      setMsg(t('zalo_link_card.errors.status_failed', 'Không tải được trạng thái liên kết'));
     }
-  }, [uid]);
+  }, [uid, t]);
 
   // tải trạng thái lần đầu
   useEffect(() => {
@@ -84,9 +87,9 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
       setCode(code);
       setExpiresAtMs(expiresAtMs);
       setZaloId(null);
-      setMsg('Đã tạo mã. Mở Zalo, vào OA và gửi: LINK-' + code);
+      setMsg(t('zalo_link_card.messages.create_success', 'Đã tạo mã. Mở Zalo, vào OA và gửi: LINK-{{code}}', { code }));
     } catch (e: any) {
-      setMsg(e?.message || 'Không tạo được mã');
+      setMsg(t('zalo_link_card.errors.create_failed', 'Không tạo được mã'));
     } finally {
       setLoading(false);
     }
@@ -95,7 +98,7 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
   const copyCode = async () => {
     if (!code) return;
     await navigator.clipboard.writeText(`LINK-${code}`);
-    setMsg('Đã copy: LINK-' + code);
+    setMsg(t('zalo_link_card.messages.copy_success', 'Đã copy: LINK-{{code}}', { code }));
   };
 
   const sendTest = async () => {
@@ -106,13 +109,13 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
       await enqueueNotification({
         templateId,
         audience: { type: 'user', uid },
-        data: { name: 'Bạn' },
+        data: { name: t('zalo_link_card.default_name', 'Bạn') },
         requiredChannels: ['zalo', 'inapp'],
         topic: 'demo',
       });
-      setMsg('Đã đưa vào hàng đợi — kiểm tra Zalo & In-app.');
+      setMsg(t('zalo_link_card.messages.enqueue_success', 'Đã đưa vào hàng đợi — kiểm tra Zalo & In-app.'));
     } catch (e: any) {
-      setMsg(e?.message || 'Không gửi được');
+      setMsg(t('zalo_link_card.errors.enqueue_failed', 'Không gửi được'));
     } finally {
       setLoading(false);
     }
@@ -120,7 +123,7 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
 
   const doUnlink = async () => {
     if (!uid) return;
-    if (!confirm('Hủy liên kết Zalo với tài khoản này?')) return;
+    if (!confirm(t('zalo_link_card.confirm.unlink', 'Hủy liên kết Zalo với tài khoản này?'))) return;
     setLoading(true);
     setMsg(null);
     try {
@@ -128,10 +131,10 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
       setZaloId(null);
       setCode(null);
       setExpiresAtMs(undefined);
-      setMsg('Đã hủy liên kết. Tạo mã mới để liên kết lại.');
+      setMsg(t('zalo_link_card.messages.unlink_success', 'Đã hủy liên kết. Tạo mã mới để liên kết lại.'));
       await refreshStatus();
     } catch (e: any) {
-      setMsg(e?.message || 'Không hủy liên kết được');
+      setMsg(t('zalo_link_card.errors.unlink_failed', 'Không hủy liên kết được'));
     } finally {
       setLoading(false);
     }
@@ -140,11 +143,14 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
   const ttlLabel = useMemo(() => {
     if (!expiresAtMs) return '';
     const remain = expiresAtMs - now;
-    if (remain <= 0) return 'Hết hạn — tạo mã mới';
+    if (remain <= 0) return t('zalo_link_card.ttl.expired', 'Hết hạn — tạo mã mới');
     const m = Math.floor(remain / 60000);
     const s = Math.floor((remain % 60000) / 1000);
-    return `Hết hạn sau ${m}m${s.toString().padStart(2, '0')}s`;
-  }, [expiresAtMs, now]);
+    return t('zalo_link_card.ttl.in', 'Hết hạn sau {{m}}m{{s}}s', {
+      m,
+      s: String(s).toString().padStart(2, '0')
+    });
+  }, [expiresAtMs, now, t]);
 
   // ---- sub components ----
   const StatusBadge = ({ linked }: { linked: boolean }) => (
@@ -162,7 +168,9 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
           linked ? 'bg-emerald-500' : 'bg-amber-500',
         ].join(' ')}
       />
-      {linked ? 'ĐÃ LIÊN KẾT' : 'CHƯA LIÊN KẾT'}
+      {linked
+        ? t('zalo_link_card.status.linked', 'ĐÃ LIÊN KẾT')
+        : t('zalo_link_card.status.unlinked', 'CHƯA LIÊN KẾT')}
     </span>
   );
 
@@ -174,8 +182,12 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
           <MessageSquareText className="h-5 w-5 text-sky-600" />
         </div>
         <div className="min-w-0">
-          <h3 className="text-base font-semibold text-slate-800">Zalo</h3>
-          <p className="text-xs text-slate-500">Liên kết tài khoản Zalo với hồ sơ của bạn</p>
+          <h3 className="text-base font-semibold text-slate-800">
+            {t('zalo_link_card.title', 'Zalo')}
+          </h3>
+          <p className="text-xs text-slate-500">
+            {t('zalo_link_card.subtitle', 'Liên kết tài khoản Zalo với hồ sơ của bạn')}
+          </p>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
@@ -184,7 +196,7 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
             variant="ghost"
             size="sm"
             className="ml-1"
-            title="Làm mới"
+            title={t('zalo_link_card.refresh', 'Làm mới')}
             onClick={() => {
               setLoading(true);
               refreshStatus().finally(() => setLoading(false));
@@ -199,7 +211,7 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
       {loading && (
         <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
           <Loader className="h-4 w-4 animate-spin" />
-          <span>Đang xử lý…</span>
+          <span>{t('zalo_link_card.loading', 'Đang xử lý…')}</span>
         </div>
       )}
 
@@ -207,11 +219,13 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
       <div className="mt-4 space-y-4">
         {!zaloId && (
           <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-            <div className="mb-3 text-sm font-medium text-slate-700">Bước 1 · Tạo mã liên kết</div>
+            <div className="mb-3 text-sm font-medium text-slate-700">
+              {t('zalo_link_card.step1_title', 'Bước 1 · Tạo mã liên kết')}
+            </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button onClick={genCode} disabled={loading} className="sm:w-auto">
-                <Link2 className="mr-2 h-4 w-4" /> Tạo mã
+                <Link2 className="mr-2 h-4 w-4" /> {t('zalo_link_card.create_code', 'Tạo mã')}
               </Button>
 
               <div className="flex flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2">
@@ -220,14 +234,16 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
                 </code>
                 <Button variant="ghost" size="sm" onClick={copyCode} disabled={!code}>
                   <Copy className="mr-2 h-4 w-4" />
-                  Copy
+                  {t('zalo_link_card.copy', 'Sao chép')}
                 </Button>
               </div>
             </div>
 
             <p className="mt-2 text-xs text-slate-500">
-              Bước 2 · Mở Zalo → Chat với OA → gửi tin: <b>LINK-{code ?? 'MÃ'}</b>.
-              Webhook sẽ tự map tài khoản. {ttlLabel && <span>({ttlLabel})</span>}
+              {t('zalo_link_card.step2_instruction', 'Bước 2 · Mở Zalo → Chat với OA → gửi tin:')}{" "}
+              <b>{`LINK-${code ?? t('zalo_link_card.placeholder_code', 'MÃ')}`}</b>.{" "}
+              {t('zalo_link_card.webhook_hint', 'Webhook sẽ tự map tài khoản.')}{' '}
+              {ttlLabel && <span>({ttlLabel})</span>}
             </p>
           </div>
         )}
@@ -236,13 +252,15 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Button onClick={sendTest} disabled={loading || !uid} className="sm:w-auto">
             <Send className="mr-2 h-4 w-4" />
-            Gửi thử qua Zalo
+            {t('zalo_link_card.send_test', 'Gửi thử qua Zalo')}
           </Button>
 
           {zaloId && (
             <div className="flex w-full flex-1 items-center gap-2">
               <div className="flex-1 truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                <span className="mr-1 text-slate-500">zaloUserId:</span>
+                <span className="mr-1 text-slate-500">
+                  {t('zalo_link_card.zalo_user_id', 'zaloUserId')}:
+                </span>
                 <b className="font-mono">{zaloId}</b>
               </div>
 
@@ -250,10 +268,10 @@ export default function ZaloLinkCard({ uid, templateId = 'test_zalo' }: Props) {
                 variant="outline"
                 onClick={doUnlink}
                 disabled={loading}
-                title="Hủy liên kết Zalo"
+                title={t('zalo_link_card.unlink', 'Hủy liên kết')}
                 className="border-red-200 text-red-600 hover:bg-red-50"
               >
-                <UnlinkIcon className="mr-2 h-4 w-4" /> Hủy liên kết
+                <UnlinkIcon className="mr-2 h-4 w-4" /> {t('zalo_link_card.unlink', 'Hủy liên kết')}
               </Button>
             </div>
           )}

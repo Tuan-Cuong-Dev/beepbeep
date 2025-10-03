@@ -4644,7 +4644,51 @@
     }
   },
 
-   "use_current_location_label": "현재 위치 사용 (GPS) — Google 지도 링크를 붙여넣을 필요가 없습니다"
+   "use_current_location_label": "현재 위치 사용 (GPS) — Google 지도 링크를 붙여넣을 필요가 없습니다",
+
+"zalo_link_card": {
+    "title": "Zalo",
+    "subtitle": "프로필에 Zalo 계정을 연결하세요",
+    "status": {
+      "linked": "연결됨",
+      "unlinked": "미연결"
+    },
+    "refresh": "새로고침",
+    "loading": "처리 중…",
+
+    "step1_title": "1단계 · 연결 코드 생성",
+    "create_code": "코드 생성",
+    "copy": "복사",
+    "step2_instruction": "2단계 · Zalo를 열고 OA 채팅에서 다음을 전송:",
+    "placeholder_code": "코드",
+    "webhook_hint": "웹훅이 계정을 자동으로 매핑합니다.",
+
+    "send_test": "Zalo로 테스트 보내기",
+    "zalo_user_id": "zaloUserId",
+    "unlink": "연결 해제",
+
+    "ttl": {
+      "expired": "만료됨 — 새 코드를 생성하세요",
+      "in": "{{m}}분 {{s}}초 후 만료"
+    },
+
+    "messages": {
+      "create_success": "코드를 생성했습니다. Zalo를 열고 OA 채팅에 메시지 전송: LINK-{{code}}",
+      "copy_success": "복사됨: LINK-{{code}}",
+      "enqueue_success": "대기열에 추가됨 — Zalo와 인앱을 확인하세요.",
+      "unlink_success": "연결을 해제했습니다. 다시 연결하려면 새 코드를 생성하세요."
+    },
+    "errors": {
+      "status_failed": "연결 상태를 불러오지 못했습니다",
+      "create_failed": "코드를 생성할 수 없습니다",
+      "enqueue_failed": "전송하지 못했습니다",
+      "unlink_failed": "연결 해제에 실패했습니다"
+    },
+    "confirm": {
+      "unlink": "이 계정의 Zalo 연결을 해제할까요?"
+    },
+    "default_name": "사용자"
+  }
 
 
 

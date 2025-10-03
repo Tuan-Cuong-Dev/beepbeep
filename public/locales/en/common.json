@@ -4579,7 +4579,51 @@
     }
   },
 
-   "use_current_location_label": "Use current location (GPS) — no need to paste Google Maps link"
+   "use_current_location_label": "Use current location (GPS) — no need to paste Google Maps link",
+
+   "zalo_link_card": {
+    "title": "Zalo",
+    "subtitle": "Link your Zalo account to your profile",
+    "status": {
+      "linked": "LINKED",
+      "unlinked": "NOT LINKED"
+    },
+    "refresh": "Refresh",
+    "loading": "Processing…",
+
+    "step1_title": "Step 1 · Generate link code",
+    "create_code": "Generate code",
+    "copy": "Copy",
+    "step2_instruction": "Step 2 · Open Zalo → Chat with the OA → send:",
+    "placeholder_code": "CODE",
+    "webhook_hint": "The webhook will map your account automatically.",
+
+    "send_test": "Send test via Zalo",
+    "zalo_user_id": "zaloUserId",
+    "unlink": "Unlink",
+
+    "ttl": {
+      "expired": "Expired — generate a new code",
+      "in": "Expires in {{m}}m{{s}}s"
+    },
+
+    "messages": {
+      "create_success": "Code created. Open Zalo, go to the OA and send: LINK-{{code}}",
+      "copy_success": "Copied: LINK-{{code}}",
+      "enqueue_success": "Queued — check Zalo & In-app.",
+      "unlink_success": "Unlinked. Generate a new code to link again."
+    },
+    "errors": {
+      "status_failed": "Failed to load link status",
+      "create_failed": "Failed to create code",
+      "enqueue_failed": "Failed to send",
+      "unlink_failed": "Failed to unlink"
+    },
+    "confirm": {
+      "unlink": "Unlink Zalo from this account?"
+    },
+    "default_name": "You"
+  }
 
 
 

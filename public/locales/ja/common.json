@@ -4622,7 +4622,51 @@
     }
   },
 
-   "use_current_location_label": "現在地を使用 (GPS) — Google マップのリンクを貼り付ける必要はありません"
+   "use_current_location_label": "現在地を使用 (GPS) — Google マップのリンクを貼り付ける必要はありません",
+
+"zalo_link_card": {
+    "title": "Zalo",
+    "subtitle": "プロフィールにZaloアカウントを連携します",
+    "status": {
+      "linked": "連携済み",
+      "unlinked": "未連携"
+    },
+    "refresh": "更新",
+    "loading": "処理中…",
+
+    "step1_title": "ステップ1 · 連携コードの作成",
+    "create_code": "コードを作成",
+    "copy": "コピー",
+    "step2_instruction": "ステップ2 · Zalo を開き、OA のチャットで次を送信：",
+    "placeholder_code": "コード",
+    "webhook_hint": "Webhook が自動的にアカウントを関連付けます。",
+
+    "send_test": "Zalo にテスト送信",
+    "zalo_user_id": "zaloUserId",
+    "unlink": "連携解除",
+
+    "ttl": {
+      "expired": "期限切れ — 新しいコードを作成してください",
+      "in": "{{m}}分{{s}}秒後に期限切れ"
+    },
+
+    "messages": {
+      "create_success": "コードを作成しました。Zalo を開き、OA のチャットで送信：LINK-{{code}}",
+      "copy_success": "コピーしました: LINK-{{code}}",
+      "enqueue_success": "キューに追加しました — Zalo とアプリ内通知を確認してください。",
+      "unlink_success": "連携を解除しました。再連携するには新しいコードを作成してください。"
+    },
+    "errors": {
+      "status_failed": "連携状態を読み込めませんでした",
+      "create_failed": "コードを作成できませんでした",
+      "enqueue_failed": "送信できませんでした",
+      "unlink_failed": "連携解除に失敗しました"
+    },
+    "confirm": {
+      "unlink": "このアカウントとの Zalo 連携を解除しますか？"
+    },
+    "default_name": "あなた"
+  }
 
 
 

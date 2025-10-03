@@ -4689,6 +4689,50 @@
       "quiet_end": "Kết thúc yên lặng",
       "link_zalo_viber": "Liên kết Zalo/Viber"
     }
+  },
+
+  "zalo_link_card": {
+    "title": "Zalo",
+    "subtitle": "Liên kết tài khoản Zalo với hồ sơ của bạn",
+    "status": {
+      "linked": "ĐÃ LIÊN KẾT",
+      "unlinked": "CHƯA LIÊN KẾT"
+    },
+    "refresh": "Làm mới",
+    "loading": "Đang xử lý…",
+
+    "step1_title": "Bước 1 · Tạo mã liên kết",
+    "create_code": "Tạo mã",
+    "copy": "Sao chép",
+    "step2_instruction": "Bước 2 · Mở Zalo → Chat với OA → gửi tin:",
+    "placeholder_code": "MÃ",
+    "webhook_hint": "Webhook sẽ tự map tài khoản.",
+
+    "send_test": "Gửi thử qua Zalo",
+    "zalo_user_id": "zaloUserId",
+    "unlink": "Hủy liên kết",
+
+    "ttl": {
+      "expired": "Hết hạn — tạo mã mới",
+      "in": "Hết hạn sau {{m}}m{{s}}s"
+    },
+
+    "messages": {
+      "create_success": "Đã tạo mã. Mở Zalo, vào OA và gửi: LINK-{{code}}",
+      "copy_success": "Đã copy: LINK-{{code}}",
+      "enqueue_success": "Đã đưa vào hàng đợi — kiểm tra Zalo & In-app.",
+      "unlink_success": "Đã hủy liên kết. Tạo mã mới để liên kết lại."
+    },
+    "errors": {
+      "status_failed": "Không tải được trạng thái liên kết",
+      "create_failed": "Không tạo được mã",
+      "enqueue_failed": "Không gửi được",
+      "unlink_failed": "Không hủy liên kết được"
+    },
+    "confirm": {
+      "unlink": "Hủy liên kết Zalo với tài khoản này?"
+    },
+    "default_name": "Bạn"
   }
 
   
